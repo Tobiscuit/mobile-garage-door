@@ -5,8 +5,8 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Mobile Garage Door',
-  description: 'Control your garage door from anywhere',
+  title: 'Mobile Garage Solutions - Your Trusted Partner for Garage Doors',
+  description: 'Professional garage door services including repair, installation, and maintenance. Reliable and professional solutions for all your garage door needs.',
 }
 
 export default function RootLayout({
