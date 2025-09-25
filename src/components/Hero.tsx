@@ -11,7 +11,7 @@ const Hero: React.FC = () => {
       <div className="container mx-auto px-6">
         <h2 className="text-5xl font-extrabold mb-4 drop-shadow-lg">Your Trusted Partner for Garage Doors</h2>
         <p className="text-xl mb-8 drop-shadow-md">Reliability and Professionalism, Guaranteed.</p>
-        <a className="btn-primary text-lg px-8 py-3" href="#services">Schedule a Service</a>
+        <a className="btn-primary text-lg px-8 py-3" href="/services">Schedule a Service</a>
       </div>
     </section>
   );

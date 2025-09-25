@@ -49,7 +49,7 @@ const Services: React.FC = () => {
               </div>
               <h3 className="text-2xl font-bold mb-2 text-charcoal-blue">{service.title}</h3>
               <p className="text-steel-gray mb-4">{service.description}</p>
-              <a className="font-bold text-golden-yellow hover:underline" href={service.link}>Learn More →</a>
+              <a className="font-bold text-golden-yellow hover:underline" href="/services">Learn More →</a>
             </div>
           ))}
         </div>
