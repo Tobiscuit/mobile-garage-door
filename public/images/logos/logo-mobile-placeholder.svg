@@ -1,0 +1,13 @@
+<svg width="120" height="40" viewBox="0 0 120 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="120" height="40" rx="6" fill="#f1c40f"/>
+  
+  <!-- Garage Door Icon -->
+  <rect x="8" y="8" width="24" height="24" rx="3" fill="#2c3e50"/>
+  <rect x="12" y="12" width="16" height="16" rx="2" fill="#f1c40f"/>
+  <line x1="20" y1="12" x2="20" y2="28" stroke="#2c3e50" stroke-width="1.5"/>
+  
+  <!-- Text -->
+  <text x="38" y="18" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#2c3e50">Mobile</text>
+  <text x="38" y="32" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#2c3e50">Garage Door</text>
+</svg>
