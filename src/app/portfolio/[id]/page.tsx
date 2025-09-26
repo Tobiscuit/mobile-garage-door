@@ -65,10 +65,10 @@ export default function ProjectDetailPage() {
           <div className="mb-12">
             <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
               <div className="md:col-span-3 rounded-xl overflow-hidden shadow-2xl">
-                <img alt="After: New Garage Door" className="w-full h-full object-cover" src={project.imageAfter} />
+                <div className={`w-full h-64 ${project.imageAfter}`}></div>
               </div>
               <div className="md:col-span-2 rounded-xl overflow-hidden shadow-2xl">
-                <img alt="Before: Old Garage Door" className="w-full h-full object-cover" src={project.imageBefore} />
+                <div className={`w-full h-64 ${project.imageBefore}`}></div>
               </div>
             </div>
             <div className="flex justify-center mt-4 gap-4">

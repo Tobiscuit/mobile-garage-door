@@ -8,37 +8,37 @@ export default function PortfolioPage() {
     {
       id: "suburban-residence-new-garage-door-installation",
       title: "Suburban Residence - New Garage Door",
-      image: "https://lh3.googleusercontent.com/aida-public/AB6AXuD3lFDiq7MVbCkgVW462HtlIVp734-hCGGjQVJAqZDl6pJXprOuSRzbAliMIHBh4Qn-2b0SAxIDdevn5jxoHQZ8AjiUHKvsWLOb8qynXsdovOjI_oPkN2mp1tEbQlu3qMiBRm5mniVI6gAYZ8oFkf0JpTpDAHW-E4HbS7goIkH8ZgsXgC57z1RLV0PgqyhIeRCY0C3G-wTdSV-fp1RoK4fEpLwSwmjvf5PFr8fLjET7cyc1K_43DGhney2NBlTx5sK2qPWH7zaaEaA0",
+      image: "garage-pattern-modern",
       description: "Complete garage door replacement with modern design and enhanced security features."
     },
     {
       id: "modern-aluminum-door-installation",
       title: "Modern Aluminum Door",
-      image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=300&fit=crop",
+      image: "garage-pattern-modern",
       description: "Sleek aluminum design with horizontal ribbing for a contemporary look."
     },
     {
       id: "classic-wooden-door-replacement",
       title: "Classic Wooden Door",
-      image: "https://images.unsplash.com/photo-1581578731548-c5a0c4c7c0d4?w=400&h=300&fit=crop",
+      image: "garage-pattern-wooden",
       description: "Traditional wooden construction with horizontal planks and natural finish."
     },
     {
       id: "custom-glass-panel-door-installation",
       title: "Custom Glass Panel Door",
-      image: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=400&h=300&fit=crop",
+      image: "garage-pattern-glass",
       description: "Modern glass panels with black frames for maximum light and style."
     },
     {
       id: "sectional-steel-door-upgrade",
       title: "Sectional Steel Door",
-      image: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=400&h=300&fit=crop",
+      image: "garage-pattern-steel",
       description: "Durable steel construction with excellent insulation properties."
     },
     {
       id: "carriage-house-door-installation",
       title: "Carriage House Door",
-      image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=300&fit=crop",
+      image: "garage-pattern-carriage",
       description: "Traditional carriage house design with modern functionality."
     }
   ];
@@ -62,11 +62,7 @@ export default function PortfolioPage() {
               <Link key={item.id} href={`/portfolio/${item.id}`} className="group">
                 <div className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
                   <div className="aspect-w-4 aspect-h-3">
-                    <img
-                      src={item.image}
-                      alt={item.title}
-                      className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
+                    <div className={`w-full h-64 ${item.image} group-hover:scale-105 transition-transform duration-300`}></div>
                   </div>
                   <div className="p-6">
                     <h3 className="text-xl font-bold text-charcoal-blue mb-2 group-hover:text-golden-yellow transition-colors">{item.title}</h3>

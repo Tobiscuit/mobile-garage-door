@@ -67,3 +67,211 @@ body {
 .accordion-button.active .accordion-icon {
   transform: rotate(45deg);
 }
+
+/* Garage Door CSS Patterns */
+.garage-pattern-modern {
+  background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.garage-pattern-modern::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent,
+    transparent 8px,
+    rgba(241, 196, 15, 0.1) 8px,
+    rgba(241, 196, 15, 0.1) 16px
+  );
+}
+
+.garage-pattern-modern::after {
+  content: '';
+  position: absolute;
+  top: 20%;
+  left: 10%;
+  right: 10%;
+  bottom: 20%;
+  border: 2px solid rgba(241, 196, 15, 0.3);
+  border-radius: 8px;
+}
+
+.garage-pattern-wooden {
+  background: linear-gradient(135deg, #8b4513 0%, #a0522d 50%, #8b4513 100%);
+  position: relative;
+}
+
+.garage-pattern-wooden::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 20px,
+    rgba(139, 69, 19, 0.3) 20px,
+    rgba(139, 69, 19, 0.3) 22px
+  );
+}
+
+.garage-pattern-wooden::after {
+  content: '';
+  position: absolute;
+  top: 15%;
+  left: 5%;
+  right: 5%;
+  bottom: 15%;
+  border: 3px solid rgba(160, 82, 45, 0.4);
+  border-radius: 4px;
+}
+
+.garage-pattern-glass {
+  background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);
+  position: relative;
+}
+
+.garage-pattern-glass::before {
+  content: '';
+  position: absolute;
+  top: 10%;
+  left: 10%;
+  right: 10%;
+  bottom: 10%;
+  background: linear-gradient(45deg, 
+    rgba(241, 196, 15, 0.1) 25%, 
+    transparent 25%, 
+    transparent 75%, 
+    rgba(241, 196, 15, 0.1) 75%),
+    linear-gradient(45deg, 
+    rgba(241, 196, 15, 0.1) 25%, 
+    transparent 25%, 
+    transparent 75%, 
+    rgba(241, 196, 15, 0.1) 75%);
+  background-size: 40px 40px;
+  background-position: 0 0, 20px 20px;
+}
+
+.garage-pattern-glass::after {
+  content: '';
+  position: absolute;
+  top: 20%;
+  left: 20%;
+  right: 20%;
+  bottom: 20%;
+  border: 2px solid rgba(241, 196, 15, 0.4);
+  border-radius: 12px;
+  box-shadow: inset 0 0 20px rgba(241, 196, 15, 0.1);
+}
+
+.garage-pattern-steel {
+  background: linear-gradient(135deg, #7f8c8d 0%, #95a5a6 100%);
+  position: relative;
+}
+
+.garage-pattern-steel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent,
+    transparent 6px,
+    rgba(44, 62, 80, 0.1) 6px,
+    rgba(44, 62, 80, 0.1) 12px
+  );
+}
+
+.garage-pattern-steel::after {
+  content: '';
+  position: absolute;
+  top: 25%;
+  left: 15%;
+  right: 15%;
+  bottom: 25%;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(44, 62, 80, 0.2) 0px,
+    rgba(44, 62, 80, 0.2) 2px,
+    transparent 2px,
+    transparent 8px
+  );
+}
+
+.garage-pattern-carriage {
+  background: linear-gradient(135deg, #8b4513 0%, #a0522d 50%, #cd853f 100%);
+  position: relative;
+}
+
+.garage-pattern-carriage::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 25px,
+    rgba(205, 133, 63, 0.2) 25px,
+    rgba(205, 133, 63, 0.2) 27px
+  );
+}
+
+.garage-pattern-carriage::after {
+  content: '';
+  position: absolute;
+  top: 10%;
+  left: 10%;
+  right: 10%;
+  bottom: 10%;
+  border: 4px solid rgba(160, 82, 45, 0.5);
+  border-radius: 8px;
+  box-shadow: 
+    inset 0 0 0 2px rgba(241, 196, 15, 0.2),
+    0 0 20px rgba(139, 69, 19, 0.3);
+}
+
+.garage-pattern-contemporary {
+  background: linear-gradient(135deg, #2c3e50 0%, #34495e 50%, #2c3e50 100%);
+  position: relative;
+}
+
+.garage-pattern-contemporary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 25% 25%, rgba(241, 196, 15, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 75% 75%, rgba(241, 196, 15, 0.1) 0%, transparent 50%);
+}
+
+.garage-pattern-contemporary::after {
+  content: '';
+  position: absolute;
+  top: 15%;
+  left: 15%;
+  right: 15%;
+  bottom: 15%;
+  border: 1px solid rgba(241, 196, 15, 0.3);
+  border-radius: 16px;
+  background: linear-gradient(45deg, 
+    rgba(241, 196, 15, 0.05) 0%, 
+    transparent 50%, 
+    rgba(241, 196, 15, 0.05) 100%);
+}
