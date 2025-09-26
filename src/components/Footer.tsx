@@ -37,7 +37,7 @@ const Footer: React.FC = () => {
         </div>
         
         <div className="text-center mt-4">
-          <p className="text-steel-gray text-sm">© 2024 Mobile Garage Solutions. All rights reserved.</p>
+          <p className="text-steel-gray text-sm">© 2025 Mobile Garage Solutions. All rights reserved.</p>
         </div>
       </div>
     </footer>
