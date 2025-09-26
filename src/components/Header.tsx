@@ -17,7 +17,7 @@ const Header: React.FC = () => {
           {/* Desktop Logo */}
           <div className="hidden md:block">
             <Image
-              src="/images/logos/logo-placeholder.svg"
+              src="/images/logos/logo-desktop.svg"
               alt="Mobile Garage Door"
               width={200}
               height={60}
@@ -29,7 +29,7 @@ const Header: React.FC = () => {
           {/* Mobile Logo */}
           <div className="block md:hidden">
             <Image
-              src="/images/logos/logo-mobile-placeholder.svg"
+              src="/images/logos/logo-mobile.svg"
               alt="Mobile Garage Door"
               width={120}
               height={40}
