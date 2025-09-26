@@ -6,7 +6,7 @@ const Footer: React.FC = () => {
       <div className="container mx-auto py-8 px-6">
         <div className="flex flex-col md:flex-row justify-between items-center">
           <div className="mb-4 md:mb-0">
-            <h3 className="text-xl font-bold">Mobile Garage Solutions</h3>
+            <h3 className="text-xl font-bold">Mobile Garage Door</h3>
             <p className="text-steel-gray">Your reliable partner for garage door services.</p>
           </div>
           
@@ -37,7 +37,7 @@ const Footer: React.FC = () => {
         </div>
         
         <div className="text-center mt-4">
-          <p className="text-steel-gray text-sm">© 2025 Mobile Garage Solutions. All rights reserved.</p>
+          <p className="text-steel-gray text-sm">© 2025 Mobile Garage Door. All rights reserved.</p>
         </div>
       </div>
     </footer>

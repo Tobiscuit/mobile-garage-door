@@ -5,7 +5,7 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Mobile Garage Solutions - Your Trusted Partner for Garage Doors',
+  title: 'Mobile Garage Door - Your Trusted Partner for Garage Doors',
   description: 'Professional garage door services including repair, installation, and maintenance. Reliable and professional solutions for all your garage door needs.',
 }
 
