@@ -9,37 +9,37 @@ export default function PortfolioPage() {
       id: "suburban-residence-new-garage-door-installation",
       title: "Suburban Residence - New Garage Door",
       image: "garage-pattern-modern",
-      description: "Complete garage door replacement with modern design and enhanced security features."
+      description: "Complete garage door replacement with modern design, enhanced security features, and improved energy efficiency for suburban homes."
     },
     {
       id: "modern-aluminum-door-installation",
       title: "Modern Aluminum Door",
       image: "garage-pattern-modern",
-      description: "Sleek aluminum design with horizontal ribbing for a contemporary look."
+      description: "Sleek aluminum construction with horizontal ribbing patterns, offering durability and contemporary aesthetic appeal."
     },
     {
       id: "classic-wooden-door-replacement",
       title: "Classic Wooden Door",
       image: "garage-pattern-wooden",
-      description: "Traditional wooden construction with horizontal planks and natural finish."
+      description: "Traditional wooden construction featuring horizontal planks, natural wood finish, and classic architectural charm."
     },
     {
       id: "custom-glass-panel-door-installation",
       title: "Custom Glass Panel Door",
       image: "garage-pattern-glass",
-      description: "Modern glass panels with black frames for maximum light and style."
+      description: "Modern glass panel design with sleek black frames, maximizing natural light and creating striking visual impact."
     },
     {
       id: "sectional-steel-door-upgrade",
       title: "Sectional Steel Door",
       image: "garage-pattern-steel",
-      description: "Durable steel construction with excellent insulation properties."
+      description: "Heavy-duty steel construction featuring excellent insulation properties and superior security for commercial applications."
     },
     {
       id: "carriage-house-door-installation",
       title: "Carriage House Door",
       image: "garage-pattern-carriage",
-      description: "Traditional carriage house design with modern functionality."
+      description: "Traditional carriage house aesthetic combined with modern overhead functionality and decorative hardware elements."
     }
   ];
 
@@ -60,13 +60,23 @@ export default function PortfolioPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {portfolioItems.map((item) => (
               <Link key={item.id} href={`/portfolio/${item.id}`} className="group">
-                <div className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
+                <div className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 h-full flex flex-col">
                   <div className="aspect-w-4 aspect-h-3">
                     <div className={`w-full h-64 ${item.image} group-hover:scale-105 transition-transform duration-300`}></div>
                   </div>
-                  <div className="p-6">
-                    <h3 className="text-xl font-bold text-charcoal-blue mb-2 group-hover:text-golden-yellow transition-colors">{item.title}</h3>
-                    <p className="text-dark-charcoal text-sm">{item.description}</p>
+                  <div className="p-6 flex flex-col flex-grow">
+                    <h3 className="text-xl font-bold text-charcoal-blue mb-3 group-hover:text-golden-yellow transition-colors" style={{
+                      display: '-webkit-box',
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: 'vertical',
+                      overflow: 'hidden'
+                    }}>{item.title}</h3>
+                    <p className="text-dark-charcoal text-sm flex-grow" style={{
+                      display: '-webkit-box',
+                      WebkitLineClamp: 3,
+                      WebkitBoxOrient: 'vertical',
+                      overflow: 'hidden'
+                    }}>{item.description}</p>
                   </div>
                 </div>
               </Link>
