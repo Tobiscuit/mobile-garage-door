@@ -104,7 +104,7 @@ export default function ServicesPage() {
               We provide transparent pricing and detailed estimates. Contact us today to discuss your garage door needs with one of our friendly experts.
             </p>
             <a 
-              className="btn-primary inline-block min-w-[200px] rounded-md h-14 px-8 text-lg font-bold tracking-wide transition-all duration-300 transform hover:scale-105 leading-[3.5rem]" 
+              className="bg-golden-yellow text-charcoal-blue font-bold py-3 px-8 rounded-lg transition-transform transform hover:scale-105 hover:bg-[#d4ac0d] inline-block text-lg" 
               href="/contact"
             >
               Contact Us Now
