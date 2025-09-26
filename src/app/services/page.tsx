@@ -105,7 +105,7 @@ export default function ServicesPage() {
             </p>
             <a 
               className="btn-primary inline-block min-w-[200px] rounded-md h-14 px-8 text-lg font-bold tracking-wide transition-all duration-300 transform hover:scale-105 leading-[3.5rem]" 
-              href="#contact"
+              href="/contact"
             >
               Contact Us Now
             </a>

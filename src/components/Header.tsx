@@ -14,8 +14,8 @@ const Header: React.FC = () => {
           <a className="text-charcoal-blue hover:text-golden-yellow transition-colors" href="/">Home</a>
           <a className="text-charcoal-blue hover:text-golden-yellow transition-colors" href="/services">Services</a>
           <a className="text-charcoal-blue hover:text-golden-yellow transition-colors" href="#about">About Us</a>
-          <a className="text-charcoal-blue hover:text-golden-yellow transition-colors" href="#contact">Contact</a>
-          <a className="btn-primary" href="#quote">Get a Quote</a>
+          <a className="text-charcoal-blue hover:text-golden-yellow transition-colors" href="/contact">Contact</a>
+          <a className="btn-primary" href="/contact">Get a Quote</a>
         </nav>
         <button className="md:hidden">
           <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">

@@ -12,6 +12,8 @@ module.exports = {
         'cloudy-white': '#f7f9fb',
         'steel-gray': '#7f8c8d',
         'golden-yellow': '#f1c40f',
+        'dark-charcoal': '#34495e',
+        'light-gray': '#bdc3c7',
       },
       fontFamily: {
         'work-sans': ['Work Sans', 'sans-serif'],

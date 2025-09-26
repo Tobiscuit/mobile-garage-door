@@ -8,6 +8,8 @@
   --cloudy-white: #f7f9fb;
   --steel-gray: #7f8c8d;
   --golden-yellow: #f1c40f;
+  --dark-charcoal: #34495e;
+  --light-gray: #bdc3c7;
 }
 
 body {
@@ -38,4 +40,30 @@ body {
 
 .btn-primary:hover {
   background-color: #e0b40e;
+}
+
+.text-dark-charcoal {
+  color: var(--dark-charcoal);
+}
+
+.border-light-gray {
+  border-color: var(--light-gray);
+}
+
+.hover-bg-golden-yellow-dark:hover {
+  background-color: #d4ac0d;
+}
+
+.focus-ring-golden-yellow:focus {
+  --tw-ring-color: var(--golden-yellow);
+}
+
+.accordion-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease-out;
+}
+
+.accordion-button.active .accordion-icon {
+  transform: rotate(45deg);
 }
