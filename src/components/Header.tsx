@@ -1,7 +1,6 @@
 'use client'
 
 import React, { useState } from 'react';
-import Image from 'next/image';
 
 const Header: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -14,32 +13,10 @@ const Header: React.FC = () => {
     <header className="bg-cloudy-white shadow-md">
       <div className="container mx-auto flex items-center justify-between px-6 py-4">
         <a href="/" className="flex items-center gap-3 text-charcoal-blue">
-          {/* Desktop Logo */}
-          <div className="hidden md:block">
-            <Image
-              src="/images/logos/logo-desktop.svg"
-              alt="Mobile Garage Door"
-              width={200}
-              height={60}
-              className="h-12 w-auto"
-              priority
-            />
-          </div>
-          
-          {/* Mobile Logo */}
-          <div className="block md:hidden">
-            <Image
-              src="/images/logos/logo-mobile.svg"
-              alt="Mobile Garage Door"
-              width={120}
-              height={40}
-              className="h-10 w-auto"
-              priority
-            />
-          </div>
-          
-          {/* Fallback Text Logo (if images don't exist) */}
-          <h1 className="text-2xl font-bold tracking-tight md:hidden">Mobile Garage Door</h1>
+          <svg className="h-8 w-8 text-golden-yellow" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path>
+          </svg>
+          <h1 className="text-2xl font-bold tracking-tight">Mobile Garage Door</h1>
         </a>
         <nav className="hidden md:flex items-center gap-8">
           <a className="text-charcoal-blue hover:text-golden-yellow transition-colors" href="/">Home</a>
