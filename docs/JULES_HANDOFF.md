@@ -42,11 +42,11 @@ graph TD
     Hono --> VectorDB
     
     %% Hybrid AI Flow
-    WebGPU -.->|Load Weights| Hono
-    Hono -.->|Fallback Inference| ServerAI
+    WebGPU -.->|Load Lite Weights (~50MB)| Hono
+    Hono -.->|Fallback/Mobile Inference| ServerAI
 ```
 
-### Inference Flow (Hybrid AI)
+### Inference Flow (Hybrid AI with Smart Loading)
 
 ```mermaid
 sequenceDiagram
@@ -54,16 +54,17 @@ sequenceDiagram
     participant WebGPU as Nano Banana 2 (WebGPU)
     participant API as Hono API (Node.js v25)
     
-    User->>User: Check navigator.gpu
-    alt WebGPU Available
-        User->>API: GET /model/weights
+    User->>User: Check Connection (Wi-Fi vs 5G)
+    
+    alt Wi-Fi + High-End GPU
+        User->>API: GET /model/weights (Lite Version ~50MB)
         API-->>User: Stream Quantized Weights
         User->>WebGPU: Load Model
         User->>WebGPU: Run Inference (Zero Latency)
         WebGPU-->>User: Result (In-Browser)
-    else Legacy Device
+    else Mobile Data or Legacy Device
         User->>API: POST /visualize (Image)
-        API->>API: Run Server-Side Inference
+        API->>API: Run Server-Side Inference (Pro Model)
         API-->>User: JSON Result
     end
 ```
