@@ -15,6 +15,13 @@ Build the **Universal Garage Door Index**, a high-performance API that serves ga
     *   **Primary:** WebGPU (Client-side) for zero-latency.
     *   **Fallback:** Server-side inference via Hono for legacy devices.
 
+### Design Rationale
+> [!NOTE]
+> **Why Hybrid AI?**
+> We assume most users evaluating a garage door are **at home**, connected to **Wi-Fi**.
+> *   **Wi-Fi Context:** Downloading a 50MB model is acceptable and provides a superior, zero-latency experience (WebGPU).
+> *   **Cellular Fallback:** For users on the go (or without high-end devices), we protect their data plan by defaulting to Server-Side inference.
+
 ### System Architecture
 
 ```mermaid
