@@ -1,7 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;700;900&display=swap');
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 :root {
   --charcoal-blue: #2c3e50;
@@ -35,12 +33,19 @@ body {
 }
 
 .btn-primary {
-  @apply bg-[var(--golden-yellow)] text-[var(--charcoal-blue)] font-bold py-2 px-4 rounded-lg transition-transform transform hover:scale-105;
+  background-color: var(--golden-yellow);
+  color: var(--charcoal-blue);
+  font-weight: 700;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  transition: transform 150ms;
 }
 
 .btn-primary:hover {
   background-color: #e0b40e;
+  transform: scale(1.05);
 }
+
 
 .text-dark-charcoal {
   color: var(--dark-charcoal);
@@ -82,13 +87,11 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
-  background: repeating-linear-gradient(
-    90deg,
-    transparent,
-    transparent 8px,
-    rgba(241, 196, 15, 0.1) 8px,
-    rgba(241, 196, 15, 0.1) 16px
-  );
+  background: repeating-linear-gradient(90deg,
+      transparent,
+      transparent 8px,
+      rgba(241, 196, 15, 0.1) 8px,
+      rgba(241, 196, 15, 0.1) 16px);
 }
 
 .garage-pattern-modern::after {
@@ -114,13 +117,11 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
-  background: repeating-linear-gradient(
-    0deg,
-    transparent,
-    transparent 20px,
-    rgba(139, 69, 19, 0.3) 20px,
-    rgba(139, 69, 19, 0.3) 22px
-  );
+  background: repeating-linear-gradient(0deg,
+      transparent,
+      transparent 20px,
+      rgba(139, 69, 19, 0.3) 20px,
+      rgba(139, 69, 19, 0.3) 22px);
 }
 
 .garage-pattern-wooden::after {
@@ -146,16 +147,16 @@ body {
   left: 10%;
   right: 10%;
   bottom: 10%;
-  background: linear-gradient(45deg, 
-    rgba(241, 196, 15, 0.1) 25%, 
-    transparent 25%, 
-    transparent 75%, 
-    rgba(241, 196, 15, 0.1) 75%),
-    linear-gradient(45deg, 
-    rgba(241, 196, 15, 0.1) 25%, 
-    transparent 25%, 
-    transparent 75%, 
-    rgba(241, 196, 15, 0.1) 75%);
+  background: linear-gradient(45deg,
+      rgba(241, 196, 15, 0.1) 25%,
+      transparent 25%,
+      transparent 75%,
+      rgba(241, 196, 15, 0.1) 75%),
+    linear-gradient(45deg,
+      rgba(241, 196, 15, 0.1) 25%,
+      transparent 25%,
+      transparent 75%,
+      rgba(241, 196, 15, 0.1) 75%);
   background-size: 40px 40px;
   background-position: 0 0, 20px 20px;
 }
@@ -184,13 +185,11 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
-  background: repeating-linear-gradient(
-    90deg,
-    transparent,
-    transparent 6px,
-    rgba(44, 62, 80, 0.1) 6px,
-    rgba(44, 62, 80, 0.1) 12px
-  );
+  background: repeating-linear-gradient(90deg,
+      transparent,
+      transparent 6px,
+      rgba(44, 62, 80, 0.1) 6px,
+      rgba(44, 62, 80, 0.1) 12px);
 }
 
 .garage-pattern-steel::after {
@@ -200,13 +199,11 @@ body {
   left: 15%;
   right: 15%;
   bottom: 25%;
-  background: repeating-linear-gradient(
-    0deg,
-    rgba(44, 62, 80, 0.2) 0px,
-    rgba(44, 62, 80, 0.2) 2px,
-    transparent 2px,
-    transparent 8px
-  );
+  background: repeating-linear-gradient(0deg,
+      rgba(44, 62, 80, 0.2) 0px,
+      rgba(44, 62, 80, 0.2) 2px,
+      transparent 2px,
+      transparent 8px);
 }
 
 .garage-pattern-carriage {
@@ -221,13 +218,11 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
-  background: repeating-linear-gradient(
-    0deg,
-    transparent,
-    transparent 25px,
-    rgba(205, 133, 63, 0.2) 25px,
-    rgba(205, 133, 63, 0.2) 27px
-  );
+  background: repeating-linear-gradient(0deg,
+      transparent,
+      transparent 25px,
+      rgba(205, 133, 63, 0.2) 25px,
+      rgba(205, 133, 63, 0.2) 27px);
 }
 
 .garage-pattern-carriage::after {
@@ -239,7 +234,7 @@ body {
   bottom: 10%;
   border: 4px solid rgba(160, 82, 45, 0.5);
   border-radius: 8px;
-  box-shadow: 
+  box-shadow:
     inset 0 0 0 2px rgba(241, 196, 15, 0.2),
     0 0 20px rgba(139, 69, 19, 0.3);
 }
@@ -256,7 +251,7 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
-  background: 
+  background:
     radial-gradient(circle at 25% 25%, rgba(241, 196, 15, 0.1) 0%, transparent 50%),
     radial-gradient(circle at 75% 75%, rgba(241, 196, 15, 0.1) 0%, transparent 50%);
 }
@@ -270,8 +265,8 @@ body {
   bottom: 15%;
   border: 1px solid rgba(241, 196, 15, 0.3);
   border-radius: 16px;
-  background: linear-gradient(45deg, 
-    rgba(241, 196, 15, 0.05) 0%, 
-    transparent 50%, 
-    rgba(241, 196, 15, 0.05) 100%);
+  background: linear-gradient(45deg,
+      rgba(241, 196, 15, 0.05) 0%,
+      transparent 50%,
+      rgba(241, 196, 15, 0.05) 100%);
 }

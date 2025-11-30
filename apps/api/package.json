@@ -1,0 +1,17 @@
+{
+    "name": "@mobile-garage-door/api",
+    "version": "0.0.1",
+    "scripts": {
+        "dev": "tsx watch src/index.ts",
+        "build": "tsc"
+    },
+    "dependencies": {
+        "@hono/node-server": "^1.19.6",
+        "hono": "^4.0.0"
+    },
+    "devDependencies": {
+        "@types/node": "^24.10.1",
+        "tsx": "^4.7.0",
+        "typescript": "^5.9.3"
+    }
+}
