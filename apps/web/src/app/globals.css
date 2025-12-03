@@ -1,272 +1,78 @@
-@import url('https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;700;900&display=swap');
 @import "tailwindcss";
 
-:root {
-  --charcoal-blue: #2c3e50;
-  --cloudy-white: #f7f9fb;
-  --steel-gray: #7f8c8d;
-  --golden-yellow: #f1c40f;
-  --dark-charcoal: #34495e;
-  --light-gray: #bdc3c7;
+@theme {
+  --color-charcoal-deep: #0f172a;
+  --color-charcoal-surface: #1e293b;
+  --color-tech-cyan: #06b6d4;
+  --color-steel-light: #94a3b8;
+  --color-brand-yellow: #f1c40f;
+  --color-brand-yellow-dark: #f39c12;
+
+  --font-heading: var(--font-outfit), sans-serif;
+  --font-sans: var(--font-inter), sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  --image-molten-gradient: linear-gradient(135deg, #f1c40f 0%, #f39c12 100%);
+  --image-dark-overlay: linear-gradient(to top, #0f172a, rgba(15, 23, 42, 0.5), transparent);
+
+  --shadow-brand-glow: 0 0 20px rgba(241, 196, 15, 0.4);
+  --shadow-neon-cyan: 0 0 10px rgba(6, 182, 212, 0.5);
 }
 
+/* Glass Forge Card */
+.card-forge {
+  @apply bg-slate-900/60 backdrop-blur-md border border-white/10 rounded-xl transition-all duration-300 ease-in-out;
+}
+.card-forge:hover {
+  @apply border-brand-yellow/50 shadow-[0_0_30px_rgba(241,196,15,0.1)] -translate-y-0.5;
+}
+
+/* Molten Button */
+.btn-molten {
+  @apply relative overflow-hidden bg-brand-yellow text-slate-950 font-bold px-8 py-3 rounded-lg transition-transform duration-150;
+  background: linear-gradient(135deg, #f1c40f 0%, #f39c12 100%);
+}
+.btn-molten::after {
+  content: '';
+  @apply absolute inset-0 bg-white/20 opacity-0 transition-opacity duration-300;
+}
+.btn-molten:hover {
+  @apply scale-105;
+}
+.btn-molten:hover::after {
+  @apply opacity-100;
+}
+
+/* Holographic Input */
+.input-holo {
+  @apply bg-slate-950/50 border border-tech-cyan/30 text-white px-4 py-3 rounded-lg w-full;
+  @apply focus:border-tech-cyan focus:ring-1 focus:ring-tech-cyan/50 focus:outline-none transition-colors duration-200;
+}
+
+/* Body defaults */
 body {
-  font-family: 'Work Sans', sans-serif;
-  background-color: var(--cloudy-white);
-  color: var(--charcoal-blue);
+  @apply bg-charcoal-deep text-white font-sans;
+}
+h1, h2, h3, h4, h5, h6 {
+  @apply font-heading;
 }
 
-.bg-primary {
-  background-color: var(--golden-yellow);
-}
-
-.text-primary {
-  color: var(--charcoal-blue);
-}
-
-.text-secondary {
-  color: var(--steel-gray);
-}
-
-.bg-background {
-  background-color: var(--cloudy-white);
-}
-
-.btn-primary {
-  background-color: var(--golden-yellow);
-  color: var(--charcoal-blue);
-  font-weight: 700;
-  padding: 0.5rem 1rem;
-  border-radius: 0.5rem;
-  transition: transform 150ms;
-}
-
-.btn-primary:hover {
-  background-color: #e0b40e;
-  transform: scale(1.05);
-}
-
-
-.text-dark-charcoal {
-  color: var(--dark-charcoal);
-}
-
-.border-light-gray {
-  border-color: var(--light-gray);
-}
-
-.hover-bg-golden-yellow-dark:hover {
-  background-color: #d4ac0d;
-}
-
-.focus-ring-golden-yellow:focus {
-  --tw-ring-color: var(--golden-yellow);
-}
-
-.accordion-content {
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.3s ease-out;
-}
-
-.accordion-button.active .accordion-icon {
-  transform: rotate(45deg);
-}
-
-/* Garage Door CSS Patterns */
+/* Garage Door CSS Patterns (Retained/Updated) */
 .garage-pattern-modern {
   background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
   position: relative;
   overflow: hidden;
 }
-
 .garage-pattern-modern::before {
   content: '';
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: repeating-linear-gradient(90deg,
-      transparent,
-      transparent 8px,
-      rgba(241, 196, 15, 0.1) 8px,
-      rgba(241, 196, 15, 0.1) 16px);
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: repeating-linear-gradient(90deg, transparent, transparent 8px, rgba(241, 196, 15, 0.1) 8px, rgba(241, 196, 15, 0.1) 16px);
 }
-
 .garage-pattern-modern::after {
   content: '';
   position: absolute;
-  top: 20%;
-  left: 10%;
-  right: 10%;
-  bottom: 20%;
+  top: 20%; left: 10%; right: 10%; bottom: 20%;
   border: 2px solid rgba(241, 196, 15, 0.3);
   border-radius: 8px;
-}
-
-.garage-pattern-wooden {
-  background: linear-gradient(135deg, #8b4513 0%, #a0522d 50%, #8b4513 100%);
-  position: relative;
-}
-
-.garage-pattern-wooden::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: repeating-linear-gradient(0deg,
-      transparent,
-      transparent 20px,
-      rgba(139, 69, 19, 0.3) 20px,
-      rgba(139, 69, 19, 0.3) 22px);
-}
-
-.garage-pattern-wooden::after {
-  content: '';
-  position: absolute;
-  top: 15%;
-  left: 5%;
-  right: 5%;
-  bottom: 15%;
-  border: 3px solid rgba(160, 82, 45, 0.4);
-  border-radius: 4px;
-}
-
-.garage-pattern-glass {
-  background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);
-  position: relative;
-}
-
-.garage-pattern-glass::before {
-  content: '';
-  position: absolute;
-  top: 10%;
-  left: 10%;
-  right: 10%;
-  bottom: 10%;
-  background: linear-gradient(45deg,
-      rgba(241, 196, 15, 0.1) 25%,
-      transparent 25%,
-      transparent 75%,
-      rgba(241, 196, 15, 0.1) 75%),
-    linear-gradient(45deg,
-      rgba(241, 196, 15, 0.1) 25%,
-      transparent 25%,
-      transparent 75%,
-      rgba(241, 196, 15, 0.1) 75%);
-  background-size: 40px 40px;
-  background-position: 0 0, 20px 20px;
-}
-
-.garage-pattern-glass::after {
-  content: '';
-  position: absolute;
-  top: 20%;
-  left: 20%;
-  right: 20%;
-  bottom: 20%;
-  border: 2px solid rgba(241, 196, 15, 0.4);
-  border-radius: 12px;
-  box-shadow: inset 0 0 20px rgba(241, 196, 15, 0.1);
-}
-
-.garage-pattern-steel {
-  background: linear-gradient(135deg, #7f8c8d 0%, #95a5a6 100%);
-  position: relative;
-}
-
-.garage-pattern-steel::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: repeating-linear-gradient(90deg,
-      transparent,
-      transparent 6px,
-      rgba(44, 62, 80, 0.1) 6px,
-      rgba(44, 62, 80, 0.1) 12px);
-}
-
-.garage-pattern-steel::after {
-  content: '';
-  position: absolute;
-  top: 25%;
-  left: 15%;
-  right: 15%;
-  bottom: 25%;
-  background: repeating-linear-gradient(0deg,
-      rgba(44, 62, 80, 0.2) 0px,
-      rgba(44, 62, 80, 0.2) 2px,
-      transparent 2px,
-      transparent 8px);
-}
-
-.garage-pattern-carriage {
-  background: linear-gradient(135deg, #8b4513 0%, #a0522d 50%, #cd853f 100%);
-  position: relative;
-}
-
-.garage-pattern-carriage::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: repeating-linear-gradient(0deg,
-      transparent,
-      transparent 25px,
-      rgba(205, 133, 63, 0.2) 25px,
-      rgba(205, 133, 63, 0.2) 27px);
-}
-
-.garage-pattern-carriage::after {
-  content: '';
-  position: absolute;
-  top: 10%;
-  left: 10%;
-  right: 10%;
-  bottom: 10%;
-  border: 4px solid rgba(160, 82, 45, 0.5);
-  border-radius: 8px;
-  box-shadow:
-    inset 0 0 0 2px rgba(241, 196, 15, 0.2),
-    0 0 20px rgba(139, 69, 19, 0.3);
-}
-
-.garage-pattern-contemporary {
-  background: linear-gradient(135deg, #2c3e50 0%, #34495e 50%, #2c3e50 100%);
-  position: relative;
-}
-
-.garage-pattern-contemporary::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background:
-    radial-gradient(circle at 25% 25%, rgba(241, 196, 15, 0.1) 0%, transparent 50%),
-    radial-gradient(circle at 75% 75%, rgba(241, 196, 15, 0.1) 0%, transparent 50%);
-}
-
-.garage-pattern-contemporary::after {
-  content: '';
-  position: absolute;
-  top: 15%;
-  left: 15%;
-  right: 15%;
-  bottom: 15%;
-  border: 1px solid rgba(241, 196, 15, 0.3);
-  border-radius: 16px;
-  background: linear-gradient(45deg,
-      rgba(241, 196, 15, 0.05) 0%,
-      transparent 50%,
-      rgba(241, 196, 15, 0.05) 100%);
 }
