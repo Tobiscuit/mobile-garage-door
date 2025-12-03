@@ -1,14 +1,24 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import { Outfit, Inter } from 'next/font/google'
 import './globals.css'
 
-const inter = Inter({ subsets: ['latin'] })
+const outfit = Outfit({
+  subsets: ['latin'],
+  variable: '--font-outfit',
+  display: 'swap',
+})
+
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-inter',
+  display: 'swap',
+})
 
 export const metadata: Metadata = {
-  title: 'Mobile Garage Door - Your Trusted Partner for Garage Doors',
-  description: 'Professional garage door services including repair, installation, and maintenance. Reliable and professional solutions for all your garage door needs.',
-  keywords: ['garage door repair', 'garage door installation', 'garage door maintenance', 'mobile garage door service'],
-  authors: [{ name: 'Mobile Garage Door' }],
+  title: 'Mobile Garage Door - The Universal Garage Door Index',
+  description: 'Access the precision-engineered database of garage door specifications. System nominal. Instant-View enabled.',
+  keywords: ['garage door index', 'specifications', 'database', 'smart home', 'techno-hero'],
+  authors: [{ name: 'Mobile Garage Door Systems' }],
   creator: 'Mobile Garage Door',
   publisher: 'Mobile Garage Door',
   robots: {
@@ -25,23 +35,23 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: 'https://mobile-garage-door.vercel.app',
-    title: 'Mobile Garage Door - Your Trusted Partner for Garage Doors',
-    description: 'Professional garage door services including repair, installation, and maintenance. Reliable and professional solutions for all your garage door needs.',
+    url: 'https://mobile-garage-door.tech',
+    title: 'Mobile Garage Door - The Universal Garage Door Index',
+    description: 'Access the precision-engineered database of garage door specifications. System nominal. Instant-View enabled.',
     siteName: 'Mobile Garage Door',
     images: [
       {
         url: '/images/social/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'Mobile Garage Door - Professional Garage Door Services',
+        alt: 'Mobile Garage Door System Interface',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Mobile Garage Door - Your Trusted Partner for Garage Doors',
-    description: 'Professional garage door services including repair, installation, and maintenance. Reliable and professional solutions for all your garage door needs.',
+    title: 'Mobile Garage Door - The Universal Garage Door Index',
+    description: 'Access the precision-engineered database of garage door specifications. System nominal. Instant-View enabled.',
     images: ['/images/social/og-image.png'],
   },
 }
@@ -53,7 +63,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body className={`${inter.variable} ${outfit.variable} font-inter bg-charcoal-deep text-white antialiased selection:bg-brand-yellow selection:text-charcoal-deep`}>
+        {children}
+      </body>
     </html>
   )
 }
