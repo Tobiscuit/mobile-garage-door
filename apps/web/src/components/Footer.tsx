@@ -1,43 +1,55 @@
 import React from 'react';
+import Link from 'next/link';
 
 const Footer: React.FC = () => {
   return (
-    <footer className="bg-dark-charcoal text-cloudy-white mt-16 lg:mt-24">
-      <div className="container mx-auto py-8 px-6">
-        <div className="flex flex-col md:flex-row justify-between items-center">
-          <div className="mb-4 md:mb-0">
-            <h3 className="text-xl font-bold">Mobile Garage Door</h3>
-            <p className="text-steel-gray">Your reliable partner for garage door services.</p>
+    <footer className="bg-charcoal-surface border-t border-white/5 text-cloudy-white mt-auto">
+      <div className="container mx-auto py-12 px-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+          <div className="col-span-1 md:col-span-2">
+            <h3 className="text-xl font-bold font-outfit text-white mb-4 uppercase tracking-wider">
+              Mobile <span className="text-brand-yellow">Garage Door</span>
+            </h3>
+            <p className="text-steel-gray max-w-sm mb-6">
+              The universal index for precision garage door specifications, maintenance protocols, and smart-view integration.
+            </p>
+            <div className="flex gap-4">
+              {/* Social Media Icons */}
+              {['Twitter', 'GitHub', 'Discord'].map((social) => (
+                <a key={social} href="#" className="w-10 h-10 rounded-full bg-charcoal-deep flex items-center justify-center text-steel-gray hover:text-brand-yellow hover:bg-white/5 transition-all border border-white/5">
+                  <span className="sr-only">{social}</span>
+                  <div className="w-4 h-4 bg-current opacity-50"></div> {/* Placeholder icon */}
+                </a>
+              ))}
+            </div>
           </div>
           
-          <div className="flex gap-6 mb-4 md:mb-0">
-            <a className="hover:text-golden-yellow transition-colors" href="#privacy">Privacy Policy</a>
-            <span className="text-steel-gray">|</span>
-            <a className="hover:text-golden-yellow transition-colors" href="#terms">Terms of Service</a>
+          <div>
+            <h4 className="text-white font-bold mb-4 uppercase text-sm tracking-widest text-brand-yellow">System</h4>
+            <ul className="space-y-2">
+              <li><Link href="/index" className="text-steel-gray hover:text-tech-cyan transition-colors">Index Database</Link></li>
+              <li><Link href="/instant-view" className="text-steel-gray hover:text-tech-cyan transition-colors">Instant-View</Link></li>
+              <li><Link href="/api" className="text-steel-gray hover:text-tech-cyan transition-colors">API Access</Link></li>
+              <li><Link href="/status" className="text-steel-gray hover:text-tech-cyan transition-colors">System Status</Link></li>
+            </ul>
           </div>
 
-          <div className="flex gap-4 mb-4 md:mb-0">
-            {/* Social Media Icons */}
-            <a href="#" className="text-steel-gray hover:text-golden-yellow transition-colors">
-              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
-              </svg>
-            </a>
-            <a href="#" className="text-steel-gray hover:text-golden-yellow transition-colors">
-              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-              </svg>
-            </a>
-            <a href="#" className="text-steel-gray hover:text-golden-yellow transition-colors">
-              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.174-.105-.949-.199-2.403.041-3.439.219-.937 1.406-5.957 1.406-5.957s-.359-.72-.359-1.781c0-1.663.967-2.911 2.168-2.911 1.024 0 1.518.769 1.518 1.688 0 1.029-.653 2.567-.992 3.992-.285 1.193.6 2.165 1.775 2.165 2.128 0 3.768-2.245 3.768-5.487 0-2.861-2.063-4.869-5.008-4.869-3.41 0-5.409 2.562-5.409 5.199 0 1.033.394 2.143.889 2.741.099.12.112.225.085.345-.09.375-.293 1.199-.334 1.363-.053.225-.172.271-.402.165-1.495-.69-2.433-2.878-2.433-4.646 0-3.776 2.748-7.252 7.92-7.252 4.158 0 7.392 2.967 7.392 6.923 0 4.135-2.607 7.462-6.233 7.462-1.214 0-2.357-.629-2.746-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146C9.57 23.812 10.763 24.009 12.017 24.009c6.624 0 11.99-5.367 11.99-11.988C24.007 5.367 18.641.001.012.001z"/>
-              </svg>
-            </a>
+          <div>
+             <h4 className="text-white font-bold mb-4 uppercase text-sm tracking-widest text-brand-yellow">Legal</h4>
+            <ul className="space-y-2">
+              <li><Link href="/privacy" className="text-steel-gray hover:text-tech-cyan transition-colors">Privacy Protocol</Link></li>
+              <li><Link href="/terms" className="text-steel-gray hover:text-tech-cyan transition-colors">Terms of Service</Link></li>
+              <li><Link href="/contact" className="text-steel-gray hover:text-tech-cyan transition-colors">Contact Support</Link></li>
+            </ul>
           </div>
         </div>
         
-        <div className="text-center mt-4">
-          <p className="text-steel-gray text-sm">© 2025 Mobile Garage Door. All rights reserved.</p>
+        <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center text-sm text-steel-gray">
+          <p>© 2025 Mobile Garage Door. All rights reserved.</p>
+          <div className="flex items-center gap-2 mt-4 md:mt-0">
+            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+            <span>Systems Nominal</span>
+          </div>
         </div>
       </div>
     </footer>

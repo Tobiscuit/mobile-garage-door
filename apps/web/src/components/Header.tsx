@@ -1,33 +1,56 @@
 'use client'
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 
 const Header: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
   return (
-    <header className="bg-cloudy-white shadow-md">
+    <header
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        scrolled || isMobileMenuOpen
+          ? 'bg-charcoal-deep/80 backdrop-blur-md border-b border-white/5 shadow-lg'
+          : 'bg-transparent border-b border-transparent'
+      }`}
+    >
       <div className="container mx-auto flex items-center justify-between px-6 py-4">
-        <a href="/" className="flex items-center gap-3 text-charcoal-blue">
-          <svg className="h-8 w-8 text-golden-yellow" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path>
-          </svg>
-          <h1 className="text-2xl font-bold tracking-tight">Mobile Garage Door</h1>
-        </a>
+        <Link href="/" className="flex items-center gap-3 group">
+          <div className="relative w-10 h-10 flex items-center justify-center bg-gradient-to-br from-brand-yellow to-yellow-600 rounded-lg shadow-neon group-hover:shadow-[0_0_15px_rgba(241,196,15,0.6)] transition-all">
+             <svg className="h-6 w-6 text-charcoal-deep" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path>
+            </svg>
+          </div>
+          <span className="text-xl font-bold tracking-tight text-white font-outfit uppercase">
+            Mobile <span className="text-brand-yellow">Garage Door</span>
+          </span>
+        </Link>
+
         <nav className="hidden md:flex items-center gap-8">
-          <a className="text-charcoal-blue hover:text-golden-yellow transition-colors" href="/">Home</a>
-          <a className="text-charcoal-blue hover:text-golden-yellow transition-colors" href="/services">Services</a>
-          <a className="text-charcoal-blue hover:text-golden-yellow transition-colors" href="/portfolio">Portfolio</a>
-          <a className="text-charcoal-blue hover:text-golden-yellow transition-colors" href="#about">About Us</a>
-          <a className="text-charcoal-blue hover:text-golden-yellow transition-colors" href="/contact">Contact</a>
-          <a className="btn-primary" href="/contact">Get a Quote</a>
+          <Link className="text-sm font-medium text-cloudy-white hover:text-brand-yellow transition-colors uppercase tracking-wider" href="/">Index</Link>
+          <Link className="text-sm font-medium text-cloudy-white hover:text-brand-yellow transition-colors uppercase tracking-wider" href="/services">Services</Link>
+          <Link className="text-sm font-medium text-cloudy-white hover:text-brand-yellow transition-colors uppercase tracking-wider" href="/portfolio">Showcase</Link>
+          <Link className="text-sm font-medium text-cloudy-white hover:text-brand-yellow transition-colors uppercase tracking-wider" href="/about">About</Link>
+          <Link className="px-5 py-2 border border-brand-yellow/50 text-brand-yellow rounded hover:bg-brand-yellow hover:text-charcoal-deep transition-all font-bold uppercase text-xs tracking-widest shadow-[0_0_10px_rgba(241,196,15,0.1)] hover:shadow-[0_0_20px_rgba(241,196,15,0.4)]" href="/contact">
+            Access System
+          </Link>
         </nav>
+
         <button 
-          className="md:hidden"
+          className="md:hidden text-white"
           onClick={toggleMobileMenu}
           aria-label="Toggle mobile menu"
         >
@@ -42,89 +65,30 @@ const Header: React.FC = () => {
       </div>
       
       {/* Mobile Navigation Menu */}
-      <div className={`md:hidden overflow-hidden transition-all duration-500 ease-out ${
+      <div className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out bg-charcoal-surface border-t border-white/5 ${
         isMobileMenuOpen 
-          ? 'max-h-96 opacity-100 transform translate-y-0' 
-          : 'max-h-0 opacity-0 transform -translate-y-2'
+          ? 'max-h-96 opacity-100'
+          : 'max-h-0 opacity-0'
       }`}>
-        <div className="bg-gradient-to-b from-cloudy-white to-white border-t border-golden-yellow/20 shadow-2xl backdrop-blur-sm">
-          <div className="px-6 py-6 space-y-1">
-            <a 
-              className="block text-charcoal-blue hover:text-golden-yellow transition-all duration-300 font-medium py-3 px-4 rounded-lg hover:bg-golden-yellow/10 transform hover:translate-x-2" 
-              href="/"
+        <div className="px-6 py-4 space-y-1">
+          {['Index', 'Services', 'Showcase', 'About', 'Contact'].map((item) => (
+             <Link
+              key={item}
+              className="block text-cloudy-white hover:text-brand-yellow hover:bg-white/5 transition-all font-medium py-3 px-4 rounded"
+              href={`/${item.toLowerCase()}`}
               onClick={() => setIsMobileMenuOpen(false)}
             >
-              <span className="flex items-center">
-                <svg className="w-5 h-5 mr-3 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                </svg>
-                Home
-              </span>
-            </a>
-            <a 
-              className="block text-charcoal-blue hover:text-golden-yellow transition-all duration-300 font-medium py-3 px-4 rounded-lg hover:bg-golden-yellow/10 transform hover:translate-x-2" 
-              href="/services"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              <span className="flex items-center">
-                <svg className="w-5 h-5 mr-3 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z" />
-                </svg>
-                Services
-              </span>
-            </a>
-            <a 
-              className="block text-charcoal-blue hover:text-golden-yellow transition-all duration-300 font-medium py-3 px-4 rounded-lg hover:bg-golden-yellow/10 transform hover:translate-x-2" 
-              href="/portfolio"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              <span className="flex items-center">
-                <svg className="w-5 h-5 mr-3 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                </svg>
-                Portfolio
-              </span>
-            </a>
-            <a 
-              className="block text-charcoal-blue hover:text-golden-yellow transition-all duration-300 font-medium py-3 px-4 rounded-lg hover:bg-golden-yellow/10 transform hover:translate-x-2" 
-              href="#about"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              <span className="flex items-center">
-                <svg className="w-5 h-5 mr-3 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                About Us
-              </span>
-            </a>
-            <a 
-              className="block text-charcoal-blue hover:text-golden-yellow transition-all duration-300 font-medium py-3 px-4 rounded-lg hover:bg-golden-yellow/10 transform hover:translate-x-2" 
+              {item}
+            </Link>
+          ))}
+          <div className="pt-4 mt-2">
+            <Link
+              className="block w-full text-center bg-brand-yellow text-charcoal-deep font-bold py-3 px-6 rounded hover:bg-white transition-colors"
               href="/contact"
               onClick={() => setIsMobileMenuOpen(false)}
             >
-              <span className="flex items-center">
-                <svg className="w-5 h-5 mr-3 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                </svg>
-                Contact
-              </span>
-            </a>
-            
-            {/* Call to Action with Special Styling */}
-            <div className="pt-4 mt-4 border-t border-golden-yellow/20">
-              <a 
-                className="block bg-gradient-to-r from-golden-yellow to-yellow-400 text-charcoal-blue font-bold py-4 px-6 rounded-xl text-center hover:from-yellow-400 hover:to-golden-yellow transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl" 
-                href="/contact"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                <span className="flex items-center justify-center">
-                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                  </svg>
-                  Get a Quote
-                </span>
-              </a>
-            </div>
+              ACCESS SYSTEM
+            </Link>
           </div>
         </div>
       </div>
