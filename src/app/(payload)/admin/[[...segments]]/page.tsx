@@ -7,9 +7,6 @@ import { importMap } from '@/app/(payload)/admin/importMap';
 /* Export metadata for the Admin Panel */
 export { generatePageMetadata as generateMetadata };
 
-/* Ensure dynamic rendering for Admin Panel to avoid Suspense/Blocking Route errors */
-export const dynamic = 'force-dynamic';
-
 interface PageProps {
   params: Promise<{ segments: string[] }>;
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
