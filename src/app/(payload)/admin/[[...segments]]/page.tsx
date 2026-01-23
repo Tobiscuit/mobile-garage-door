@@ -30,6 +30,7 @@ const Page = async ({ params, searchParams }: PageProps) => {
     importMap,
     params, 
     searchParams: searchParams as Promise<{ [key: string]: string | string[] }> 
+  });
   } catch (error) {
     console.error('[Page] Error resolving config:', error);
     throw error;
