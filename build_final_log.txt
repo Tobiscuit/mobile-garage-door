@@ -1,0 +1,28 @@
+
+> mobile-garage-door@1.0.0 build
+> next build
+
+Γû▓ Next.js 16.2.0-canary.2 (Turbopack)
+- Environments: .env
+- Cache Components enabled
+
+  Creating an optimized production build ...
+Γ£ô Compiled successfully in 22.8s
+  Running TypeScript ...
+Failed to compile.
+
+./src/app/(payload)/admin/[[...segments]]/page.tsx:17:5
+Type error: Type 'Promise<{ [key: string]: string | string[] | undefined; }>' is not assignable to type 'Promise<{ [key: string]: string | string[]; }>'.
+  Type '{ [key: string]: string | string[] | undefined; }' is not assignable to type '{ [key: string]: string | string[]; }'.
+    'string' index signatures are incompatible.
+      Type 'string | string[] | undefined' is not assignable to type 'string | string[]'.
+        Type 'undefined' is not assignable to type 'string | string[]'.
+
+  15 |     config, 
+  16 |     params, 
+> 17 |     searchParams 
+     |     ^
+  18 |   });
+  19 | };
+  20 |
+Next.js build worker exited with code: 1 and signal: null

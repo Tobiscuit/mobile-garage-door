@@ -1,0 +1,28 @@
+
+> mobile-garage-door@1.0.0 build
+> next build
+
+Γû▓ Next.js 16.2.0-canary.2 (Turbopack)
+- Environments: .env
+- Cache Components enabled
+
+  Creating an optimized production build ...
+Γ£ô Compiled successfully in 19.9s
+  Running TypeScript ...
+Failed to compile.
+
+.next/types/validator.ts:108:31
+Type error: Type 'typeof import("C:/dev/mobile-garage-door/src/app/(payload)/api/graphql/route")' does not satisfy the constraint 'RouteHandlerConfig<"/api/graphql">'.
+  Types of property 'GET' are incompatible.
+    Type '(config: Promise<SanitizedConfig>) => (request: Request) => Promise<Response>' is not assignable to type '(request: NextRequest, context: { params: Promise<{}>; }) => void | Response | Promise<void | Response>'.
+      Types of parameters 'config' and 'request' are incompatible.
+        Type 'NextRequest' is missing the following properties from type 'Promise<SanitizedConfig>': then, catch, finally, [Symbol.toStringTag]
+
+  106 |   type __IsExpected<Specific extends RouteHandlerConfig<"/api/graphql">> = Specific
+  107 |   const handler = {} as typeof import("../../src/app/(payload)/api/graphql/route.js")
+> 108 |   type __Check = __IsExpected<typeof handler>
+      |                               ^
+  109 |   // @ts-ignore
+  110 |   type __Unused = __Check
+  111 | }
+Next.js build worker exited with code: 1 and signal: null

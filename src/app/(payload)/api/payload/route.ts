@@ -1,4 +1,6 @@
-import { GET, POST, DELETE } from '@payloadcms/next/routes';
-import config from '@/payload.config';
+import { REST_DELETE, REST_GET, REST_POST } from '@payloadcms/next/routes';
+import configPromise from '@/payload.config';
 
-export { GET, POST, DELETE };
+export const DELETE = REST_DELETE(configPromise);
+export const GET = REST_GET(configPromise);
+export const POST = REST_POST(configPromise);
