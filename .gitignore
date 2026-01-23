@@ -43,3 +43,8 @@ next-env.d.ts
 
 # OS
 Thumbs.db
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfvars
