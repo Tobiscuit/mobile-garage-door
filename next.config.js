@@ -1,8 +1,8 @@
-const { withPayload } = require('@payloadcms/next/withPayload')
+import { withPayload } from '@payloadcms/next/withPayload'
 
 const nextConfig = {
   output: 'standalone',
   reactStrictMode: false,
 }
 
-module.exports = withPayload(nextConfig)
+export default withPayload(nextConfig)

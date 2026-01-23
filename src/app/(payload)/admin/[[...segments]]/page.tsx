@@ -1,8 +1,7 @@
 /* This file renders the main Admin UI */
 import { RootPage, generatePageMetadata } from '@payloadcms/next/views';
 import config from '@/payload.config';
-
-import { importMap } from '@/app/(payload)/admin/importMap';
+import { importMap } from '../importMap';
 
 /* Export metadata for the Admin Panel */
 export { generatePageMetadata as generateMetadata };
@@ -17,7 +16,7 @@ interface PageProps {
 
 const Page = async ({ params, searchParams }: PageProps) => {
   const resolvedConfig = await config;
-  
+
   return RootPage({ 
     config: Promise.resolve(resolvedConfig), 
     importMap,
