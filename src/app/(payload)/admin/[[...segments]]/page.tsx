@@ -16,8 +16,10 @@ interface PageProps {
 }
 
 const Page = async ({ params, searchParams }: PageProps) => {
+  const resolvedConfig = await config;
+  
   return RootPage({ 
-    config, 
+    config: resolvedConfig, 
     importMap,
     params, 
     searchParams: searchParams as Promise<{ [key: string]: string | string[] }> 
