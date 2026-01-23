@@ -19,7 +19,7 @@ const Page = async ({ params, searchParams }: PageProps) => {
   const resolvedConfig = await config;
   
   return RootPage({ 
-    config: resolvedConfig, 
+    config: Promise.resolve(resolvedConfig), 
     importMap,
     params, 
     searchParams: searchParams as Promise<{ [key: string]: string | string[] }> 
