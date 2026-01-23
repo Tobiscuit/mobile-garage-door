@@ -2,7 +2,8 @@ import React from 'react';
 import Header from '@/components/Header';
 import Hero from '@/components/Hero';
 import Services from '@/components/Services';
-import Testimonials from '@/components/Testimonials';
+import TrustIndicators from '@/components/TrustIndicators';
+import ValueStack from '@/components/ValueStack';
 import Footer from '@/components/Footer';
 
 export default function Home() {
@@ -12,7 +13,8 @@ export default function Home() {
       <main className="flex-grow">
         <Hero />
         <Services />
-        <Testimonials />
+        <ValueStack />
+        <TrustIndicators />
       </main>
       <Footer />
     </div>

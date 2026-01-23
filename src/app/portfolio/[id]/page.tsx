@@ -1,15 +1,21 @@
-'use client'
-
 import React from 'react';
-import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { portfolioItems, getProjectNavigation } from '@/data/projects';
 
-export default function ProjectDetailPage() {
-  const params = useParams();
-  const projectId = params.id as string;
+interface ProjectDetailPageProps {
+  params: Promise<{ id: string }>;
+}
+
+export async function generateStaticParams() {
+  return portfolioItems.map((item) => ({
+    id: item.id,
+  }));
+}
+
+export default async function ProjectDetailPage({ params }: ProjectDetailPageProps) {
+  const { id: projectId } = await params;
 
   const project = portfolioItems.find(item => item.id === projectId);
 

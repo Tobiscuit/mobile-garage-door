@@ -5,130 +5,85 @@ import React, { useState } from 'react';
 const Header: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
-  };
+  // Close menu when route changes (optional optimization)
+  const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
 
   return (
-    <header className="bg-cloudy-white shadow-md">
-      <div className="container mx-auto flex items-center justify-between px-6 py-4">
-        <a href="/" className="flex items-center gap-3 text-charcoal-blue">
-          <svg className="h-8 w-8 text-golden-yellow" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path>
-          </svg>
-          <h1 className="text-2xl font-bold tracking-tight">Mobile Garage Door</h1>
-        </a>
-        <nav className="hidden md:flex items-center gap-8">
-          <a className="text-charcoal-blue hover:text-golden-yellow transition-colors" href="/">Home</a>
-          <a className="text-charcoal-blue hover:text-golden-yellow transition-colors" href="/services">Services</a>
-          <a className="text-charcoal-blue hover:text-golden-yellow transition-colors" href="/portfolio">Portfolio</a>
-          <a className="text-charcoal-blue hover:text-golden-yellow transition-colors" href="#about">About Us</a>
-          <a className="text-charcoal-blue hover:text-golden-yellow transition-colors" href="/contact">Contact</a>
-          <a className="btn-primary" href="/contact">Get a Quote</a>
-        </nav>
-        <button 
-          className="md:hidden"
-          onClick={toggleMobileMenu}
-          aria-label="Toggle mobile menu"
-        >
-          <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            {isMobileMenuOpen ? (
-              <path d="M6 18L18 6M6 6l12 12" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path>
-            ) : (
-              <path d="M4 6h16M4 12h16m-7 6h7" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path>
-            )}
-          </svg>
-        </button>
-      </div>
-      
-      {/* Mobile Navigation Menu */}
-      <div className={`md:hidden overflow-hidden transition-all duration-500 ease-out ${
-        isMobileMenuOpen 
-          ? 'max-h-96 opacity-100 transform translate-y-0' 
-          : 'max-h-0 opacity-0 transform -translate-y-2'
-      }`}>
-        <div className="bg-gradient-to-b from-cloudy-white to-white border-t border-golden-yellow/20 shadow-2xl backdrop-blur-sm">
-          <div className="px-6 py-6 space-y-1">
-            <a 
-              className="block text-charcoal-blue hover:text-golden-yellow transition-all duration-300 font-medium py-3 px-4 rounded-lg hover:bg-golden-yellow/10 transform hover:translate-x-2" 
-              href="/"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              <span className="flex items-center">
-                <svg className="w-5 h-5 mr-3 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                </svg>
-                Home
-              </span>
-            </a>
-            <a 
-              className="block text-charcoal-blue hover:text-golden-yellow transition-all duration-300 font-medium py-3 px-4 rounded-lg hover:bg-golden-yellow/10 transform hover:translate-x-2" 
-              href="/services"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              <span className="flex items-center">
-                <svg className="w-5 h-5 mr-3 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z" />
-                </svg>
-                Services
-              </span>
-            </a>
-            <a 
-              className="block text-charcoal-blue hover:text-golden-yellow transition-all duration-300 font-medium py-3 px-4 rounded-lg hover:bg-golden-yellow/10 transform hover:translate-x-2" 
-              href="/portfolio"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              <span className="flex items-center">
-                <svg className="w-5 h-5 mr-3 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                </svg>
-                Portfolio
-              </span>
-            </a>
-            <a 
-              className="block text-charcoal-blue hover:text-golden-yellow transition-all duration-300 font-medium py-3 px-4 rounded-lg hover:bg-golden-yellow/10 transform hover:translate-x-2" 
-              href="#about"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              <span className="flex items-center">
-                <svg className="w-5 h-5 mr-3 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                About Us
-              </span>
-            </a>
-            <a 
-              className="block text-charcoal-blue hover:text-golden-yellow transition-all duration-300 font-medium py-3 px-4 rounded-lg hover:bg-golden-yellow/10 transform hover:translate-x-2" 
-              href="/contact"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              <span className="flex items-center">
-                <svg className="w-5 h-5 mr-3 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                </svg>
-                Contact
-              </span>
+    <>
+      <header className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b border-white/10 backdrop-blur-xl bg-charcoal-blue/90 text-white supports-[backdrop-filter]:bg-charcoal-blue/60">
+        <div className="container mx-auto px-6 h-20 flex items-center justify-between">
+          
+          {/* LOGO: Engineered & Solid */}
+          <a href="/" className="flex items-center gap-3 group">
+            <div className="bg-golden-yellow/10 p-2 rounded-lg border border-golden-yellow/20 group-hover:border-golden-yellow/50 transition-colors">
+              <svg className="h-6 w-6 text-golden-yellow" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path>
+              </svg>
+            </div>
+            <span className="text-xl font-bold tracking-tight font-display">
+              MOBILE<span className="text-gray-300 font-light">GARAGE</span>
+            </span>
+          </a>
+
+          {/* DESKTOP NAV: The "Command Center" */}
+          <nav className="hidden md:flex items-center gap-1 bg-white/5 p-1 rounded-full border border-white/10">
+            <a className="px-5 py-2 rounded-full text-sm font-medium text-gray-300 hover:text-white hover:bg-white/10 transition-all" href="/services">Services</a>
+            <a className="px-5 py-2 rounded-full text-sm font-medium text-gray-300 hover:text-white hover:bg-white/10 transition-all" href="/portfolio">Portfolio</a>
+            <a className="px-5 py-2 rounded-full text-sm font-medium text-gray-300 hover:text-white hover:bg-white/10 transition-all" href="/about">About</a>
+          </nav>
+
+          {/* DESKTOP ACTIONS: Bifurcated (Pro vs Emergency) */}
+          <div className="hidden md:flex items-center gap-4">
+             {/* Pro Link */}
+            <a href="/contact?type=contractor" className="text-sm font-bold text-golden-yellow hover:text-yellow-300 transition-colors uppercase tracking-wider text-[10px]">
+              For Contractors
             </a>
             
-            {/* Call to Action with Special Styling */}
-            <div className="pt-4 mt-4 border-t border-golden-yellow/20">
-              <a 
-                className="block bg-gradient-to-r from-golden-yellow to-yellow-400 text-charcoal-blue font-bold py-4 px-6 rounded-xl text-center hover:from-yellow-400 hover:to-golden-yellow transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl" 
-                href="/contact"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                <span className="flex items-center justify-center">
-                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                  </svg>
-                  Get a Quote
-                </span>
-              </a>
-            </div>
+            <div className="h-8 w-px bg-white/10"></div>
+
+            {/* Emergency CTA */}
+            <a href="tel:555-000-0000" className="flex items-center gap-2 bg-red-600 hover:bg-red-500 text-white text-sm font-bold py-2.5 px-5 rounded-lg shadow-lg shadow-red-900/20 transition-all hover:scale-105">
+              <svg className="w-4 h-4 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
+              <span>24/7 Repair</span>
+            </a>
           </div>
+
+          {/* MOBILE TOGGLE */}
+          <button 
+            className="md:hidden p-2 text-gray-300 hover:text-white"
+            onClick={toggleMobileMenu}
+            aria-label="Toggle menu"
+          >
+            <svg className="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              {isMobileMenuOpen ? (
+                <path d="M6 18L18 6M6 6l12 12" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path>
+              ) : (
+                <path d="M4 6h16M4 12h16m-7 6h7" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path>
+              )}
+            </svg>
+          </button>
+        </div>
+      </header>
+      
+      {/* Mobile Navigation Menu - Full Screen Overlay */}
+      <div className={`fixed inset-0 z-40 bg-charcoal-blue/98 backdrop-blur-3xl transition-all duration-300 md:hidden flex flex-col pt-24 px-6 ${
+        isMobileMenuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-full pointer-events-none'
+      }`}>
+        <div className="flex flex-col gap-6 text-center">
+          <a href="/services" onClick={() => setIsMobileMenuOpen(false)} className="text-2xl font-bold text-white hover:text-golden-yellow">Services</a>
+          <a href="/portfolio" onClick={() => setIsMobileMenuOpen(false)} className="text-2xl font-bold text-white hover:text-golden-yellow">Portfolio</a>
+          <a href="/about" onClick={() => setIsMobileMenuOpen(false)} className="text-2xl font-bold text-white hover:text-golden-yellow">About Us</a>
+          <div className="h-px w-20 mx-auto bg-white/10 my-4"></div>
+          <a href="/contact?type=contractor" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-bold text-golden-yellow uppercase tracking-widest">
+            Contractor Portal
+          </a>
+          <a href="tel:555-000-0000" className="mt-8 bg-red-600 text-white font-bold py-5 rounded-2xl text-xl shadow-xl flex items-center justify-center gap-3">
+             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
+             Call 24/7 Emergency
+          </a>
         </div>
       </div>
-    </header>
+    </>
   );
 };
 

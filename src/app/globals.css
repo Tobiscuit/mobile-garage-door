@@ -1,7 +1,19 @@
 @import url('https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;700;900&display=swap');
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+  --color-charcoal-blue: #2c3e50;
+  --color-cloudy-white: #f7f9fb;
+  --color-steel-gray: #7f8c8d;
+  --color-golden-yellow: #f1c40f;
+  --color-dark-charcoal: #34495e;
+  --color-light-gray: #bdc3c7;
+
+  --font-work-sans: 'Work Sans', sans-serif;
+
+  --background-image-gradient-radial: radial-gradient(var(--tw-gradient-stops));
+  --background-image-gradient-conic: conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops));
+}
 
 :root {
   --charcoal-blue: #2c3e50;
@@ -35,7 +47,7 @@ body {
 }
 
 .btn-primary {
-  @apply bg-[var(--golden-yellow)] text-[var(--charcoal-blue)] font-bold py-2 px-4 rounded-lg transition-transform transform hover:scale-105;
+  /* @apply bg-[var(--golden-yellow)] text-[var(--charcoal-blue)] font-bold py-2 px-4 rounded-lg transition-transform transform hover:scale-105; */
 }
 
 .btn-primary:hover {
