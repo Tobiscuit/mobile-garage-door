@@ -12,12 +12,12 @@ interface PageProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
-const Page = ({ params, searchParams }: PageProps) => {
+const Page = async ({ params, searchParams }: PageProps) => {
   return RootPage({ 
     config, 
     importMap,
     params, 
-    searchParams: searchParams as Promise<{ [key: string]: string | string[] }> 
+    searchParams 
   });
 };
 
