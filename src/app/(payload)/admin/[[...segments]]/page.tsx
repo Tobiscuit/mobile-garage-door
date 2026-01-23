@@ -15,14 +15,25 @@ interface PageProps {
 }
 
 const Page = async ({ params, searchParams }: PageProps) => {
-  const resolvedConfig = await config;
+  console.log('[Page] Awaiting config...');
+  try {
+    const resolvedConfig = await config;
+    console.log('[Page] Config resolved:', resolvedConfig ? 'YES' : 'NO');
+    if (!resolvedConfig) {
+       console.error('[Page] CRITICAL: Config is undefined!');
+       throw new Error('Config failed to load');
+    }
+    console.log('[Page] Collections:', resolvedConfig.collections?.map(c => c.slug));
 
   return RootPage({ 
-    config: Promise.resolve(resolvedConfig), 
+    config: Promise.resolve(resolvedConfig),  
     importMap,
     params, 
     searchParams: searchParams as Promise<{ [key: string]: string | string[] }> 
-  });
+  } catch (error) {
+    console.error('[Page] Error resolving config:', error);
+    throw error;
+  }
 };
 
 export default Page;
