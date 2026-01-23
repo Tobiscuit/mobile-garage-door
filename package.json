@@ -14,8 +14,13 @@
   },
   "packageManager": "npm@11.7.0",
   "dependencies": {
+    "@payloadcms/db-sqlite": "^3.72.0",
+    "@payloadcms/next": "^3.72.0",
+    "@payloadcms/richtext-lexical": "^3.72.0",
     "@tailwindcss/postcss": "^4.1.18",
+    "graphql": "^16.12.0",
     "next": "^16.2.0-canary.2",
+    "payload": "^3.72.0",
     "react": "^19.3.0-canary-6a0ab4d2-20260121",
     "react-dom": "^19.3.0-canary-6a0ab4d2-20260121"
   },
