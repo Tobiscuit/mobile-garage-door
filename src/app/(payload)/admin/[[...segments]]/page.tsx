@@ -17,7 +17,7 @@ const Page = async ({ params, searchParams }: PageProps) => {
     config, 
     importMap,
     params, 
-    searchParams 
+    searchParams: searchParams as Promise<{ [key: string]: string | string[] }> 
   });
 };
 
