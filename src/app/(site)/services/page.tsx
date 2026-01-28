@@ -5,112 +5,168 @@ import Footer from '@/components/Footer';
 export default function ServicesPage() {
   const services = [
     {
+      id: "repair",
+      category: "Critical Response",
+      title: "Precision Repair",
+      description: "Diagnostic-first approach to broken springs, cables, and openers. We carry 98% of parts on our trucks.",
+      features: ["Torsion Spring Replacement", "Cable Reset & Spooling", "Sensor Alignment"],
       icon: (
-        <svg className="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path>
-        </svg>
+        <svg className="w-8 h-8 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
       ),
-      title: "Garage Door Repair",
-      description: "From broken springs to faulty openers, our technicians can diagnose and fix any issue, ensuring your door is safe and functional.",
-      features: [
-        "Spring & Cable Replacement",
-        "Opener & Sensor Repair",
-        "Track & Roller Alignment"
-      ],
-      testimonial: "They fixed my garage door the same day I called. Fast, professional, and affordable. Highly recommend!",
-      author: "Mark T."
+      highlight: true
     },
     {
+      id: "install",
+      category: "Architecture",
+      title: "Modern Installation",
+      description: "Complete entryway transformation. We install high-R-value insulated doors that withstand local weather extremes.",
+      features: ["Custom Sizing", "Smart Opener Integration", "Old Door Haul-Away"],
       icon: (
-        <svg className="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path>
-        </svg>
+        <svg className="w-8 h-8 text-golden-yellow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
       ),
-      title: "Garage Door Installation",
-      description: "Enhance your home's curb appeal and security with a brand new, professionally installed garage door.",
-      features: [
-        "Wide Selection of Styles",
-        "New Door & Opener Installation",
-        "Custom Design Consultations"
-      ],
-      testimonial: "The new door looks amazing! The installation was seamless and the team was incredibly professional.",
-      author: "Sarah M."
+      highlight: false
     },
     {
+      id: "maintenance",
+      category: "Preventative",
+      title: "Annual Tune-Up",
+      description: "The '25-Point Safety Inspection' that extends the life of your system and prevents guaranteed failure points.",
+      features: ["Lube & Balance", "Roller Inspection", "Safety Reverse Test"],
       icon: (
-        <svg className="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path>
-        </svg>
+        <svg className="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
       ),
-      title: "Garage Door Maintenance",
-      description: "Extend the life of your garage door and prevent unexpected breakdowns with our regular maintenance plans.",
-      features: [
-        "Comprehensive Safety Checks",
-        "Lubrication of Moving Parts",
-        "Balance & Tension Adjustments"
-      ],
-      testimonial: "Their annual check-up service gives me peace of mind. A small price for knowing my door is safe.",
-      author: "David L."
+      highlight: false
+    },
+     {
+      id: "automation",
+      category: "Smart Home",
+      title: "Automation & WiFi",
+      description: "Open your door from your phone. Integration with HomeKit, Alexa, and Google Home.",
+      features: ["MyQ Setup", "Camera Installation", "Keypad Programming"],
+      icon: (
+        <svg className="w-8 h-8 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+      ),
+      highlight: false
     }
   ];
 
   return (
-    <div className="min-h-screen flex flex-col bg-cloudy-white">
+    <div className="min-h-screen bg-cloudy-white font-work-sans">
       <Header />
       <main className="flex-grow">
-        {/* Hero Section */}
-        <section className="text-center py-16 md:py-24 px-6 bg-white">
-          <div className="container mx-auto">
-            <h1 className="text-4xl md:text-5xl font-extrabold text-charcoal-blue leading-tight">Expert Garage Door Services</h1>
-            <p className="mt-4 text-lg md:text-xl text-steel-gray max-w-3xl mx-auto">
-              Your one-stop solution for reliable garage door repair, professional installation, and preventative maintenance. We come to you!
-            </p>
-          </div>
-        </section>
-
-        {/* Services Section */}
-        <section className="py-20 md:py-28" id="services">
-          <div className="container mx-auto px-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
-              {services.map((service, index) => (
-                <div key={index} className="bg-white p-8 rounded-lg shadow-lg transition-all duration-300 hover:shadow-xl flex flex-col items-center text-center">
-                  <div className="flex items-center justify-center h-16 w-16 rounded-full bg-golden-yellow text-white mb-6">
-                    {service.icon}
-                  </div>
-                  <h3 className="text-2xl font-bold text-charcoal-blue mb-4">{service.title}</h3>
-                  <p className="text-steel-gray mb-6">{service.description}</p>
-                  <ul className="space-y-3 text-left w-full">
-                    {service.features.map((feature, featureIndex) => (
-                      <li key={featureIndex} className="flex items-start">
-                        <span className="text-golden-yellow mr-3 mt-1">✓</span>
-                        <span>{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  <blockquote className="mt-8 border-l-4 border-golden-yellow pl-4 italic text-steel-gray text-left w-full">
-                    "{service.testimonial}" - {service.author}
-                  </blockquote>
+        
+        {/* BIFURCATED HERO: Services Edition */}
+        <section className="relative flex flex-col md:flex-row text-white overflow-hidden font-display min-h-[60vh]">
+            {/* LEFT: URGENT */}
+            <div className="relative w-full md:w-1/2 bg-dark-charcoal flex flex-col justify-center px-8 md:px-16 py-20 border-r border-white/5">
+                <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'radial-gradient(#ffffff 1px, transparent 1px)', backgroundSize: '16px 16px' }}></div>
+                <div className="relative z-10">
+                    <div className="inline-flex items-center gap-2 bg-red-500/10 border border-red-500/20 text-red-400 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-6">
+                        Rapid Response
+                    </div>
+                    <h1 className="text-4xl md:text-5xl font-black leading-tight mb-4">
+                        Something <span className="text-red-500">Broken?</span>
+                    </h1>
+                    <p className="text-gray-400 text-lg mb-8 max-w-sm">
+                        Springs, openers, and off-track doors. We utilize industrial-grade parts for lasting repairs.
+                    </p>
+                    <a href="/contact?type=repair" className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-500 text-white font-bold py-3 px-6 rounded-lg transition-all">
+                        Dispatch Technician
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                    </a>
                 </div>
-              ))}
             </div>
-          </div>
+
+            {/* RIGHT: PLANNED */}
+            <div className="relative w-full md:w-1/2 bg-charcoal-blue flex flex-col justify-center px-8 md:px-16 py-20">
+                <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'radial-gradient(#f1c40f 1px, transparent 1px)', backgroundSize: '24px 24px' }}></div>
+                <div className="relative z-10">
+                    <div className="inline-flex items-center gap-2 bg-golden-yellow/10 border border-golden-yellow/20 text-golden-yellow px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-6">
+                        Project & Design
+                    </div>
+                    <h1 className="text-4xl md:text-5xl font-black leading-tight mb-4">
+                        Something <span className="text-golden-yellow">New?</span>
+                    </h1>
+                    <p className="text-gray-400 text-lg mb-8 max-w-sm">
+                        Upgrade to an insulated, smart-enabled system that increases your home's value and security.
+                    </p>
+                    <a href="/contact?type=install" className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white font-bold py-3 px-6 rounded-lg transition-all border border-white/10">
+                        Start Your Project
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                    </a>
+                </div>
+            </div>
         </section>
 
-        {/* Call to Action Section */}
-        <section className="bg-cloudy-white py-16 md:py-24">
-          <div className="container mx-auto text-center px-6">
-            <h2 className="text-3xl md:text-4xl font-bold text-charcoal-blue mb-4">Ready for a Free Estimate?</h2>
-            <p className="text-lg text-steel-gray mb-8 max-w-2xl mx-auto">
-              We provide transparent pricing and detailed estimates. Contact us today to discuss your garage door needs with one of our friendly experts.
-            </p>
-            <a 
-              className="bg-golden-yellow text-charcoal-blue font-bold py-3 px-8 rounded-lg transition-transform transform hover:scale-105 hover:bg-[#d4ac0d] inline-block text-lg" 
-              href="/contact"
-            >
-              Contact Us Now
-            </a>
-          </div>
+        {/* SERVICE MATRIX (Bento Grid) */}
+        <section className="py-24 bg-cloudy-white px-6">
+            <div className="container mx-auto">
+                <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
+                    <div>
+                        <h2 className="text-charcoal-blue text-4xl font-black mb-4">Technical Capabilities</h2>
+                        <p className="text-steel-gray max-w-xl text-lg">
+                            We don't just "swap parts". We engineer solutions for longevity using the highest rated components in the industry.
+                        </p>
+                    </div>
+                    <div className="hidden md:block">
+                         <div className="text-right">
+                            <div className="text-3xl font-black text-charcoal-blue">5,000+</div>
+                            <div className="text-sm font-bold text-steel-gray uppercase tracking-wider">Repairs Completed</div>
+                         </div>
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    {services.map((service, index) => (
+                        <div key={index} className={`group relative p-8 rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl ${service.highlight ? 'bg-charcoal-blue text-white ring-4 ring-charcoal-blue/10' : 'bg-white text-charcoal-blue shadow-lg border border-gray-100'}`}>
+                            
+                            <div className="flex justify-between items-start mb-8">
+                                <div className={`p-3 rounded-lg ${service.highlight ? 'bg-white/10' : 'bg-gray-50'}`}>
+                                    {service.icon}
+                                </div>
+                                <span className={`text-xs font-bold uppercase tracking-wider py-1 px-2 rounded ${service.highlight ? 'bg-white/10 text-gray-300' : 'bg-gray-100 text-gray-500'}`}>
+                                    {service.category}
+                                </span>
+                            </div>
+
+                            <h3 className="text-2xl font-bold mb-3">{service.title}</h3>
+                            <p className={`mb-8 leading-relaxed ${service.highlight ? 'text-gray-400' : 'text-steel-gray'}`}>
+                                {service.description}
+                            </p>
+
+                            <ul className="space-y-3 mb-8">
+                                {service.features.map((feature, i) => (
+                                    <li key={i} className="flex items-center gap-3 text-sm font-medium">
+                                        <div className={`w-1.5 h-1.5 rounded-full ${service.highlight ? 'bg-golden-yellow' : 'bg-charcoal-blue'}`}></div>
+                                        <span className={service.highlight ? 'text-gray-300' : 'text-gray-600'}>{feature}</span>
+                                    </li>
+                                ))}
+                            </ul>
+
+                            <a href={`/contact?service=${service.id}`} className={`absolute bottom-8 left-8 right-8 py-3 text-center rounded-lg font-bold transition-colors ${service.highlight ? 'bg-golden-yellow text-charcoal-blue hover:bg-white' : 'bg-gray-50 text-charcoal-blue hover:bg-gray-100'}`}>
+                                Configure Service
+                            </a>
+                             {/* Spacer for button */}
+                             <div className="h-12"></div>
+                        </div>
+                    ))}
+                </div>
+            </div>
         </section>
+
+        {/* TRUST BANNER */}
+        <section className="bg-charcoal-blue py-16 border-t border-white/10">
+            <div className="container mx-auto px-6 text-center">
+                <p className="text-gray-400 font-bold uppercase tracking-widest text-sm mb-8">Authorised Dealer & Installer For</p>
+                <div className="flex flex-wrap justify-center items-center gap-12 md:gap-24 opacity-60">
+                    <span className="text-2xl font-black text-white">LIFTMASTER</span>
+                    <span className="text-2xl font-black text-white">CHAMBERLAIN</span>
+                    <span className="text-2xl font-black text-white">AMARR</span>
+                    <span className="text-2xl font-black text-white">CLOPAY</span>
+                </div>
+            </div>
+        </section>
+
       </main>
       <Footer />
     </div>
