@@ -1,54 +1,32 @@
 import React from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import { getPayloadClient } from '@/lib/payload';
 
-export default function ServicesPage() {
-  const services = [
-    {
-      id: "repair",
-      category: "Critical Response",
-      title: "Precision Repair",
-      description: "Diagnostic-first approach to broken springs, cables, and openers. We carry 98% of parts on our trucks.",
-      features: ["Torsion Spring Replacement", "Cable Reset & Spooling", "Sensor Alignment"],
-      icon: (
-        <svg className="w-8 h-8 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-      ),
-      highlight: true
-    },
-    {
-      id: "install",
-      category: "Architecture",
-      title: "Modern Installation",
-      description: "Complete entryway transformation. We install high-R-value insulated doors that withstand local weather extremes.",
-      features: ["Custom Sizing", "Smart Opener Integration", "Old Door Haul-Away"],
-      icon: (
-        <svg className="w-8 h-8 text-golden-yellow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
-      ),
-      highlight: false
-    },
-    {
-      id: "maintenance",
-      category: "Preventative",
-      title: "Annual Tune-Up",
-      description: "The '25-Point Safety Inspection' that extends the life of your system and prevents guaranteed failure points.",
-      features: ["Lube & Balance", "Roller Inspection", "Safety Reverse Test"],
-      icon: (
-        <svg className="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
-      ),
-      highlight: false
-    },
-     {
-      id: "automation",
-      category: "Smart Home",
-      title: "Automation & WiFi",
-      description: "Open your door from your phone. Integration with HomeKit, Alexa, and Google Home.",
-      features: ["MyQ Setup", "Camera Installation", "Keypad Programming"],
-      icon: (
-        <svg className="w-8 h-8 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
-      ),
-      highlight: false
-    }
-  ];
+// Icon mapping helper
+const getIcon = (iconName: string, highlight: boolean) => {
+  const className = `w-8 h-8 ${highlight ? 'text-red-400' : 'text-golden-yellow'}`; // Default colors, adjusted below per icon
+  
+  switch (iconName) {
+    case 'lightning': // Repair
+      return <svg className="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>;
+    case 'building': // Install
+      return <svg className="w-8 h-8 text-golden-yellow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>;
+    case 'clipboard': // Maintenance
+      return <svg className="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>;
+    case 'phone': // Automation
+      return <svg className="w-8 h-8 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>;
+    default:
+      return <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>;
+  }
+};
+
+export default async function ServicesPage() {
+  const payload = await getPayloadClient();
+  const { docs: services } = await payload.find({
+    collection: 'services',
+    sort: 'order',
+  });
 
   return (
     <div className="min-h-screen bg-cloudy-white font-work-sans">
@@ -122,7 +100,7 @@ export default function ServicesPage() {
                             
                             <div className="flex justify-between items-start mb-8">
                                 <div className={`p-3 rounded-lg ${service.highlight ? 'bg-white/10' : 'bg-gray-50'}`}>
-                                    {service.icon}
+                                    {getIcon(service.icon, service.highlight || false)}
                                 </div>
                                 <span className={`text-xs font-bold uppercase tracking-wider py-1 px-2 rounded ${service.highlight ? 'bg-white/10 text-gray-300' : 'bg-gray-100 text-gray-500'}`}>
                                     {service.category}
@@ -135,15 +113,15 @@ export default function ServicesPage() {
                             </p>
 
                             <ul className="space-y-3 mb-8">
-                                {service.features.map((feature, i) => (
+                                {service.features?.map((item: any, i: number) => (
                                     <li key={i} className="flex items-center gap-3 text-sm font-medium">
                                         <div className={`w-1.5 h-1.5 rounded-full ${service.highlight ? 'bg-golden-yellow' : 'bg-charcoal-blue'}`}></div>
-                                        <span className={service.highlight ? 'text-gray-300' : 'text-gray-600'}>{feature}</span>
+                                        <span className={service.highlight ? 'text-gray-300' : 'text-gray-600'}>{item.feature}</span>
                                     </li>
                                 ))}
                             </ul>
 
-                            <a href={`/contact?service=${service.id}`} className={`absolute bottom-8 left-8 right-8 py-3 text-center rounded-lg font-bold transition-colors ${service.highlight ? 'bg-golden-yellow text-charcoal-blue hover:bg-white' : 'bg-gray-50 text-charcoal-blue hover:bg-gray-100'}`}>
+                            <a href={`/contact?service=${service.slug}`} className={`absolute bottom-8 left-8 right-8 py-3 text-center rounded-lg font-bold transition-colors ${service.highlight ? 'bg-golden-yellow text-charcoal-blue hover:bg-white' : 'bg-gray-50 text-charcoal-blue hover:bg-gray-100'}`}>
                                 Configure Service
                             </a>
                              {/* Spacer for button */}

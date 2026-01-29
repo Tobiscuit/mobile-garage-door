@@ -2,66 +2,14 @@ import React from 'react';
 import Link from 'next/link';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import { getPayloadClient } from '@/lib/payload';
 
-export default function PortfolioPage() {
-  const projects = [
-    {
-      id: "commercial-fleet-hq",
-      title: "Logistics Hub: High-Speed Door Deployment",
-      client: "Regional Distribution Center",
-      location: "Industrial Park, Sector 4",
-      imageClass: "garage-pattern-steel",
-      stats: [
-        { label: "Install Time", value: "6 Hours" },
-        { label: "Efficiency Gain", value: "+40%" },
-        { label: "Cycle Rating", value: "100k" }
-      ],
-      description: "Replaced failing chain-link gates with high-speed, insulated steel sectional doors. Integrated with facility management software for automated access control.",
-      tags: ["Commercial", "Automation", "Security"]
-    },
-    {
-      id: "residential-modern-glass",
-      title: "Estate Modernization: Glass & Aluminum",
-      client: "Private Residence",
-      location: "Highland Estates",
-      imageClass: "garage-pattern-glass",
-      stats: [
-        { label: "Curb Appeal", value: "Max" },
-        { label: "R-Value", value: "12.9" },
-        { label: "Warranty", value: "Lifetime" }
-      ],
-      description: "Custom-fabricated aluminum frame with tempered frosted glass. Complete tear-out of 1980s wood doors. Smart opener integration with geofencing.",
-      tags: ["Residential", "Design", "Smart Home"]
-    },
-    {
-      id: "carriage-house-retro",
-      title: "Historic Preservation: Carriage House",
-      client: "Heritage Trust",
-      location: "Old Town District",
-      imageClass: "garage-pattern-carriage",
-      stats: [
-        { label: "Style Match", value: "100%" },
-        { label: "Noise Reduction", value: "-25dB" },
-        { label: "Maintenance", value: "Zero" }
-      ],
-      description: "Synthetic composite overlay that mimics 100-year-old wood but requires zero staining. Silent belt-drive openers installed to protect fragile structure.",
-      tags: ["Restoration", "Custom", "Quiet"]
-    },
-    {
-      id: "emergency-spring-replacement",
-      title: "Critical Failure: Torsion Spring Snap",
-      client: "Emergency Call",
-      location: "Suburban Multi-Car",
-      imageClass: "garage-pattern-modern",
-      stats: [
-        { label: "Response", value: "45 Min" },
-        { label: "Fix Time", value: "1 Hour" },
-        { label: "Safety Rating", value: "Pass" }
-      ],
-      description: "Vehicle trapped inside. Rapid response team arrived within the hour. Converted hazardous extension springs to safe, high-cycle torsion system.",
-      tags: ["Repair", "Emergency", "Safety"]
-    }
-  ];
+export default async function PortfolioPage() {
+  const payload = await getPayloadClient();
+  const { docs: projects } = await payload.find({
+    collection: 'projects',
+    sort: '-createdAt', // Newest first
+  });
 
   return (
     <div className="min-h-screen bg-cloudy-white font-work-sans">
@@ -101,15 +49,16 @@ export default function PortfolioPage() {
                             
                             {/* IMAGE CARD */}
                             <div className="w-full lg:w-3/5">
-                                <Link href={`/portfolio/${project.id}`} className="block relative h-96 w-full rounded-2xl overflow-hidden shadow-2xl transition-transform duration-500 group-hover:scale-[1.01]">
-                                    <div className={`absolute inset-0 ${project.imageClass} opacity-90`}></div>
+                                <Link href={`/portfolio/${project.slug}`} className="block relative h-96 w-full rounded-2xl overflow-hidden shadow-2xl transition-transform duration-500 group-hover:scale-[1.01]">
+                                    {/* Fallback pattern based on imageStyle or collection default */}
+                                    <div className={`absolute inset-0 ${project.imageStyle || 'garage-pattern-steel'} opacity-90`}></div>
                                     <div className="absolute inset-0 bg-gradient-to-t from-charcoal-blue/80 to-transparent"></div>
                                     
                                     <div className="absolute bottom-8 left-8">
                                         <div className="flex gap-2 mb-4">
-                                            {project.tags.map((tag, i) => (
+                                            {project.tags?.map((item: any, i: number) => (
                                                 <span key={i} className="bg-white/20 backdrop-blur-md border border-white/30 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
-                                                    {tag}
+                                                    {item.tag}
                                                 </span>
                                             ))}
                                         </div>
@@ -125,12 +74,14 @@ export default function PortfolioPage() {
                                     <p className="text-sm text-gray-500 mt-1">{project.location}</p>
                                 </div>
 
-                                <p className="text-dark-charcoal text-lg leading-relaxed mb-8">
-                                    {project.description}
-                                </p>
+                                <div className="text-dark-charcoal text-lg leading-relaxed mb-8 line-clamp-3">
+                                    {/* Using Payload's Rich Text would require a renderer, for now traversing basic text */}
+                                    {/* @ts-ignore - straightforward text extraction for preview */}
+                                    {project.description?.root?.children?.[0]?.children?.[0]?.text || 'View project details...'}
+                                </div>
 
                                 <div className="grid grid-cols-3 gap-4 mb-8">
-                                    {project.stats.map((stat, i) => (
+                                    {project.stats?.map((stat: any, i: number) => (
                                         <div key={i} className="bg-white p-4 rounded-lg shadow-sm border border-gray-100 text-center">
                                             <div className="text-2xl font-black text-charcoal-blue">{stat.value}</div>
                                             <div className="text-xs font-bold text-gray-400 uppercase tracking-tight">{stat.label}</div>
@@ -138,7 +89,7 @@ export default function PortfolioPage() {
                                     ))}
                                 </div>
 
-                                <Link href={`/contact?project=${project.id}`} className="inline-flex items-center gap-2 font-bold text-charcoal-blue hover:text-golden-yellow transition-colors">
+                                <Link href={`/contact?project=${project.slug}`} className="inline-flex items-center gap-2 font-bold text-charcoal-blue hover:text-golden-yellow transition-colors">
                                     View Production Details
                                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
                                 </Link>
