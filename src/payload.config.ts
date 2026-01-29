@@ -5,11 +5,21 @@ import { lexicalEditor } from '@payloadcms/richtext-lexical';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
+// Collections
+import { Services } from './collections/Services';
+import { Projects } from './collections/Projects';
+import { Testimonials } from './collections/Testimonials';
+import { Posts } from './collections/Posts';
+
+// Globals
+import { SiteSettings } from './globals/SiteSettings';
+
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
 
 console.log('--- [PAYLOAD CONFIG] Initializing... ---');
 console.log('--- [PAYLOAD CONFIG] DB URI:', process.env.DATABASE_URI);
+
 export default buildConfig({
   admin: {
     user: 'users',
@@ -34,6 +44,13 @@ export default buildConfig({
         },
       ],
     },
+    Services,
+    Projects,
+    Testimonials,
+    Posts,
+  ],
+  globals: [
+    SiteSettings,
   ],
   editor: lexicalEditor({}),
   secret: process.env.PAYLOAD_SECRET || 'fallback-secret-do-not-use-in-production',
