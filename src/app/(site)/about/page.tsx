@@ -1,28 +1,6 @@
 import React from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-
-export default function AboutPage() {
-  const stats = [
-    { value: '15+', label: 'Years in Service' },
-    { value: '5,000+', label: 'Repairs Completed' },
-    { value: '98%', label: 'Customer Satisfaction' },
-    { value: '24/7', label: 'Emergency Response' },
-  ];
-
-  const values = [
-    {
-      title: 'Reliability',
-      description: 'We show up when we say we will. No excuses, no delays.',
-      icon: (
-        <svg className="w-8 h-8 text-golden-yellow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-      ),
-    },
-    {
-      title: 'Transparency',
-      description: 'Upfront pricing. No hidden fees. What we quote is what you pay.',
-      icon: (
-        <svg className="w-8 h-8 text-golden-yellow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
 import { getPayloadClient } from '@/lib/payload';
 
 export default async function AboutPage() {
@@ -131,11 +109,11 @@ export default async function AboutPage() {
         </section>
 
         {/* CTA */}
-              <a href="tel:555-000-0000" className="bg-white/10 text-white font-bold py-4 px-8 rounded-xl border border-white/20 hover:bg-white/20 transition-all">
-                Call 24/7 Hotline
-              </a>
-            </div>
-          </div>
+        <section className="bg-charcoal-blue py-24 px-6 text-center">
+             <h2 className="text-white text-4xl font-black mb-8">Work with the Authority.</h2>
+             <a href="/contact" className="inline-block bg-golden-yellow hover:bg-white text-charcoal-blue font-bold py-4 px-10 rounded-xl transition-all transform hover:-translate-y-1 shadow-2xl">
+                Request Service
+             </a>
         </section>
 
       </main>
