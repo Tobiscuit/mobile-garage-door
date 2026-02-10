@@ -9,9 +9,10 @@ export default async function PortalDashboard() {
   const { user } = await payload.auth({ headers: await headers() });
 
   if (!user) return null; // Should be handled by layout
+  const customer = user as any;
 
   const activeRequests = await payload.find({
-    collection: 'service-requests',
+    collection: 'service-requests' as any,
     where: {
       customer: { equals: user.id },
       status: { not_equals: 'completed' }, // and not cancelled
@@ -20,7 +21,7 @@ export default async function PortalDashboard() {
   });
 
   const pastRequests = await payload.find({
-    collection: 'service-requests',
+    collection: 'service-requests' as any,
     where: {
       customer: { equals: user.id },
       status: { equals: 'completed' },
@@ -34,7 +35,7 @@ export default async function PortalDashboard() {
       <div className="bg-charcoal-blue text-white rounded-2xl p-8 shadow-xl relative overflow-hidden">
         <div className="relative z-10 flex flex-col md:flex-row justify-between items-center gap-6">
             <div>
-                <h1 className="text-3xl font-black mb-2">Welcome back, {user.name}</h1>
+                <h1 className="text-3xl font-black mb-2">Welcome back, {customer.name}</h1>
                 <p className="text-gray-400">Manage your garage service requests and view history.</p>
             </div>
             <Link 
@@ -134,15 +135,15 @@ export default async function PortalDashboard() {
                 <div className="space-y-3">
                     <div>
                         <div className="text-xs text-gray-400">Name</div>
-                        <div className="font-medium text-charcoal-blue">{user.name}</div>
+                        <div className="font-medium text-charcoal-blue">{customer.name}</div>
                     </div>
                     <div>
                         <div className="text-xs text-gray-400">Email</div>
-                        <div className="font-medium text-charcoal-blue">{user.email}</div>
+                        <div className="font-medium text-charcoal-blue">{customer.email}</div>
                     </div>
                     <div>
                         <div className="text-xs text-gray-400">Phone</div>
-                        <div className="font-medium text-charcoal-blue">{user.phone}</div>
+                        <div className="font-medium text-charcoal-blue">{customer.phone}</div>
                     </div>
                 </div>
              </div>
