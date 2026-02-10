@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
     const tripFee = 9900; // $99.00 in cents
     
     // Create Payment
-    const { result } = await squareClient.payments.create({
+    const result = await squareClient.payments.create({
       sourceId,
       idempotencyKey: randomUUID(),
       amountMoney: {
