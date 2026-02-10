@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "next dev --turbo=false",
     "build": "payload generate:importmap && next build",
-    "start": "next start",
+    "start": "node .next/standalone/server.js",
     "lint": "next lint",
     "seed": "node --import tsx scripts/seed.ts"
   },
