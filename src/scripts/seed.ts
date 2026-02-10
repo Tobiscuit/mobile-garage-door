@@ -143,6 +143,94 @@ const seed = async (): Promise<void> => {
     }
   }
 
+  // 3. Seed Testimonials
+  const testimonials = [
+    {
+      author: 'Ethan Carter',
+      location: 'Homeowner • Spring Repair',
+      quote: "Tech arrived in 45 mins. Had the exact spring needed on the truck. No upsell, just solved the problem. Exactly what you want.",
+      rating: 5,
+      featured: true,
+    },
+    {
+      author: 'Sophia Bennett',
+      location: 'General Contractor • Installation',
+      quote: "We use Mobile Garage for all our new builds. Their reliability is unmatched in the local market. They simply show up and get it done.",
+      rating: 5,
+      featured: true,
+    },
+  ]
+
+  for (const t of testimonials) {
+    const existing = await payload.find({
+      collection: 'testimonials',
+      where: { author: { equals: t.author } },
+    })
+    if (existing.totalDocs === 0) {
+      await payload.create({ collection: 'testimonials', data: t })
+      payload.logger.info(`Created Testimonial: ${t.author}`)
+    }
+  }
+
+  // 4. Seed Services
+  const servicesData = [
+    {
+      title: 'Something Broken?',
+      slug: 'emergency-repair',
+      category: 'Critical Response',
+      description: 'Most common issues we fix same-day:',
+      highlight: false,
+      icon: 'lightning',
+      order: 1,
+      features: [
+        { feature: "Door Stuck / Won't Open" },
+        { feature: 'Loud Grinding Noise' },
+        { feature: 'Broken Spring (Pop Sound)' },
+        { feature: 'Off Track / Crooked' },
+        { feature: 'Opener Unresponsive' },
+      ],
+    },
+    {
+      title: 'Contractors & Builders',
+      slug: 'contractor-portal',
+      category: 'Commercial',
+      description: 'Volume pricing, dedicated project managers, and 100% schedule reliability.',
+      highlight: true,
+      icon: 'building',
+      order: 2,
+      features: [
+        { feature: 'Volume Pricing' },
+        { feature: 'Dedicated Project Managers' },
+        { feature: 'Schedule Reliability' },
+      ],
+    },
+    {
+      title: 'New Installations',
+      slug: 'installations',
+      category: 'Design',
+      description: "Visualize your home's potential. Modern, Carriage, and Glass styles.",
+      highlight: false,
+      icon: 'building',
+      order: 3,
+      features: [
+        { feature: 'Modern Styles' },
+        { feature: 'Carriage Styles' },
+        { feature: 'Glass Styles' },
+      ],
+    },
+  ]
+
+  for (const s of servicesData) {
+    const existing = await payload.find({
+      collection: 'services',
+      where: { slug: { equals: s.slug } },
+    })
+    if (existing.totalDocs === 0) {
+      await payload.create({ collection: 'services', data: s as any })
+      payload.logger.info(`Created Service: ${s.title}`)
+    }
+  }
+
   payload.logger.info('Seeding complete.')
   process.exit(0)
 }

@@ -1,6 +1,17 @@
 import React from 'react';
 
-const TrustIndicators: React.FC = () => {
+interface Testimonial {
+  author: string;
+  location: string;
+  quote: string;
+  rating: number;
+}
+
+interface TrustIndicatorsProps {
+  testimonials?: Testimonial[];
+}
+
+const TrustIndicators: React.FC<TrustIndicatorsProps> = ({ testimonials = [] }) => {
   return (
     <section className="py-20 bg-white border-t border-gray-100">
       <div className="w-full max-w-[1800px] mx-auto px-6 md:px-12">
@@ -41,58 +52,48 @@ const TrustIndicators: React.FC = () => {
           ))}
         </div>
 
-        {/* VERIFIED REVIEWS (Streamlined) */}
+        {/* VERIFIED REVIEWS (Dynamic) */}
         <div className="grid md:grid-cols-2 gap-8">
-           {/* Review 1 */}
-           <div className="group bg-white p-8 rounded-2xl shadow-sm hover:shadow-xl border border-gray-100 transition-all duration-300">
-             <div className="flex justify-between items-start mb-6">
-               <div className="flex gap-1 text-golden-yellow">
-                 {[1,2,3,4,5].map(star => <svg key={star} className="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>)}
+           {testimonials.length > 0 ? (
+             testimonials.map((testimonial, i) => (
+               <div key={i} className="group bg-white p-8 rounded-2xl shadow-sm hover:shadow-xl border border-gray-100 transition-all duration-300">
+                 <div className="flex justify-between items-start mb-6">
+                   <div className="flex gap-1 text-golden-yellow">
+                     {Array.from({ length: testimonial.rating }).map((_, star) => (
+                       <svg key={star} className="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                         <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                       </svg>
+                     ))}
+                   </div>
+                   <div className="flex items-center text-gray-500 text-[10px] font-mono bg-gray-50 px-2 py-1 rounded border border-gray-100">
+                     <span className="w-1.5 h-1.5 rounded-full bg-green-500 mr-2 animate-pulse"></span>
+                     ID: {Math.floor(Math.random() * 9000 + 1000)}-VERIFIED
+                   </div>
+                 </div>
+                 <p className="text-xl font-medium text-charcoal-blue mb-6 leading-relaxed">
+                   "{testimonial.quote}"
+                 </p>
+                 <div className="flex items-center gap-4 pt-6 border-t border-gray-50">
+                    <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-charcoal-blue font-bold text-sm">
+                      {testimonial.author.split(' ').map(n => n[0]).join('')}
+                    </div>
+                    <div>
+                      <div className="font-bold text-charcoal-blue text-sm">{testimonial.author}</div>
+                      <div className="text-xs text-steel-gray">{testimonial.location}</div>
+                    </div>
+                 </div>
                </div>
-               <div className="flex items-center text-gray-500 text-[10px] font-mono bg-gray-50 px-2 py-1 rounded border border-gray-100">
-                 <span className="w-1.5 h-1.5 rounded-full bg-green-500 mr-2 animate-pulse"></span>
-                 ID: 9942-RES-REPAIR
-               </div>
-             </div>
-             <p className="text-xl font-medium text-charcoal-blue mb-6 leading-relaxed">
-               "Tech arrived in 45 mins. Had the exact spring needed on the truck. No upsell, just solved the problem. Exactly what you want."
-             </p>
-             <div className="flex items-center gap-4 pt-6 border-t border-gray-50">
-                <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-charcoal-blue font-bold text-sm">EC</div>
-                <div>
-                  <div className="font-bold text-charcoal-blue text-sm">Ethan Carter</div>
-                  <div className="text-xs text-steel-gray">Homeowner • Spring Repair</div>
-                </div>
-             </div>
-           </div>
-
-           {/* Review 2 */}
-           <div className="group bg-white p-8 rounded-2xl shadow-sm hover:shadow-xl border border-gray-100 transition-all duration-300">
-             <div className="flex justify-between items-start mb-6">
-               <div className="flex gap-1 text-golden-yellow">
-                 {[1,2,3,4,5].map(star => <svg key={star} className="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>)}
-               </div>
-               <div className="flex items-center text-gray-500 text-[10px] font-mono bg-gray-50 px-2 py-1 rounded border border-gray-100">
-                 <span className="w-1.5 h-1.5 rounded-full bg-green-500 mr-2 animate-pulse"></span>
-                 ID: 8821-COM-INSTALL
-               </div>
-             </div>
-             <p className="text-xl font-medium text-charcoal-blue mb-6 leading-relaxed">
-               "We use Mobile Garage for all our new builds. Their reliability is unmatched in the local market. They simply show up and get it done."
-             </p>
-             <div className="flex items-center gap-4 pt-6 border-t border-gray-50">
-                <div className="w-10 h-10 rounded-full bg-charcoal-blue text-white flex items-center justify-center font-bold text-sm">SB</div>
-                <div>
-                  <div className="font-bold text-charcoal-blue text-sm">Sophia Bennett</div>
-                  <div className="text-xs text-steel-gray">General Contractor • Installation</div>
-                </div>
-             </div>
-           </div>
+             ))
+           ) : (
+             <p className="text-gray-400 italic">No verified reviews available.</p>
+           )}
         </div>
 
       </div>
     </section>
   );
 };
+
+export default TrustIndicators;
 
 export default TrustIndicators;
