@@ -60,8 +60,7 @@ export default buildConfig({
           exportName: 'default',
         },
       },
-      views: {
-        Dashboard: {
+        dashboard: {
           Component: {
             path: '/src/components/payload/CustomDashboard.tsx#default',
             exportName: 'default',
