@@ -106,7 +106,12 @@ header.app-header {
   font-size: 0.85rem;
   border: none;
   box-shadow: 0 4px 12px rgba(241, 196, 15, 0.2);
+  width: fit-content !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
 }
+
 
 .btn.btn--style-primary:hover {
   background-color: #ffe066 !important; /* Lighter yellow on hover */
@@ -118,6 +123,7 @@ header.app-header {
   background-color: rgba(255,255,255,0.05) !important;
   color: var(--theme-text-primary) !important;
   border: 1px solid rgba(255,255,255,0.1) !important;
+  width: fit-content !important;
 }
 
 .btn.btn--style-secondary:hover {

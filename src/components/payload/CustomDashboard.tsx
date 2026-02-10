@@ -84,44 +84,44 @@ const CustomDashboard: React.FC = () => {
                 <span className="w-2 h-8 bg-[#f1c40f] rounded-full"></span>
                 Quick Actions
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Link href="/admin/collections/service-requests/create" className="group p-6 bg-[#34495e] border border-[#ffffff10] rounded-xl hover:bg-[#3e5669] transition-all flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-full bg-[#f1c40f] flex items-center justify-center text-[#2c3e50] font-bold group-hover:scale-110 transition-transform">
-                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"></path></svg>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <Link href="/admin/collections/service-requests/create" className="group p-4 bg-[#34495e] border border-[#ffffff10] rounded-xl hover:bg-[#3e5669] transition-all flex flex-col items-center text-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-[#f1c40f] flex items-center justify-center text-[#2c3e50] font-bold group-hover:scale-110 transition-transform">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"></path></svg>
                     </div>
                     <div>
-                        <div className="font-bold text-white text-lg">New Dispatch</div>
-                        <div className="text-[#7f8c8d] text-sm">Create service request</div>
+                        <div className="font-bold text-white text-sm">New Dispatch</div>
+                        <div className="text-[#7f8c8d] text-xs">Create request</div>
                     </div>
                 </Link>
 
-                <Link href="/admin/collections/customers/create" className="group p-6 bg-[#34495e] border border-[#ffffff10] rounded-xl hover:bg-[#3e5669] transition-all flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-full bg-[#ffffff10] flex items-center justify-center text-white font-bold group-hover:bg-[#ffffff20] transition-colors">
-                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
+                <Link href="/admin/collections/customers/create" className="group p-4 bg-[#34495e] border border-[#ffffff10] rounded-xl hover:bg-[#3e5669] transition-all flex flex-col items-center text-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-[#ffffff10] flex items-center justify-center text-white font-bold group-hover:bg-[#ffffff20] transition-colors">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
                     </div>
                     <div>
-                        <div className="font-bold text-white text-lg">Add Customer</div>
-                        <div className="text-[#7f8c8d] text-sm">Register new client</div>
+                        <div className="font-bold text-white text-sm">Add Customer</div>
+                        <div className="text-[#7f8c8d] text-xs">New client</div>
                     </div>
                 </Link>
 
-                 <Link href="/admin/collections/invoices/create" className="group p-6 bg-[#34495e] border border-[#ffffff10] rounded-xl hover:bg-[#3e5669] transition-all flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-full bg-[#ffffff10] flex items-center justify-center text-white font-bold group-hover:bg-[#ffffff20] transition-colors">
-                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                 <Link href="/admin/collections/invoices/create" className="group p-4 bg-[#34495e] border border-[#ffffff10] rounded-xl hover:bg-[#3e5669] transition-all flex flex-col items-center text-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-[#ffffff10] flex items-center justify-center text-white font-bold group-hover:bg-[#ffffff20] transition-colors">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                     </div>
                     <div>
-                        <div className="font-bold text-white text-lg">Draft Invoice</div>
-                        <div className="text-[#7f8c8d] text-sm">Create billing record</div>
+                        <div className="font-bold text-white text-sm">Draft Invoice</div>
+                        <div className="text-[#7f8c8d] text-xs">Create bill</div>
                     </div>
                 </Link>
 
-                 <Link href="/admin/collections/posts/create" className="group p-6 bg-[#34495e] border border-[#ffffff10] rounded-xl hover:bg-[#3e5669] transition-all flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-full bg-[#ffffff10] flex items-center justify-center text-white font-bold group-hover:bg-[#ffffff20] transition-colors">
-                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                 <Link href="/admin/collections/posts/create" className="group p-4 bg-[#34495e] border border-[#ffffff10] rounded-xl hover:bg-[#3e5669] transition-all flex flex-col items-center text-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-[#ffffff10] flex items-center justify-center text-white font-bold group-hover:bg-[#ffffff20] transition-colors">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
                     </div>
                     <div>
-                        <div className="font-bold text-white text-lg">Write Post</div>
-                        <div className="text-[#7f8c8d] text-sm">Publish update</div>
+                        <div className="font-bold text-white text-sm">Write Post</div>
+                        <div className="text-[#7f8c8d] text-xs">Publish update</div>
                     </div>
                 </Link>
             </div>
