@@ -11,6 +11,9 @@
     "lint": "next lint",
     "generate:importmap": "payload generate:importmap",
     "generate:types": "payload generate:types",
+    "payload": "payload",
+    "migrate:create": "payload migrate:create",
+    "migrate": "payload migrate",
     "seed": "tsx src/scripts/seed.ts"
   },
   "engines": {
@@ -19,13 +22,12 @@
   "packageManager": "npm@11.7.0",
   "dependencies": {
     "@payloadcms/db-postgres": "^3.76.0",
-    "@payloadcms/db-sqlite": "^3.72.0",
-    "@payloadcms/next": "^3.72.0",
-    "@payloadcms/richtext-lexical": "^3.72.0",
+    "@payloadcms/next": "^3.76.0",
+    "@payloadcms/richtext-lexical": "^3.76.0",
     "@tailwindcss/postcss": "^4.1.18",
     "graphql": "^16.12.0",
     "next": "^15.5.9",
-    "payload": "^3.72.0",
+    "payload": "^3.76.0",
     "pg": "^8.18.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",

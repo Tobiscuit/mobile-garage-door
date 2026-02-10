@@ -35,7 +35,7 @@ export const portfolioItems = [
     subtitle: 'Timeless elegance meets modern functionality.',
     challenge: 'Homeowner wanted to restore the traditional charm of their historic property while improving garage door security and insulation.',
     solution: 'Replaced an aging, uninsulated door with a custom-built solid wood carriage-style door, featuring enhanced insulation, robust locking, and a period-appropriate finish.',
-    imageAfter: 'garage-pattern-wooden',
+    imageAfter: 'garage-pattern-carriage',
     imageBefore: 'garage-pattern-glass',
     benefits: [
       'Authentic Charm: Preserves and enhances the historical aesthetic of the property.',

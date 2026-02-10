@@ -7,18 +7,19 @@ const seed = async (): Promise<void> => {
 
   payload.logger.info('seeding...')
 
-  const email = process.env.ADMIN_EMAIL || 'admin@mobilegaragedoor.com';
+  const email = process.env.ADMIN_EMAIL;
   const password = process.env.ADMIN_PASSWORD;
 
-  if (!password) {
-      payload.logger.warn('WARNING: No ADMIN_PASSWORD env var set. Using default "password123".')
+  if (!email || !password) {
+      payload.logger.error('ERROR: ADMIN_EMAIL and ADMIN_PASSWORD env vars are REQUIRED for seeding.')
+      process.exit(1);
   }
 
-  const finalPassword = password || 'password123';
+  const finalPassword = password;
 
   // 1. Create Admin User
-  // Note: 'users' collection defined in payload.config.ts has no 'role' field, so we omit it.
-  const users = await payload.find({
+  // Check if THIS specific user exists
+  const existingUser = await payload.find({
     collection: 'users',
     where: {
       email: {
@@ -27,7 +28,7 @@ const seed = async (): Promise<void> => {
     },
   })
 
-  if (users.totalDocs === 0) {
+  if (existingUser.totalDocs === 0) {
     await payload.create({
       collection: 'users',
       data: {
@@ -37,7 +38,7 @@ const seed = async (): Promise<void> => {
     })
     payload.logger.info(`Created Admin User: ${email}`)
   } else {
-    payload.logger.info('Admin User already exists.')
+    payload.logger.info(`Admin User already exists: ${email}`)
   }
 
   // Helper to create simple Lexical features
