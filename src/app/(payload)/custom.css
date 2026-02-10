@@ -191,20 +191,33 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* NAV LINKS - Force Contrast */
+aside.nav {
+    color: var(--theme-text-primary) !important;
+}
+
 aside.nav a, 
 .nav__link, 
-.nav__log-out {
+.nav__log-out,
+.nav__link-content,
+.nav__link-label,
+aside.nav span,
+aside.nav div {
     color: var(--theme-text-primary) !important;
     opacity: 1 !important;
 }
 
-.nav__link:hover {
+.nav__link:hover,
+.nav__link:hover * {
     color: var(--theme-brand-500) !important;
     background: rgba(241, 196, 15, 0.1) !important;
 }
 
 .nav__label, .nav-group__label {
-    color: #bdc3c7 !important;
+    color: var(--theme-text-secondary) !important;
+    font-size: 0.75rem !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+    margin-top: 1rem !important;
 }
 
 /* SVG SAFETY - Prevent infinite scaling on default Payload icons */
