@@ -194,43 +194,6 @@ h1, h2, h3, h4, h5, h6 {
   text-shadow: 0 2px 10px rgba(0,0,0,0.3);
 }
 
-/* NUCLEAR OPTION: HIDE BACKGROUND WATERMARKS */
-.graphic-icon, 
-.view-description__icon,
-.collection-list__icon,
-[class*="background"],
-[class*="watermark"] {
-    /* Only hide if it's clearly a background element (svg) or empty div */
-}
-
-/* Target specific Payload background graphics if possible */
-.dashboard > svg,
-.template-default__content > svg {
-    display: none !important;
-}
-
-/* Force Sidebar Text Visibility */
-aside.nav a, 
-.nav__link, 
-.nav__log-out {
-    color: #f7f9fb !important; /* Whiter than white */
-    opacity: 1 !important;
-}
-
-.nav__link:hover {
-    color: var(--theme-brand-500) !important;
-    background: rgba(241, 196, 15, 0.1) !important;
-}
-
-.nav__label, .nav-group__label {
-    color: #bdc3c7 !important;
-}
-
-/* Fix "Gigantic Icon" - Likely a rogue SVG with no width */
-svg {
-    max-width: 100%;
-}
-
 /* TABLE & LIST VIEW FIXES */
 table, .table {
   background: transparent !important;
