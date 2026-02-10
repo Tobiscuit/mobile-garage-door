@@ -40,7 +40,7 @@ export const SiteSettings: GlobalConfig = {
           name: 'licenseNumber',
           type: 'text',
           label: 'Contractor License',
-          defaultValue: 'CA LIC #1045678',
+          defaultValue: 'TX Registered & Bonded',
         },
         {
           name: 'insuranceAmount',

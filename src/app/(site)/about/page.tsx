@@ -92,7 +92,7 @@ export default async function AboutPage() {
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
                     <div className="bg-white p-6 rounded-xl shadow-sm flex flex-col justify-center items-center h-48">
                         <div className="font-black text-gray-300 text-xl mb-2">LICENSE</div>
-                        <div className="font-bold text-charcoal-blue text-lg">{settings.licenseNumber || "CSLB #982143"}</div>
+                        <div className="font-bold text-charcoal-blue text-lg">{settings.licenseNumber || "TX Registered & Bonded"}</div>
                     </div>
                     <div className="bg-white p-6 rounded-xl shadow-sm flex flex-col justify-center items-center h-48">
                         <div className="font-black text-gray-300 text-xl mb-2">INSURANCE</div>
