@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPayload } from 'payload';
 import configPromise from '@/payload.config';
+// @ts-ignore
 import { Client, Environment } from 'square';
 import { randomUUID } from 'crypto';
 
@@ -12,7 +13,7 @@ const squareClient = new Client({
 export async function POST(req: NextRequest) {
   try {
     const payload = await getPayload({ config: configPromise });
-    const { user } = await payload.auth({ req });
+    const { user } = await payload.auth({ req: req as any });
 
     if (!user || (user as any).collection !== 'customers') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
