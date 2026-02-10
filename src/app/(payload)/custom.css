@@ -187,3 +187,75 @@ h1, h2, h3, h4, h5, h6 {
 .dashboard__header h1 {
   text-shadow: 0 2px 10px rgba(0,0,0,0.3);
 }
+
+/* TABLE & LIST VIEW FIXES */
+table, .table {
+  background: transparent !important;
+  color: var(--theme-text-primary) !important;
+  border-collapse: separate !important;
+  border-spacing: 0 4px !important;
+}
+
+thead tr th, .table thead tr th {
+  background-color: rgba(0,0,0,0.2) !important;
+  color: var(--theme-text-secondary) !important;
+  font-size: 0.75rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  border-bottom: 1px solid rgba(255,255,255,0.1) !important;
+  padding: 12px 16px !important;
+}
+
+tbody tr, .table tbody tr, .row {
+  background-color: rgba(255, 255, 255, 0.02) !important;
+  transition: background-color 0.2s ease !important;
+}
+
+tbody tr:hover, .table tbody tr:hover, .row:hover {
+  background-color: rgba(241, 196, 15, 0.08) !important; /* Golden glow on hover */
+}
+
+td, .table tbody tr td, .cell {
+  color: var(--theme-text-primary) !important;
+  border-top: 1px solid rgba(255,255,255,0.05) !important;
+  border-bottom: 1px solid rgba(255,255,255,0.05) !important;
+  font-size: 0.9rem !important;
+  padding: 12px 16px !important;
+}
+
+/* Link/Title in Table */
+td a, .table a, .cell a {
+  color: var(--theme-text-primary) !important;
+  font-weight: 600 !important;
+}
+
+td a:hover, .table a:hover, .cell a:hover {
+  color: var(--theme-brand-500) !important;
+}
+
+/* Pagination & Utilities */
+.paginator, .per-page {
+  color: var(--theme-text-secondary) !important;
+}
+
+.paginator button, .per-page button {
+  color: var(--theme-text-primary) !important;
+}
+
+.pill {
+  background-color: rgba(241, 196, 15, 0.1) !important;
+  color: var(--theme-brand-500) !important;
+  border: 1px solid rgba(241, 196, 15, 0.2) !important;
+}
+
+/* Filter & Column Drawers */
+.list-controls__columns .popup-button,
+.list-controls__toggle-columns {
+    background-color: var(--theme-elevation-100) !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+    color: var(--theme-text-primary) !important;
+}
+
+.list-controls__columns .popup-button:hover {
+    border-color: var(--theme-brand-500) !important;
+}
