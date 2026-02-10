@@ -1,1 +1,52 @@
 /* Custom styles for Payload Admin */
+:root {
+  --theme-bg: #1A1D23;
+  --theme-input-bg: #22262D;
+  --theme-elevation-0: #1A1D23;
+  --theme-elevation-50: #1D2128;
+  --theme-elevation-100: #22262D;
+  --theme-elevation-150: #292E36;
+  --theme-elevation-200: #303640;
+  
+  --theme-success-50: #E6FFFA;
+  --theme-success-100: #B2F5EA;
+  --theme-success-500: #38B2AC;
+
+  --theme-warning-50: #FFFBEB;
+  --theme-warning-100: #FEF3C7;
+  --theme-warning-500: #F6E05E;
+
+  --theme-error-50: #FFF5F5;
+  --theme-error-100: #FED7D7;
+  --theme-error-500: #E53E3E;
+  
+  /* MOBIL GARAGE Primary Brand Color (Golden Yellow) */
+  --theme-brand-50: #FFFBEB;
+  --theme-brand-100: #FEF3C7;
+  --theme-brand-500: #FFC107;
+  --theme-brand-600: #E1A700;
+  
+  --theme-font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+body {
+  background-color: var(--theme-bg);
+}
+
+.nav__sidebar {
+    background-color: var(--theme-elevation-50) !important;
+}
+
+.nav__header {
+    background-color: var(--theme-elevation-100) !important;
+}
+
+.btn--style-primary {
+    background-color: var(--theme-brand-500) !important;
+    color: #000 !important;
+    font-weight: 700 !important;
+}
+
+.btn--style-primary:hover {
+    background-color: var(--theme-brand-600) !important;
+}

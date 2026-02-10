@@ -18,6 +18,10 @@ import { Payments } from './collections/Payments';
 // Globals
 import { SiteSettings } from './globals/SiteSettings';
 
+// Custom Branding Components
+import { Logo } from './components/payload/Logo';
+import { Icon } from './components/payload/Icon';
+
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
 
@@ -28,6 +32,29 @@ console.log('--- [PAYLOAD CONFIG] PAYLOAD_SECRET:', process.env.PAYLOAD_SECRET ?
 export default buildConfig({
   admin: {
     user: 'users',
+    meta: {
+      titleSuffix: '- Mobil Garage Admin',
+      icons: [
+        {
+          rel: 'icon',
+          type: 'image/x-icon',
+          url: '/favicon.ico',
+        },
+      ],
+      openGraph: {
+        images: [
+          {
+            url: '/images/social/og-image.png',
+          },
+        ],
+      },
+    },
+    components: {
+      graphics: {
+        Logo: Logo as any,
+        Icon: Icon as any,
+      },
+    },
   },
   collections: [
     {
