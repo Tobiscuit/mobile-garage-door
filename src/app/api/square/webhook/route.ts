@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-// @ts-ignore
-import { Client, Environment, WebhooksHelper } from 'square';
+import { SquareClient as Client, SquareEnvironment as Environment, WebhooksHelper } from 'square';
 import { getPayload } from 'payload';
 import configPromise from '@/payload.config';
 
