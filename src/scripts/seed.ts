@@ -7,12 +7,22 @@ const seed = async (): Promise<void> => {
 
   payload.logger.info('seeding...')
 
+  const email = process.env.ADMIN_EMAIL || 'admin@mobilegaragedoor.com';
+  const password = process.env.ADMIN_PASSWORD;
+
+  if (!password) {
+      payload.logger.warn('WARNING: No ADMIN_PASSWORD env var set. Using default "password123".')
+  }
+
+  const finalPassword = password || 'password123';
+
   // 1. Create Admin User
+  // Note: 'users' collection defined in payload.config.ts has no 'role' field, so we omit it.
   const users = await payload.find({
     collection: 'users',
     where: {
       email: {
-        equals: 'admin@mobilegaragedoor.com',
+        equals: email,
       },
     },
   })
@@ -21,15 +31,54 @@ const seed = async (): Promise<void> => {
     await payload.create({
       collection: 'users',
       data: {
-        email: 'admin@mobilegaragedoor.com',
-        password: 'password123',
-        role: 'admin',
+        email: email,
+        password: finalPassword,
       },
     })
-    payload.logger.info('Created Admin User: admin@mobilegaragedoor.com / password123')
+    payload.logger.info(`Created Admin User: ${email}`)
   } else {
     payload.logger.info('Admin User already exists.')
   }
+
+  // Helper to create simple Lexical features
+  const createLexicalParagraph = (text: string, bold: boolean = false) => ({
+    "type": "paragraph",
+    "children": [
+      {
+        "type": "text",
+        "detail": 0,
+        "format": bold ? 1 : 0, // 1 is bold
+        "mode": "normal",
+        "style": "",
+        "text": text,
+        "version": 1
+      }
+    ],
+    "direction": "ltr",
+    "format": "",
+    "indent": 0,
+    "version": 1
+  });
+
+  const createLexicalHeader = (text: string, tag: "h1" | "h2" | "h3" | "h4") => ({
+    "type": "heading",
+    "tag": tag,
+    "children": [
+        {
+          "type": "text",
+          "detail": 0,
+          "format": 0,
+          "mode": "normal",
+          "style": "",
+          "text": text,
+          "version": 1
+        }
+    ],
+    "direction": "ltr",
+    "format": "",
+    "indent": 0,
+    "version": 1
+  });
 
   // 2. Seed Projects
   for (const project of portfolioItems) {
@@ -44,51 +93,35 @@ const seed = async (): Promise<void> => {
 
     if (existingProjects.totalDocs === 0) {
       try {
-          // Construct Rich Text for Description
-          // Challenge + Solution + Benefits
-          const richTextDescription = [
-            {
-              children: [{ text: project.subtitle, bold: true }],
-              type: 'h3',
-            },
-            {
-              children: [{ text: 'The Challenge' }],
-              type: 'h4',
-            },
-            {
-              children: [{ text: project.challenge }],
-            },
-            {
-              children: [{ text: 'Our Solution' }],
-              type: 'h4',
-            },
-            {
-              children: [{ text: project.solution }],
-            },
-            {
-              children: [{ text: 'Key Benefits' }],
-              type: 'h4',
-            },
-            {
-              children: project.benefits.map(benefit => ({
-                text: benefit,
-              })),
-              type: 'ul', // Simplified list structure (Payload rich text is complex, often just text blocks work for basic seeding)
-            }
-          ];
+          // Construct Lexical Rich Text for Description
+          const lexicalContent = {
+              "root": {
+                "type": "root",
+                "format": "",
+                "indent": 0,
+                "version": 1,
+                "direction": "ltr",
+                "children": [
+                    createLexicalHeader(project.subtitle, 'h3'),
+                    createLexicalHeader('The Challenge', 'h4'),
+                    createLexicalParagraph(project.challenge),
+                    createLexicalHeader('Our Solution', 'h4'),
+                    createLexicalParagraph(project.solution),
+                    createLexicalHeader('Key Benefits', 'h4'),
+                    // Benefits list as paragraphs for simplicity in seeding
+                    ...project.benefits.map(b => createLexicalParagraph(`• ${b}`)) 
+                ]
+              }
+          };
 
-          // Simplified Rich Text: Payload expects a specific JSON structure (Slate/Lexical). 
-          // For safety/speed, we will just put the challenge/solution in simple paragraphs if stricter validation exists.
-          // But let's try a basic Slate structure.
-          
           await payload.create({
             collection: 'projects',
             data: {
               title: project.title,
               slug: project.id,
-              client: 'Residential Customer', // Default
-              location: 'Greater Seattle Area', // Default
-              imageStyle: project.imageAfter, // mapped from imageAfter which matches select values
+              client: 'Residential Customer',
+              location: 'Greater Seattle Area',
+              imageStyle: project.imageAfter as any, // Cast to any to satisfy TS enum check
               tags: [
                   { tag: 'Installation' },
                   { tag: 'Residential' }
@@ -97,23 +130,7 @@ const seed = async (): Promise<void> => {
                   { label: 'Time', value: '1 Day' },
                   { label: 'Warranty', value: 'Limited Lifetime' }
               ],
-              description: [
-                  {
-                      children: [{ text: project.subtitle, bold: true }],
-                  },
-                  {
-                      children: [{ text: '' }],
-                  },
-                  {
-                      children: [{ text: 'Challenge: ', bold: true }, { text: project.challenge }],
-                  },
-                  {
-                      children: [{ text: '' }],
-                  },
-                  {
-                      children: [{ text: 'Solution: ', bold: true }, { text: project.solution }],
-                  },
-              ],
+              description: lexicalContent as any, // Cast to any to avoid complex Lexical type generation in seed
             },
           })
           payload.logger.info(`Created Project: ${project.title}`)
