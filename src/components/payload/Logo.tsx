@@ -27,7 +27,7 @@ const Logo: React.FC = () => {
         M
       </div>
       <span>
-        MOBIL<span style={{ color: '#555', fontWeight: '300' }}>GARAGE</span>
+        MOBIL<span style={{ fontWeight: '300', opacity: 0.8 }}>GARAGE</span>
       </span>
     </div>
   );

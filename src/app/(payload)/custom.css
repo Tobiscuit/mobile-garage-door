@@ -172,6 +172,17 @@ h1, h2, h3, h4, h5, h6 {
   letter-spacing: -0.02em;
 }
 
+/* NAV ICONS & ARROWS */
+.nav__toggler, .nav__link svg, .breadcrumb svg, .icon, .svg-icon {
+  color: var(--theme-text-secondary) !important;
+  fill: currentColor !important;
+  stroke: currentColor !important;
+}
+
+.nav__toggler:hover, .nav__link:hover svg {
+  color: var(--theme-brand-500) !important;
+}
+
 /* DASHBOARD HEADERS */
 .dashboard__header h1 {
   text-shadow: 0 2px 10px rgba(0,0,0,0.3);
