@@ -38,8 +38,9 @@ export const Invoices: CollectionConfig = {
         type: 'text', // PAID, OPEN, VOIDED
     },
     {
-        name: 'customerEmail',
-        type: 'text',
+        name: 'customer', // Changed from customerEmail
+        type: 'relationship', // Changed from text
+        relationTo: 'customers' as any,
     },
     {
         name: 'publicUrl',

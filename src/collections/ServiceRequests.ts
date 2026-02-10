@@ -39,7 +39,7 @@ export const ServiceRequests: CollectionConfig = {
     {
       name: 'customer',
       type: 'relationship',
-      relationTo: 'customers',
+      relationTo: 'customers' as any,
       required: true,
       hasMany: false,
     },
