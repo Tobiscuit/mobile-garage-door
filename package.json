@@ -9,7 +9,9 @@
     "build": "payload generate:importmap && next build",
     "start": "next start",
     "lint": "next lint",
-    "seed": "node --import tsx scripts/seed.ts"
+    "generate:importmap": "payload generate:importmap",
+    "generate:types": "payload generate:types",
+    "seed": "tsx src/scripts/seed.ts"
   },
   "engines": {
     "node": ">=25.0.0"
