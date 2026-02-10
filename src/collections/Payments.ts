@@ -5,7 +5,6 @@ export const Payments: CollectionConfig = {
     admin: {
       useAsTitle: 'squarePaymentId',
       group: 'Finance',
-      relationTo: 'invoices' as any,
     },
     access: {
       read: ({ req: { user } }) => user?.collection === 'users',
