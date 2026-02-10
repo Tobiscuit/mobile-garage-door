@@ -10,7 +10,7 @@ export default async function PortalLayout({ children }: { children: React.React
   const payload = await getPayload({ config: configPromise });
   const { user } = await payload.auth({ headers: await headers() });
 
-  if (!user || user.collection !== 'customers') {
+  if (!user || (user as any).collection !== 'customers') {
     redirect('/login');
   }
 
