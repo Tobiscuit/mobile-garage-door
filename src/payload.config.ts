@@ -22,7 +22,8 @@ const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
 
 console.log('--- [PAYLOAD CONFIG] Initializing... ---');
-console.log('--- [PAYLOAD CONFIG] DB URI:', process.env.DATABASE_URI);
+console.log('--- [PAYLOAD CONFIG] DB URI:', process.env.DATABASE_URI ? 'FOUND' : 'MISSING');
+console.log('--- [PAYLOAD CONFIG] PAYLOAD_SECRET:', process.env.PAYLOAD_SECRET ? 'FOUND (length: ' + process.env.PAYLOAD_SECRET.length + ')' : 'MISSING');
 
 export default buildConfig({
   admin: {
