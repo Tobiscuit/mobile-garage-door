@@ -17,7 +17,7 @@ export default async function AboutPage() {
       <main className="flex-grow">
         
         {/* HERO: Blueprint Style */}
-        <section className="bg-charcoal-blue text-white py-24 relative overflow-hidden">
+        <section className="bg-charcoal-blue text-white pt-48 pb-24 relative overflow-hidden min-h-[50vh] flex flex-col justify-center">
             {/* Grid Background */}
             <div className="absolute inset-0 opacity-10" 
                  style={{ backgroundImage: 'linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)', backgroundSize: '40px 40px' }}>

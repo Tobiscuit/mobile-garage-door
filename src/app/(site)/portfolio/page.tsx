@@ -19,7 +19,7 @@ export default async function PortfolioPage() {
       <main className="flex-grow">
         
         {/* HEADER: Minimal Industrial */}
-        <section className="bg-charcoal-blue text-white py-24 px-6 relative overflow-hidden">
+        <section className="bg-charcoal-blue text-white pt-48 pb-24 px-6 relative overflow-hidden min-h-[50vh] flex flex-col justify-center">
             <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(#ffffff 1px, transparent 1px)', backgroundSize: '32px 32px' }}></div>
             <div className="container mx-auto relative z-10">
                 <div className="flex flex-col md:flex-row justify-between items-end gap-8">

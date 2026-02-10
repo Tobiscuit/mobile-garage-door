@@ -216,7 +216,7 @@ export default function ContactPage() {
   return (
     <div className="min-h-screen bg-cloudy-white font-work-sans flex flex-col">
       <Header />
-      <main className="flex-grow pt-24 pb-20 px-6">
+      <main className="flex-grow pt-48 pb-20 px-6">
         <Suspense fallback={
              <div className="text-center py-20">
                 <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-charcoal-blue"></div>

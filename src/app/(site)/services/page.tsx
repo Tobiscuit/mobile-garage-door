@@ -38,7 +38,7 @@ export default async function ServicesPage() {
         {/* BIFURCATED HERO: Services Edition */}
         <section className="relative flex flex-col md:flex-row text-white overflow-hidden font-display min-h-[60vh]">
             {/* LEFT: URGENT */}
-            <div className="relative w-full md:w-1/2 bg-dark-charcoal flex flex-col justify-center px-8 md:px-16 py-20 border-r border-white/5">
+            <div className="relative w-full md:w-1/2 bg-dark-charcoal flex flex-col justify-center px-8 md:px-16 pt-48 pb-20 border-r border-white/5">
                 <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'radial-gradient(#ffffff 1px, transparent 1px)', backgroundSize: '16px 16px' }}></div>
                 <div className="relative z-10">
                     <div className="inline-flex items-center gap-2 bg-red-500/10 border border-red-500/20 text-red-400 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-6">
@@ -58,7 +58,7 @@ export default async function ServicesPage() {
             </div>
 
             {/* RIGHT: PLANNED */}
-            <div className="relative w-full md:w-1/2 bg-charcoal-blue flex flex-col justify-center px-8 md:px-16 py-20">
+            <div className="relative w-full md:w-1/2 bg-charcoal-blue flex flex-col justify-center px-8 md:px-16 pt-48 pb-20">
                 <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'radial-gradient(#f1c40f 1px, transparent 1px)', backgroundSize: '24px 24px' }}></div>
                 <div className="relative z-10">
                     <div className="inline-flex items-center gap-2 bg-golden-yellow/10 border border-golden-yellow/20 text-golden-yellow px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-6">
