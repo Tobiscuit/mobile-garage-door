@@ -46,14 +46,14 @@ export const metadata: Metadata = {
   },
 }
 
-export default function SiteLayout({
+export default function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
   return (
-    <>
-      {children}
-    </>
+    <html lang="en">
+      <body className={inter.className}>{children}</body>
+    </html>
   )
 }
