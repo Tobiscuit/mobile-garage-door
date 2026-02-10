@@ -62,13 +62,6 @@ body {
     radial-gradient(circle at 100% 100%, rgba(241, 196, 15, 0.03) 0%, transparent 50%);
 }
 
-/* SIDEBAR STYLING */
-aside.nav {
-  background: rgba(52, 73, 94, 0.7) !important; /* Dark Charcoal with opacity */
-  border-right: 1px solid rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-}
 
 .nav__scroll {
    background: transparent !important;
@@ -143,21 +136,6 @@ a:hover {
   color: var(--theme-brand-500);
 }
 
-/* NAV LINKS */
-.nav__link {
-  color: var(--theme-text-secondary) !important;
-  border-radius: 8px;
-  margin-bottom: 2px;
-}
-
-.nav__link:hover, .nav__link--active {
-  color: var(--theme-brand-500) !important;
-  background: rgba(241, 196, 15, 0.1) !important;
-}
-
-.nav__link--active::before {
-  background-color: var(--theme-brand-500) !important;
-}
 
 /* INPUTS */
 input, textarea, .react-select__control {
@@ -190,35 +168,6 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--theme-brand-500) !important;
 }
 
-/* NAV LINKS - Force Contrast */
-aside.nav {
-    color: var(--theme-text-primary) !important;
-}
-
-aside.nav a, 
-.nav__link, 
-.nav__log-out,
-.nav__link-content,
-.nav__link-label,
-aside.nav span,
-aside.nav div {
-    color: var(--theme-text-primary) !important;
-    opacity: 1 !important;
-}
-
-.nav__link:hover,
-.nav__link:hover * {
-    color: var(--theme-brand-500) !important;
-    background: rgba(241, 196, 15, 0.1) !important;
-}
-
-.nav__label, .nav-group__label {
-    color: var(--theme-text-secondary) !important;
-    font-size: 0.75rem !important;
-    text-transform: uppercase !important;
-    letter-spacing: 0.05em !important;
-    margin-top: 1rem !important;
-}
 
 /* SVG SAFETY - Prevent infinite scaling on default Payload icons */
 svg {
