@@ -19,8 +19,8 @@ import { Payments } from './collections/Payments';
 import { SiteSettings } from './globals/SiteSettings';
 
 // Custom Branding Components
-import { Logo } from './components/payload/Logo';
-import { Icon } from './components/payload/Icon';
+// import Logo from './components/payload/Logo';
+// import Icon from './components/payload/Icon';
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
@@ -51,8 +51,14 @@ export default buildConfig({
     },
     components: {
       graphics: {
-        Logo: Logo as any,
-        Icon: Icon as any,
+        Logo: {
+          path: path.resolve(dirname, 'components/payload/Logo.tsx') + '#default',
+          exportName: 'default',
+        },
+        Icon: {
+          path: path.resolve(dirname, 'components/payload/Icon.tsx') + '#default',
+          exportName: 'default',
+        },
       },
     },
   },

@@ -1,6 +1,8 @@
+'use client';
+
 import React from 'react';
 
-export const Logo: React.FC = () => {
+const Logo: React.FC = () => {
   return (
     <div style={{ 
       display: 'flex', 
@@ -30,3 +32,5 @@ export const Logo: React.FC = () => {
     </div>
   );
 };
+
+export default Logo;

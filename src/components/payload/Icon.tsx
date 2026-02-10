@@ -1,6 +1,8 @@
+'use client';
+
 import React from 'react';
 
-export const Icon: React.FC = () => {
+const Icon: React.FC = () => {
   return (
     <div style={{ 
       width: '24px', 
@@ -18,3 +20,5 @@ export const Icon: React.FC = () => {
     </div>
   );
 };
+
+export default Icon;
