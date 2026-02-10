@@ -5,7 +5,7 @@ import configPromise from '@/payload.config';
 
 // Initialize Square Client
 const squareClient = new Client({
-  accessToken: process.env.SQUARE_ACCESS_TOKEN,
+  token: process.env.SQUARE_ACCESS_TOKEN,
   environment: process.env.SQUARE_ENVIRONMENT === 'production' ? Environment.Production : Environment.Sandbox,
 });
 
