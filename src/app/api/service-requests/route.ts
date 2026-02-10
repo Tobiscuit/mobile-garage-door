@@ -13,7 +13,7 @@ const squareClient = new Client({
 export async function POST(req: NextRequest) {
   try {
     const payload = await getPayload({ config: configPromise });
-    const { user } = await payload.auth({ req: req as any });
+    const { user } = await payload.auth({ headers: req.headers });
 
     if (!user || (user as any).collection !== 'customers') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
