@@ -190,6 +190,29 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--theme-brand-500) !important;
 }
 
+/* NAV LINKS - Force Contrast */
+aside.nav a, 
+.nav__link, 
+.nav__log-out {
+    color: var(--theme-text-primary) !important;
+    opacity: 1 !important;
+}
+
+.nav__link:hover {
+    color: var(--theme-brand-500) !important;
+    background: rgba(241, 196, 15, 0.1) !important;
+}
+
+.nav__label, .nav-group__label {
+    color: #bdc3c7 !important;
+}
+
+/* SVG SAFETY - Prevent infinite scaling on default Payload icons */
+svg {
+    max-width: 100%;
+    height: auto; 
+}
+
 /* DASHBOARD HEADERS */
 .dashboard__header h1 {
   text-shadow: 0 2px 10px rgba(0,0,0,0.3);
