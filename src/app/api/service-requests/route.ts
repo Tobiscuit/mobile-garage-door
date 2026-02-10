@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
     const payload = await getPayload({ config: configPromise });
     const { user } = await payload.auth({ req });
 
-    if (!user || user.collection !== 'customers') {
+    if (!user || (user as any).collection !== 'customers') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
 
     // 2. Create Service Request in Payload
     const serviceRequest = await payload.create({
-      collection: 'service-requests',
+      collection: 'service-requests' as any,
       data: {
         customer: user.id,
         issueDescription,
@@ -62,7 +62,7 @@ export async function POST(req: NextRequest) {
     // 3. Create Payment Record (for syncing purposes)
     if (result.payment?.id) {
          await payload.create({
-            collection: 'payments',
+            collection: 'payments' as any,
             data: {
                 squarePaymentId: result.payment.id,
                 amount: Number(result.payment.amountMoney?.amount),
