@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
 
   try {
     // Verify Signature
-    const isValid = WebhooksHelper.isValidWebhookEventSignature(
+    const isValid = (WebhooksHelper as any).isValidWebhookEventSignature(
       body,
       signature,
       process.env.SQUARE_WEBHOOK_SIGNATURE_KEY,
