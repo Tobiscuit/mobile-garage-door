@@ -1,52 +1,178 @@
-/* Custom styles for Payload Admin */
+@import url('https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700&display=swap');
+
 :root {
-  --theme-bg: #1A1D23;
-  --theme-input-bg: #22262D;
-  --theme-elevation-0: #1A1D23;
-  --theme-elevation-50: #1D2128;
-  --theme-elevation-100: #22262D;
-  --theme-elevation-150: #292E36;
-  --theme-elevation-200: #303640;
-  
-  --theme-success-50: #E6FFFA;
-  --theme-success-100: #B2F5EA;
-  --theme-success-500: #38B2AC;
+  /* 
+    MOBIL GARAGE BRAND PALETTE 
+    Primary Dark: #2c3e50 (Charcoal Blue)
+    Secondary Dark: #34495e (Dark Charcoal)
+    Accent: #f1c40f (Golden Yellow)
+    Text: #f7f9fb (Cloudy White)
+  */
 
-  --theme-warning-50: #FFFBEB;
-  --theme-warning-100: #FEF3C7;
-  --theme-warning-500: #F6E05E;
+  /* CORE BACKGROUNDS */
+  --theme-bg: #2c3e50; /* Charcoal Blue base */
+  
+  /* ELEVATION LAYERS (Cards, Sidebar, Header) */
+  --theme-elevation-0: #2c3e50;
+  --theme-elevation-50: #34495e; /* Sidebar/Header */
+  --theme-elevation-100: #3e5669; /* Cards */
+  --theme-elevation-150: #496377;
+  --theme-elevation-200: #547085;
+  --theme-elevation-250: #607d93;
+  --theme-elevation-300: #6c8a9f;
+  
+  /* BRAND COLORS */
+  --theme-brand-50: #fffbeb;
+  --theme-brand-100: #fef3c7;
+  --theme-brand-200: #fde68a;
+  --theme-brand-300: #fcd34d;
+  --theme-brand-400: #fbbf24;
+  --theme-brand-500: #f1c40f; /* Golden Yellow */
+  --theme-brand-600: #d4ac0d;
+  --theme-brand-700: #b58900;
+  --theme-brand-800: #926f00;
+  --theme-brand-900: #785c00;
 
-  --theme-error-50: #FFF5F5;
-  --theme-error-100: #FED7D7;
-  --theme-error-500: #E53E3E;
+  /* TEXT COLORS */
+  --theme-text-primary: #f7f9fb; /* Cloudy White */
+  --theme-text-secondary: #bdc3c7; /* Light Gray */
+
+  /* INPUTS */
+  --theme-input-bg: #1e2b38; /* Darker than Bg for contrast */
+  --theme-input-border: #4a6378;
+  --theme-input-text: #f7f9fb;
   
-  /* MOBIL GARAGE Primary Brand Color (Golden Yellow) */
-  --theme-brand-50: #FFFBEB;
-  --theme-brand-100: #FEF3C7;
-  --theme-brand-500: #FFC107;
-  --theme-brand-600: #E1A700;
-  
-  --theme-font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  /* SUCCESS / WARNING / ERROR STATUSES */
+  --theme-success-500: #2ecc71;
+  --theme-warning-500: #f39c12;
+  --theme-error-500: #e74c3c;
+
+  /* TYPOGRAPHY */
+  --font-body: 'Work Sans', system-ui, -apple-system, sans-serif;
+  --font-header: 'Work Sans', system-ui, -apple-system, sans-serif;
 }
 
+/* GLOBAL OVERRIDES */
 body {
+  font-family: var(--font-body);
   background-color: var(--theme-bg);
+  background-image: 
+    radial-gradient(circle at 0% 0%, rgba(241, 196, 15, 0.03) 0%, transparent 50%),
+    radial-gradient(circle at 100% 100%, rgba(241, 196, 15, 0.03) 0%, transparent 50%);
 }
 
-.nav__sidebar {
-    background-color: var(--theme-elevation-50) !important;
+/* SIDEBAR STYLING */
+aside.nav {
+  background: rgba(52, 73, 94, 0.7) !important; /* Dark Charcoal with opacity */
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
-.nav__header {
-    background-color: var(--theme-elevation-100) !important;
+.nav__scroll {
+   background: transparent !important;
 }
 
-.btn--style-primary {
-    background-color: var(--theme-brand-500) !important;
-    color: #000 !important;
-    font-weight: 700 !important;
+/* HEADER STYLING */
+header.app-header {
+  background: rgba(52, 73, 94, 0.7) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
-.btn--style-primary:hover {
-    background-color: var(--theme-brand-600) !important;
+/* CARD STYLING */
+.card, .dashboard__card, .collection-list__list {
+  background-color: var(--theme-elevation-100) !important;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px -5px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  border-color: rgba(241, 196, 15, 0.3);
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.3);
+}
+
+/* BUTTONS */
+.btn.btn--style-primary {
+  background-color: var(--theme-brand-500) !important;
+  color: #2c3e50 !important; /* Charcoal Text on Yellow Button */
+  font-weight: 700;
+  border-radius: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.85rem;
+  border: none;
+  box-shadow: 0 4px 12px rgba(241, 196, 15, 0.2);
+}
+
+.btn.btn--style-primary:hover {
+  background-color: #ffe066 !important; /* Lighter yellow on hover */
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(241, 196, 15, 0.3);
+}
+
+.btn.btn--style-secondary {
+  background-color: rgba(255,255,255,0.05) !important;
+  color: var(--theme-text-primary) !important;
+  border: 1px solid rgba(255,255,255,0.1) !important;
+}
+
+.btn.btn--style-secondary:hover {
+  background-color: rgba(255,255,255,0.1) !important;
+  border-color: var(--theme-brand-500) !important;
+}
+
+/* LINKS */
+a {
+  color: var(--theme-text-primary);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+a:hover {
+  color: var(--theme-brand-500);
+}
+
+/* NAV LINKS */
+.nav__link {
+  color: var(--theme-text-secondary) !important;
+  border-radius: 8px;
+  margin-bottom: 2px;
+}
+
+.nav__link:hover, .nav__link--active {
+  color: var(--theme-brand-500) !important;
+  background: rgba(241, 196, 15, 0.1) !important;
+}
+
+.nav__link--active::before {
+  background-color: var(--theme-brand-500) !important;
+}
+
+/* INPUTS */
+input, textarea, .react-select__control {
+  background-color: var(--theme-input-bg) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: var(--theme-text-primary) !important;
+  border-radius: 8px !important;
+}
+
+input:focus, textarea:focus, .react-select__control--is-focused {
+  border-color: var(--theme-brand-500) !important;
+  box-shadow: 0 0 0 2px rgba(241, 196, 15, 0.2) !important;
+}
+
+/* HEADINGS */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--theme-brand-500) !important;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+/* DASHBOARD HEADERS */
+.dashboard__header h1 {
+  text-shadow: 0 2px 10px rgba(0,0,0,0.3);
 }
