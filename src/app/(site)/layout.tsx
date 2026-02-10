@@ -25,7 +25,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: 'https://mobile-garage-door.vercel.app',
+    url: 'https://mobil-garage-door.vercel.app',
     title: 'Mobil Garage Door - Your Trusted Partner for Garage Doors',
     description: 'Professional garage door services including repair, installation, and maintenance. Reliable and professional solutions for all your garage door needs.',
     siteName: 'Mobil Garage Door',

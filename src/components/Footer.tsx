@@ -23,10 +23,10 @@ const Footer: React.FC = () => {
           <div>
             <h4 className="text-white font-bold mb-6 uppercase tracking-wider text-xs">Deployment Zones</h4>
             <ul className="space-y-3">
-              <li><a href="#" className="hover:text-white transition-colors">North Metro Area</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Industrial Park District</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Westside Suburbs</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Downtown Corridor</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">Greater Katy & West Houston</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">The Woodlands & North Houston</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">Sugar Land & Richmond</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">Houston Interior & Heights</a></li>
             </ul>
           </div>
 

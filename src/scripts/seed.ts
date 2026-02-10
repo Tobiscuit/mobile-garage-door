@@ -121,7 +121,7 @@ const seed = async (): Promise<void> => {
               title: project.title,
               slug: project.id,
               client: 'Residential Customer',
-              location: 'Greater Seattle Area',
+              location: 'Houston & Surrounding Areas',
               imageStyle: project.imageAfter as any, // Cast to any to satisfy TS enum check
               tags: [
                   { tag: 'Installation' },
