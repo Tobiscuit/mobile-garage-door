@@ -52,11 +52,11 @@ export default buildConfig({
     components: {
       graphics: {
         Logo: {
-          path: path.resolve(dirname, 'components/payload/Logo.tsx') + '#default',
+          path: '/src/components/payload/Logo.tsx#default',
           exportName: 'default',
         },
         Icon: {
-          path: path.resolve(dirname, 'components/payload/Icon.tsx') + '#default',
+          path: '/src/components/payload/Icon.tsx#default',
           exportName: 'default',
         },
       },
