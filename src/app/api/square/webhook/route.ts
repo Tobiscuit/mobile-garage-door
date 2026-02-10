@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+// @ts-ignore
 import { Client, Environment, WebhooksHelper } from 'square';
 import { getPayload } from 'payload';
 import configPromise from '@/payload.config';
@@ -48,7 +49,7 @@ export async function POST(req: NextRequest) {
         // Sync to 'payments' collection
         // Check if exists
         const existingPayments = await payload.find({
-          collection: 'payments',
+          collection: 'payments' as any,
           where: {
             squarePaymentId: { equals: squarePaymentId },
           },
@@ -57,7 +58,7 @@ export async function POST(req: NextRequest) {
         if (existingPayments.totalDocs > 0) {
           // Update
           await payload.update({
-            collection: 'payments',
+            collection: 'payments' as any,
             id: existingPayments.docs[0].id,
             data: {
               status,
@@ -69,7 +70,7 @@ export async function POST(req: NextRequest) {
         } else {
           // Create
           await payload.create({
-            collection: 'payments',
+            collection: 'payments' as any,
             data: {
               squarePaymentId,
               amount,
@@ -92,7 +93,7 @@ export async function POST(req: NextRequest) {
         const amount = Number(invoice.payment_requests[0].computed_amount_money.amount);
 
         const existingInvoices = await payload.find({
-            collection: 'invoices',
+            collection: 'invoices' as any,
             where: {
                 squareInvoiceId: { equals: squareInvoiceId }
             }
@@ -100,7 +101,7 @@ export async function POST(req: NextRequest) {
 
         if (existingInvoices.totalDocs > 0) {
             await payload.update({
-                collection: 'invoices',
+                collection: 'invoices' as any,
                 id: existingInvoices.docs[0].id,
                 data: {
                     status,
