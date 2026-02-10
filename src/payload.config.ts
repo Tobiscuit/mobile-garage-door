@@ -10,6 +10,10 @@ import { Services } from './collections/Services';
 import { Projects } from './collections/Projects';
 import { Testimonials } from './collections/Testimonials';
 import { Posts } from './collections/Posts';
+import { Customers } from './collections/Customers';
+import { ServiceRequests } from './collections/ServiceRequests';
+import { Invoices } from './collections/Invoices';
+import { Payments } from './collections/Payments';
 
 // Globals
 import { SiteSettings } from './globals/SiteSettings';
@@ -48,6 +52,10 @@ export default buildConfig({
     Projects,
     Testimonials,
     Posts,
+    Customers,
+    ServiceRequests,
+    Invoices,
+    Payments,
   ],
   globals: [
     SiteSettings,

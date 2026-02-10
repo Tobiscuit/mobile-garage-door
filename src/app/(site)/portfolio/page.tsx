@@ -4,6 +4,8 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { getPayloadClient } from '@/lib/payload';
 
+export const dynamic = 'force-dynamic';
+
 export default async function PortfolioPage() {
   const payload = await getPayloadClient();
   const { docs: projects } = await payload.find({

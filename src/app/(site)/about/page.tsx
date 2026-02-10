@@ -3,6 +3,8 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { getPayloadClient } from '@/lib/payload';
 
+export const dynamic = 'force-dynamic';
+
 export default async function AboutPage() {
   const payload = await getPayloadClient();
   const settings = await payload.findGlobal({
