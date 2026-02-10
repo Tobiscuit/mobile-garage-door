@@ -3,5 +3,9 @@
     "install": {
       "cmds": ["npm ci --legacy-peer-deps"]
     }
+  },
+  "variables": {
+    "HOSTNAME": "0.0.0.0",
+    "PORT": "3000"
   }
 }
