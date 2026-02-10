@@ -133,5 +133,3 @@ const Services: React.FC<ServicesProps> = ({ services = [] }) => {
 };
 
 export default Services;
-
-export default Services;

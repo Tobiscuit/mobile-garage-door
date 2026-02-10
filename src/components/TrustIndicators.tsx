@@ -95,5 +95,3 @@ const TrustIndicators: React.FC<TrustIndicatorsProps> = ({ testimonials = [] }) 
 };
 
 export default TrustIndicators;
-
-export default TrustIndicators;

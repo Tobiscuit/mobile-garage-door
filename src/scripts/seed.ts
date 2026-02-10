@@ -155,7 +155,7 @@ const seed = async (): Promise<void> => {
     {
       author: 'Sophia Bennett',
       location: 'General Contractor • Installation',
-      quote: "We use Mobile Garage for all our new builds. Their reliability is unmatched in the local market. They simply show up and get it done.",
+      quote: "We use Mobil Garage for all our new builds. Their reliability is unmatched in the local market. They simply show up and get it done.",
       rating: 5,
       featured: true,
     },

@@ -3,12 +3,12 @@ import React from 'react';
 const Testimonials: React.FC = () => {
   const testimonials = [
     {
-      quote: "Mobile Garage Solutions provided exceptional service. They were prompt, professional, and fixed my garage door quickly and efficiently. Highly recommend!",
+      quote: "Mobil Garage Solutions provided exceptional service. They were prompt, professional, and fixed my garage door quickly and efficiently. Highly recommend!",
       name: "Ethan Carter",
       image: "https://lh3.googleusercontent.com/aida-public/AB6AXuCVSo9B1J9QvKQTnNhUS17VHh6zNIB5abDr8e8n0OPHUIDiiveOej0kDbq87pwVivtkBfN4Vsmiy214Nw5Lq1_8rlh0PaIjI2UmB25PSkm8UyGZqIG9TdpFVq1m8XrGVwASEm74bGwQW6Av3IEm97xO9cCcvton_uY9G4NdtsqkZnjWgXlukuMwB-2zbeuLqDawF1KRNQyloczBNaxxIJEkGk3EgwIPs1F-0JzVJmxUqel9Q87_PgqoIgNcafDwdk3A7iUABq_--sUE"
     },
     {
-      quote: "I had a new garage door installed by Mobile Garage Solutions, and the experience was seamless. The team was knowledgeable, and the installation was flawless. Very satisfied with their work.",
+      quote: "I had a new garage door installed by Mobil Garage Solutions, and the experience was seamless. The team was knowledgeable, and the installation was flawless. Very satisfied with their work.",
       name: "Sophia Bennett",
       image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBF-4USAj9l2Z7yJDQq3XLeL-avApKgHZVdvx-fW21mlP_vLWVo1vCqLm1ewZh34dfSrBpHJI370AE3ptUuPmY74JKiYxvkxwqtspdIOs9XaEso5MJJkY7Khnr1KDcKk3a4TjvzjZgy6LXdXECGsdIgWWP1MMylVax5nkEmZE231IReyfRN1byLIwVYeQSqxlS1fMomqzI9b6oRbilgeEYcDyztXPW4UKPIkmIaNdb176KUTGIh9x17T7YY-4f1CdJcWX4clrrxt9gQ"
     }

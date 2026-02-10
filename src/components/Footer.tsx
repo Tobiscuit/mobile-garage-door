@@ -8,7 +8,7 @@ const Footer: React.FC = () => {
           
           {/* BRAND */}
           <div className="col-span-1 md:col-span-1">
-            <h3 className="text-white text-xl font-bold mb-6 font-display tracking-tight">MOBILE<span className="text-gray-600">GARAGE</span></h3>
+            <h3 className="text-white text-xl font-bold mb-6 font-display tracking-tight">MOBIL<span className="text-gray-600">GARAGE</span></h3>
             <p className="leading-relaxed mb-6">
               The premier automated access solution for residential builders and discerning homeowners.
             </p>
@@ -56,8 +56,8 @@ const Footer: React.FC = () => {
               <div>
                 <div className="text-xs text-gray-600 uppercase">HQ Dispatch</div>
                 <div className="text-white">
-                  4400 Industrial Blvd, Ste 200<br />
-                  Logistics City, ST 90210
+                  Rapid Response Unit<br />
+                  Houston & Surrounding Areas
                 </div>
               </div>
             </div>
@@ -67,7 +67,7 @@ const Footer: React.FC = () => {
 
         {/* BOTTOM BAR */}
         <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p>© 2026 Mobile Garage Door Inc. All rights reserved.</p>
+          <p>© 2026 Mobil Garage Door Inc. All rights reserved.</p>
           <div className="flex gap-6 text-xs">
             <a href="#" className="hover:text-white">Privacy Policy</a>
             <a href="#" className="hover:text-white">Terms of Service</a>
