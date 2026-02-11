@@ -21,7 +21,7 @@ export async function createUser(formData: FormData) {
     });
   } catch (error) {
     console.error('Create Error:', error);
-    return { error: 'Failed to create user' };
+    throw new Error('Failed to create user');
   }
 
   revalidatePath('/dashboard/users');
