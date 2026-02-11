@@ -41,6 +41,14 @@ export const Projects: CollectionConfig = {
       },
     },
     {
+      name: 'completionDate',
+      type: 'date',
+      label: 'Completion Date',
+      admin: {
+        position: 'sidebar',
+      },
+    },
+    {
       name: 'description',
       type: 'richText',
       required: true,

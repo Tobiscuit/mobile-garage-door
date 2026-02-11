@@ -82,7 +82,6 @@ export async function createProject(formData: FormData) {
         imageStyle: 'garage-pattern-modern', // Default for now
         tags: [{ tag: 'General' }], // Default tag
         stats: [], // Empty stats
-        _status: 'published',
       },
     });
   } catch (error) {

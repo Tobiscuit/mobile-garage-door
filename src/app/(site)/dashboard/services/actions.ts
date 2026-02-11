@@ -18,7 +18,6 @@ export async function createService(formData: FormData) {
         title,
         description,
         category,
-        _status: 'published',
       },
     });
   } catch (error) {
