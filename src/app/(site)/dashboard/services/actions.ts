@@ -73,3 +73,16 @@ export async function getServiceById(id: string) {
     return null;
   }
 }
+
+export async function getServices() {
+  const payload = await getPayload({ config: configPromise });
+  
+  const results = await payload.find({
+    collection: 'services',
+    depth: 1,
+    limit: 100,
+    sort: '-createdAt',
+  });
+
+  return results.docs;
+}
