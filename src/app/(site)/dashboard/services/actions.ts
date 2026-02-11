@@ -20,7 +20,7 @@ export async function createService(formData: FormData) {
         description,
         category,
         price: parseFloat(price) || 0,
-      },
+      } as any,
     });
   } catch (error) {
     console.error('Create Error:', error);
@@ -48,7 +48,7 @@ export async function updateService(id: string, formData: FormData) {
         description,
         category,
         price: parseFloat(price) || 0,
-      },
+      } as any,
     });
   } catch (error) {
     console.error('Update Error:', error);
