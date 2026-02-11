@@ -32,9 +32,6 @@ console.log('--- [PAYLOAD CONFIG] PAYLOAD_SECRET:', process.env.PAYLOAD_SECRET ?
 export default buildConfig({
   admin: {
     user: 'users',
-    routes: {
-      admin: '/db',
-    },
     meta: {
       titleSuffix: '- Mobil Garage Admin',
       icons: [
