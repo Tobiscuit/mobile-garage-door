@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { getPayload } from 'payload';
 import configPromise from '@payload-config';
 import Image from 'next/image';
-import MediaUpload from '@/components/admin/ui/MediaUpload';
+import QuickUpload from '@/components/admin/media/QuickUpload';
 
 async function getMedia() {
   const payload = await getPayload({ config: configPromise });
@@ -40,14 +40,7 @@ export default async function MediaPage() {
         <div className="col-span-1 md:col-span-1">
             <div className="bg-[#34495e]/50 backdrop-blur-md border border-[#ffffff08] p-6 rounded-2xl shadow-xl space-y-4">
                 <h3 className="text-sm font-bold text-white">Quick Upload</h3>
-                <MediaUpload 
-                    label="Drop Image Here"
-                    onUploadComplete={() => {
-                        // In a client component we could update list, 
-                        // but here we are in a server component so it requires revalidation or simple refresh
-                        // For now we just allow upload.
-                    }} 
-                />
+                <QuickUpload />
                 <p className="text-xs text-[#7f8c8d] mt-2 text-center">
                     Note: Refresh page to see new uploads in the gallery.
                 </p>

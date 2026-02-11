@@ -5,6 +5,7 @@ import '../globals.css'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
+  metadataBase: new URL('http://localhost:3000'),
   title: 'Mobil Garage Door - Your Trusted Partner for Garage Doors',
   description: 'Professional garage door services including repair, installation, and maintenance. Reliable and professional solutions for all your garage door needs.',
   keywords: ['garage door repair', 'garage door installation', 'garage door maintenance', 'mobil garage door service'],
