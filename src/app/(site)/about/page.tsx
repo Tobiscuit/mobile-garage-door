@@ -112,7 +112,7 @@ export default async function AboutPage() {
 
         {/* CTA */}
         <section className="bg-charcoal-blue py-24 px-6 text-center">
-             <h2 className="text-white text-4xl font-black mb-8">Work with the Authority.</h2>
+             <h2 className="text-white text-4xl font-black mb-8">Work with Mobil Garage Door.</h2>
              <a href="/contact" className="inline-block bg-golden-yellow hover:bg-white text-charcoal-blue font-bold py-4 px-10 rounded-xl transition-all transform hover:-translate-y-1 shadow-2xl">
                 Request Service
              </a>
