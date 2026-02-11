@@ -3,10 +3,58 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useNav } from '@payloadcms/ui';
 import Logo from './Logo';
+
+// Icons
+const ArchiveIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="5" x="2" y="3" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"/></svg>
+);
+const UsersIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 1-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+);
+const FileTextIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
+);
+const SettingsIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1-1-1.72v-.51a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+);
+const MessageSquareIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+);
+const BriefcaseIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+);
+const WrenchIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+);
+const HomeIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+);
+const ImageIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+);
+const LogoutIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
+);
 
 const CustomNav: React.FC = () => {
   const pathname = usePathname();
+  // Hook into Payload's nav state to ensure layout compatibility or just for refs
+  // Ideally, if we replace the *entire* nav, we need to provide the `nav` class.
+  // The useNav hook provides: navOpen, setNavOpen, navRef, hydrated, shouldAnimate
+  const { navOpen, navRef, hydrated, shouldAnimate } = useNav();
+  const baseClass = 'nav';
+
+  // Construct classes exactly like Payload's default NavWrapper to ensure layout works
+  const classes = [
+    baseClass,
+    navOpen && `${baseClass}--nav-open`,
+    shouldAnimate && `${baseClass}--nav-animate`,
+    hydrated && `${baseClass}--nav-hydrated`,
+    // Our custom overrides (ensure they have high enough specificity or order)
+    'bg-[#34495e] border-r border-[#ffffff05] flex flex-col h-screen shadow-2xl z-[100]'
+  ].filter(Boolean).join(' ');
 
   const isActive = (path: string) => {
     return pathname === path || pathname?.startsWith(`${path}/`);
@@ -41,102 +89,90 @@ const CustomNav: React.FC = () => {
   );
 
   return (
-    <aside className="w-[280px] bg-[#34495e] border-r border-[#ffffff05] flex flex-col h-screen fixed left-0 top-0 overflow-y-auto z-50 shadow-2xl">
-      {/* LOGO HEADER */}
-      <div className="p-6 mb-2">
-        <div className="w-40">
-           <Logo />
+    <aside className={classes} ref={navRef} aria-hidden={!navOpen}>
+      <div className={`${baseClass}__scroll h-full flex flex-col overflow-y-auto custom-scrollbar`}>
+        {/* LOGO HEADER */}
+        <div className="p-6 mb-2 shrink-0">
+            <Link href="/admin" className="block w-40 hover:opacity-90 transition-opacity">
+               <Logo />
+            </Link>
         </div>
+
+        {/* NAVIGATION SCROLL AREA */}
+        <nav className="flex-1 px-4 pb-6">
+            
+            {/* CORE */}
+            <NavGroup label="Core">
+            <NavItem 
+                href="/admin" 
+                label="Command Center" 
+                icon={<HomeIcon />} 
+            />
+            </NavGroup>
+
+            {/* OPERATIONS */}
+            <NavGroup label="Operations">
+            <NavItem 
+                href="/admin/collections/services" 
+                label="Services" 
+                icon={<WrenchIcon />} 
+            />
+            <NavItem 
+                href="/admin/collections/projects" 
+                label="Portfolio Projects" 
+                icon={<BriefcaseIcon />} 
+            />
+            </NavGroup>
+
+            {/* CONTENT */}
+            <NavGroup label="Content">
+            <NavItem 
+                href="/admin/collections/posts" 
+                label="Blog Posts" 
+                icon={<FileTextIcon />} 
+            />
+            <NavItem 
+                href="/admin/collections/testimonials" 
+                label="Testimonials" 
+                icon={<MessageSquareIcon />} 
+            />
+             <NavItem 
+                href="/admin/collections/media" 
+                label="Media Library" 
+                icon={<ImageIcon />} 
+            />
+            </NavGroup>
+
+            {/* CONFIGURATION */}
+            <NavGroup label="Configuration">
+            <NavItem 
+                href="/admin/globals/site-settings" 
+                label="Site Settings" 
+                icon={<SettingsIcon />} 
+            />
+            <NavItem 
+                href="/admin/collections/users" 
+                label="Users" 
+                icon={<UsersIcon />} 
+            />
+            </NavGroup>
+
+            {/* LOGOUT */}
+            <div className="mt-8 pt-6 border-t border-[#ffffff10]">
+            <Link href="/admin/logout" className="flex items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-500/10 rounded-lg transition-all">
+                <LogoutIcon />
+                <span className="font-bold">Log Out</span>
+            </Link>
+            </div>
+
+            {/* Footer / Meta Links */}
+            <div className="mt-4 px-4 text-xs text-[#ecf0f1] font-mono opacity-30">
+                <div>Mobil Garage Door</div>
+                <div>v1.0.0 (Bleeding Edge)</div>
+            </div>
+
+        </nav>
       </div>
-
-      {/* NAVIGATION SCROLL AREA */}
-      <nav className="flex-1 px-4 pb-6">
-        
-        {/* CORE */}
-        <NavGroup label="Core">
-          <NavItem 
-            href="/admin" 
-            label="Command Center" 
-            icon={<svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>} 
-          />
-        </NavGroup>
-
-        {/* OPERATIONS */}
-        <NavGroup label="Operations">
-          <NavItem 
-            href="/admin/collections/service-requests" 
-            label="Service Requests" 
-            icon={<svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>} 
-          />
-          <NavItem 
-            href="/admin/collections/customers" 
-            label="Customers" 
-            icon={<svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>} 
-          />
-          <NavItem 
-            href="/admin/collections/invoices" 
-            label="Invoices" 
-            icon={<svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>} 
-          />
-          <NavItem 
-            href="/admin/collections/payments" 
-            label="Payments" 
-            icon={<svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>} 
-          />
-        </NavGroup>
-
-        {/* CONTENT */}
-        <NavGroup label="Content">
-          <NavItem 
-            href="/admin/collections/services" 
-            label="Services" 
-            icon={<svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>} 
-          />
-           <NavItem 
-            href="/admin/collections/projects" 
-            label="Projects" 
-            icon={<svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>} 
-          />
-          <NavItem 
-            href="/admin/collections/testimonials" 
-            label="Testimonials" 
-            icon={<svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 8h10M7 12h5m-5 4h5m-7-9a4 4 0 118 0 4 4 0 018 0zM3 21h18M3 10V9a4 4 0 014-4h10a4 4 0 014 4v10a2 2 0 01-2 2H5a2 2 0 01-2-2V10z"/></svg>} 
-          />
-          <NavItem 
-            href="/admin/collections/posts" 
-            label="Posts (SEO)" 
-            icon={<svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>} 
-          />
-           <NavItem 
-            href="/admin/collections/media" 
-            label="Media Library" 
-            icon={<svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>} 
-          />
-        </NavGroup>
-
-        {/* SETTINGS */}
-        <NavGroup label="Configuration">
-          <NavItem 
-            href="/admin/globals/site-settings" 
-            label="Site Settings" 
-            icon={<svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>} 
-          />
-           <NavItem 
-            href="/admin/collections/users" 
-            label="Users" 
-            icon={<svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>} 
-          />
-        </NavGroup>
-
-        {/* LOGOUT */}
-        <div className="mt-8 pt-6 border-t border-[#ffffff10]">
-          <Link href="/admin/logout" className="flex items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-500/10 rounded-lg transition-all">
-             <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
-             <span className="font-bold">Log Out</span>
-          </Link>
-        </div>
-
-      </nav>
     </aside>
   );
 };

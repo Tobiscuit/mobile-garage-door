@@ -11,138 +11,198 @@
   */
 
   /* CORE BACKGROUNDS */
-  --theme-bg: #2c3e50; /* Charcoal Blue base */
+  --theme-bg: #2c3e50; /* Charcoal Blue base - Main Page Background */
   
-  /* ELEVATION LAYERS (Cards, Sidebar, Header) */
+  /* ELEVATION LAYERS */
   --theme-elevation-0: #2c3e50;
-  --theme-elevation-50: #34495e; /* Sidebar/Header */
-  --theme-elevation-100: #3e5669; /* Cards */
+  --theme-elevation-50: #34495e; /* Sidebar/Header/Panels */
+  --theme-elevation-100: #3e5669; /* Cards/Containers */
   --theme-elevation-150: #496377;
-  --theme-elevation-200: #547085;
-  --theme-elevation-250: #607d93;
-  --theme-elevation-300: #6c8a9f;
+  --theme-elevation-200: #547085; /* Modals/Dropdowns */
   
   /* BRAND COLORS */
-  --theme-brand-50: #fffbeb;
-  --theme-brand-100: #fef3c7;
-  --theme-brand-200: #fde68a;
-  --theme-brand-300: #fcd34d;
-  --theme-brand-400: #fbbf24;
   --theme-brand-500: #f1c40f; /* Golden Yellow */
   --theme-brand-600: #d4ac0d;
-  --theme-brand-700: #b58900;
-  --theme-brand-800: #926f00;
-  --theme-brand-900: #785c00;
-
+  
   /* TEXT COLORS */
   --theme-text-primary: #f7f9fb; /* Cloudy White */
   --theme-text-secondary: #bdc3c7; /* Light Gray */
+  --theme-text-muted: #95a5a6;
 
   /* INPUTS */
-  --theme-input-bg: #1e2b38; /* Darker than Bg for contrast */
+  --theme-input-bg: #1e2b38; /* Darker than Bg */
   --theme-input-border: #4a6378;
   --theme-input-text: #f7f9fb;
   
-  /* SUCCESS / WARNING / ERROR STATUSES */
-  --theme-success-500: #2ecc71;
-  --theme-warning-500: #f39c12;
-  --theme-error-500: #e74c3c;
-
-  /* TYPOGRAPHY */
+  /* PAYLOAD VARIABLE OVERRIDES */
+  --theme-bg-html: var(--theme-bg);
+  --theme-elevation-0: var(--theme-bg);
+  --theme-elevation-50: var(--theme-elevation-50);
+  --theme-elevation-100: var(--theme-elevation-100);
+  --theme-elevation-150: var(--theme-elevation-150);
+  --theme-elevation-200: var(--theme-elevation-200);
+  --theme-elevation-250: var(--theme-elevation-200);
+  --theme-elevation-300: var(--theme-elevation-200);
+  --theme-elevation-350: var(--theme-elevation-200);
+  --theme-elevation-400: var(--theme-elevation-200);
+  --theme-elevation-450: var(--theme-elevation-200);
+  --theme-elevation-500: var(--theme-elevation-200);
+  --theme-elevation-800: var(--theme-elevation-200);
+  
+  /* Typography */
   --font-body: 'Work Sans', system-ui, -apple-system, sans-serif;
   --font-header: 'Work Sans', system-ui, -apple-system, sans-serif;
 }
 
-/* GLOBAL OVERRIDES */
-body {
-  font-family: var(--font-body);
-  background-color: var(--theme-bg);
-  background-image: 
-    radial-gradient(circle at 0% 0%, rgba(241, 196, 15, 0.03) 0%, transparent 50%),
-    radial-gradient(circle at 100% 100%, rgba(241, 196, 15, 0.03) 0%, transparent 50%);
+/* =========================================
+   GLOBAL RESET & LAYOUT
+   ========================================= */
+html, body {
+  background-color: var(--theme-bg) !important;
+  color: var(--theme-text-primary) !important;
+  font-family: var(--font-body) !important;
 }
 
-
-.nav__scroll {
-   background: transparent !important;
+/* Force standard Payload Layout to transparent/dark */
+.payload-default-template, 
+.template-default, 
+main {
+  background-color: var(--theme-bg) !important;
 }
 
-/* HEADER STYLING */
-header.app-header {
-  background: rgba(52, 73, 94, 0.7) !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+/* Header/Top Bar */
+header, .app-header {
+  background: rgba(52, 73, 94, 0.9) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
   backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
 }
 
-/* CARD STYLING */
-.card, .dashboard__card, .collection-list__list {
-  background-color: var(--theme-elevation-100) !important;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 12px;
-  box-shadow: 0 4px 20px -5px rgba(0, 0, 0, 0.2);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+/* =========================================
+   LIST VIEW OVERRIDES
+   ========================================= */
+/* The main list container */
+.collection-list {
+  padding: 2rem !important;
 }
 
-.card:hover {
-  border-color: rgba(241, 196, 15, 0.3);
-  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.3);
-}
-
-/* BUTTONS */
-.btn.btn--style-primary {
-  background-color: var(--theme-brand-500) !important;
-  color: #2c3e50 !important; /* Charcoal Text on Yellow Button */
-  font-weight: 700;
-  border-radius: 8px;
+/* List Headers */
+.collection-list header h1, 
+.view-description {
+  color: var(--theme-brand-500) !important;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  font-size: 0.85rem;
-  border: none;
-  box-shadow: 0 4px 12px rgba(241, 196, 15, 0.2);
-  width: fit-content !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
+  font-weight: 700;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.3);
 }
 
-
-.btn.btn--style-primary:hover {
-  background-color: #ffe066 !important; /* Lighter yellow on hover */
-  transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(241, 196, 15, 0.3);
+/* Filter/Search Bar area */
+.list-controls {
+  background: transparent !important;
+  border: none !important;
+  margin-bottom: 2rem !important;
 }
 
-.btn.btn--style-secondary {
+/* Filter Pills/Buttons */
+.pill, .list-controls__toggle-columns, .list-controls__toggle-where {
   background-color: rgba(255,255,255,0.05) !important;
-  color: var(--theme-text-primary) !important;
   border: 1px solid rgba(255,255,255,0.1) !important;
-  width: fit-content !important;
-}
-
-.btn.btn--style-secondary:hover {
-  background-color: rgba(255,255,255,0.1) !important;
-  border-color: var(--theme-brand-500) !important;
-}
-
-/* LINKS */
-a {
-  color: var(--theme-text-primary);
-  text-decoration: none;
-  transition: color 0.2s;
-}
-
-a:hover {
-  color: var(--theme-brand-500);
-}
-
-
-/* INPUTS */
-input, textarea, .react-select__control {
-  background-color: var(--theme-input-bg) !important;
-  border-color: rgba(255, 255, 255, 0.1) !important;
   color: var(--theme-text-primary) !important;
   border-radius: 8px !important;
+}
+
+.pill:hover, .list-controls__toggle-columns:hover {
+  border-color: var(--theme-brand-500) !important;
+  color: var(--theme-brand-500) !important;
+}
+
+/* The Data Table */
+table, .table {
+  background: var(--theme-elevation-50) !important;
+  border-radius: 12px !important;
+  overflow: hidden !important;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2) !important;
+  border: 1px solid rgba(255,255,255,0.05) !important;
+}
+
+thead tr th {
+  background-color: rgba(0,0,0,0.2) !important;
+  color: var(--theme-brand-500) !important; /* Yellow Headers */
+  font-size: 0.75rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.1em !important;
+  border-bottom: 1px solid rgba(255,255,255,0.1) !important;
+  padding: 16px !important;
+}
+
+/* Table Rows */
+tbody tr, .row-1 {
+  background-color: transparent !important;
+  transition: all 0.2s ease !important;
+}
+
+tbody tr:hover {
+  background-color: rgba(241, 196, 15, 0.05) !important;
+}
+
+td {
+  border-top: 1px solid rgba(255,255,255,0.05) !important;
+  color: var(--theme-text-primary) !important;
+}
+
+/* Links in table */
+td a {
+  color: var(--theme-text-primary) !important;
+  font-weight: 500 !important;
+}
+td a:hover {
+  color: var(--theme-brand-500) !important;
+}
+
+/* =========================================
+   EDIT VIEW OVERRIDES
+   ========================================= */
+/* The main edit container */
+.doc-controls {
+  background-color: var(--theme-elevation-50) !important;
+  border-bottom: 1px solid rgba(255,255,255,0.05) !important;
+  padding: 1rem 2rem !important;
+}
+
+.doc-header__title {
+  color: var(--theme-brand-500) !important;
+}
+
+/* Field Groups / Cards */
+.field-type.group, .field-type.ui-field, .card {
+  background-color: var(--theme-elevation-100) !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  border-radius: 12px !important;
+  padding: 1.5rem !important;
+  margin-bottom: 1.5rem !important;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1) !important;
+}
+
+/* Field Labels */
+.field-label {
+  color: var(--theme-text-secondary) !important;
+  text-transform: uppercase;
+  font-size: 0.75rem !important;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem !important;
+}
+
+/* Inputs */
+input[type="text"], 
+input[type="number"], 
+input[type="email"], 
+input[type="password"],
+textarea, 
+.react-select__control {
+  background-color: var(--theme-input-bg) !important;
+  border: 1px solid var(--theme-input-border) !important;
+  color: var(--theme-text-primary) !important;
+  border-radius: 6px !important;
+  padding: 0.75rem !important;
 }
 
 input:focus, textarea:focus, .react-select__control--is-focused {
@@ -150,104 +210,75 @@ input:focus, textarea:focus, .react-select__control--is-focused {
   box-shadow: 0 0 0 2px rgba(241, 196, 15, 0.2) !important;
 }
 
-/* HEADINGS */
-h1, h2, h3, h4, h5, h6 {
-  color: var(--theme-brand-500) !important;
-  font-weight: 700;
-  letter-spacing: -0.02em;
+/* Rich Text Editor Overrides */
+.rich-text-editor {
+  background-color: var(--theme-input-bg) !important;
+  border: 1px solid var(--theme-input-border) !important;
+  border-radius: 8px !important;
 }
-
-/* NAV ICONS & ARROWS */
-.nav__toggler, .nav__link svg, .breadcrumb svg, .icon, .svg-icon {
-  color: var(--theme-text-secondary) !important;
-  fill: currentColor !important;
-  stroke: currentColor !important;
-}
-
-.nav__toggler:hover, .nav__link:hover svg {
-  color: var(--theme-brand-500) !important;
-}
-
-
-/* SVG SAFETY - Prevent infinite scaling on default Payload icons */
-svg {
-    max-width: 100%;
-    height: auto; 
-}
-
-/* DASHBOARD HEADERS */
-.dashboard__header h1 {
-  text-shadow: 0 2px 10px rgba(0,0,0,0.3);
-}
-
-/* TABLE & LIST VIEW FIXES */
-table, .table {
-  background: transparent !important;
-  color: var(--theme-text-primary) !important;
-  border-collapse: separate !important;
-  border-spacing: 0 4px !important;
-}
-
-thead tr th, .table thead tr th {
-  background-color: rgba(0,0,0,0.2) !important;
-  color: var(--theme-text-secondary) !important;
-  font-size: 0.75rem !important;
-  text-transform: uppercase !important;
-  letter-spacing: 0.05em !important;
-  border-bottom: 1px solid rgba(255,255,255,0.1) !important;
-  padding: 12px 16px !important;
-}
-
-tbody tr, .table tbody tr, .row {
-  background-color: rgba(255, 255, 255, 0.02) !important;
-  transition: background-color 0.2s ease !important;
-}
-
-tbody tr:hover, .table tbody tr:hover, .row:hover {
-  background-color: rgba(241, 196, 15, 0.08) !important; /* Golden glow on hover */
-}
-
-td, .table tbody tr td, .cell {
-  color: var(--theme-text-primary) !important;
-  border-top: 1px solid rgba(255,255,255,0.05) !important;
+.rich-text-editor__toolbar {
+  background-color: var(--theme-elevation-50) !important;
   border-bottom: 1px solid rgba(255,255,255,0.05) !important;
-  font-size: 0.9rem !important;
-  padding: 12px 16px !important;
 }
 
-/* Link/Title in Table */
-td a, .table a, .cell a {
+/* Sidebar in Edit View (Publish Controls) */
+.form-sidebar {
+  background-color: transparent !important;
+}
+.form-sidebar .field-type {
+  background-color: var(--theme-elevation-100) !important;
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+/* =========================================
+   BUTTONS
+   ========================================= */
+/* Primary Action (Save/Publish) */
+.btn--style-primary {
+  background-color: var(--theme-brand-500) !important;
+  color: #2c3e50 !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  border-radius: 6px !important;
+  border: none !important;
+  box-shadow: 0 4px 15px rgba(241, 196, 15, 0.3) !important;
+  transition: transform 0.2s !important;
+}
+
+.btn--style-primary:hover {
+  transform: translateY(-2px);
+  background-color: #ffe066 !important;
+  box-shadow: 0 6px 20px rgba(241, 196, 15, 0.4) !important;
+}
+
+/* Secondary Action (Preview/Cancel) */
+.btn--style-secondary {
+  background-color: transparent !important;
+  border: 1px solid rgba(255,255,255,0.1) !important;
   color: var(--theme-text-primary) !important;
-  font-weight: 600 !important;
 }
 
-td a:hover, .table a:hover, .cell a:hover {
+.btn--style-secondary:hover {
+  border-color: var(--theme-brand-500) !important;
   color: var(--theme-brand-500) !important;
 }
 
-/* Pagination & Utilities */
-.paginator, .per-page {
-  color: var(--theme-text-secondary) !important;
+/* Delete Button */
+.btn--style-icon-label {
+    color: var(--theme-text-muted) !important;
+}
+.btn--style-icon-label:hover {
+    color: #e74c3c !important; /* Red */
 }
 
-.paginator button, .per-page button {
-  color: var(--theme-text-primary) !important;
+/* =========================================
+   NAVBAR FIX
+   ========================================= */
+/* Ensure the standard payload nav container takes full height and fits with our custom styles */
+nav.nav {
+  height: 100vh;
 }
-
-.pill {
-  background-color: rgba(241, 196, 15, 0.1) !important;
-  color: var(--theme-brand-500) !important;
-  border: 1px solid rgba(241, 196, 15, 0.2) !important;
-}
-
-/* Filter & Column Drawers */
-.list-controls__columns .popup-button,
-.list-controls__toggle-columns {
-    background-color: var(--theme-elevation-100) !important;
-    border: 1px solid rgba(255,255,255,0.1) !important;
-    color: var(--theme-text-primary) !important;
-}
-
-.list-controls__columns .popup-button:hover {
-    border-color: var(--theme-brand-500) !important;
+.nav__scroll {
+  background-color: var(--theme-elevation-50) !important;
 }
