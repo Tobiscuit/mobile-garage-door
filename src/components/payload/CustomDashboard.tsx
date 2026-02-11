@@ -71,5 +71,3 @@ const CustomDashboard: React.FC = () => {
 };
 
 export default CustomDashboard;
-
-export default CustomDashboard;
