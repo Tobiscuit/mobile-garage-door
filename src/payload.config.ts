@@ -14,6 +14,7 @@ import { Customers } from './collections/Customers';
 import { ServiceRequests } from './collections/ServiceRequests';
 import { Invoices } from './collections/Invoices';
 import { Payments } from './collections/Payments';
+import { Users } from './collections/Users';
 
 // Globals
 import { SiteSettings } from './globals/SiteSettings';
@@ -63,15 +64,7 @@ export default buildConfig({
     },
   },
   collections: [
-    {
-      slug: 'users',
-      auth: true,
-      access: {
-        delete: () => false,
-        update: () => true,
-      },
-      fields: [],
-    },
+    Users,
     {
       slug: 'media',
       upload: true,
