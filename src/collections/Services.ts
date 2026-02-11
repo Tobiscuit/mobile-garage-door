@@ -38,6 +38,7 @@ export const Services: CollectionConfig = {
       admin: {
         description: 'Starting price for this service',
       },
+      },
     },
     {
       name: 'description',
