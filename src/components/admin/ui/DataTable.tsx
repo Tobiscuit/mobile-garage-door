@@ -1,5 +1,3 @@
-'use client';
-
 import React from 'react';
 import Link from 'next/link';
 
@@ -13,14 +11,14 @@ interface Column<T> {
 interface DataTableProps<T> {
   data: T[];
   columns: Column<T>[];
-  onRowClick?: (item: T) => void;
+
   isLoading?: boolean;
 }
 
 export function DataTable<T extends { id: string | number }>({
   data,
   columns,
-  onRowClick,
+
   isLoading
 }: DataTableProps<T>) {
 
@@ -57,11 +55,7 @@ export function DataTable<T extends { id: string | number }>({
           {data.map((item, rowIdx) => (
             <tr 
               key={item.id} 
-              onClick={() => onRowClick && onRowClick(item)}
-              className={`
-                group transition-all duration-200 hover:bg-[#f1c40f]/5 
-                ${onRowClick ? 'cursor-pointer' : ''}
-              `}
+              className="group transition-all duration-200 hover:bg-[#f1c40f]/5"
             >
               {columns.map((col, colIdx) => (
                 <td key={colIdx} className={`p-5 text-sm text-[#f7f9fb] ${col.className || ''}`}>
