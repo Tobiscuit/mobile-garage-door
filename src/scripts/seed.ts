@@ -1,3 +1,4 @@
+import 'dotenv/config'
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 import { portfolioItems } from '@/data/projects'
@@ -81,8 +82,42 @@ const seed = async (): Promise<void> => {
     "version": 1
   });
 
+  const createSimpleLexicalDocument = (text: string) => ({
+    "root": {
+      "type": "root",
+      "format": "",
+      "indent": 0,
+      "version": 1,
+      "direction": "ltr",
+      "children": [
+        createLexicalParagraph(text)
+      ]
+    }
+  });
+
   // 2. Seed Projects
   for (const project of portfolioItems) {
+    // Construct Lexical Rich Text for Description
+    const lexicalContent = {
+        "root": {
+          "type": "root",
+          "format": "",
+          "indent": 0,
+          "version": 1,
+          "direction": "ltr",
+          "children": [
+              createLexicalHeader(project.subtitle, 'h3'),
+              createLexicalHeader('The Challenge', 'h4'),
+              createLexicalParagraph(project.challenge),
+              createLexicalHeader('Our Solution', 'h4'),
+              createLexicalParagraph(project.solution),
+              createLexicalHeader('Key Benefits', 'h4'),
+              // Benefits list as paragraphs for simplicity in seeding
+              ...project.benefits.map(b => createLexicalParagraph(`• ${b}`)) 
+          ]
+        }
+    };
+
     const existingProjects = await payload.find({
       collection: 'projects',
       where: {
@@ -94,27 +129,6 @@ const seed = async (): Promise<void> => {
 
     if (existingProjects.totalDocs === 0) {
       try {
-          // Construct Lexical Rich Text for Description
-          const lexicalContent = {
-              "root": {
-                "type": "root",
-                "format": "",
-                "indent": 0,
-                "version": 1,
-                "direction": "ltr",
-                "children": [
-                    createLexicalHeader(project.subtitle, 'h3'),
-                    createLexicalHeader('The Challenge', 'h4'),
-                    createLexicalParagraph(project.challenge),
-                    createLexicalHeader('Our Solution', 'h4'),
-                    createLexicalParagraph(project.solution),
-                    createLexicalHeader('Key Benefits', 'h4'),
-                    // Benefits list as paragraphs for simplicity in seeding
-                    ...project.benefits.map(b => createLexicalParagraph(`• ${b}`)) 
-                ]
-              }
-          };
-
           await payload.create({
             collection: 'projects',
             data: {
@@ -131,7 +145,9 @@ const seed = async (): Promise<void> => {
                   { label: 'Time', value: '1 Day' },
                   { label: 'Warranty', value: 'Limited Lifetime' }
               ],
-              description: lexicalContent as any, // Cast to any to avoid complex Lexical type generation in seed
+              description: lexicalContent as any, 
+              challenge: createSimpleLexicalDocument(project.challenge) as any,
+              solution: createSimpleLexicalDocument(project.solution) as any,
             },
           })
           payload.logger.info(`Created Project: ${project.title}`)
@@ -139,7 +155,20 @@ const seed = async (): Promise<void> => {
           payload.logger.error(`Failed to seed project ${project.title}: ${e.message}`)
       }
     } else {
-      payload.logger.info(`Project already exists: ${project.title}`)
+      payload.logger.info(`Updating existing project: ${project.title}`)
+      try {
+        await payload.update({
+          collection: 'projects',
+          id: existingProjects.docs[0].id,
+          data: {
+             challenge: createSimpleLexicalDocument(project.challenge) as any,
+             solution: createSimpleLexicalDocument(project.solution) as any,
+             description: lexicalContent as any,
+          }
+        })
+      } catch (e: any) {
+         payload.logger.error(`Failed to update project ${project.title}: ${e.message}`)
+      }
     }
   }
 

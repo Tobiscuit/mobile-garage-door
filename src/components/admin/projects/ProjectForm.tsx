@@ -85,13 +85,34 @@ export default function ProjectForm({ initialData, isEdit = false }: ProjectForm
                 </div>
 
                 <div>
-                   <label className="block text-xs font-bold text-[#bdc3c7] uppercase mb-2">Description / Case Study</label>
+                   <label className="block text-xs font-bold text-[#bdc3c7] uppercase mb-2">Description / Case Study (Main)</label>
                    <textarea 
                      name="description" 
                      defaultValue={getInitialDescription()}
-                     className="w-full bg-[#1e2b38]/80 border border-[#ffffff10] rounded-xl p-4 text-white placeholder-[#547085] focus:border-[#f1c40f] outline-none transition-all min-h-[300px] font-mono text-sm leading-relaxed"
-                     placeholder="Detailed description of the project, challenges, and solution..."
+                     className="w-full bg-[#1e2b38]/80 border border-[#ffffff10] rounded-xl p-4 text-white placeholder-[#547085] focus:border-[#f1c40f] outline-none transition-all min-h-[200px] font-mono text-sm leading-relaxed"
+                     placeholder="Detailed description of the project..."
                    />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label className="block text-xs font-bold text-[#bdc3c7] uppercase mb-2">The Challenge</label>
+                        <textarea 
+                            name="challenge" 
+                            defaultValue={initialData?.challenge}
+                            className="w-full bg-[#1e2b38]/80 border border-[#ffffff10] rounded-xl p-4 text-white placeholder-[#547085] focus:border-[#f1c40f] outline-none transition-all min-h-[150px] font-mono text-sm"
+                            placeholder="What problem was the client facing?"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-xs font-bold text-[#bdc3c7] uppercase mb-2">Our Solution</label>
+                        <textarea 
+                            name="solution" 
+                            defaultValue={initialData?.solution}
+                            className="w-full bg-[#1e2b38]/80 border border-[#ffffff10] rounded-xl p-4 text-white placeholder-[#547085] focus:border-[#f1c40f] outline-none transition-all min-h-[150px] font-mono text-sm"
+                            placeholder="How did we fix it?"
+                        />
+                    </div>
                 </div>
               </div>
            </div>

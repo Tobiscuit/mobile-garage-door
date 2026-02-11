@@ -53,6 +53,27 @@ export const Projects: CollectionConfig = {
       type: 'richText',
       required: true,
       label: 'Case Study Details',
+      admin: {
+        description: 'Main body content (Rich Text)',
+      },
+    },
+    {
+      name: 'challenge',
+      type: 'richText',
+      required: true,
+      label: 'The Challenge',
+      admin: {
+        description: 'What problem was the client facing?',
+      },
+    },
+    {
+      name: 'solution',
+      type: 'richText',
+      required: true,
+      label: 'Our Solution',
+      admin: {
+        description: 'How did we fix it?',
+      },
     },
     {
       name: 'imageStyle',

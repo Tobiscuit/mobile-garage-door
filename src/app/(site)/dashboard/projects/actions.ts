@@ -63,6 +63,8 @@ export async function createProject(formData: FormData) {
 
   const title = formData.get('title') as string;
   const description = formData.get('description') as string;
+  const challenge = formData.get('challenge') as string;
+  const solution = formData.get('solution') as string;
   const client = formData.get('client') as string;
   const location = formData.get('location') as string;
   const completionDate = formData.get('completionDate') as string;
@@ -74,6 +76,8 @@ export async function createProject(formData: FormData) {
       data: {
         title,
         description: generateRichText(description) as any, // Cast to any to bypass complex Lexical types in server action
+        challenge: generateRichText(challenge) as any,
+        solution: generateRichText(solution) as any,
         client,
         location,
         completionDate,
@@ -98,6 +102,8 @@ export async function updateProject(id: string, formData: FormData) {
 
   const title = formData.get('title') as string;
   const description = formData.get('description') as string;
+  const challenge = formData.get('challenge') as string;
+  const solution = formData.get('solution') as string;
   const client = formData.get('client') as string;
   const location = formData.get('location') as string;
   const completionDate = formData.get('completionDate') as string;
@@ -110,6 +116,8 @@ export async function updateProject(id: string, formData: FormData) {
       data: {
         title,
         description: generateRichText(description) as any,
+        challenge: generateRichText(challenge) as any,
+        solution: generateRichText(solution) as any,
         client,
         location,
         completionDate,

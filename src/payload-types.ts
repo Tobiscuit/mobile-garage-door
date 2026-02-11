@@ -64,6 +64,7 @@ export type SupportedTimezones =
 export interface Config {
   auth: {
     users: UserAuthOperations;
+    customers: CustomerAuthOperations;
   };
   blocks: {};
   collections: {
@@ -73,6 +74,10 @@ export interface Config {
     projects: Project;
     testimonials: Testimonial;
     posts: Post;
+    customers: Customer;
+    'service-requests': ServiceRequest;
+    invoices: Invoice;
+    payments: Payment;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -86,6 +91,10 @@ export interface Config {
     projects: ProjectsSelect<false> | ProjectsSelect<true>;
     testimonials: TestimonialsSelect<false> | TestimonialsSelect<true>;
     posts: PostsSelect<false> | PostsSelect<true>;
+    customers: CustomersSelect<false> | CustomersSelect<true>;
+    'service-requests': ServiceRequestsSelect<false> | ServiceRequestsSelect<true>;
+    invoices: InvoicesSelect<false> | InvoicesSelect<true>;
+    payments: PaymentsSelect<false> | PaymentsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -102,15 +111,31 @@ export interface Config {
     'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
   };
   locale: null;
-  user: User & {
-    collection: 'users';
-  };
+  user: User | Customer;
   jobs: {
     tasks: unknown;
     workflows: unknown;
   };
 }
 export interface UserAuthOperations {
+  forgotPassword: {
+    email: string;
+    password: string;
+  };
+  login: {
+    email: string;
+    password: string;
+  };
+  registerFirstUser: {
+    email: string;
+    password: string;
+  };
+  unlock: {
+    email: string;
+    password: string;
+  };
+}
+export interface CustomerAuthOperations {
   forgotPassword: {
     email: string;
     password: string;
@@ -151,6 +176,7 @@ export interface User {
       }[]
     | null;
   password?: string | null;
+  collection: 'users';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -186,6 +212,10 @@ export interface Service {
    * Category tag (e.g., "Critical Response", "Smart Home")
    */
   category: string;
+  /**
+   * Starting price for this service
+   */
+  price?: number | null;
   description: string;
   features?:
     | {
@@ -224,7 +254,47 @@ export interface Project {
    * Service area (e.g., "Industrial Park, Sector 4")
    */
   location: string;
+  completionDate?: string | null;
+  /**
+   * Main body content (Rich Text)
+   */
   description: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  /**
+   * What problem was the client facing?
+   */
+  challenge: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  /**
+   * How did we fix it?
+   */
+  solution: {
     root: {
       type: string;
       children: {
@@ -326,6 +396,88 @@ export interface Post {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "customers".
+ */
+export interface Customer {
+  id: number;
+  name: string;
+  phone: string;
+  address?: string | null;
+  squareCustomerId?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  email: string;
+  resetPasswordToken?: string | null;
+  resetPasswordExpiration?: string | null;
+  salt?: string | null;
+  hash?: string | null;
+  loginAttempts?: number | null;
+  lockUntil?: string | null;
+  sessions?:
+    | {
+        id: string;
+        createdAt?: string | null;
+        expiresAt: string;
+      }[]
+    | null;
+  password?: string | null;
+  collection: 'customers';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "service-requests".
+ */
+export interface ServiceRequest {
+  id: number;
+  ticketId?: string | null;
+  customer: number | Customer;
+  issueDescription: string;
+  urgency?: ('standard' | 'emergency') | null;
+  scheduledTime?: string | null;
+  status?: ('pending' | 'confirmed' | 'dispatched' | 'on_site' | 'completed' | 'cancelled') | null;
+  tripFeePayment?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "invoices".
+ */
+export interface Invoice {
+  id: number;
+  squareInvoiceId: string;
+  orderId?: string | null;
+  amount: number;
+  status?: string | null;
+  customer?: (number | null) | Customer;
+  publicUrl?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payments".
+ */
+export interface Payment {
+  id: number;
+  squarePaymentId: string;
+  amount: number;
+  currency?: string | null;
+  status?: string | null;
+  sourceType?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -371,12 +523,33 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'posts';
         value: number | Post;
+      } | null)
+    | ({
+        relationTo: 'customers';
+        value: number | Customer;
+      } | null)
+    | ({
+        relationTo: 'service-requests';
+        value: number | ServiceRequest;
+      } | null)
+    | ({
+        relationTo: 'invoices';
+        value: number | Invoice;
+      } | null)
+    | ({
+        relationTo: 'payments';
+        value: number | Payment;
       } | null);
   globalSlug?: string | null;
-  user: {
-    relationTo: 'users';
-    value: number | User;
-  };
+  user:
+    | {
+        relationTo: 'users';
+        value: number | User;
+      }
+    | {
+        relationTo: 'customers';
+        value: number | Customer;
+      };
   updatedAt: string;
   createdAt: string;
 }
@@ -386,10 +559,15 @@ export interface PayloadLockedDocument {
  */
 export interface PayloadPreference {
   id: number;
-  user: {
-    relationTo: 'users';
-    value: number | User;
-  };
+  user:
+    | {
+        relationTo: 'users';
+        value: number | User;
+      }
+    | {
+        relationTo: 'customers';
+        value: number | Customer;
+      };
   key?: string | null;
   value?:
     | {
@@ -462,6 +640,7 @@ export interface ServicesSelect<T extends boolean = true> {
   title?: T;
   slug?: T;
   category?: T;
+  price?: T;
   description?: T;
   features?:
     | T
@@ -484,7 +663,10 @@ export interface ProjectsSelect<T extends boolean = true> {
   slug?: T;
   client?: T;
   location?: T;
+  completionDate?: T;
   description?: T;
+  challenge?: T;
+  solution?: T;
   imageStyle?: T;
   image?: T;
   tags?:
@@ -536,6 +718,74 @@ export interface PostsSelect<T extends boolean = true> {
   publishedAt?: T;
   status?: T;
   quickNotes?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "customers_select".
+ */
+export interface CustomersSelect<T extends boolean = true> {
+  name?: T;
+  phone?: T;
+  address?: T;
+  squareCustomerId?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  email?: T;
+  resetPasswordToken?: T;
+  resetPasswordExpiration?: T;
+  salt?: T;
+  hash?: T;
+  loginAttempts?: T;
+  lockUntil?: T;
+  sessions?:
+    | T
+    | {
+        id?: T;
+        createdAt?: T;
+        expiresAt?: T;
+      };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "service-requests_select".
+ */
+export interface ServiceRequestsSelect<T extends boolean = true> {
+  ticketId?: T;
+  customer?: T;
+  issueDescription?: T;
+  urgency?: T;
+  scheduledTime?: T;
+  status?: T;
+  tripFeePayment?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "invoices_select".
+ */
+export interface InvoicesSelect<T extends boolean = true> {
+  squareInvoiceId?: T;
+  orderId?: T;
+  amount?: T;
+  status?: T;
+  customer?: T;
+  publicUrl?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payments_select".
+ */
+export interface PaymentsSelect<T extends boolean = true> {
+  squarePaymentId?: T;
+  amount?: T;
+  currency?: T;
+  status?: T;
+  sourceType?: T;
   updatedAt?: T;
   createdAt?: T;
 }
