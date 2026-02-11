@@ -69,9 +69,6 @@ export default buildConfig({
         },
       },
       // Insert Custom Sidebar (Nav)
-      Nav: {
-        path: '/src/components/payload/CustomNav.tsx#default',
-        exportName: 'default',
       },
     },
   },
