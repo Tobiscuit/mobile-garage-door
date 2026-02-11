@@ -29,6 +29,35 @@ export async function getProjectById(id: string) {
   }
 }
 
+const generateRichText = (text: string) => ({
+  root: {
+    type: 'root',
+    format: '',
+    indent: 0,
+    version: 1,
+    direction: 'ltr',
+    children: [
+      {
+        type: 'paragraph',
+        format: '',
+        indent: 0,
+        version: 1,
+        children: [
+          {
+            type: 'text',
+            detail: 0,
+            format: 0,
+            mode: 'normal',
+            style: '',
+            text: text || '',
+            version: 1,
+          },
+        ],
+      },
+    ],
+  },
+});
+
 export async function createProject(formData: FormData) {
   const payload = await getPayload({ config: configPromise });
 
@@ -37,18 +66,22 @@ export async function createProject(formData: FormData) {
   const client = formData.get('client') as string;
   const location = formData.get('location') as string;
   const completionDate = formData.get('completionDate') as string;
-  const coverImage = formData.get('coverImage') as string; // ID of the media
+  const coverImage = formData.get('coverImage') as string;
 
   try {
     await payload.create({
       collection: 'projects',
       data: {
         title,
-        description, // Simplified string for now, could be rich text
+        description: generateRichText(description) as any, // Cast to any to bypass complex Lexical types in server action
         client,
         location,
         completionDate,
-        coverImage: coverImage || undefined,
+        image: coverImage ? (coverImage as any) : undefined, // Cast to any to bypass strict number check
+        slug: title.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, ''),
+        imageStyle: 'garage-pattern-modern', // Default for now
+        tags: [{ tag: 'General' }], // Default tag
+        stats: [], // Empty stats
         _status: 'published',
       },
     });
@@ -77,11 +110,11 @@ export async function updateProject(id: string, formData: FormData) {
       id,
       data: {
         title,
-        description,
+        description: generateRichText(description) as any,
         client,
         location,
         completionDate,
-        coverImage: coverImage || undefined,
+        image: coverImage ? (coverImage as any) : undefined,
       },
     });
   } catch (error) {
