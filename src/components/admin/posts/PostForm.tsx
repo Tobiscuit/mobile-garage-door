@@ -13,6 +13,8 @@ interface PostFormProps {
 export default function PostForm({ action, initialData, buttonLabel }: PostFormProps) {
   const router = useRouter();
 
+  const [featuredImageId, setFeaturedImageId] = React.useState<string | null>(initialData?.featuredImage?.id || initialData?.featuredImage || null);
+
   // Helper to extract text from Lexical JSON if it exists
   const getInitialContent = () => {
     if (!initialData?.content) return '';
@@ -34,6 +36,8 @@ export default function PostForm({ action, initialData, buttonLabel }: PostFormP
 
   return (
     <form action={action} className="max-w-6xl">
+      <input type="hidden" name="featuredImage" value={featuredImageId || ''} />
+      
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
         {/* MAIN CONTENT COLUMN */}
@@ -177,8 +181,8 @@ export default function PostForm({ action, initialData, buttonLabel }: PostFormP
                  <h3 className="text-xs font-bold text-[#bdc3c7] uppercase tracking-wider mb-4 border-b border-[#ffffff10] pb-2">Featured Image</h3>
                  
                  <MediaUpload 
-                    name="featuredImage"
-                    initialValue={initialData?.featuredImage}
+                    onUploadComplete={(doc) => setFeaturedImageId(doc.id)}
+                    initialMedia={initialData?.featuredImage}
                  />
             </div>
 

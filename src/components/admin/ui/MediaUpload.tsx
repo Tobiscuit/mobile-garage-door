@@ -2,7 +2,7 @@
 
 import React, { useState, useRef } from 'react';
 import Image from 'next/image';
-import { uploadMedia } from '@/app/(site)/dashboard/media/actions';
+import { uploadMedia } from '@/app/(site)/admin/media/actions';
 
 interface MediaUploadProps {
   onUploadComplete: (media: any) => void;

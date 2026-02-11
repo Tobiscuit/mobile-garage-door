@@ -39,7 +39,6 @@ export const Services: CollectionConfig = {
         description: 'Starting price for this service',
       },
       },
-    },
     {
       name: 'description',
       type: 'textarea',
