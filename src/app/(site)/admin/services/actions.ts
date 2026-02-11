@@ -27,8 +27,8 @@ export async function createService(formData: FormData) {
     return { error: 'Failed to create service' };
   }
 
-  revalidatePath('/dashboard/services');
-  redirect('/dashboard/services');
+  revalidatePath('/admin/services');
+  redirect('/admin/services');
 }
 
 export async function updateService(id: string, formData: FormData) {
@@ -55,8 +55,8 @@ export async function updateService(id: string, formData: FormData) {
     return { error: 'Failed to update service' };
   }
 
-  revalidatePath('/dashboard/services');
-  redirect('/dashboard/services');
+  revalidatePath('/admin/services');
+  redirect('/admin/services');
 }
 
 export async function getServiceById(id: string) {

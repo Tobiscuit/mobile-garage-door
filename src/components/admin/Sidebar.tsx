@@ -63,7 +63,7 @@ const Sidebar: React.FC = () => {
       <aside className="fixed left-0 top-0 h-screen w-[280px] bg-[#2c3e50]/95 backdrop-blur-xl border-r border-[#ffffff08] flex flex-col z-50">
         {/* LOGO AREA */}
         <div className="p-6 mb-2 shrink-0">
-            <Link href="/dashboard" className="block w-40 hover:opacity-90 transition-opacity">
+            <Link href="/admin" className="block w-40 hover:opacity-90 transition-opacity">
                <Logo />
             </Link>
         </div>
@@ -71,23 +71,23 @@ const Sidebar: React.FC = () => {
         {/* SCROLLABLE NAV */}
         <nav className="flex-1 px-4 overflow-y-auto custom-scrollbar">
             <NavGroup title="Core">
-                <NavItem href="/dashboard" icon={CommandIcon} label="Command Center" />
+                <NavItem href="/admin" icon={CommandIcon} label="Command Center" />
             </NavGroup>
 
             <NavGroup title="Operations">
-                <NavItem href="/dashboard/services" icon={ServiceIcon} label="Services" />
-                <NavItem href="/dashboard/projects" icon={ProjectIcon} label="Projects" />
-                <NavItem href="/dashboard/testimonials" icon={UsersIcon} label="Testimonials" />
+                <NavItem href="/admin/services" icon={ServiceIcon} label="Services" />
+                <NavItem href="/admin/projects" icon={ProjectIcon} label="Projects" />
+                <NavItem href="/admin/testimonials" icon={UsersIcon} label="Testimonials" />
             </NavGroup>
 
             <NavGroup title="Content">
-                <NavItem href="/dashboard/posts" icon={PostIcon} label="Blog Posts" />
-                <NavItem href="/dashboard/media" icon={MediaIcon} label="Media Library" />
+                <NavItem href="/admin/posts" icon={PostIcon} label="Blog Posts" />
+                <NavItem href="/admin/media" icon={MediaIcon} label="Media Library" />
             </NavGroup>
 
             <NavGroup title="Configuration">
-                <NavItem href="/dashboard/users" icon={UsersIcon} label="Users" />
-                <NavItem href="/dashboard/settings" icon={SettingsIcon} label="Site Settings" />
+                <NavItem href="/admin/users" icon={UsersIcon} label="Users" />
+                <NavItem href="/admin/settings" icon={SettingsIcon} label="Site Settings" />
             </NavGroup>
         </nav>
 

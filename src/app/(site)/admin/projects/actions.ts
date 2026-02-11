@@ -89,8 +89,8 @@ export async function createProject(formData: FormData) {
     return { error: 'Failed to create project' };
   }
 
-  revalidatePath('/dashboard/projects');
-  redirect('/dashboard/projects');
+  revalidatePath('/admin/projects');
+  redirect('/admin/projects');
 }
 
 export async function updateProject(id: string, formData: FormData) {
@@ -121,6 +121,6 @@ export async function updateProject(id: string, formData: FormData) {
     return { error: 'Failed to update project' };
   }
 
-  revalidatePath('/dashboard/projects');
-  redirect('/dashboard/projects');
+  revalidatePath('/admin/projects');
+  redirect('/admin/projects');
 }

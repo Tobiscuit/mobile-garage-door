@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { createProject, updateProject } from '@/app/(site)/dashboard/projects/actions';
-import MediaUpload from '@/components/dashboard/ui/MediaUpload';
+import { createProject, updateProject } from '@/app/(site)/admin/projects/actions';
+import MediaUpload from '@/components/admin/ui/MediaUpload';
 
 interface ProjectFormProps {
   initialData?: any;

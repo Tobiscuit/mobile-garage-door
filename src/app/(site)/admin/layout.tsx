@@ -3,7 +3,7 @@ import { getPayload } from 'payload';
 import configPromise from '@payload-config';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
-import Sidebar from '@/components/dashboard/Sidebar';
+import Sidebar from '@/components/admin/Sidebar';
 
 export default async function DashboardLayout({
   children,
@@ -15,7 +15,7 @@ export default async function DashboardLayout({
   const { user } = await payload.auth({ headers: headersList });
 
   if (!user) {
-    redirect('/admin/login?redirect=' + encodeURIComponent('/dashboard'));
+    redirect('/db/login?redirect=' + encodeURIComponent('/admin'));
   }
 
   return (

@@ -1,11 +1,11 @@
 import React from 'react';
 import Link from 'next/link';
-import { getServices } from './actions';
-import { DataTable } from '@/components/dashboard/ui/DataTable';
+import { getProjects } from './actions';
+import { DataTable } from '@/components/admin/ui/DataTable';
+import Image from 'next/image';
 
-// This is a Server Component
-export default async function ServicesPage() {
-  const services = await getServices();
+export default async function ProjectsPage() {
+  const projects = await getProjects();
 
   return (
     <div className="animate-in fade-in duration-500">
@@ -13,7 +13,7 @@ export default async function ServicesPage() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
            <div className="flex items-center gap-2 mb-1">
-              <Link href="/dashboard" className="text-[#7f8c8d] hover:text-[#f1c40f] text-sm font-bold uppercase tracking-widest transition-colors">
+              <Link href="/admin" className="text-[#7f8c8d] hover:text-[#f1c40f] text-sm font-bold uppercase tracking-widest transition-colors">
                 Command Center
               </Link>
               <span className="text-[#ffffff20]">/</span>
@@ -21,11 +21,11 @@ export default async function ServicesPage() {
                 Operations
               </span>
            </div>
-           <h1 className="text-4xl font-black text-white">Services</h1>
+           <h1 className="text-4xl font-black text-white">Project Portfolio</h1>
         </div>
 
         <Link 
-          href="/dashboard/services/create" 
+          href="/admin/projects/create" 
           className="
             flex items-center gap-2 bg-[#f1c40f] text-[#2c3e50] font-bold px-6 py-3 rounded-xl 
             shadow-[0_4px_20px_rgba(241,196,15,0.3)] hover:shadow-[0_6px_25px_rgba(241,196,15,0.5)] 
@@ -35,41 +35,47 @@ export default async function ServicesPage() {
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
           </svg>
-          <span>New Service</span>
+          <span>New Project</span>
         </Link>
       </div>
 
       {/* DATA TABLE */}
       <DataTable 
-        data={services}
+        data={projects}
         columns={[
           {
-            header: 'Service Name',
+            header: 'Project',
             cell: (item: any) => (
-               <div>
-                  <div className="font-bold text-lg text-white group-hover:text-[#f1c40f] transition-colors">
-                    {item.title}
+               <div className="flex items-center gap-4">
+                  <div className="w-16 h-16 rounded-lg bg-[#ffffff05] relative overflow-hidden shrink-0 border border-[#ffffff10]">
+                      {item.coverImage?.url ? (
+                         <Image src={item.coverImage.url} alt={item.title} fill className="object-cover" />
+                      ) : (
+                         <div className="flex items-center justify-center h-full text-[#547085]">
+                            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                         </div>
+                      )}
                   </div>
-                  <div className="text-xs text-[#7f8c8d] line-clamp-1">{item.description}</div>
+                  <div>
+                    <div className="font-bold text-lg text-white group-hover:text-[#f1c40f] transition-colors">{item.title}</div>
+                    <div className="text-xs text-[#7f8c8d]">{item.client}</div>
+                  </div>
                </div>
             )
           },
           {
-            header: 'Category',
+            header: 'Location',
             cell: (item: any) => (
-                <span className="inline-block px-3 py-1 rounded-md bg-[#ffffff05] border border-[#ffffff05] text-xs font-bold text-[#bdc3c7]">
-                    {item.category || 'Uncategorized'}
-                </span>
+                <div className="text-sm font-medium text-[#bdc3c7]">
+                    {item.location || 'N/A'}
+                </div>
             )
           },
           {
-             header: 'Status',
+             header: 'Completion',
              cell: (item: any) => (
-                <div className="flex items-center gap-2">
-                    <div className={`w-2 h-2 rounded-full ${item._status === 'published' ? 'bg-[#2ecc71]' : 'bg-[#e67e22]'}`}></div>
-                    <span className="text-xs font-bold uppercase tracking-wider text-[#bdc3c7]">
-                        {item._status || 'Draft'}
-                    </span>
+                <div className="text-xs font-mono text-[#547085] uppercase tracking-wider">
+                    {item.completionDate ? new Date(item.completionDate).toLocaleDateString() : 'Ongoing'}
                 </div>
              )
           },
@@ -79,9 +85,8 @@ export default async function ServicesPage() {
             cell: (item: any) => (
               <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                  <Link 
-                    href={`/dashboard/services/${item.id}`}
+                    href={`/admin/projects/${item.id}`}
                     className="p-2 bg-[#ffffff05] hover:bg-[#f1c40f] hover:text-[#2c3e50] rounded-lg transition-colors"
-                    title="Edit Service"
                  >
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />

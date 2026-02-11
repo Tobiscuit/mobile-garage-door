@@ -32,6 +32,9 @@ console.log('--- [PAYLOAD CONFIG] PAYLOAD_SECRET:', process.env.PAYLOAD_SECRET ?
 export default buildConfig({
   admin: {
     user: 'users',
+    routes: {
+      admin: '/db',
+    },
     meta: {
       titleSuffix: '- Mobil Garage Admin',
       icons: [
@@ -59,16 +62,6 @@ export default buildConfig({
           path: '/src/components/payload/Icon.tsx#default',
           exportName: 'default',
         },
-      },
-      views: {
-        dashboard: {
-          Component: {
-            path: '/src/components/payload/CustomDashboard.tsx#default',
-            exportName: 'default',
-          },
-        },
-      },
-      // Insert Custom Sidebar (Nav)
       },
     },
   },

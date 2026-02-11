@@ -2,7 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getServiceById } from '../actions';
-import ServiceForm from '@/components/dashboard/services/ServiceForm';
+import ServiceForm from '@/components/admin/services/ServiceForm';
 
 export default async function EditServicePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -16,7 +16,7 @@ export default async function EditServicePage({ params }: { params: Promise<{ id
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="mb-8">
         <div className="flex items-center gap-2 mb-1">
-            <Link href="/dashboard/services" className="text-[#7f8c8d] hover:text-[#f1c40f] text-sm font-bold uppercase tracking-widest transition-colors">
+            <Link href="/admin/services" className="text-[#7f8c8d] hover:text-[#f1c40f] text-sm font-bold uppercase tracking-widest transition-colors">
             Services
             </Link>
             <span className="text-[#ffffff20]">/</span>

@@ -2,7 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getProjectById } from '../actions';
-import ProjectForm from '@/components/dashboard/projects/ProjectForm';
+import ProjectForm from '@/components/admin/projects/ProjectForm';
 
 export default async function EditProjectPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -16,7 +16,7 @@ export default async function EditProjectPage({ params }: { params: Promise<{ id
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="mb-8">
         <div className="flex items-center gap-2 mb-1">
-            <Link href="/dashboard/projects" className="text-[#7f8c8d] hover:text-[#f1c40f] text-sm font-bold uppercase tracking-widest transition-colors">
+            <Link href="/admin/projects" className="text-[#7f8c8d] hover:text-[#f1c40f] text-sm font-bold uppercase tracking-widest transition-colors">
             Projects
             </Link>
             <span className="text-[#ffffff20]">/</span>
