@@ -82,7 +82,7 @@ export async function createProject(formData: FormData) {
         imageStyle: 'garage-pattern-modern', // Default for now
         tags: [{ tag: 'General' }], // Default tag
         stats: [], // Empty stats
-      },
+      } as any, // Bypass stale type definition for completionDate
     });
   } catch (error) {
     console.error('Create Project Error:', error);
@@ -114,7 +114,7 @@ export async function updateProject(id: string, formData: FormData) {
         location,
         completionDate,
         image: coverImage ? (coverImage as any) : undefined,
-      },
+      } as any,
     });
   } catch (error) {
     console.error('Update Project Error:', error);

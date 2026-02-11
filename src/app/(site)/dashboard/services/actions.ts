@@ -11,6 +11,7 @@ export async function createService(formData: FormData) {
   const title = formData.get('title') as string;
   const description = formData.get('description') as string;
   const category = formData.get('category') as 'Design' | 'Commercial' | 'Residential' | 'Critical Response'; // Type safety match
+  const price = formData.get('price') as string;
   try {
     await payload.create({
       collection: 'services',
@@ -18,6 +19,7 @@ export async function createService(formData: FormData) {
         title,
         description,
         category,
+        price: parseFloat(price) || 0,
       },
     });
   } catch (error) {
@@ -35,6 +37,7 @@ export async function updateService(id: string, formData: FormData) {
   const title = formData.get('title') as string;
   const description = formData.get('description') as string;
   const category = formData.get('category') as any;
+  const price = formData.get('price') as string;
 
   try {
     await payload.update({
@@ -44,6 +47,7 @@ export async function updateService(id: string, formData: FormData) {
         title,
         description,
         category,
+        price: parseFloat(price) || 0,
       },
     });
   } catch (error) {

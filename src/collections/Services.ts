@@ -32,6 +32,14 @@ export const Services: CollectionConfig = {
       },
     },
     {
+      name: 'price',
+      type: 'number',
+      label: 'Base Price ($)',
+      admin: {
+        description: 'Starting price for this service',
+      },
+    },
+    {
       name: 'description',
       type: 'textarea',
       required: true,
