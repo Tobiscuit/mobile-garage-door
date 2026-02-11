@@ -28,6 +28,21 @@ export default function ProjectForm({ initialData, isEdit = false }: ProjectForm
     }
   }
 
+  // Helper to extract text from Lexical JSON if it exists
+  const getInitialDescription = () => {
+    if (!initialData?.description) return '';
+    // If string (from our simple create), return it
+    if (typeof initialData.description === 'string') return initialData.description;
+    // If Lexical JSON object
+    try {
+        // Very basic extraction: get the first paragraph text
+        // TODO: iterate over children for full text if needed
+        return initialData.description?.root?.children?.[0]?.children?.[0]?.text || '';
+    } catch (e) {
+        return '';
+    }
+  };
+
   return (
     <form action={handleSubmit} className="max-w-6xl animate-in fade-in duration-500">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -73,7 +88,7 @@ export default function ProjectForm({ initialData, isEdit = false }: ProjectForm
                    <label className="block text-xs font-bold text-[#bdc3c7] uppercase mb-2">Description / Case Study</label>
                    <textarea 
                      name="description" 
-                     defaultValue={initialData?.description}
+                     defaultValue={getInitialDescription()}
                      className="w-full bg-[#1e2b38]/80 border border-[#ffffff10] rounded-xl p-4 text-white placeholder-[#547085] focus:border-[#f1c40f] outline-none transition-all min-h-[300px] font-mono text-sm leading-relaxed"
                      placeholder="Detailed description of the project, challenges, and solution..."
                    />

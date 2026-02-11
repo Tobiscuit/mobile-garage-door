@@ -22,6 +22,9 @@ const Sidebar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false); // Mobile toggle state logic here if needed
 
   const isActive = (path: string) => {
+    if (path === '/dashboard') {
+      return pathname === path;
+    }
     return pathname === path || pathname?.startsWith(`${path}/`);
   };
 

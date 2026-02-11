@@ -11,6 +11,20 @@ interface ServiceFormProps {
 export default function ServiceForm({ initialData, isEdit = false }: ServiceFormProps) {
   const [isLoading, setIsLoading] = useState(false);
 
+  // Helper to extract text from Lexical JSON if it exists
+  const getInitialDescription = () => {
+    if (!initialData?.description) return '';
+    // If string (from our simple create), return it
+    if (typeof initialData.description === 'string') return initialData.description;
+    // If Lexical JSON object
+    try {
+        // Very basic extraction: get the first paragraph text
+        return initialData.description?.root?.children?.[0]?.children?.[0]?.text || '';
+    } catch (e) {
+        return '';
+    }
+  };
+
   // Wrapper to handle submit and loading state
   async function handleSubmit(formData: FormData) {
     setIsLoading(true);
@@ -80,7 +94,7 @@ export default function ServiceForm({ initialData, isEdit = false }: ServiceForm
               <h3 className="text-[#f1c40f] font-bold uppercase tracking-widest text-xs mb-4">Description</h3>
               <textarea 
                 name="description" 
-                defaultValue={initialData?.description}
+                defaultValue={getInitialDescription()}
                 className="w-full flex-1 bg-[#1e2b38]/80 border border-[#ffffff10] rounded-xl p-4 text-white placeholder-[#547085] focus:border-[#f1c40f] outline-none transition-all min-h-[200px]"
                 placeholder="Detailed description of the service..."
               />
