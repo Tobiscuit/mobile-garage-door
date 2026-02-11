@@ -3,32 +3,73 @@
 import { getPayload } from 'payload';
 import configPromise from '@payload-config';
 import { revalidatePath } from 'next/cache';
+import { redirect } from 'next/navigation';
 
-export async function getServices() {
+export async function createService(formData: FormData) {
   const payload = await getPayload({ config: configPromise });
   
-  const results = await payload.find({
-    collection: 'services',
-    depth: 1,
-    limit: 100, // Pagination can be added later
-    sort: '-createdAt', // Default sort
-  });
+  const title = formData.get('title') as string;
+  const description = formData.get('description') as string;
+  const category = formData.get('category') as 'Design' | 'Commercial' | 'Residential' | 'Critical Response'; // Type safety match
+  const price = formData.get('price') as string;
 
-  return results.docs;
+  try {
+    await payload.create({
+      collection: 'services',
+      data: {
+        title,
+        description,
+        category,
+        price: parseFloat(price) || 0,
+        _status: 'published',
+      },
+    });
+  } catch (error) {
+    console.error('Create Error:', error);
+    return { error: 'Failed to create service' };
+  }
+
+  revalidatePath('/dashboard/services');
+  redirect('/dashboard/services');
 }
 
-export async function deleteService(id: string) {
+export async function updateService(id: string, formData: FormData) {
   const payload = await getPayload({ config: configPromise });
-  
+
+  const title = formData.get('title') as string;
+  const description = formData.get('description') as string;
+  const category = formData.get('category') as any;
+  const price = formData.get('price') as string;
+
   try {
-    await payload.delete({
+    await payload.update({
+      collection: 'services',
+      id,
+      data: {
+        title,
+        description,
+        category,
+        price: parseFloat(price) || 0,
+      },
+    });
+  } catch (error) {
+    console.error('Update Error:', error);
+    return { error: 'Failed to update service' };
+  }
+
+  revalidatePath('/dashboard/services');
+  redirect('/dashboard/services');
+}
+
+export async function getServiceById(id: string) {
+  const payload = await getPayload({ config: configPromise });
+  try {
+    const service = await payload.findByID({
       collection: 'services',
       id,
     });
-    revalidatePath('/dashboard/services');
-    return { success: true };
+    return service;
   } catch (error) {
-    console.error('Failed to delete service:', error);
-    return { success: false, error: 'Failed to delete service' };
+    return null;
   }
 }
