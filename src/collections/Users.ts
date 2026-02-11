@@ -30,7 +30,7 @@ export const Users: CollectionConfig = {
             id: user.id,
             data: {
               lastLogin: new Date().toISOString(),
-            },
+            } as any,
           })
         } catch (err) {
           console.error('Error updating lastLogin for user:', user.id, err)
