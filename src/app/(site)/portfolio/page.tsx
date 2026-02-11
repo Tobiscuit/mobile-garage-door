@@ -87,7 +87,7 @@ export default async function PortfolioPage() {
                             // Robust Image Handling
                             const imageUrl = typeof project.image === 'object' && project.image?.url 
                                 ? project.image.url 
-                                : (project.gallery?.[0]?.image?.url || null);
+                                : null;
                             
                             return (
                                 <Link 
