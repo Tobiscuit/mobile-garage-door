@@ -64,7 +64,8 @@ export default function LoginPage() {
                 <input 
                   type="email" 
                   required
-                  className="w-full bg-gray-50 border border-gray-200 rounded-lg p-4 font-medium text-charcoal-blue focus:ring-2 focus:ring-golden-yellow focus:border-transparent outline-none transition-all"
+                  className="w-full bg-white border border-gray-200 rounded-lg p-4 font-medium text-black focus:ring-2 focus:ring-[#f1c40f] focus:border-transparent outline-none transition-all"
+                  style={{ color: '#000000', backgroundColor: '#ffffff' }}
                   placeholder="name@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -76,7 +77,8 @@ export default function LoginPage() {
                 <input 
                   type="password" 
                   required
-                  className="w-full bg-gray-50 border border-gray-200 rounded-lg p-4 font-medium text-charcoal-blue focus:ring-2 focus:ring-golden-yellow focus:border-transparent outline-none transition-all"
+                  className="w-full bg-white border border-gray-200 rounded-lg p-4 font-medium text-black focus:ring-2 focus:ring-[#f1c40f] focus:border-transparent outline-none transition-all"
+                  style={{ color: '#000000', backgroundColor: '#ffffff' }}
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}

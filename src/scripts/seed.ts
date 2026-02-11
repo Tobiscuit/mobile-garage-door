@@ -107,10 +107,6 @@ const seed = async (): Promise<void> => {
           "direction": "ltr",
           "children": [
               createLexicalHeader(project.subtitle, 'h3'),
-              createLexicalHeader('The Challenge', 'h4'),
-              createLexicalParagraph(project.challenge),
-              createLexicalHeader('Our Solution', 'h4'),
-              createLexicalParagraph(project.solution),
               createLexicalHeader('Key Benefits', 'h4'),
               // Benefits list as paragraphs for simplicity in seeding
               ...project.benefits.map(b => createLexicalParagraph(`• ${b}`)) 

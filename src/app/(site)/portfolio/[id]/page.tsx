@@ -31,7 +31,7 @@ const SerializeLexical = ({ nodes }: { nodes: any[] }) => {
           case 'root':
             return <div key={i}>{serializedChildren}</div>;
           case 'heading':
-            const Tag = (node.tag || 'h2') as keyof JSX.IntrinsicElements;
+            const Tag = (node.tag || 'h2') as any;
             const sizes = {
               h1: 'text-4xl md:text-5xl',
               h2: 'text-3xl md:text-4xl',

@@ -29,15 +29,38 @@ export async function getProjectById(id: string) {
   }
 }
 
-const generateRichText = (text: string) => ({
-  root: {
-    type: 'root',
-    format: '',
-    indent: 0,
-    version: 1,
-    direction: 'ltr',
-    children: [
-      {
+const generateRichText = (text: string) => {
+  if (!text) {
+    return {
+      root: {
+        type: 'root',
+        format: '',
+        indent: 0,
+        version: 1,
+        direction: 'ltr',
+        children: [
+          {
+            type: 'paragraph',
+            format: '',
+            indent: 0,
+            version: 1,
+            children: [],
+          },
+        ],
+      },
+    };
+  }
+
+  const paragraphs = text.split('\n');
+
+  return {
+    root: {
+      type: 'root',
+      format: '',
+      indent: 0,
+      version: 1,
+      direction: 'ltr',
+      children: paragraphs.map((pText) => ({
         type: 'paragraph',
         format: '',
         indent: 0,
@@ -49,14 +72,14 @@ const generateRichText = (text: string) => ({
             format: 0,
             mode: 'normal',
             style: '',
-            text: text || '',
+            text: pText,
             version: 1,
           },
         ],
-      },
-    ],
-  },
-});
+      })),
+    },
+  };
+};
 
 export async function createProject(formData: FormData) {
   const payload = await getPayload({ config: configPromise });

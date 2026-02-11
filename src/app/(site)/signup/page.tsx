@@ -95,7 +95,7 @@ export default function SignupPage() {
                   type="text" 
                   name="name"
                   required
-                  className="w-full bg-gray-50 border border-gray-200 rounded-lg p-4 font-medium text-charcoal-blue focus:ring-2 focus:ring-golden-yellow focus:border-transparent outline-none transition-all"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-lg p-4 font-medium text-[#2c3e50] focus:ring-2 focus:ring-[#f1c40f] focus:border-transparent outline-none transition-all"
                   placeholder="John Doe"
                   onChange={handleChange}
                 />
@@ -108,7 +108,7 @@ export default function SignupPage() {
                     type="email" 
                     name="email"
                     required
-                    className="w-full bg-gray-50 border border-gray-200 rounded-lg p-4 font-medium text-charcoal-blue focus:ring-2 focus:ring-golden-yellow focus:border-transparent outline-none transition-all"
+                    className="w-full bg-gray-50 border border-gray-200 rounded-lg p-4 font-medium text-[#2c3e50] focus:ring-2 focus:ring-[#f1c40f] focus:border-transparent outline-none transition-all"
                     placeholder="name@company.com"
                     onChange={handleChange}
                     />
@@ -119,7 +119,7 @@ export default function SignupPage() {
                     type="tel" 
                     name="phone"
                     required
-                    className="w-full bg-gray-50 border border-gray-200 rounded-lg p-4 font-medium text-charcoal-blue focus:ring-2 focus:ring-golden-yellow focus:border-transparent outline-none transition-all"
+                    className="w-full bg-gray-50 border border-gray-200 rounded-lg p-4 font-medium text-[#2c3e50] focus:ring-2 focus:ring-[#f1c40f] focus:border-transparent outline-none transition-all"
                     placeholder="(555) 000-0000"
                     onChange={handleChange}
                     />
@@ -133,7 +133,7 @@ export default function SignupPage() {
                     type="password" 
                     name="password"
                     required
-                    className="w-full bg-gray-50 border border-gray-200 rounded-lg p-4 font-medium text-charcoal-blue focus:ring-2 focus:ring-golden-yellow focus:border-transparent outline-none transition-all"
+                    className="w-full bg-gray-50 border border-gray-200 rounded-lg p-4 font-medium text-[#2c3e50] focus:ring-2 focus:ring-[#f1c40f] focus:border-transparent outline-none transition-all"
                     placeholder="Create a password"
                     onChange={handleChange}
                     />
@@ -144,7 +144,7 @@ export default function SignupPage() {
                     type="password" 
                     name="confirmPassword"
                     required
-                    className="w-full bg-gray-50 border border-gray-200 rounded-lg p-4 font-medium text-charcoal-blue focus:ring-2 focus:ring-golden-yellow focus:border-transparent outline-none transition-all"
+                    className="w-full bg-gray-50 border border-gray-200 rounded-lg p-4 font-medium text-[#2c3e50] focus:ring-2 focus:ring-[#f1c40f] focus:border-transparent outline-none transition-all"
                     placeholder="Confirm password"
                     onChange={handleChange}
                     />
