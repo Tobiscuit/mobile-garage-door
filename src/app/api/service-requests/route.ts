@@ -13,12 +13,43 @@ export async function POST(req: NextRequest) {
   try {
     const payload = await getPayload({ config: configPromise });
     const { user } = await payload.auth({ headers: req.headers });
+    let customerId = user?.id;
 
-    if (!user || (user as any).collection !== 'customers') {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const body = await req.json();
+    const { sourceId, issueDescription, urgency, scheduledTime, amount, guestName, guestEmail, guestPhone, guestAddress } = body;
+
+    if (!user) {
+        // Allow Guest Checkout if details provided
+        if (guestName && guestPhone && guestEmail) {
+             // 1. Check if customer exists by Email
+            const existingCustomers = await payload.find({
+                collection: 'customers' as any,
+                where: {
+                    email: { equals: guestEmail },
+                },
+            });
+
+            if (existingCustomers.totalDocs > 0) {
+                customerId = existingCustomers.docs[0].id;
+            } else {
+                // 2. Create new Customer
+                const randomPassword = randomUUID(); 
+                const newCustomer = await payload.create({
+                    collection: 'customers' as any,
+                    data: {
+                        email: guestEmail,
+                        password: randomPassword,
+                        name: guestName,
+                        phone: guestPhone,
+                        address: guestAddress,
+                    },
+                });
+                customerId = newCustomer.id;
+            }
+        } else {
+             return NextResponse.json({ error: 'Unauthorized: Please login or provide guest details.' }, { status: 401 });
+        }
     }
-
-    const { sourceId, issueDescription, urgency, scheduledTime, amount } = await req.json();
 
     // 1. Process Payment with Square
     // Note: In production, amount should be calculated server-side based on the service selected
@@ -46,7 +77,7 @@ export async function POST(req: NextRequest) {
     const serviceRequest = await payload.create({
       collection: 'service-requests' as any,
       data: {
-        customer: user.id,
+        customer: customerId,
         issueDescription,
         urgency,
         scheduledTime,
