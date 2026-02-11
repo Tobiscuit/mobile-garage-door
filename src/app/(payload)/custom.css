@@ -1,284 +1,282 @@
-@import url('https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700;900&display=swap');
 @import "tailwindcss";
 
 :root {
   /* 
-    MOBIL GARAGE BRAND PALETTE 
-    Primary Dark: #2c3e50 (Charcoal Blue)
-    Secondary Dark: #34495e (Dark Charcoal)
-    Accent: #f1c40f (Golden Yellow)
-    Text: #f7f9fb (Cloudy White)
+    MOBIL GARAGE BRAND PALETTE - BLEEDING EDGE INTERFACE
   */
-
-  /* CORE BACKGROUNDS */
-  --theme-bg: #2c3e50; /* Charcoal Blue base - Main Page Background */
+  --theme-bg: #2c3e50; 
   
-  /* ELEVATION LAYERS */
+  /* ELEVATION LAYERS - Using slightly transparent bases for glassmorphism */
   --theme-elevation-0: #2c3e50;
-  --theme-elevation-50: #34495e; /* Sidebar/Header/Panels */
-  --theme-elevation-100: #3e5669; /* Cards/Containers */
-  --theme-elevation-150: #496377;
-  --theme-elevation-200: #547085; /* Modals/Dropdowns */
+  --theme-elevation-50: rgba(52, 73, 94, 0.6); /* Sidebar/Header */
+  --theme-elevation-100: rgba(62, 86, 105, 0.4); /* Cards */
+  --theme-elevation-200: #547085;
   
   /* BRAND COLORS */
   --theme-brand-500: #f1c40f; /* Golden Yellow */
   --theme-brand-600: #d4ac0d;
+  --theme-brand-glow: rgba(241, 196, 15, 0.3);
   
-  /* TEXT COLORS */
-  --theme-text-primary: #f7f9fb; /* Cloudy White */
-  --theme-text-secondary: #bdc3c7; /* Light Gray */
+  /* TEXT */
+  --theme-text-primary: #ffffff;
+  --theme-text-secondary: #bdc3c7;
   --theme-text-muted: #95a5a6;
 
   /* INPUTS */
-  --theme-input-bg: #1e2b38; /* Darker than Bg */
-  --theme-input-border: #4a6378;
-  --theme-input-text: #f7f9fb;
+  --theme-input-bg: rgba(30, 43, 56, 0.8);
+  --theme-input-border: rgba(255, 255, 255, 0.1);
   
-  /* PAYLOAD VARIABLE OVERRIDES */
+  /* PAYLOAD VARS */
   --theme-bg-html: var(--theme-bg);
   --theme-elevation-0: var(--theme-bg);
   --theme-elevation-50: var(--theme-elevation-50);
   --theme-elevation-100: var(--theme-elevation-100);
-  --theme-elevation-150: var(--theme-elevation-150);
-  --theme-elevation-200: var(--theme-elevation-200);
-  --theme-elevation-250: var(--theme-elevation-200);
-  --theme-elevation-300: var(--theme-elevation-200);
-  --theme-elevation-350: var(--theme-elevation-200);
-  --theme-elevation-400: var(--theme-elevation-200);
-  --theme-elevation-450: var(--theme-elevation-200);
-  --theme-elevation-500: var(--theme-elevation-200);
-  --theme-elevation-800: var(--theme-elevation-200);
   
-  /* Typography */
+  /* TYPOGRAPHY */
   --font-body: 'Work Sans', system-ui, -apple-system, sans-serif;
   --font-header: 'Work Sans', system-ui, -apple-system, sans-serif;
 }
 
 /* =========================================
-   GLOBAL RESET & LAYOUT
+   GLOBAL RESET & LAYOUT FIXES
    ========================================= */
 html, body {
   background-color: var(--theme-bg) !important;
   color: var(--theme-text-primary) !important;
   font-family: var(--font-body) !important;
+  font-size: 16px !important; /* Bump base size */
+  line-height: 1.6;
 }
 
-/* Force standard Payload Layout to transparent/dark */
+/* MAIN LAYOUT WRAPPER - FORCE Mover over for Sidebar */
 .payload-default-template, 
 .template-default, 
 main {
   background-color: var(--theme-bg) !important;
+  
+  /* CRITICAL: Push content right to avoid sidebar overlap */
+  margin-left: 280px !important; 
+  width: calc(100% - 280px) !important;
+  min-height: 100vh;
+  position: relative;
+  z-index: 1;
 }
 
-/* Header/Top Bar */
-header, .app-header {
-  background: rgba(52, 73, 94, 0.9) !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
-  backdrop-filter: blur(12px);
+/* Glassmorphic Background Gradient */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    radial-gradient(circle at 15% 50%, rgba(241, 196, 15, 0.03) 0%, transparent 40%),
+    radial-gradient(circle at 85% 30%, rgba(46, 204, 113, 0.02) 0%, transparent 40%);
+  z-index: -1;
+  pointer-events: none;
 }
+
 
 /* =========================================
-   LIST VIEW OVERRIDES
+   HEADER
    ========================================= */
-/* The main list container */
+header, .app-header {
+  left: 280px !important; /* Adjust header to start after sidebar */
+  width: calc(100% - 280px) !important;
+  background: rgba(44, 62, 80, 0.8) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+  height: auto !important;
+  min-height: 80px;
+  padding: 1rem 2rem !important;
+}
+
+
+/* =========================================
+   LIST VIEWS (Tables) - SCALED UP
+   ========================================= */
 .collection-list {
-  padding: 2rem !important;
+  padding: 3rem !important; /* More breathing room */
 }
 
-/* List Headers */
-.collection-list header h1, 
-.view-description {
-  color: var(--theme-brand-500) !important;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  font-weight: 700;
-  text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+/* Page Title */
+.collection-list header h1, .view-description {
+  font-size: 2.5rem !important;
+  font-weight: 800 !important;
+  color: #fff !important;
+  letter-spacing: -0.03em;
+  margin-bottom: 1rem !important;
 }
 
-/* Filter/Search Bar area */
+/* Controls (Search/Filter) */
 .list-controls {
+  margin-bottom: 2.5rem !important;
   background: transparent !important;
   border: none !important;
-  margin-bottom: 2rem !important;
+  display: flex !important;
+  gap: 1rem !important;
 }
 
-/* Filter Pills/Buttons */
-.pill, .list-controls__toggle-columns, .list-controls__toggle-where {
-  background-color: rgba(255,255,255,0.05) !important;
+/* Search Input */
+.search-filter input {
+  height: 50px !important;
+  font-size: 1rem !important;
+  background: rgba(0,0,0,0.2) !important;
   border: 1px solid rgba(255,255,255,0.1) !important;
-  color: var(--theme-text-primary) !important;
-  border-radius: 8px !important;
-}
-
-.pill:hover, .list-controls__toggle-columns:hover {
-  border-color: var(--theme-brand-500) !important;
-  color: var(--theme-brand-500) !important;
-}
-
-/* The Data Table */
-table, .table {
-  background: var(--theme-elevation-50) !important;
   border-radius: 12px !important;
-  overflow: hidden !important;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.2) !important;
+  padding-left: 1.5rem !important;
+}
+
+/* Table Container */
+table, .table {
+  background: rgba(52, 73, 94, 0.4) !important;
+  border-radius: 16px !important;
   border: 1px solid rgba(255,255,255,0.05) !important;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.2) !important;
+  margin-top: 1rem !important;
+  width: 100% !important;
+  border-spacing: 0 !important;
+  border-collapse: separate !important;
 }
 
+/* Headers */
 thead tr th {
-  background-color: rgba(0,0,0,0.2) !important;
-  color: var(--theme-brand-500) !important; /* Yellow Headers */
-  font-size: 0.75rem !important;
-  text-transform: uppercase !important;
-  letter-spacing: 0.1em !important;
+  background: rgba(0,0,0,0.3) !important;
+  color: var(--theme-brand-500) !important;
+  font-size: 0.85rem !important;
+  font-weight: 700 !important;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 1.25rem 1.5rem !important;
   border-bottom: 1px solid rgba(255,255,255,0.1) !important;
-  padding: 16px !important;
 }
 
-/* Table Rows */
-tbody tr, .row-1 {
-  background-color: transparent !important;
-  transition: all 0.2s ease !important;
+/* Cells */
+td, .cell {
+  padding: 1.25rem 1.5rem !important; /* Taller rows */
+  border-bottom: 1px solid rgba(255,255,255,0.05) !important;
+  font-size: 1rem !important;
+  color: #ecf0f1 !important;
+  vertical-align: middle !important;
 }
 
+/* Row Hover */
+tbody tr {
+  transition: all 0.2s ease;
+}
 tbody tr:hover {
   background-color: rgba(241, 196, 15, 0.05) !important;
-}
-
-td {
-  border-top: 1px solid rgba(255,255,255,0.05) !important;
-  color: var(--theme-text-primary) !important;
+  transform: scale(1.005); /* Subtle pop */
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  z-index: 10;
+  position: relative;
 }
 
 /* Links in table */
 td a {
-  color: var(--theme-text-primary) !important;
-  font-weight: 500 !important;
-}
-td a:hover {
-  color: var(--theme-brand-500) !important;
+  font-weight: 600 !important;
+  color: #fff !important;
 }
 
 /* =========================================
-   EDIT VIEW OVERRIDES
+   EDIT VIEWS (Forms)
    ========================================= */
-/* The main edit container */
 .doc-controls {
-  background-color: var(--theme-elevation-50) !important;
+  background: rgba(52, 73, 94, 0.6) !important;
   border-bottom: 1px solid rgba(255,255,255,0.05) !important;
-  padding: 1rem 2rem !important;
+  padding: 2rem !important;
 }
 
-.doc-header__title {
-  color: var(--theme-brand-500) !important;
-}
-
-/* Field Groups / Cards */
+/* Field Cards */
 .field-type.group, .field-type.ui-field, .card {
-  background-color: var(--theme-elevation-100) !important;
-  border: 1px solid rgba(255, 255, 255, 0.05) !important;
-  border-radius: 12px !important;
-  padding: 1.5rem !important;
-  margin-bottom: 1.5rem !important;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1) !important;
+  background: rgba(62, 86, 105, 0.3) !important;
+  border: 1px solid rgba(255,255,255,0.08) !important;
+  border-radius: 16px !important;
+  padding: 2rem !important;
+  margin-bottom: 2rem !important;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1) !important;
 }
 
-/* Field Labels */
 .field-label {
-  color: var(--theme-text-secondary) !important;
-  text-transform: uppercase;
-  font-size: 0.75rem !important;
-  letter-spacing: 0.05em;
-  margin-bottom: 0.5rem !important;
+  font-size: 0.85rem !important;
+  color: var(--theme-brand-500) !important;
+  margin-bottom: 0.75rem !important;
+  display: block;
 }
 
 /* Inputs */
-input[type="text"], 
-input[type="number"], 
-input[type="email"], 
-input[type="password"],
-textarea, 
-.react-select__control {
-  background-color: var(--theme-input-bg) !important;
-  border: 1px solid var(--theme-input-border) !important;
-  color: var(--theme-text-primary) !important;
-  border-radius: 6px !important;
-  padding: 0.75rem !important;
+input[type="text"], textarea, .react-select__control {
+  background: rgba(0,0,0,0.2) !important;
+  border: 1px solid rgba(255,255,255,0.1) !important;
+  border-radius: 8px !important;
+  padding: 1rem !important; /* Taller inputs */
+  font-size: 1rem !important;
+  color: #fff !important;
+  transition: all 0.2s;
 }
 
 input:focus, textarea:focus, .react-select__control--is-focused {
+  background: rgba(0,0,0,0.3) !important;
   border-color: var(--theme-brand-500) !important;
-  box-shadow: 0 0 0 2px rgba(241, 196, 15, 0.2) !important;
+  box-shadow: 0 0 0 4px rgba(241, 196, 15, 0.1) !important;
 }
 
-/* Rich Text Editor Overrides */
-.rich-text-editor {
-  background-color: var(--theme-input-bg) !important;
-  border: 1px solid var(--theme-input-border) !important;
-  border-radius: 8px !important;
-}
-.rich-text-editor__toolbar {
-  background-color: var(--theme-elevation-50) !important;
-  border-bottom: 1px solid rgba(255,255,255,0.05) !important;
-}
-
-/* Sidebar in Edit View (Publish Controls) */
-.form-sidebar {
-  background-color: transparent !important;
-}
-.form-sidebar .field-type {
-  background-color: var(--theme-elevation-100) !important;
-  border-radius: 12px;
-  padding: 1rem;
-}
 
 /* =========================================
-   BUTTONS
+   BUTTONS (Premium)
    ========================================= */
-/* Primary Action (Save/Publish) */
 .btn--style-primary {
-  background-color: var(--theme-brand-500) !important;
+  background: var(--theme-brand-500) !important;
   color: #2c3e50 !important;
-  font-weight: 700 !important;
-  text-transform: uppercase !important;
-  border-radius: 6px !important;
+  font-size: 0.9rem !important;
+  font-weight: 800 !important;
+  padding: 1rem 2rem !important;
+  border-radius: 8px !important;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  box-shadow: 0 4px 15px var(--theme-brand-glow) !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
   border: none !important;
-  box-shadow: 0 4px 15px rgba(241, 196, 15, 0.3) !important;
-  transition: transform 0.2s !important;
 }
 
 .btn--style-primary:hover {
   transform: translateY(-2px);
-  background-color: #ffe066 !important;
-  box-shadow: 0 6px 20px rgba(241, 196, 15, 0.4) !important;
+  filter: brightness(110%);
+  box-shadow: 0 8px 25px var(--theme-brand-glow) !important;
 }
 
-/* Secondary Action (Preview/Cancel) */
 .btn--style-secondary {
-  background-color: transparent !important;
-  border: 1px solid rgba(255,255,255,0.1) !important;
-  color: var(--theme-text-primary) !important;
+  background: transparent !important;
+  border: 2px solid rgba(255,255,255,0.1) !important;
+  color: #fff !important;
+  font-weight: 600 !important;
+  padding: 0.9rem 1.8rem !important;
+  border-radius: 8px !important;
 }
-
 .btn--style-secondary:hover {
   border-color: var(--theme-brand-500) !important;
   color: var(--theme-brand-500) !important;
 }
 
-/* Delete Button */
-.btn--style-icon-label {
-    color: var(--theme-text-muted) !important;
-}
-.btn--style-icon-label:hover {
-    color: #e74c3c !important; /* Red */
-}
-
 /* =========================================
-   NAVBAR FIX
+   MOBILE RESPONSIVENESS
    ========================================= */
-/* Ensure the standard payload nav container takes full height and fits with our custom styles */
-nav.nav {
-  height: 100vh;
-}
-.nav__scroll {
-  background-color: var(--theme-elevation-50) !important;
+@media (max-width: 768px) {
+  .payload-default-template, main {
+    margin-left: 0 !important;
+    width: 100% !important;
+    padding-top: 80px; /* Space for mobile header */
+  }
+  
+  header, .app-header {
+    left: 0 !important;
+    width: 100% !important;
+  }
+  
+  /* Assume sidebar toggles or is hidden on mobile, 
+     requires CustomNav to handle mobile state carefully */
 }

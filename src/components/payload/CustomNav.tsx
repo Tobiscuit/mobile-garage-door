@@ -53,7 +53,8 @@ const CustomNav: React.FC = () => {
     shouldAnimate && `${baseClass}--nav-animate`,
     hydrated && `${baseClass}--nav-hydrated`,
     // Our custom overrides (ensure they have high enough specificity or order)
-    'bg-[#34495e] border-r border-[#ffffff05] flex flex-col h-screen shadow-2xl z-[100]'
+    'bg-[#2c3e50]/95 backdrop-blur-xl border-r border-[#ffffff08] flex flex-col h-screen fixed left-0 top-0 shadow-2xl z-[100] transition-transform duration-300 ease-in-out',
+    navOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
   ].filter(Boolean).join(' ');
 
   const isActive = (path: string) => {
