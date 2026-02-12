@@ -6,23 +6,31 @@
 - **GraphQL**: Updated to v16.12+.
 - **tsx**: Updated to v4.21+.
 
-## 2. Architectural Overhaul:
-The `src/app/(site)/book-service/page.tsx` was a "God Component". It has been refactored into a clean, modular architecture:
+## 2. Architectural Overhaul
+The codebase has been refactored to follow a clean, modular architecture separating View, State, and Data layers.
 
-- **View Layer**: Decomposed into small, single-purpose components in `src/components/booking/`:
-    - `ContactStep.tsx`
-    - `IssueStep.tsx`
-    - `ScheduleStep.tsx`
-    - `PaymentStep.tsx`
-- **State Management**: Extracted to `src/hooks/useBookingForm.ts`. This also fixes the `guestPassword` type error by ensuring proper initialization.
-- **Integration Layer**: Extracted Square logic to `src/hooks/useSquarePayment.ts`.
+### **Pages Refactored**
+- **Booking Page** (`src/app/(site)/book-service/page.tsx`):
+    - Decomposed into `ContactStep`, `IssueStep`, `ScheduleStep`, `PaymentStep`.
+    - State managed by `useBookingForm` hook.
+    - Square logic in `useSquarePayment` hook.
+- **Portal Dashboard** (`src/app/(site)/portal/page.tsx`):
+    - Decomposed into `PortalHeader`, `ActiveRequestList`, `ServiceHistory`, `AccountSidebar`.
+    - Data fetching moved to `serviceRequestService`.
+- **Admin Dashboard** (`src/app/(site)/dashboard/page.tsx`):
+    - Decomposed into `KPIGrid`, `QuickActions`.
 
-## 3. Clean Architecture: Server Actions
-The `src/app/actions/booking.ts` file has been refactored to be a pure orchestrator. Business logic has been moved to a new Service Layer:
+### **New Service Layer (`src/services/`)**
+Logic has been moved out of Server Actions and Components into dedicated services:
+- **`squareService.ts`**: Handles payment processing with modern SDK methods.
+- **`serviceRequestService.ts`**: Handles ticket data fetching.
+- **`userService.ts`**: Handles user profile operations.
 
-- **Square Service**: `src/services/squareService.ts` handles payment processing using the modern `paymentsApi.createPayment` method.
-- **Customer Service**: Customer lookup/creation logic is now encapsulated (currently as a helper in the action, ready for extraction to `src/services/customerService.ts` if needed).
+### **New Hooks (`src/hooks/`)**
+- **`useBookingForm.ts`**: Form state management.
+- **`useSquarePayment.ts`**: Payment integration.
+- **`useMobileMenu.ts`**: shared logic for responsive navigation.
 
-## 4. Pending Items
+## 3. Pending Items
 - **Database Connection**: The build failed due to missing local Postgres credentials. Ensure `DATABASE_URI` is set in your environment before running migrations.
 - **Schema**: If `guestPassword` field does not exist in your Payload `users` collection, run `payload migrate` after setting up the DB connection.
