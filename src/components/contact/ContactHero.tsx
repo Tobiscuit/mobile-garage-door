@@ -1,11 +1,13 @@
 import React from 'react';
 
 interface ContactHeroProps {
-  type: 'repair' | 'install' | 'general';
+  type: 'repair' | 'install' | 'contractor' | 'general';
 }
 
 export function ContactHero({ type }: ContactHeroProps) {
   const isEmergency = type === 'repair';
+  const isContractor = type === 'contractor';
+
   const accentColor = isEmergency ? 'text-red-500' : 'text-golden-yellow';
   const bgColor = isEmergency ? 'bg-dark-charcoal' : 'bg-charcoal-blue';
   const patternColor = isEmergency ? '#ef4444' : '#f1c40f'; // Red-500 or Yellow-400
@@ -25,6 +27,11 @@ export function ContactHero({ type }: ContactHeroProps) {
               <span className="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
               24/7 Emergency Dispatch
             </>
+          ) : isContractor ? (
+            <>
+              <span className="w-2 h-2 rounded-full bg-golden-yellow"></span>
+              Contractor Portal
+            </>
           ) : (
             <>
               <span className="w-2 h-2 rounded-full bg-golden-yellow"></span>
@@ -36,6 +43,8 @@ export function ContactHero({ type }: ContactHeroProps) {
         <h1 className="text-5xl md:text-7xl font-black text-white leading-tight mb-6 tracking-tight">
           {isEmergency ? (
             <>System <span className="text-red-500">Critical?</span></>
+          ) : isContractor ? (
+            <>Partner <span className="text-golden-yellow">Access</span></>
           ) : (
             type === 'install' ? (
               <>Build Your <span className="text-golden-yellow">Vision</span></>
@@ -48,13 +57,14 @@ export function ContactHero({ type }: ContactHeroProps) {
         <p className="text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed">
           {isEmergency
             ? "Immediate response required. Our rapid dispatch team is standing by to deploy industrial-grade repair solutions."
+            : isContractor
+            ? "Dedicated support and bulk pricing for residential builders and property managers."
             : "Whether it's a new installation or a custom upgrade, our engineers are ready to architect the perfect access solution."
           }
         </p>
       </div>
 
-      {/* Gradient Fade for overlap */}
-      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-cloudy-white to-transparent"></div>
+      {/* Removed Gradient Fade */}
     </section>
   );
 }
