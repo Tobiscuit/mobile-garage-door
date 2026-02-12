@@ -13,6 +13,21 @@ export const Users: CollectionConfig = {
   },
   fields: [
     {
+      name: 'role',
+      type: 'select',
+      defaultValue: 'admin',
+      options: [
+        { label: 'Admin', value: 'admin' },
+        { label: 'Technician', value: 'technician' },
+        { label: 'Dispatcher', value: 'dispatcher' },
+      ],
+      required: true,
+    },
+    {
+      name: 'name',
+      type: 'text',
+    },
+    {
       name: 'lastLogin',
       type: 'date',
       admin: {

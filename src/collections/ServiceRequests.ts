@@ -80,6 +80,17 @@ export const ServiceRequests: CollectionConfig = {
       ],
     },
     {
+      name: 'assignedTech',
+      type: 'relationship',
+      relationTo: 'users',
+      filterOptions: {
+        role: { equals: 'technician' },
+      },
+      admin: {
+        position: 'sidebar',
+      },
+    },
+    {
       name: 'tripFeePayment',
       type: 'json',
       admin: {
