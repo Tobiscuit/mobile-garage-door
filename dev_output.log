@@ -325,3 +325,9 @@ undefined
   digest: '1318868211'
 }
  HEAD / 500 in 131ms (compile: 4ms, render: 127ms)
+○ Compiling /contact ...
+ GET /contact?type=repair 200 in 6.2s (compile: 5.4s, render: 728ms)
+ GET /contact?type=repair 200 in 636ms (compile: 19ms, render: 616ms)
+ GET /images/map-bg.jpg 404 in 2.1s (compile: 2.0s, render: 106ms)
+ GET /contact?type=install 200 in 104ms (compile: 6ms, render: 98ms)
+ GET /images/map-bg.jpg 404 in 93ms (compile: 10ms, render: 83ms)
