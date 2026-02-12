@@ -2,15 +2,48 @@
 
 import { getPayload } from 'payload';
 import configPromise from '@/payload.config';
-import { SquareClient as Client, SquareEnvironment as Environment } from 'square';
-import { randomUUID } from 'crypto';
 import { redirect } from 'next/navigation';
+import { squareService } from '@/services/squareService';
+import { randomUUID } from 'crypto';
 
-const squareClient = new Client({
-  token: process.env.SQUARE_ACCESS_TOKEN,
-  environment: process.env.SQUARE_ENVIRONMENT === 'production' ? Environment.Production : Environment.Sandbox,
-});
+interface CustomerData {
+  guestName: string;
+  guestEmail: string;
+  guestPhone: string;
+  guestAddress: string;
+  guestPassword?: string;
+}
 
+// 1. Private Helper: Find or Create Customer
+async function findOrCreateCustomer(payload: any, data: CustomerData): Promise<string | number> {
+  const existingCustomers = await payload.find({
+    collection: 'users',
+    where: {
+      email: { equals: data.guestEmail },
+    },
+  });
+
+  if (existingCustomers.totalDocs > 0) {
+    return existingCustomers.docs[0].id;
+  }
+
+  const passwordToUse = data.guestPassword || randomUUID();
+  const newCustomer = await payload.create({
+    collection: 'users',
+    data: {
+      email: data.guestEmail,
+      password: passwordToUse,
+      name: data.guestName,
+      phone: data.guestPhone,
+      address: data.guestAddress,
+      role: 'customer',
+    },
+  });
+
+  return newCustomer.id;
+}
+
+// 2. Main Server Action
 export async function createBooking(prevState: any, formData: FormData) {
   const payload = await getPayload({ config: configPromise });
 
@@ -27,54 +60,24 @@ export async function createBooking(prevState: any, formData: FormData) {
   let customerId: string | number | undefined;
 
   try {
-    // 1. Check for existing user
-    const existingCustomers = await payload.find({
-      collection: 'users',
-      where: {
-        email: { equals: guestEmail },
-      },
+    // A. Customer Logic
+    customerId = await findOrCreateCustomer(payload, {
+      guestName,
+      guestEmail,
+      guestPhone,
+      guestAddress,
+      guestPassword
     });
 
-    if (existingCustomers.totalDocs > 0) {
-      customerId = existingCustomers.docs[0].id;
-      // Optionally update phone/address if missing?
-    } else {
-      // 2. Create new Customer
-      // If no password provided, generate one (Guest Checkout style)
-      // But if provided, they are setting up an account.
-      const passwordToUse = guestPassword || randomUUID();
-      
-      const newCustomer = await payload.create({
-        collection: 'users',
-        data: {
-          email: guestEmail,
-          password: passwordToUse,
-          name: guestName,
-          phone: guestPhone,
-          address: guestAddress,
-          role: 'customer',
-        },
-      });
-      customerId = newCustomer.id;
-    }
-
-    // 3. Process Payment
-    const tripFee = 9900; // $99.00
-    const paymentResult = await squareClient.payments.create({
+    // B. Payment Logic (Service Layer)
+    const tripFee = 9900; // 9.00
+    const payment = await squareService.processPayment(
       sourceId,
-      idempotencyKey: randomUUID(),
-      amountMoney: {
-        amount: BigInt(tripFee),
-        currency: 'USD',
-      },
-      note: `Trip Fee for ${guestName} (${guestEmail})`,
-    });
+      tripFee,
+      `Trip Fee for ${guestName} (${guestEmail})`
+    );
 
-    if (!paymentResult.payment || (paymentResult.payment.status !== 'COMPLETED' && paymentResult.payment.status !== 'APPROVED')) {
-      return { error: 'Payment failed. Please try a different card.' };
-    }
-
-    // 4. Create Service Request
+    // C. Service Request Logic
     await payload.create({
       collection: 'service-requests',
       data: {
@@ -84,23 +87,23 @@ export async function createBooking(prevState: any, formData: FormData) {
         scheduledTime,
         status: 'confirmed',
         tripFeePayment: {
-            paymentId: paymentResult.payment.id,
-            amount: Number(paymentResult.payment.amountMoney?.amount),
-            status: paymentResult.payment.status,
+            paymentId: payment.id,
+            amount: Number(payment.amountMoney?.amount),
+            status: payment.status,
         },
       },
     });
 
-    // 5. Log Payment
-    if (paymentResult.payment?.id) {
+    // D. Payment Logging Logic
+    if (payment.id) {
         await payload.create({
            collection: 'payments',
            data: {
-               squarePaymentId: paymentResult.payment.id,
-               amount: Number(paymentResult.payment.amountMoney?.amount),
-               currency: paymentResult.payment.amountMoney?.currency,
-               status: paymentResult.payment.status,
-               sourceType: paymentResult.payment.sourceType,
+               squarePaymentId: payment.id,
+               amount: Number(payment.amountMoney?.amount),
+               currency: payment.amountMoney?.currency,
+               status: payment.status,
+               sourceType: payment.sourceType,
            }
        });
    }
@@ -109,11 +112,9 @@ export async function createBooking(prevState: any, formData: FormData) {
     console.error('Booking Error:', error);
     let errorMessage = 'Failed to process booking.';
     
-    // Square specific errors
-    if (error.result && error.result.errors) {
-        errorMessage = error.result.errors[0].detail;
-    } else if (error.message) {
-        errorMessage = error.message;
+    // Check if it's a known error object
+    if (error.message) {
+      errorMessage = error.message;
     }
 
     return { error: errorMessage };

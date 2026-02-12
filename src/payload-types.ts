@@ -159,6 +159,11 @@ export interface CustomerAuthOperations {
  */
 export interface User {
   id: number;
+  role: 'admin' | 'technician' | 'dispatcher' | 'customer';
+  name?: string | null;
+  phone?: string | null;
+  address?: string | null;
+  lastLogin?: string | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -435,6 +440,7 @@ export interface ServiceRequest {
   urgency?: ('standard' | 'emergency') | null;
   scheduledTime?: string | null;
   status?: ('pending' | 'confirmed' | 'dispatched' | 'on_site' | 'completed' | 'cancelled') | null;
+  assignedTech?: (number | null) | User;
   tripFeePayment?:
     | {
         [k: string]: unknown;
@@ -597,6 +603,11 @@ export interface PayloadMigration {
  * via the `definition` "users_select".
  */
 export interface UsersSelect<T extends boolean = true> {
+  role?: T;
+  name?: T;
+  phone?: T;
+  address?: T;
+  lastLogin?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -758,6 +769,7 @@ export interface ServiceRequestsSelect<T extends boolean = true> {
   urgency?: T;
   scheduledTime?: T;
   status?: T;
+  assignedTech?: T;
   tripFeePayment?: T;
   updatedAt?: T;
   createdAt?: T;
