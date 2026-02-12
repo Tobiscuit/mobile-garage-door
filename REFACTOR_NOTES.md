@@ -10,26 +10,15 @@
 The codebase has been refactored to follow a clean, modular architecture separating View, State, and Data layers.
 
 ### **Pages Refactored**
+- **Contact Page** (`src/app/(site)/contact/page.tsx`):
+    - Redesigned with a dynamic `ContactHero` component that adapts to `?type=repair`.
+    - Aligned with "Techno-Hero" aesthetic (Charcoal Blue, Golden Yellow, Industrial patterns).
+    - Uses overlapping "Command Center" layout similar to Booking Page.
 - **Booking Page** (`src/app/(site)/book-service/page.tsx`):
     - Decomposed into `ContactStep`, `IssueStep`, `ScheduleStep`, `PaymentStep`.
-    - State managed by `useBookingForm` hook.
-    - Square logic in `useSquarePayment` hook.
-- **Portal Dashboard** (`src/app/(site)/portal/page.tsx`):
-    - Decomposed into `PortalHeader`, `ActiveRequestList`, `ServiceHistory`, `AccountSidebar`.
-    - Data fetching moved to `serviceRequestService`.
-- **Admin Dashboard** (`src/app/(site)/dashboard/page.tsx`):
-    - Decomposed into `KPIGrid`, `QuickActions`.
-
-### **New Service Layer (`src/services/`)**
-Logic has been moved out of Server Actions and Components into dedicated services:
-- **`squareService.ts`**: Handles payment processing with modern SDK methods.
-- **`serviceRequestService.ts`**: Handles ticket data fetching.
-- **`userService.ts`**: Handles user profile operations.
-
-### **New Hooks (`src/hooks/`)**
-- **`useBookingForm.ts`**: Form state management.
-- **`useSquarePayment.ts`**: Payment integration.
-- **`useMobileMenu.ts`**: shared logic for responsive navigation.
+- **Portal & Dashboard**:
+    - Decomposed into specialized components (`PortalHeader`, `KPIGrid`, etc.).
+    - Data fetching moved to Service Layer.
 
 ## 3. Pending Items
 - **Database Connection**: The build failed due to missing local Postgres credentials. Ensure `DATABASE_URI` is set in your environment before running migrations.
