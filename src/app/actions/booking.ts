@@ -81,7 +81,7 @@ export async function createBooking(prevState: any, formData: FormData) {
     await payload.create({
       collection: 'service-requests',
       data: {
-        customer: customerId,
+        customer: customerId as number, // Cast to number or correct ID type
         issueDescription,
         urgency: urgency as 'standard' | 'emergency',
         scheduledTime,
