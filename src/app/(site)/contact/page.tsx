@@ -21,7 +21,11 @@ function ContactContent() {
   });
 
   // Determine the "Hero State"
-  const heroType = typeParam === 'repair' ? 'repair' : (typeParam === 'install' ? 'install' : 'general');
+  // Default to 'general' if null
+  const heroType = typeParam === 'repair' ? 'repair'
+                 : typeParam === 'install' ? 'install'
+                 : typeParam === 'contractor' ? 'contractor'
+                 : 'general';
 
   useEffect(() => {
     // Generate a random ticket ID on mount (simulating a system generation)
@@ -166,7 +170,7 @@ function ContactContent() {
                         </h3>
                         
                         <div className="space-y-8 relative z-10">
-                            <div className="flex items-start gap-4 group cursor-pointer hover:bg-white/5 p-4 -mx-4 rounded-xl transition-colors">
+                            <a href="tel:832-419-1293" className="flex items-start gap-4 group cursor-pointer hover:bg-white/5 p-4 -mx-4 rounded-xl transition-colors">
                                 <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center text-golden-yellow shrink-0 group-hover:bg-golden-yellow group-hover:text-charcoal-blue transition-all">
                                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
                                 </div>
@@ -174,9 +178,9 @@ function ContactContent() {
                                     <div className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">24/7 Hotline</div>
                                     <div className="text-2xl font-bold font-mono tracking-tight group-hover:text-golden-yellow transition-colors">832-419-1293</div>
                                 </div>
-                            </div>
+                            </a>
 
-                            <div className="flex items-start gap-4 group cursor-pointer hover:bg-white/5 p-4 -mx-4 rounded-xl transition-colors">
+                            <a href="mailto:dispatch@mobilgarage.com" className="flex items-start gap-4 group cursor-pointer hover:bg-white/5 p-4 -mx-4 rounded-xl transition-colors">
                                 <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center text-golden-yellow shrink-0 group-hover:bg-golden-yellow group-hover:text-charcoal-blue transition-all">
                                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
                                 </div>
@@ -184,7 +188,7 @@ function ContactContent() {
                                     <div className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Email Support</div>
                                     <div className="text-lg font-medium group-hover:text-golden-yellow transition-colors">dispatch@mobilgarage.com</div>
                                 </div>
-                            </div>
+                            </a>
                         </div>
                     </div>
 
