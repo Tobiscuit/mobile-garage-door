@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { sourceId, issueDescription, urgency, scheduledTime, amount, guestName, guestEmail, guestPhone, guestAddress } = body;
+    const { sourceId, issueDescription, urgency, scheduledTime, amount, guestName, guestEmail, guestPhone, guestAddress, guestPassword } = body;
 
     // Handle Auth & Guest Logic
     if (!user && !isValidApiKey) {
@@ -33,26 +33,29 @@ export async function POST(req: NextRequest) {
         if (guestName && guestPhone && guestEmail) {
              // 1. Check if customer exists by Email
             const existingCustomers = await payload.find({
-                collection: 'customers' as any,
+                collection: 'users' as any, // NOTE: Changed from 'customers' to 'users' to match Payload Auth
                 where: {
                     email: { equals: guestEmail },
                 },
             });
 
             if (existingCustomers.totalDocs > 0) {
+                // If they exist, we link the ticket to them. 
+                // Ideally we'd ask them to login, but for speed we link it and they see it next time they login.
                 customerId = existingCustomers.docs[0].id;
             } else {
                 // 2. Create new Customer
-                const randomPassword = randomUUID(); 
+                const passwordToUse = guestPassword || randomUUID(); 
                 const newCustomer = await payload.create({
-                    collection: 'customers' as any,
+                    collection: 'users' as any,
                     data: {
                         email: guestEmail,
-                        password: randomPassword,
+                        password: passwordToUse,
                         name: guestName,
                         phone: guestPhone,
                         address: guestAddress,
-                    },
+                        role: 'customer', // Default role
+                    } as any, 
                 });
                 customerId = newCustomer.id;
             }

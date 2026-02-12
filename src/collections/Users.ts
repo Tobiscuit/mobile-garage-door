@@ -20,12 +20,21 @@ export const Users: CollectionConfig = {
         { label: 'Admin', value: 'admin' },
         { label: 'Technician', value: 'technician' },
         { label: 'Dispatcher', value: 'dispatcher' },
+        { label: 'Customer', value: 'customer' },
       ],
       required: true,
     },
     {
       name: 'name',
       type: 'text',
+    },
+    {
+      name: 'phone',
+      type: 'text',
+    },
+    {
+      name: 'address',
+      type: 'textarea',
     },
     {
       name: 'lastLogin',

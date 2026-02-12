@@ -5,6 +5,7 @@ export const dynamic = 'force-dynamic';
 import React, { useState, useEffect } from 'react';
 import Script from 'next/script';
 import { useRouter } from 'next/navigation';
+import { createBooking } from '@/app/actions/booking';
 
 export default function BookingPage() {
   const router = useRouter();
@@ -64,30 +65,30 @@ export default function BookingPage() {
         
         const token = result.token; // sourceId
 
-        // 2. Submit to Backend
-        const res = await fetch('/api/service-requests', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                ...formData,
-                sourceId: token,
-                amount: 9900, // $99
-            }),
-        });
+        // 2. Create FormData for Server Action
+        const submissionData = new FormData();
+        submissionData.append('guestName', formData.guestName);
+        submissionData.append('guestEmail', formData.guestEmail);
+        submissionData.append('guestPhone', formData.guestPhone);
+        submissionData.append('guestAddress', formData.guestAddress);
+        submissionData.append('guestPassword', formData.guestPassword);
+        submissionData.append('issueDescription', formData.issueDescription);
+        submissionData.append('urgency', formData.urgency);
+        submissionData.append('scheduledTime', formData.scheduledTime);
+        submissionData.append('sourceId', token);
 
-        const data = await res.json();
+        // 3. Call Server Action
+        const response = await createBooking(null, submissionData);
         
-        if (!res.ok) {
-            throw new Error(data.error || 'Booking failed.');
+        if (response?.error) {
+            throw new Error(response.error);
         }
 
-        // Success!
-        // Redirect to a success page or show success state
-        router.push('/portal?success=booked');
+        // Redirect is handled by the server action on success
 
     } catch (err: any) {
-        setError(err.message);
-    } finally {
+        console.error(err);
+        setError(err.message || 'Booking failed.');
         setLoading(false);
     }
   };
@@ -165,6 +166,35 @@ export default function BookingPage() {
                                 value={formData.guestAddress}
                                 onChange={(e) => setFormData({...formData, guestAddress: e.target.value})}
                             />
+                        </div>
+
+                        <div className="col-span-2 pt-4 border-t border-gray-100">
+                             <div className="flex items-center gap-3 mb-4">
+                                <input 
+                                    type="checkbox" 
+                                    id="createAccount"
+                                    className="w-5 h-5 text-golden-yellow rounded focus:ring-golden-yellow border-gray-300"
+                                    checked={!!formData.guestPassword}
+                                    onChange={(e) => setFormData({...formData, guestPassword: e.target.checked ? 'temp123' : ''})} 
+                                />
+                                <label htmlFor="createAccount" className="font-bold text-charcoal-blue cursor-pointer select-none">
+                                    Create an account to track my repair history
+                                </label>
+                             </div>
+                             
+                             {formData.guestPassword && (
+                                <div className="animate-fadeIn">
+                                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Create Password</label>
+                                    <input 
+                                        type="password"
+                                        className="w-full bg-white border border-gray-300 rounded-xl p-4 font-bold text-charcoal-blue focus:ring-2 focus:ring-golden-yellow outline-none"
+                                        placeholder="Choose a secure password"
+                                        value={formData.guestPassword === 'temp123' ? '' : formData.guestPassword}
+                                        onChange={(e) => setFormData({...formData, guestPassword: e.target.value})}
+                                    />
+                                    <p className="text-[10px] text-gray-400 mt-2">We'll use your email as your username.</p>
+                                </div>
+                             )}
                         </div>
                     </div>
 
