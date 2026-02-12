@@ -16,3 +16,312 @@ https://nextjs.org/telemetry
 ○ Compiling /book-service ...
  GET /book-service 200 in 27.5s (compile: 27.1s, render: 439ms)
  GET /book-service 200 in 285ms (compile: 100ms, render: 185ms)
+○ Compiling / ...
+--- [PAYLOAD CONFIG] Initializing... ---
+--- [PAYLOAD CONFIG] DB URI: MISSING
+--- [PAYLOAD CONFIG] PAYLOAD_SECRET: MISSING
+[19:29:47] [31mERROR[39m: [36mError: cannot connect to Postgres. Details: [39m
+    err: {
+      "type": "AggregateError",
+      "message": "",
+      "stack":
+          AggregateError:
+              at /app/node_modules/pg-pool/index.js:45:11
+              at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+              at async connectWithReconnect (file:///app/node_modules/@payloadcms/db-postgres/dist/connect.js:7:18)
+              at async Object.connect (file:///app/node_modules/@payloadcms/db-postgres/dist/connect.js:46:13)
+              at async BasePayload.init (file:///app/node_modules/payload/dist/index.js:371:13)
+              at async getPayload (file:///app/node_modules/payload/dist/index.js:593:26)
+              at async Home (/app/.next/dev/server/chunks/ssr/[root-of-the-server]__eb411306._.js:2880:21)
+      "aggregateErrors": [
+        {
+          "type": "Error",
+          "message": "connect ECONNREFUSED ::1:5432",
+          "stack":
+              Error: connect ECONNREFUSED ::1:5432
+                  at createConnectionError (node:net:1678:14)
+                  at afterConnectMultiple (node:net:1708:16)
+                  at TCPConnectWrap.callbackTrampoline (node:internal/async_hooks:130:17)
+          "errno": -111,
+          "code": "ECONNREFUSED",
+          "syscall": "connect",
+          "address": "::1",
+          "port": 5432
+        },
+        {
+          "type": "Error",
+          "message": "connect ECONNREFUSED 127.0.0.1:5432",
+          "stack":
+              Error: connect ECONNREFUSED 127.0.0.1:5432
+                  at createConnectionError (node:net:1678:14)
+                  at afterConnectMultiple (node:net:1708:16)
+                  at TCPConnectWrap.callbackTrampoline (node:internal/async_hooks:130:17)
+          "errno": -111,
+          "code": "ECONNREFUSED",
+          "syscall": "connect",
+          "address": "127.0.0.1",
+          "port": 5432
+        }
+      ],
+      "code": "ECONNREFUSED"
+    }
+undefined
+⨯ unhandledRejection: undefined
+⨯ unhandledRejection:  undefined
+⨯ Error: Error: cannot connect to Postgres:
+    at async Home (src/app/(site)/page.tsx:12:19)
+  10 |
+  11 | export default async function Home() {
+> 12 |   const payload = await getPayload({ config: configPromise });
+     |                   ^
+  13 |
+  14 |   const { docs: services } = await payload.find({
+  15 |     collection: 'services', {
+  payloadInitError: true,
+  digest: '1318868211'
+}
+ GET / 500 in 16.0s (compile: 7.6s, render: 8.4s)
+undefined
+[19:29:48] [31mERROR[39m: [36mError: cannot connect to Postgres. Details: [39m
+    err: {
+      "type": "AggregateError",
+      "message": "",
+      "stack":
+          AggregateError:
+              at /app/node_modules/pg-pool/index.js:45:11
+              at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+              at async connectWithReconnect (file:///app/node_modules/@payloadcms/db-postgres/dist/connect.js:7:18)
+              at async Object.connect (file:///app/node_modules/@payloadcms/db-postgres/dist/connect.js:46:13)
+              at async BasePayload.init (file:///app/node_modules/payload/dist/index.js:371:13)
+              at async getPayload (file:///app/node_modules/payload/dist/index.js:593:26)
+              at async Home (/app/.next/dev/server/chunks/ssr/[root-of-the-server]__eb411306._.js:2880:21)
+      "aggregateErrors": [
+        {
+          "type": "Error",
+          "message": "connect ECONNREFUSED ::1:5432",
+          "stack":
+              Error: connect ECONNREFUSED ::1:5432
+                  at createConnectionError (node:net:1678:14)
+                  at afterConnectMultiple (node:net:1708:16)
+                  at TCPConnectWrap.callbackTrampoline (node:internal/async_hooks:130:17)
+          "errno": -111,
+          "code": "ECONNREFUSED",
+          "syscall": "connect",
+          "address": "::1",
+          "port": 5432
+        },
+        {
+          "type": "Error",
+          "message": "connect ECONNREFUSED 127.0.0.1:5432",
+          "stack":
+              Error: connect ECONNREFUSED 127.0.0.1:5432
+                  at createConnectionError (node:net:1678:14)
+                  at afterConnectMultiple (node:net:1708:16)
+                  at TCPConnectWrap.callbackTrampoline (node:internal/async_hooks:130:17)
+          "errno": -111,
+          "code": "ECONNREFUSED",
+          "syscall": "connect",
+          "address": "127.0.0.1",
+          "port": 5432
+        }
+      ],
+      "code": "ECONNREFUSED"
+    }
+⨯ unhandledRejection: undefined
+⨯ unhandledRejection:  undefined
+⨯ Error: Error: cannot connect to Postgres:
+    at async Home (src/app/(site)/page.tsx:12:19)
+  10 |
+  11 | export default async function Home() {
+> 12 |   const payload = await getPayload({ config: configPromise });
+     |                   ^
+  13 |
+  14 |   const { docs: services } = await payload.find({
+  15 |     collection: 'services', {
+  payloadInitError: true,
+  digest: '1318868211'
+}
+ GET / 500 in 272ms (compile: 7ms, render: 266ms)
+[19:30:16] [31mERROR[39m: [36mError: cannot connect to Postgres. Details: [39m
+    err: {
+      "type": "AggregateError",
+      "message": "",
+      "stack":
+          AggregateError:
+              at /app/node_modules/pg-pool/index.js:45:11
+              at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+              at async connectWithReconnect (file:///app/node_modules/@payloadcms/db-postgres/dist/connect.js:7:18)
+              at async Object.connect (file:///app/node_modules/@payloadcms/db-postgres/dist/connect.js:46:13)
+              at async BasePayload.init (file:///app/node_modules/payload/dist/index.js:371:13)
+              at async getPayload (file:///app/node_modules/payload/dist/index.js:593:26)
+              at async Home (/app/.next/dev/server/chunks/ssr/[root-of-the-server]__eb411306._.js:2880:21)
+      "aggregateErrors": [
+        {
+          "type": "Error",
+          "message": "connect ECONNREFUSED ::1:5432",
+          "stack":
+              Error: connect ECONNREFUSED ::1:5432
+                  at createConnectionError (node:net:1678:14)
+                  at afterConnectMultiple (node:net:1708:16)
+                  at TCPConnectWrap.callbackTrampoline (node:internal/async_hooks:130:17)
+          "errno": -111,
+          "code": "ECONNREFUSED",
+          "syscall": "connect",
+          "address": "::1",
+          "port": 5432
+        },
+        {
+          "type": "Error",
+          "message": "connect ECONNREFUSED 127.0.0.1:5432",
+          "stack":
+              Error: connect ECONNREFUSED 127.0.0.1:5432
+                  at createConnectionError (node:net:1678:14)
+                  at afterConnectMultiple (node:net:1708:16)
+                  at TCPConnectWrap.callbackTrampoline (node:internal/async_hooks:130:17)
+          "errno": -111,
+          "code": "ECONNREFUSED",
+          "syscall": "connect",
+          "address": "127.0.0.1",
+          "port": 5432
+        }
+      ],
+      "code": "ECONNREFUSED"
+    }
+undefined
+⨯ unhandledRejection: undefined
+⨯ unhandledRejection:  undefined
+⨯ Error: Error: cannot connect to Postgres:
+    at async Home (src/app/(site)/page.tsx:12:19)
+  10 |
+  11 | export default async function Home() {
+> 12 |   const payload = await getPayload({ config: configPromise });
+     |                   ^
+  13 |
+  14 |   const { docs: services } = await payload.find({
+  15 |     collection: 'services', {
+  payloadInitError: true,
+  digest: '1318868211'
+}
+ GET / 500 in 203ms (compile: 8ms, render: 195ms)
+[19:30:17] [31mERROR[39m: [36mError: cannot connect to Postgres. Details: [39m
+    err: {
+      "type": "AggregateError",
+      "message": "",
+      "stack":
+          AggregateError:
+              at /app/node_modules/pg-pool/index.js:45:11
+              at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+              at async connectWithReconnect (file:///app/node_modules/@payloadcms/db-postgres/dist/connect.js:7:18)
+              at async Object.connect (file:///app/node_modules/@payloadcms/db-postgres/dist/connect.js:46:13)
+              at async BasePayload.init (file:///app/node_modules/payload/dist/index.js:371:13)
+              at async getPayload (file:///app/node_modules/payload/dist/index.js:593:26)
+              at async Home (/app/.next/dev/server/chunks/ssr/[root-of-the-server]__eb411306._.js:2880:21)
+      "aggregateErrors": [
+        {
+          "type": "Error",
+          "message": "connect ECONNREFUSED ::1:5432",
+          "stack":
+              Error: connect ECONNREFUSED ::1:5432
+                  at createConnectionError (node:net:1678:14)
+                  at afterConnectMultiple (node:net:1708:16)
+                  at TCPConnectWrap.callbackTrampoline (node:internal/async_hooks:130:17)
+          "errno": -111,
+          "code": "ECONNREFUSED",
+          "syscall": "connect",
+          "address": "::1",
+          "port": 5432
+        },
+        {
+          "type": "Error",
+          "message": "connect ECONNREFUSED 127.0.0.1:5432",
+          "stack":
+              Error: connect ECONNREFUSED 127.0.0.1:5432
+                  at createConnectionError (node:net:1678:14)
+                  at afterConnectMultiple (node:net:1708:16)
+                  at TCPConnectWrap.callbackTrampoline (node:internal/async_hooks:130:17)
+          "errno": -111,
+          "code": "ECONNREFUSED",
+          "syscall": "connect",
+          "address": "127.0.0.1",
+          "port": 5432
+        }
+      ],
+      "code": "ECONNREFUSED"
+    }
+undefined
+⨯ unhandledRejection: undefined
+⨯ unhandledRejection:  undefined
+⨯ Error: Error: cannot connect to Postgres:
+    at async Home (src/app/(site)/page.tsx:12:19)
+  10 |
+  11 | export default async function Home() {
+> 12 |   const payload = await getPayload({ config: configPromise });
+     |                   ^
+  13 |
+  14 |   const { docs: services } = await payload.find({
+  15 |     collection: 'services', {
+  payloadInitError: true,
+  digest: '1318868211'
+}
+ GET / 500 in 429ms (compile: 15ms, render: 415ms)
+[19:30:42] [31mERROR[39m: [36mError: cannot connect to Postgres. Details: [39m
+    err: {
+      "type": "AggregateError",
+      "message": "",
+      "stack":
+          AggregateError:
+              at /app/node_modules/pg-pool/index.js:45:11
+              at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+              at async connectWithReconnect (file:///app/node_modules/@payloadcms/db-postgres/dist/connect.js:7:18)
+              at async Object.connect (file:///app/node_modules/@payloadcms/db-postgres/dist/connect.js:46:13)
+              at async BasePayload.init (file:///app/node_modules/payload/dist/index.js:371:13)
+              at async getPayload (file:///app/node_modules/payload/dist/index.js:593:26)
+              at async Home (/app/.next/dev/server/chunks/ssr/[root-of-the-server]__eb411306._.js:2880:21)
+      "aggregateErrors": [
+        {
+          "type": "Error",
+          "message": "connect ECONNREFUSED ::1:5432",
+          "stack":
+              Error: connect ECONNREFUSED ::1:5432
+                  at createConnectionError (node:net:1678:14)
+                  at afterConnectMultiple (node:net:1708:16)
+                  at TCPConnectWrap.callbackTrampoline (node:internal/async_hooks:130:17)
+          "errno": -111,
+          "code": "ECONNREFUSED",
+          "syscall": "connect",
+          "address": "::1",
+          "port": 5432
+        },
+        {
+          "type": "Error",
+          "message": "connect ECONNREFUSED 127.0.0.1:5432",
+          "stack":
+              Error: connect ECONNREFUSED 127.0.0.1:5432
+                  at createConnectionError (node:net:1678:14)
+                  at afterConnectMultiple (node:net:1708:16)
+                  at TCPConnectWrap.callbackTrampoline (node:internal/async_hooks:130:17)
+          "errno": -111,
+          "code": "ECONNREFUSED",
+          "syscall": "connect",
+          "address": "127.0.0.1",
+          "port": 5432
+        }
+      ],
+      "code": "ECONNREFUSED"
+    }
+undefined
+⨯ unhandledRejection: undefined
+⨯ unhandledRejection:  undefined
+⨯ Error: Error: cannot connect to Postgres:
+    at async Home (src/app/(site)/page.tsx:12:19)
+  10 |
+  11 | export default async function Home() {
+> 12 |   const payload = await getPayload({ config: configPromise });
+     |                   ^
+  13 |
+  14 |   const { docs: services } = await payload.find({
+  15 |     collection: 'services', {
+  payloadInitError: true,
+  digest: '1318868211'
+}
+ HEAD / 500 in 131ms (compile: 4ms, render: 127ms)

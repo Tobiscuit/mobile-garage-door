@@ -1,15 +1,13 @@
 'use client'
 
-import React, { useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useMobileMenu } from '@/hooks/useMobileMenu';
 
 const Header: React.FC = () => {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { isOpen, toggle, close } = useMobileMenu();
   const pathname = usePathname();
-
-  // Close menu when route changes (optional optimization)
-  const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
 
   const isActive = (path: string) => pathname === path;
 
@@ -70,11 +68,11 @@ const Header: React.FC = () => {
           {/* MOBILE TOGGLE */}
           <button 
             className="md:hidden p-2 text-gray-300 hover:text-white"
-            onClick={toggleMobileMenu}
+            onClick={toggle}
             aria-label="Toggle menu"
           >
             <svg className="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              {isMobileMenuOpen ? (
+              {isOpen ? (
                 <path d="M6 18L18 6M6 6l12 12" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path>
               ) : (
                 <path d="M4 6h16M4 12h16m-7 6h7" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path>
@@ -86,7 +84,7 @@ const Header: React.FC = () => {
       
       {/* Mobile Navigation Menu - Full Screen Overlay */}
       <div className={`fixed inset-0 z-40 bg-charcoal-blue/98 backdrop-blur-3xl transition-all duration-300 md:hidden flex flex-col pt-24 px-6 ${
-        isMobileMenuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-full pointer-events-none'
+        isOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-full pointer-events-none'
       }`}>
         <div className="flex flex-col gap-6 text-center">
           {[
@@ -97,7 +95,7 @@ const Header: React.FC = () => {
             <Link 
               key={link.path}
               href={link.path} 
-              onClick={() => setIsMobileMenuOpen(false)} 
+              onClick={close}
               className={`text-2xl font-bold transition-colors ${
                 isActive(link.path) ? 'text-golden-yellow' : 'text-white hover:text-golden-yellow'
               }`}
@@ -106,7 +104,7 @@ const Header: React.FC = () => {
             </Link>
           ))}
           <div className="h-px w-20 mx-auto bg-white/10 my-4"></div>
-          <Link href="/contact?type=contractor" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-bold text-golden-yellow uppercase tracking-widest">
+          <Link href="/contact?type=contractor" onClick={close} className="text-lg font-bold text-golden-yellow uppercase tracking-widest">
             Contractor Portal
           </Link>
           <a href="tel:832-419-1293" className="mt-8 bg-red-600 text-white font-bold py-5 rounded-2xl text-xl shadow-xl flex items-center justify-center gap-3">
