@@ -11,13 +11,14 @@ The codebase has been refactored to follow a clean, modular architecture separat
 
 ### **Pages Refactored**
 - **Contact Page** (`src/app/(site)/contact/page.tsx`):
-    - Redesigned with a dynamic `ContactHero` component that adapts to `?type=repair`.
+    - Redesigned with a dynamic `ContactHero` component.
+    - **Fixes**: Removed distracting gradient, refined Contractor/Partner messaging logic.
     - Aligned with "Techno-Hero" aesthetic (Charcoal Blue, Golden Yellow, Industrial patterns).
-    - Uses overlapping "Command Center" layout similar to Booking Page.
+    - Uses overlapping "Command Center" layout.
 - **Booking Page** (`src/app/(site)/book-service/page.tsx`):
     - Decomposed into `ContactStep`, `IssueStep`, `ScheduleStep`, `PaymentStep`.
 - **Portal & Dashboard**:
-    - Decomposed into specialized components (`PortalHeader`, `KPIGrid`, etc.).
+    - Decomposed into specialized components.
     - Data fetching moved to Service Layer.
 
 ## 3. Pending Items
