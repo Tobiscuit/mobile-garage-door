@@ -15,11 +15,21 @@ export async function POST(req: NextRequest) {
     const { user } = await payload.auth({ headers: req.headers });
     let customerId = user?.id;
 
+    // API Key Auth for Server-to-Server (e.g., AWS Lambda)
+    const apiKey = req.headers.get('x-api-key');
+    const isValidApiKey = apiKey && process.env.SERVICE_API_KEY && apiKey === process.env.SERVICE_API_KEY;
+
+    if (!user && !isValidApiKey) {
+        // Only block if no user AND no valid API key
+        // But wait, we still need to handle guest checkout logic below
+    }
+
     const body = await req.json();
     const { sourceId, issueDescription, urgency, scheduledTime, amount, guestName, guestEmail, guestPhone, guestAddress } = body;
 
-    if (!user) {
-        // Allow Guest Checkout if details provided
+    // Handle Auth & Guest Logic
+    if (!user && !isValidApiKey) {
+        // Standard Guest Checkout Logic from Frontend
         if (guestName && guestPhone && guestEmail) {
              // 1. Check if customer exists by Email
             const existingCustomers = await payload.find({
