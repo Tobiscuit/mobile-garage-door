@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "next dev",
-    "build": "echo \"y\" | payload migrate && payload generate:importmap && next build",
+    "build": "echo \"y\" | payload migrate && payload generate:types && payload generate:importmap && next build",
     "start": "next start",
     "lint": "next lint",
     "generate:importmap": "payload generate:importmap",
@@ -22,6 +22,7 @@
   "packageManager": "npm@11.7.0",
   "dependencies": {
     "@payloadcms/db-postgres": "^3.76.1",
+    "@payloadcms/db-sqlite": "^3.76.1",
     "@payloadcms/next": "^3.76.1",
     "@payloadcms/richtext-lexical": "^3.76.1",
     "@tailwindcss/postcss": "^4.1.18",

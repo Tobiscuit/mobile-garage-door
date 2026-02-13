@@ -164,6 +164,15 @@ export interface User {
   phone?: string | null;
   address?: string | null;
   lastLogin?: string | null;
+  pushSubscription?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -608,6 +617,7 @@ export interface UsersSelect<T extends boolean = true> {
   phone?: T;
   address?: T;
   lastLogin?: T;
+  pushSubscription?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
