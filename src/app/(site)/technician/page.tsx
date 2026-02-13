@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { getAvailableJobs, acceptJob } from '@/app/actions/technician';
+import { getAvailableJobs, acceptJob, savePushSubscription } from '@/app/actions/technician';
 
 export default function TechnicianDashboard() {
   const router = useRouter();
@@ -58,7 +58,10 @@ export default function TechnicianDashboard() {
       setSubscription(sub);
       setIsSubscribed(true);
       console.log('Web Push Subscription:', JSON.stringify(sub));
-      // TODO: Send subscription to server to save in User profile
+      
+      // Save subscription to server
+      await savePushSubscription(JSON.parse(JSON.stringify(sub)));
+      
       alert('Subscribed to Dispatch Alerts!');
     } catch (error) {
         console.error('Failed to subscribe', error);
