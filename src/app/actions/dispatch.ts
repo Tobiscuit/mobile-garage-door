@@ -21,7 +21,7 @@ export async function assignJobToTechnician(jobId: string, technicianId: string)
             id: jobId,
             data: {
                 status: 'dispatched',
-                assignedTech: technicianId,
+                assignedTech: Number(technicianId), // Ensure it's a number for SQLite/Postgres relation or correct type
             },
         });
 

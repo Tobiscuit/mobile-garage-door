@@ -122,7 +122,7 @@ export const SquarePaymentModal: React.FC<SquarePaymentModalProps> = ({ isOpen, 
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-charcoal-blue/90 backdrop-blur-sm">
             {/* Load Square SDK */}
             <Script 
-                src="https://sandbox.web.squareup.com/v1/square.js"
+                src="https://sandbox.web.squarecdn.com/v1/square.js"
                 onLoad={() => setIsSdkLoaded(true)}
             />
 
