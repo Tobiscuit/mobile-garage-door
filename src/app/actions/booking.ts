@@ -15,7 +15,7 @@ interface CustomerData {
 }
 
 // 1. Private Helper: Find or Create Customer
-async function findOrCreateCustomer(payload: any, data: CustomerData): Promise<string | number> {
+async function findOrCreateCustomer(payload: any, data: CustomerData): Promise<number> {
   const existingCustomers = await payload.find({
     collection: 'users',
     where: {
@@ -24,7 +24,7 @@ async function findOrCreateCustomer(payload: any, data: CustomerData): Promise<s
   });
 
   if (existingCustomers.totalDocs > 0) {
-    return existingCustomers.docs[0].id;
+    return existingCustomers.docs[0].id as number;
   }
 
   const passwordToUse = data.guestPassword || randomUUID();
@@ -40,7 +40,7 @@ async function findOrCreateCustomer(payload: any, data: CustomerData): Promise<s
     },
   });
 
-  return newCustomer.id;
+  return newCustomer.id as number;
 }
 
 // 2. Main Server Action
@@ -57,7 +57,7 @@ export async function createBooking(prevState: any, formData: FormData) {
   const scheduledTime = formData.get('scheduledTime') as string;
   const sourceId = formData.get('sourceId') as string; // Square Token
 
-  let customerId: string | number | undefined;
+  let customerId: number | undefined;
 
   try {
     // A. Customer Logic
@@ -70,7 +70,7 @@ export async function createBooking(prevState: any, formData: FormData) {
     });
 
     // B. Payment Logic (Service Layer)
-    const tripFee = 9900; // 9.00
+    const tripFee = 9900; // 99.00
     const payment = await squareService.processPayment(
       sourceId,
       tripFee,
@@ -85,7 +85,7 @@ export async function createBooking(prevState: any, formData: FormData) {
         issueDescription,
         urgency: urgency as 'standard' | 'emergency',
         scheduledTime,
-        status: 'confirmed',
+        status: 'pending',
         tripFeePayment: {
             paymentId: payment.id,
             amount: Number(payment.amountMoney?.amount),

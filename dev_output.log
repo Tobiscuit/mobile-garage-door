@@ -337,3 +337,7 @@ undefined
  GET /contact?type=contractor 200 in 678ms (compile: 5ms, render: 673ms)
  GET /contact?type=contractor 200 in 797ms (compile: 43ms, render: 754ms)
  GET /images/map-bg.jpg 404 in 78ms (compile: 8ms, render: 70ms)
+✓ Compiled in 3.4s
+✓ Compiled in 2.5s
+✓ Compiled in 365ms
+✓ Compiled in 102ms
