@@ -25,25 +25,29 @@ export async function assignJobToTechnician(jobId: string, technicianId: string)
             },
         });
 
-        // 2. Fetch Technician's Push Subscription (Assuming it's stored on the User profile)
-        // NOTE: We need to add a 'pushSubscription' field to the Users collection first.
-        // For now, we will simulate the push notification log.
-        
-        /* 
+        // 2. Fetch Technician's Push Subscription
         const tech = await payload.findByID({ collection: 'users', id: technicianId });
-        if (tech.pushSubscription) {
-             await webpush.sendNotification(
-                 tech.pushSubscription,
-                 JSON.stringify({ 
-                     title: 'New Mission Assigned!', 
-                     body: `Ticket #${updatedJob.ticketId}: ${updatedJob.issueDescription}`,
-                     url: `/technician`
-                 })
-             );
-        }
-        */
+        
+        // Cast to any because pushSubscription type might not be generated yet or is 'unknown'
+        const subscription = (tech as any).pushSubscription;
 
-        console.log(`Job ${jobId} assigned to Tech ${technicianId}. Push Notification Sent (Simulated).`);
+        if (subscription) {
+             try {
+                 await webpush.sendNotification(
+                     subscription,
+                     JSON.stringify({ 
+                         title: 'New Mission Assigned!', 
+                         body: `Ticket #${updatedJob.ticketId}: ${updatedJob.issueDescription}`,
+                         url: `/technician`
+                     })
+                 );
+                 console.log(`Push notification sent to ${tech.email}`);
+             } catch (pushError) {
+                 console.error('Failed to send push notification:', pushError);
+             }
+        }
+
+        console.log(`Job ${jobId} assigned to Tech ${technicianId}.`);
 
         return { success: true };
 

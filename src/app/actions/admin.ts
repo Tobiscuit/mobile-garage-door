@@ -47,7 +47,7 @@ export async function getAllTechnicians() {
             id: tech.id,
             name: tech.name,
             email: tech.email,
-            isOnline: !!tech.pushSubscription // Rough proxy for "online" if they have a sub
+            isOnline: !!(tech as any).pushSubscription // Rough proxy for "online" if they have a sub
         }));
     } catch (error) {
         console.error('Error fetching technicians:', error);
