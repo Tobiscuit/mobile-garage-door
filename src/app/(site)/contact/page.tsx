@@ -192,10 +192,8 @@ const ContactContent = () => {
                             </div>
                         </div>
 
-                        {/* SERVICE AREA */}
-                        <div className="bg-gray-200 rounded-3xl h-80 w-full relative overflow-hidden shadow-inner border border-black/5">
-                            <ServiceAreaMap />
-                        </div>
+                        {/* SERVICE AREA (Map Placeholder) */}
+                        <ServiceAreaMap />
                     </div>
                 </div>
             </div>
