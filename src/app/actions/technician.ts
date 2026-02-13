@@ -22,15 +22,15 @@ export async function savePushSubscription(subscription: any) {
          });
 
          if (techs.totalDocs > 0) {
-             await payload.update({
-                 collection: 'users',
-                 id: techs.docs[0].id,
-                 data: {
-                     pushSubscription: subscription
-                 }
-             });
-             return { success: true };
-         }
+            await payload.update({
+                collection: 'users',
+                id: techs.docs[0].id,
+                data: {
+                    pushSubscription: subscription as any // Use 'as any' to bypass JSON field type check if needed
+                }
+            });
+            return { success: true };
+        }
          return { success: false, error: 'No technician found' };
 
     } catch (error) {
