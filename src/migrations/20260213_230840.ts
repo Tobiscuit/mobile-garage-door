@@ -1,6 +1,7 @@
 import { MigrateUpArgs, MigrateDownArgs, sql } from '@payloadcms/db-postgres'
 
 export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
+  // 1. Enums (Idempotent)
   await db.execute(sql`
    DO $$ BEGIN
      IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'enum_users_role') THEN
@@ -25,7 +26,10 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
        CREATE TYPE "public"."enum_service_requests_status" AS ENUM('pending', 'confirmed', 'dispatched', 'on_site', 'completed', 'cancelled');
      END IF;
    END $$;
+  `)
 
+  // 2. Tables
+  await db.execute(sql`
   CREATE TABLE IF NOT EXISTS "users_sessions" (
   	"_order" integer NOT NULL,
   	"_parent_id" integer NOT NULL,
@@ -53,19 +57,6 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"lock_until" timestamp(3) with time zone
   );
 
-  DO $$ BEGIN
-    BEGIN
-      ALTER TABLE "users" ADD COLUMN "role" "enum_users_role" DEFAULT 'admin' NOT NULL;
-    EXCEPTION
-      WHEN duplicate_column THEN NULL;
-    END;
-    BEGIN
-      ALTER TABLE "users" ADD COLUMN "push_subscription" jsonb;
-    EXCEPTION
-      WHEN duplicate_column THEN NULL;
-    END;
-  END $$;
-  
   CREATE TABLE IF NOT EXISTS "media" (
   	"id" serial PRIMARY KEY NOT NULL,
   	"alt" varchar,
@@ -335,7 +326,26 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"updated_at" timestamp(3) with time zone,
   	"created_at" timestamp(3) with time zone
   );
-  
+  `)
+
+  // 3. Add Columns (Idempotent)
+  await db.execute(sql`
+  DO $$ BEGIN
+    BEGIN
+      ALTER TABLE "users" ADD COLUMN "role" "enum_users_role" DEFAULT 'admin' NOT NULL;
+    EXCEPTION
+      WHEN duplicate_column THEN NULL;
+    END;
+    BEGIN
+      ALTER TABLE "users" ADD COLUMN "push_subscription" jsonb;
+    EXCEPTION
+      WHEN duplicate_column THEN NULL;
+    END;
+  END $$;
+  `)
+
+  // 4. Constraints and Indexes
+  await db.execute(sql`
   DO $$ BEGIN
    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'users_sessions_parent_id_fk') THEN
     ALTER TABLE "users_sessions" ADD CONSTRAINT "users_sessions_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;
@@ -574,7 +584,8 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE INDEX IF NOT EXISTS "site_settings_stats_order_idx" ON "site_settings_stats" USING btree ("_order");
   CREATE INDEX IF NOT EXISTS "site_settings_stats_parent_id_idx" ON "site_settings_stats" USING btree ("_parent_id");
   CREATE INDEX IF NOT EXISTS "site_settings_values_order_idx" ON "site_settings_values" USING btree ("_order");
-  CREATE INDEX IF NOT EXISTS "site_settings_values_parent_id_idx" ON "site_settings_values" USING btree ("_parent_id");`)
+  CREATE INDEX IF NOT EXISTS "site_settings_values_parent_id_idx" ON "site_settings_values" USING btree ("_parent_id");
+  `)
 }
 
 export async function down({ db, payload, req }: MigrateDownArgs): Promise<void> {
