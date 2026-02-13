@@ -7,6 +7,7 @@ import Footer from '@/components/Footer';
 import { ContactHero } from '@/components/contact/ContactHero';
 import { AddressAutocomplete } from '@/components/ui/AddressAutocomplete';
 import { ServiceAreaMap } from '@/components/ui/ServiceAreaMap';
+import { SquarePaymentModal } from '@/components/payment/SquarePaymentModal';
 
 const ContactContent = () => {
     const searchParams = useSearchParams();
@@ -20,6 +21,8 @@ const ContactContent = () => {
 
     // State for urgency toggle
     const [urgency, setUrgency] = useState<'Standard' | 'Emergency'>('Standard');
+    const [showPaymentModal, setShowPaymentModal] = useState(false);
+    const [isPaid, setIsPaid] = useState(false);
 
     useEffect(() => {
         if (heroType === 'repair') {
@@ -48,14 +51,61 @@ const ContactContent = () => {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        // Mimic original alert behavior or implement server action later
-        alert('Dispatch request received. Technician alerted.');
+        // Open Payment Modal
+        setShowPaymentModal(true);
+    };
+
+    const handlePaymentSuccess = async (paymentResult: any) => {
+        // TODO: Create Service Request in Payload CMS
+        console.log('Payment Successful:', paymentResult);
+        setShowPaymentModal(false);
+        setIsPaid(true);
+        // alert('Payment Confirmed! Technician Dispatched.');
     };
 
     const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '';
 
+    if (isPaid) {
+        return (
+             <>
+                <ContactHero type={heroType} />
+                <div className="container mx-auto max-w-4xl -mt-20 relative z-20 px-6 pb-24">
+                    <div className="bg-white rounded-3xl shadow-2xl p-12 text-center border-t-8 border-green-500">
+                        <div className="w-24 h-24 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6 animate-bounce">
+                             <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                        </div>
+                        <h2 className="text-4xl font-black text-charcoal-blue mb-4">DISPATCH CONFIRMED</h2>
+                        <p className="text-gray-500 text-lg mb-8 max-w-lg mx-auto">
+                            Your technician has been alerted and is en route to <span className="font-bold text-charcoal-blue">{formData.address || 'your location'}</span>.
+                        </p>
+                        
+                        {/* Technician Tracker Placeholder */}
+                        <div className="bg-charcoal-blue rounded-3xl p-1 overflow-hidden shadow-lg relative h-64 mb-8">
+                             <ServiceAreaMap />
+                             <div className="absolute top-4 left-4 bg-white/10 backdrop-blur-md px-4 py-2 rounded-lg border border-white/20">
+                                <div className="text-[10px] text-gray-300 font-bold uppercase tracking-widest">ETA</div>
+                                <div className="text-white font-mono font-bold text-xl">15-30 MIN</div>
+                             </div>
+                        </div>
+
+                        <p className="text-sm text-gray-400 font-bold uppercase tracking-widest">
+                            Ticket #{Math.floor(Math.random() * 100000)} • Priority: {urgency}
+                        </p>
+                    </div>
+                </div>
+             </>
+        );
+    }
+
     return (
-        <APIProvider apiKey={API_KEY}>
+        <>
+            <SquarePaymentModal 
+                isOpen={showPaymentModal}
+                onClose={() => setShowPaymentModal(false)}
+                onSuccess={handlePaymentSuccess}
+                amount={99.00}
+            />
+
             <ContactHero type={heroType} />
             <div className="container mx-auto max-w-6xl -mt-20 relative z-20 px-6 pb-24">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
