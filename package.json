@@ -22,7 +22,6 @@
   "packageManager": "npm@11.7.0",
   "dependencies": {
     "@payloadcms/db-postgres": "^3.76.1",
-    "@payloadcms/db-sqlite": "^3.76.1",
     "@payloadcms/next": "^3.76.1",
     "@payloadcms/richtext-lexical": "^3.76.1",
     "@tailwindcss/postcss": "^4.1.18",
