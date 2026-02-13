@@ -5,8 +5,8 @@ import { useSearchParams } from 'next/navigation';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { ContactHero } from '@/components/contact/ContactHero';
-import { APIProvider } from '@vis.gl/react-google-maps';
 import { AddressAutocomplete } from '@/components/ui/AddressAutocomplete';
+import { ServiceAreaMap } from '@/components/ui/ServiceAreaMap';
 
 const ContactContent = () => {
     const searchParams = useSearchParams();
@@ -192,41 +192,16 @@ const ContactContent = () => {
                             </div>
                         </div>
 
-                        {/* SERVICE AREA (Map Placeholder) */}
-                        <div className="bg-gray-200 rounded-3xl h-80 w-full relative overflow-hidden group shadow-inner border border-black/5">
-                            <div className="absolute inset-0 bg-cover bg-center grayscale opacity-50 group-hover:grayscale-0 transition-all duration-700" style={{ backgroundImage: "url('/images/map-bg.jpg')" }}>
-                                {/* Fallback gradient if image fails */}
-                                <div className="absolute inset-0 bg-gradient-to-br from-gray-300 to-gray-400 -z-10"></div>
-                            </div>
-                            
-                            {/* Radar Scan Effect */}
-                            <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                                 <div className="absolute top-1/2 left-1/2 w-[600px] h-[600px] bg-gradient-to-r from-transparent via-golden-yellow/20 to-transparent -translate-x-1/2 -translate-y-1/2 animate-spin-slow origin-center rounded-full opacity-30 blur-2xl"></div>
-                            </div>
-
-                            <div className="absolute bottom-6 left-6 right-6">
-                                <div className="bg-white/90 backdrop-blur-md p-4 rounded-2xl shadow-lg border border-white/50">
-                                    <div className="flex justify-between items-center mb-2">
-                                        <div className="text-[10px] font-bold text-charcoal-blue uppercase tracking-widest">Deployment Zone</div>
-                                        <div className="flex items-center gap-1.5 bg-green-100 px-2 py-0.5 rounded-full border border-green-200">
-                                            <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></div>
-                                            <span className="text-[10px] font-bold text-green-700 uppercase">Active</span>
-                                        </div>
-                                    </div>
-                                    <p className="text-xs text-gray-500 font-medium leading-relaxed">
-                                        Greater Houston Metropolitan Area + 50 mile radius. <span className="text-charcoal-blue font-bold">3 technicians</span> currently patrolling your sector.
-                                    </p>
-                                </div>
-                            </div>
+                        {/* SERVICE AREA */}
+                        <div className="bg-gray-200 rounded-3xl h-80 w-full relative overflow-hidden shadow-inner border border-black/5">
+                            <ServiceAreaMap />
                         </div>
-
                     </div>
-
                 </div>
             </div>
-        </APIProvider>
+        </>
     );
-}
+};
 
 export default function ContactPage() {
   return (
