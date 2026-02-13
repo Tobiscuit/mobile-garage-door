@@ -35,7 +35,7 @@ const seed = async (): Promise<void> => {
       data: {
         email: email,
         password: finalPassword,
-      },
+      } as any,
     })
     payload.logger.info(`Created Admin User: ${email}`)
   } else {
