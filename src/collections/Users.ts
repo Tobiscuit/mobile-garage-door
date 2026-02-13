@@ -44,6 +44,13 @@ export const Users: CollectionConfig = {
         readOnly: true,
       },
     },
+    {
+      name: 'pushSubscription',
+      type: 'json', // Storing the full subscription object
+      admin: {
+        readOnly: true,
+      },
+    },
   ],
   hooks: {
     afterLogin: [
