@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { getAvailableJobs, acceptJob } from '@/app/actions/technician';
 
 export default function TechnicianDashboard() {
   const router = useRouter();
@@ -9,14 +10,31 @@ export default function TechnicianDashboard() {
   const [subscription, setSubscription] = useState<PushSubscription | null>(null);
   const [registration, setRegistration] = useState<ServiceWorkerRegistration | null>(null);
   
-  // Mock Jobs
-  const [jobs, setJobs] = useState([
-    { id: 'SR-1715201', type: 'REPAIR', address: '123 Main St, Houston, TX', status: 'PAID', urgency: 'Emergency' },
-    { id: 'SR-1715205', type: 'INSTALL', address: '4500 Memorial Dr, Houston, TX', status: 'PAID', urgency: 'Standard' },
-  ]);
+  const [jobs, setJobs] = useState<any[]>([]);
+
+  const fetchJobs = async () => {
+      const data = await getAvailableJobs();
+      setJobs(data);
+  };
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && 'serviceWorker' in navigator && (window as any).workbox !== undefined) {
+    // Initial fetch
+    fetchJobs();
+    
+    // Poll for new jobs every 15 seconds (Simple "Real-time" for MVP)
+    const interval = setInterval(fetchJobs, 15000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleAccept = async (jobId: string) => {
+      if (confirm('Accept this assignment?')) {
+          await acceptJob(jobId);
+          await fetchJobs(); // Refresh list
+      }
+  };
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
       // run only in browser
       navigator.serviceWorker.ready.then(reg => {
         setRegistration(reg);
@@ -103,16 +121,20 @@ export default function TechnicianDashboard() {
                             <span className={`px-2 py-1 rounded text-[10px] font-black uppercase tracking-wide ${job.urgency === 'Emergency' ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-blue-500/20 text-blue-400 border border-blue-500/30'}`}>
                                 {job.urgency}
                             </span>
-                            <span className="text-xs font-mono text-gray-400">{job.id}</span>
+                            <span className="text-xs font-mono text-gray-400">{job.ticketId}</span>
                         </div>
-                        <h3 className="text-lg font-bold mb-1">{job.type} REQUEST</h3>
-                        <p className="text-gray-300 text-sm mb-4">{job.address}</p>
+                        <h3 className="text-lg font-bold mb-1">{job.customerName}</h3>
+                        <p className="text-gray-300 text-sm mb-1">{job.customerAddress}</p>
+                        <p className="text-gray-400 text-xs italic mb-4 line-clamp-2">"{job.issue}"</p>
                         
                         <div className="grid grid-cols-2 gap-3">
                             <button className="bg-white/10 py-3 rounded-xl text-xs font-bold uppercase tracking-wide hover:bg-white/20 transition-colors">
                                 Decline
                             </button>
-                            <button className="bg-green-500 text-white py-3 rounded-xl text-xs font-bold uppercase tracking-wide hover:bg-green-400 transition-colors shadow-lg shadow-green-900/20">
+                            <button 
+                                onClick={() => handleAccept(job.id)}
+                                className="bg-green-500 text-white py-3 rounded-xl text-xs font-bold uppercase tracking-wide hover:bg-green-400 transition-colors shadow-lg shadow-green-900/20"
+                            >
                                 Accept Mission
                             </button>
                         </div>

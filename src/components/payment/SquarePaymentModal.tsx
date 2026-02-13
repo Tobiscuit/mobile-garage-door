@@ -9,6 +9,14 @@ interface SquarePaymentModalProps {
     onClose: () => void;
     onSuccess: (paymentResult: any) => void;
     amount: number; // e.g. 99.00
+    customerDetails: {
+        name: string;
+        phone: string;
+        email: string;
+        address: string;
+        issue: string;
+        urgency: 'Standard' | 'Emergency';
+    }
 }
 
 declare global {
@@ -17,7 +25,7 @@ declare global {
     }
 }
 
-export const SquarePaymentModal: React.FC<SquarePaymentModalProps> = ({ isOpen, onClose, onSuccess, amount }) => {
+export const SquarePaymentModal: React.FC<SquarePaymentModalProps> = ({ isOpen, onClose, onSuccess, amount, customerDetails }) => {
     const [isSdkLoaded, setIsSdkLoaded] = useState(false);
     const [status, setStatus] = useState<'idle' | 'loading' | 'processing' | 'success' | 'error'>('idle');
     const [errorMessage, setErrorMessage] = useState('');
@@ -84,7 +92,11 @@ export const SquarePaymentModal: React.FC<SquarePaymentModalProps> = ({ isOpen, 
             
             if (result.status === 'OK') {
                 // 2. Process payment on server
-                const serverResult = await processPayment(result.token, amount * 100); // Convert to cents
+                const serverResult = await processPayment({
+                    sourceId: result.token,
+                    amount: amount * 100, // Convert to cents
+                    customerDetails
+                });
                 
                 if (serverResult.success) {
                     setStatus('success');
