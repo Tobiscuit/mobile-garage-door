@@ -9,7 +9,7 @@ const squareClient = new SquareClient({
 export const squareService = {
   processPayment: async (sourceId: string, amount: number, note: string) => {
     try {
-      const result = await squareClient.payments.create({
+      const response = await squareClient.payments.create({
         sourceId,
         idempotencyKey: randomUUID(),
         amountMoney: {
@@ -19,16 +19,18 @@ export const squareService = {
         note,
       });
 
-      if (!result.payment || (result.payment.status !== 'COMPLETED' && result.payment.status !== 'APPROVED')) {
-        throw new Error('Payment failed. Status: ' + result.payment?.status);
+      if (!response.payment || (response.payment.status !== 'COMPLETED' && response.payment.status !== 'APPROVED')) {
+        throw new Error('Payment failed. Status: ' + response.payment?.status);
       }
 
-      return result.payment;
+      return response.payment;
     } catch (error: any) {
       console.error('Square Service Error:', error);
-      if (error.result && error.result.errors) {
-        // If it's an array of errors, take the first one
-        throw new Error(error.result.errors[0].detail);
+
+      if (error.errors && Array.isArray(error.errors) && error.errors.length > 0) {
+        throw new Error(error.errors[0].detail);
+      } else if (error.body && error.body.errors) {
+        throw new Error(error.body.errors[0].detail);
       } else if (error.message) {
         throw new Error(error.message);
       }

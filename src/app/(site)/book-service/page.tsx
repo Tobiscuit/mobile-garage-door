@@ -21,6 +21,9 @@ export default function BookingPage() {
 
   const APP_ID = process.env.NEXT_PUBLIC_SQUARE_APP_ID || 'sandbox-sq0idb-YOUR_APP_ID_HERE'; 
   const LOCATION_ID = process.env.NEXT_PUBLIC_SQUARE_LOCATION_ID || 'YOUR_LOCATION_ID_HERE';
+  const SQUARE_SCRIPT_SRC = APP_ID.startsWith('sandbox')
+      ? 'https://sandbox.web.squarecdn.com/v1/square.js'
+      : 'https://web.squarecdn.com/v1/square.js';
 
   // Initialize Square Hook
   const { card, setSdkLoaded, error: squareError, tokenizeCard } = useSquarePayment(
@@ -70,7 +73,7 @@ export default function BookingPage() {
   return (
     <div className="min-h-screen bg-cloudy-white py-12 px-4 font-work-sans">
       <Script 
-        src="https://sandbox.web.squarecdn.com/v1/square.js"
+        src={SQUARE_SCRIPT_SRC}
         onLoad={() => setSdkLoaded(true)} 
       />
 
