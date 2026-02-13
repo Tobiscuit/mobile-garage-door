@@ -26,8 +26,8 @@ export async function savePushSubscription(subscription: any) {
                 collection: 'users',
                 id: techs.docs[0].id,
                 data: {
-                    pushSubscription: subscription as any // Use 'as any' to bypass JSON field type check if needed
-                }
+                    pushSubscription: subscription
+                } as any
             });
             return { success: true };
         }
