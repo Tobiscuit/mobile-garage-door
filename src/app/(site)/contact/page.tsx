@@ -34,6 +34,7 @@ const ContactContent = () => {
 
     const [formData, setFormData] = useState({
         name: '',
+        email: '',
         phone: '',
         address: '',
         issue: ''
@@ -104,6 +105,10 @@ const ContactContent = () => {
                 onClose={() => setShowPaymentModal(false)}
                 onSuccess={handlePaymentSuccess}
                 amount={99.00}
+                customerDetails={{
+                    ...formData,
+                    urgency
+                }}
             />
 
             <ContactHero type={heroType} />
@@ -147,15 +152,26 @@ const ContactContent = () => {
                             </div>
 
                             <form onSubmit={handleSubmit} className="space-y-6 relative z-10">
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-gray-400 uppercase tracking-widest">Contact Name</label>
+                                    <input 
+                                        type="text" 
+                                        name="name"
+                                        required
+                                        className="w-full bg-gray-50 border border-gray-200 rounded-xl p-4 font-bold text-charcoal-blue focus:ring-2 focus:ring-golden-yellow focus:border-transparent outline-none transition-all"
+                                        placeholder="Full Name"
+                                        onChange={handleInputChange}
+                                    />
+                                </div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div className="space-y-2">
-                                        <label className="text-xs font-bold text-gray-400 uppercase tracking-widest">Contact Name</label>
+                                        <label className="text-xs font-bold text-gray-400 uppercase tracking-widest">Email Address</label>
                                         <input 
-                                            type="text" 
-                                            name="name"
+                                            type="email" 
+                                            name="email"
                                             required
                                             className="w-full bg-gray-50 border border-gray-200 rounded-xl p-4 font-bold text-charcoal-blue focus:ring-2 focus:ring-golden-yellow focus:border-transparent outline-none transition-all"
-                                            placeholder="Full Name"
+                                            placeholder="john@example.com"
                                             onChange={handleInputChange}
                                         />
                                     </div>
