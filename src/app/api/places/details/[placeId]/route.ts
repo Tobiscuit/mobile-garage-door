@@ -2,12 +2,12 @@ import { NextResponse } from 'next/server';
 
 const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
-export async function GET(request: Request, { params }: { params: { placeId: string } }) {
+export async function GET(request: Request, context: { params: Promise<{ placeId: string }> }) {
   if (!API_KEY) {
     return NextResponse.json({ error: 'Missing API Key' }, { status: 500 });
   }
 
-  const placeId = params.placeId;
+  const { placeId } = await context.params;
   const { searchParams } = new URL(request.url);
   const sessionToken = searchParams.get('sessionToken');
 
