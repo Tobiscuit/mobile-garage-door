@@ -1,32 +1,34 @@
 import { MigrateUpArgs, MigrateDownArgs, sql } from '@payloadcms/db-postgres'
 
 export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
-  // 1. Enums (Idempotent)
-  await db.execute(sql`
-   DO $$ BEGIN
-     IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'enum_users_role') THEN
-       CREATE TYPE "public"."enum_users_role" AS ENUM('admin', 'technician', 'dispatcher', 'customer');
-     END IF;
-     IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'enum_services_icon') THEN
-       CREATE TYPE "public"."enum_services_icon" AS ENUM('lightning', 'building', 'clipboard', 'phone');
-     END IF;
-     IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'enum_projects_image_style') THEN
-       CREATE TYPE "public"."enum_projects_image_style" AS ENUM('garage-pattern-steel', 'garage-pattern-glass', 'garage-pattern-carriage', 'garage-pattern-modern');
-     END IF;
-     IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'enum_posts_category') THEN
-       CREATE TYPE "public"."enum_posts_category" AS ENUM('repair-tips', 'product-spotlight', 'contractor-insights', 'maintenance-guide', 'industry-news');
-     END IF;
-     IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'enum_posts_status') THEN
-       CREATE TYPE "public"."enum_posts_status" AS ENUM('draft', 'published');
-     END IF;
-     IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'enum_service_requests_urgency') THEN
-       CREATE TYPE "public"."enum_service_requests_urgency" AS ENUM('standard', 'emergency');
-     END IF;
-     IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'enum_service_requests_status') THEN
-       CREATE TYPE "public"."enum_service_requests_status" AS ENUM('pending', 'confirmed', 'dispatched', 'on_site', 'completed', 'cancelled');
-     END IF;
-   END $$;
-  `)
+  // 1. Enums (Safe creation)
+  try {
+    await db.execute(sql`CREATE TYPE "public"."enum_users_role" AS ENUM('admin', 'technician', 'dispatcher', 'customer');`)
+  } catch (e) { /* Ignore if exists */ }
+  
+  try {
+    await db.execute(sql`CREATE TYPE "public"."enum_services_icon" AS ENUM('lightning', 'building', 'clipboard', 'phone');`)
+  } catch (e) { /* Ignore if exists */ }
+
+  try {
+    await db.execute(sql`CREATE TYPE "public"."enum_projects_image_style" AS ENUM('garage-pattern-steel', 'garage-pattern-glass', 'garage-pattern-carriage', 'garage-pattern-modern');`)
+  } catch (e) { /* Ignore if exists */ }
+
+  try {
+    await db.execute(sql`CREATE TYPE "public"."enum_posts_category" AS ENUM('repair-tips', 'product-spotlight', 'contractor-insights', 'maintenance-guide', 'industry-news');`)
+  } catch (e) { /* Ignore if exists */ }
+
+  try {
+    await db.execute(sql`CREATE TYPE "public"."enum_posts_status" AS ENUM('draft', 'published');`)
+  } catch (e) { /* Ignore if exists */ }
+
+  try {
+    await db.execute(sql`CREATE TYPE "public"."enum_service_requests_urgency" AS ENUM('standard', 'emergency');`)
+  } catch (e) { /* Ignore if exists */ }
+
+  try {
+    await db.execute(sql`CREATE TYPE "public"."enum_service_requests_status" AS ENUM('pending', 'confirmed', 'dispatched', 'on_site', 'completed', 'cancelled');`)
+  } catch (e) { /* Ignore if exists */ }
 
   // 2. Tables
   await db.execute(sql`
@@ -328,186 +330,121 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   );
   `)
 
-  // 3. Add Columns (Idempotent)
-  await db.execute(sql`
-  DO $$ BEGIN
-    BEGIN
-      ALTER TABLE "users" ADD COLUMN "role" "enum_users_role" DEFAULT 'admin' NOT NULL;
-    EXCEPTION
-      WHEN duplicate_column THEN NULL;
-    END;
-    BEGIN
-      ALTER TABLE "users" ADD COLUMN "push_subscription" jsonb;
-    EXCEPTION
-      WHEN duplicate_column THEN NULL;
-    END;
-  END $$;
-  `)
+  // 3. Columns (Safe addition)
+  await db.execute(sql`ALTER TABLE "users" ADD COLUMN IF NOT EXISTS "role" "enum_users_role" DEFAULT 'admin' NOT NULL;`)
+  await db.execute(sql`ALTER TABLE "users" ADD COLUMN IF NOT EXISTS "push_subscription" jsonb;`)
 
-  // 4. Constraints and Indexes
+  // 4. Constraints (Safe addition)
+  try {
+    await db.execute(sql`ALTER TABLE "users_sessions" ADD CONSTRAINT "users_sessions_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;`)
+  } catch (e) { /* Ignore */ }
+
+  try {
+    await db.execute(sql`ALTER TABLE "services_features" ADD CONSTRAINT "services_features_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."services"("id") ON DELETE cascade ON UPDATE no action;`)
+  } catch (e) { /* Ignore */ }
+
+  try {
+    await db.execute(sql`ALTER TABLE "projects_tags" ADD CONSTRAINT "projects_tags_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."projects"("id") ON DELETE cascade ON UPDATE no action;`)
+  } catch (e) { /* Ignore */ }
+
+  try {
+    await db.execute(sql`ALTER TABLE "projects_stats" ADD CONSTRAINT "projects_stats_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."projects"("id") ON DELETE cascade ON UPDATE no action;`)
+  } catch (e) { /* Ignore */ }
+
+  try {
+    await db.execute(sql`ALTER TABLE "projects" ADD CONSTRAINT "projects_image_id_media_id_fk" FOREIGN KEY ("image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;`)
+  } catch (e) { /* Ignore */ }
+
+  try {
+    await db.execute(sql`ALTER TABLE "posts_keywords" ADD CONSTRAINT "posts_keywords_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."posts"("id") ON DELETE cascade ON UPDATE no action;`)
+  } catch (e) { /* Ignore */ }
+
+  try {
+    await db.execute(sql`ALTER TABLE "posts" ADD CONSTRAINT "posts_featured_image_id_media_id_fk" FOREIGN KEY ("featured_image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;`)
+  } catch (e) { /* Ignore */ }
+
+  try {
+    await db.execute(sql`ALTER TABLE "customers_sessions" ADD CONSTRAINT "customers_sessions_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."customers"("id") ON DELETE cascade ON UPDATE no action;`)
+  } catch (e) { /* Ignore */ }
+
+  try {
+    await db.execute(sql`ALTER TABLE "service_requests" ADD CONSTRAINT "service_requests_customer_id_customers_id_fk" FOREIGN KEY ("customer_id") REFERENCES "public"."customers"("id") ON DELETE set null ON UPDATE no action;`)
+  } catch (e) { /* Ignore */ }
+
+  try {
+    await db.execute(sql`ALTER TABLE "service_requests" ADD CONSTRAINT "service_requests_assigned_tech_id_users_id_fk" FOREIGN KEY ("assigned_tech_id") REFERENCES "public"."users"("id") ON DELETE set null ON UPDATE no action;`)
+  } catch (e) { /* Ignore */ }
+
+  try {
+    await db.execute(sql`ALTER TABLE "invoices" ADD CONSTRAINT "invoices_customer_id_customers_id_fk" FOREIGN KEY ("customer_id") REFERENCES "public"."customers"("id") ON DELETE set null ON UPDATE no action;`)
+  } catch (e) { /* Ignore */ }
+
+  try {
+    await db.execute(sql`ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_parent_fk" FOREIGN KEY ("parent_id") REFERENCES "public"."payload_locked_documents"("id") ON DELETE cascade ON UPDATE no action;`)
+  } catch (e) { /* Ignore */ }
+
+  try {
+    await db.execute(sql`ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_users_fk" FOREIGN KEY ("users_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;`)
+  } catch (e) { /* Ignore */ }
+
+  try {
+    await db.execute(sql`ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_media_fk" FOREIGN KEY ("media_id") REFERENCES "public"."media"("id") ON DELETE cascade ON UPDATE no action;`)
+  } catch (e) { /* Ignore */ }
+
+  try {
+    await db.execute(sql`ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_services_fk" FOREIGN KEY ("services_id") REFERENCES "public"."services"("id") ON DELETE cascade ON UPDATE no action;`)
+  } catch (e) { /* Ignore */ }
+
+  try {
+    await db.execute(sql`ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_projects_fk" FOREIGN KEY ("projects_id") REFERENCES "public"."projects"("id") ON DELETE cascade ON UPDATE no action;`)
+  } catch (e) { /* Ignore */ }
+
+  try {
+    await db.execute(sql`ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_testimonials_fk" FOREIGN KEY ("testimonials_id") REFERENCES "public"."testimonials"("id") ON DELETE cascade ON UPDATE no action;`)
+  } catch (e) { /* Ignore */ }
+
+  try {
+    await db.execute(sql`ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_posts_fk" FOREIGN KEY ("posts_id") REFERENCES "public"."posts"("id") ON DELETE cascade ON UPDATE no action;`)
+  } catch (e) { /* Ignore */ }
+
+  try {
+    await db.execute(sql`ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_customers_fk" FOREIGN KEY ("customers_id") REFERENCES "public"."customers"("id") ON DELETE cascade ON UPDATE no action;`)
+  } catch (e) { /* Ignore */ }
+
+  try {
+    await db.execute(sql`ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_service_requests_fk" FOREIGN KEY ("service_requests_id") REFERENCES "public"."service_requests"("id") ON DELETE cascade ON UPDATE no action;`)
+  } catch (e) { /* Ignore */ }
+
+  try {
+    await db.execute(sql`ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_invoices_fk" FOREIGN KEY ("invoices_id") REFERENCES "public"."invoices"("id") ON DELETE cascade ON UPDATE no action;`)
+  } catch (e) { /* Ignore */ }
+
+  try {
+    await db.execute(sql`ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_payments_fk" FOREIGN KEY ("payments_id") REFERENCES "public"."payments"("id") ON DELETE cascade ON UPDATE no action;`)
+  } catch (e) { /* Ignore */ }
+
+  try {
+    await db.execute(sql`ALTER TABLE "payload_preferences_rels" ADD CONSTRAINT "payload_preferences_rels_parent_fk" FOREIGN KEY ("parent_id") REFERENCES "public"."payload_preferences"("id") ON DELETE cascade ON UPDATE no action;`)
+  } catch (e) { /* Ignore */ }
+
+  try {
+    await db.execute(sql`ALTER TABLE "payload_preferences_rels" ADD CONSTRAINT "payload_preferences_rels_users_fk" FOREIGN KEY ("users_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;`)
+  } catch (e) { /* Ignore */ }
+
+  try {
+    await db.execute(sql`ALTER TABLE "payload_preferences_rels" ADD CONSTRAINT "payload_preferences_rels_customers_fk" FOREIGN KEY ("customers_id") REFERENCES "public"."customers"("id") ON DELETE cascade ON UPDATE no action;`)
+  } catch (e) { /* Ignore */ }
+
+  try {
+    await db.execute(sql`ALTER TABLE "site_settings_stats" ADD CONSTRAINT "site_settings_stats_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."site_settings"("id") ON DELETE cascade ON UPDATE no action;`)
+  } catch (e) { /* Ignore */ }
+
+  try {
+    await db.execute(sql`ALTER TABLE "site_settings_values" ADD CONSTRAINT "site_settings_values_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."site_settings"("id") ON DELETE cascade ON UPDATE no action;`)
+  } catch (e) { /* Ignore */ }
+
+  // 5. Indexes (Safe addition)
   await db.execute(sql`
-  DO $$ BEGIN
-   IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'users_sessions_parent_id_fk') THEN
-    ALTER TABLE "users_sessions" ADD CONSTRAINT "users_sessions_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;
-   END IF;
-  END $$;
-  
-  DO $$ BEGIN
-   IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'services_features_parent_id_fk') THEN
-    ALTER TABLE "services_features" ADD CONSTRAINT "services_features_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."services"("id") ON DELETE cascade ON UPDATE no action;
-   END IF;
-  END $$;
-  
-  DO $$ BEGIN
-   IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'projects_tags_parent_id_fk') THEN
-    ALTER TABLE "projects_tags" ADD CONSTRAINT "projects_tags_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."projects"("id") ON DELETE cascade ON UPDATE no action;
-   END IF;
-  END $$;
-  
-  DO $$ BEGIN
-   IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'projects_stats_parent_id_fk') THEN
-    ALTER TABLE "projects_stats" ADD CONSTRAINT "projects_stats_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."projects"("id") ON DELETE cascade ON UPDATE no action;
-   END IF;
-  END $$;
-  
-  DO $$ BEGIN
-   IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'projects_image_id_media_id_fk') THEN
-    ALTER TABLE "projects" ADD CONSTRAINT "projects_image_id_media_id_fk" FOREIGN KEY ("image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
-   END IF;
-  END $$;
-  
-  DO $$ BEGIN
-   IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'posts_keywords_parent_id_fk') THEN
-    ALTER TABLE "posts_keywords" ADD CONSTRAINT "posts_keywords_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."posts"("id") ON DELETE cascade ON UPDATE no action;
-   END IF;
-  END $$;
-  
-  DO $$ BEGIN
-   IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'posts_featured_image_id_media_id_fk') THEN
-    ALTER TABLE "posts" ADD CONSTRAINT "posts_featured_image_id_media_id_fk" FOREIGN KEY ("featured_image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
-   END IF;
-  END $$;
-  
-  DO $$ BEGIN
-   IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'customers_sessions_parent_id_fk') THEN
-    ALTER TABLE "customers_sessions" ADD CONSTRAINT "customers_sessions_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."customers"("id") ON DELETE cascade ON UPDATE no action;
-   END IF;
-  END $$;
-  
-  DO $$ BEGIN
-   IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'service_requests_customer_id_customers_id_fk') THEN
-    ALTER TABLE "service_requests" ADD CONSTRAINT "service_requests_customer_id_customers_id_fk" FOREIGN KEY ("customer_id") REFERENCES "public"."customers"("id") ON DELETE set null ON UPDATE no action;
-   END IF;
-  END $$;
-  
-  DO $$ BEGIN
-   IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'service_requests_assigned_tech_id_users_id_fk') THEN
-    ALTER TABLE "service_requests" ADD CONSTRAINT "service_requests_assigned_tech_id_users_id_fk" FOREIGN KEY ("assigned_tech_id") REFERENCES "public"."users"("id") ON DELETE set null ON UPDATE no action;
-   END IF;
-  END $$;
-  
-  DO $$ BEGIN
-   IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'invoices_customer_id_customers_id_fk') THEN
-    ALTER TABLE "invoices" ADD CONSTRAINT "invoices_customer_id_customers_id_fk" FOREIGN KEY ("customer_id") REFERENCES "public"."customers"("id") ON DELETE set null ON UPDATE no action;
-   END IF;
-  END $$;
-  
-  DO $$ BEGIN
-   IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'payload_locked_documents_rels_parent_fk') THEN
-    ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_parent_fk" FOREIGN KEY ("parent_id") REFERENCES "public"."payload_locked_documents"("id") ON DELETE cascade ON UPDATE no action;
-   END IF;
-  END $$;
-  
-  DO $$ BEGIN
-   IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'payload_locked_documents_rels_users_fk') THEN
-    ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_users_fk" FOREIGN KEY ("users_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;
-   END IF;
-  END $$;
-  
-  DO $$ BEGIN
-   IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'payload_locked_documents_rels_media_fk') THEN
-    ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_media_fk" FOREIGN KEY ("media_id") REFERENCES "public"."media"("id") ON DELETE cascade ON UPDATE no action;
-   END IF;
-  END $$;
-  
-  DO $$ BEGIN
-   IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'payload_locked_documents_rels_services_fk') THEN
-    ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_services_fk" FOREIGN KEY ("services_id") REFERENCES "public"."services"("id") ON DELETE cascade ON UPDATE no action;
-   END IF;
-  END $$;
-  
-  DO $$ BEGIN
-   IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'payload_locked_documents_rels_projects_fk') THEN
-    ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_projects_fk" FOREIGN KEY ("projects_id") REFERENCES "public"."projects"("id") ON DELETE cascade ON UPDATE no action;
-   END IF;
-  END $$;
-  
-  DO $$ BEGIN
-   IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'payload_locked_documents_rels_testimonials_fk') THEN
-    ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_testimonials_fk" FOREIGN KEY ("testimonials_id") REFERENCES "public"."testimonials"("id") ON DELETE cascade ON UPDATE no action;
-   END IF;
-  END $$;
-  
-  DO $$ BEGIN
-   IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'payload_locked_documents_rels_posts_fk') THEN
-    ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_posts_fk" FOREIGN KEY ("posts_id") REFERENCES "public"."posts"("id") ON DELETE cascade ON UPDATE no action;
-   END IF;
-  END $$;
-  
-  DO $$ BEGIN
-   IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'payload_locked_documents_rels_customers_fk') THEN
-    ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_customers_fk" FOREIGN KEY ("customers_id") REFERENCES "public"."customers"("id") ON DELETE cascade ON UPDATE no action;
-   END IF;
-  END $$;
-  
-  DO $$ BEGIN
-   IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'payload_locked_documents_rels_service_requests_fk') THEN
-    ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_service_requests_fk" FOREIGN KEY ("service_requests_id") REFERENCES "public"."service_requests"("id") ON DELETE cascade ON UPDATE no action;
-   END IF;
-  END $$;
-  
-  DO $$ BEGIN
-   IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'payload_locked_documents_rels_invoices_fk') THEN
-    ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_invoices_fk" FOREIGN KEY ("invoices_id") REFERENCES "public"."invoices"("id") ON DELETE cascade ON UPDATE no action;
-   END IF;
-  END $$;
-  
-  DO $$ BEGIN
-   IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'payload_locked_documents_rels_payments_fk') THEN
-    ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_payments_fk" FOREIGN KEY ("payments_id") REFERENCES "public"."payments"("id") ON DELETE cascade ON UPDATE no action;
-   END IF;
-  END $$;
-  
-  DO $$ BEGIN
-   IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'payload_preferences_rels_parent_fk') THEN
-    ALTER TABLE "payload_preferences_rels" ADD CONSTRAINT "payload_preferences_rels_parent_fk" FOREIGN KEY ("parent_id") REFERENCES "public"."payload_preferences"("id") ON DELETE cascade ON UPDATE no action;
-   END IF;
-  END $$;
-  
-  DO $$ BEGIN
-   IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'payload_preferences_rels_users_fk') THEN
-    ALTER TABLE "payload_preferences_rels" ADD CONSTRAINT "payload_preferences_rels_users_fk" FOREIGN KEY ("users_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;
-   END IF;
-  END $$;
-  
-  DO $$ BEGIN
-   IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'payload_preferences_rels_customers_fk') THEN
-    ALTER TABLE "payload_preferences_rels" ADD CONSTRAINT "payload_preferences_rels_customers_fk" FOREIGN KEY ("customers_id") REFERENCES "public"."customers"("id") ON DELETE cascade ON UPDATE no action;
-   END IF;
-  END $$;
-  
-  DO $$ BEGIN
-   IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'site_settings_stats_parent_id_fk') THEN
-    ALTER TABLE "site_settings_stats" ADD CONSTRAINT "site_settings_stats_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."site_settings"("id") ON DELETE cascade ON UPDATE no action;
-   END IF;
-  END $$;
-  
-  DO $$ BEGIN
-   IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'site_settings_values_parent_id_fk') THEN
-    ALTER TABLE "site_settings_values" ADD CONSTRAINT "site_settings_values_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."site_settings"("id") ON DELETE cascade ON UPDATE no action;
-   END IF;
-  END $$;
-  
   CREATE INDEX IF NOT EXISTS "users_sessions_order_idx" ON "users_sessions" USING btree ("_order");
   CREATE INDEX IF NOT EXISTS "users_sessions_parent_id_idx" ON "users_sessions" USING btree ("_parent_id");
   CREATE INDEX IF NOT EXISTS "users_updated_at_idx" ON "users" USING btree ("updated_at");
