@@ -1,10 +1,10 @@
 'use client';
 
-import React, { useRef, useEffect, useState, useCallback } from 'react';
-import { useMapsLibrary } from '@vis.gl/react-google-maps';
+import React, { useRef, useEffect, useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 
 interface AddressAutocompleteProps {
-  onAddressSelect: (place: google.maps.places.PlaceResult) => void;
+  onAddressSelect: (place: any) => void;
   className?: string;
   defaultValue?: string;
   placeholder?: string;
@@ -16,85 +16,91 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
   defaultValue,
   placeholder = "Start typing your address..."
 }) => {
-  const placesLib = useMapsLibrary('places');
-  
-  const [sessionToken, setSessionToken] = useState<google.maps.places.AutocompleteSessionToken | null>(null);
-  const [autocompleteService, setAutocompleteService] = useState<google.maps.places.AutocompleteService | null>(null);
-  const [placesService, setPlacesService] = useState<google.maps.places.PlacesService | null>(null);
-  
   const [inputValue, setInputValue] = useState(defaultValue || '');
-  const [predictions, setPredictions] = useState<google.maps.places.AutocompletePrediction[]>([]);
+  const [predictions, setPredictions] = useState<any[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [sessionToken, setSessionToken] = useState<string>('');
 
   const wrapperRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Initialize Services
+  // Initialize Session Token
   useEffect(() => {
-    if (!placesLib) return;
-
-    setAutocompleteService(new placesLib.AutocompleteService());
-    setSessionToken(new placesLib.AutocompleteSessionToken());
-    
-    // We need a dummy div for PlacesService if we use the legacy getDetails, 
-    // but we can also use the new Place class if desired. 
-    // For safety and type compatibility with existing PlaceResult, we'll use PlacesService.
-    const dummyDiv = document.createElement('div');
-    setPlacesService(new placesLib.PlacesService(dummyDiv));
-  }, [placesLib]);
+    setSessionToken(uuidv4());
+  }, []);
 
   // Handle Input Change
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setInputValue(value);
     
-    if (!value) {
+    if (!value || value.length < 3) {
       setPredictions([]);
       setIsOpen(false);
       return;
     }
 
-    if (!autocompleteService || !sessionToken) return;
-
     setIsLoading(true);
-    autocompleteService.getPlacePredictions({
-      input: value,
-      sessionToken: sessionToken,
-      types: ['address'],
-      componentRestrictions: { country: 'us' } // Optional: restrict to US
-    }, (results, status) => {
-      setIsLoading(false);
-      if (status === google.maps.places.PlacesServiceStatus.OK && results) {
-        setPredictions(results);
+    try {
+      const response = await fetch('/api/places/autocomplete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ input: value, sessionToken }),
+      });
+      
+      const data = await response.json();
+      
+      if (data.suggestions) {
+        setPredictions(data.suggestions.map((item: any) => ({
+            place_id: item.placePrediction.placeId,
+            main_text: item.placePrediction.structuredFormat?.mainText?.text || '',
+            secondary_text: item.placePrediction.structuredFormat?.secondaryText?.text || '',
+            description: item.placePrediction.text.text
+        })));
         setIsOpen(true);
       } else {
         setPredictions([]);
-        setIsOpen(false);
       }
-    });
+    } catch (error) {
+      console.error("Autocomplete Error:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // Handle Selection
-  const handlePredictionSelect = (prediction: google.maps.places.AutocompletePrediction) => {
+  const handlePredictionSelect = async (prediction: any) => {
     setInputValue(prediction.description);
     setIsOpen(false);
     setPredictions([]);
 
-    if (!placesLib || !placesService || !sessionToken) return;
-
-    // Fetch Details
-    placesService.getDetails({
-      placeId: prediction.place_id,
-      fields: ['geometry', 'name', 'formatted_address', 'address_components'],
-      sessionToken: sessionToken
-    }, (place, status) => {
-      if (status === google.maps.places.PlacesServiceStatus.OK && place) {
-        onAddressSelect(place);
-        // Refresh token for next session
-        setSessionToken(new placesLib.AutocompleteSessionToken());
-      }
-    });
+    try {
+        const response = await fetch(`/api/places/details/${prediction.place_id}?sessionToken=${sessionToken}`);
+        const placeDetails = await response.json();
+        
+        if (placeDetails.id) {
+            // Map to a format consistent with your app
+             const placeResult = {
+                place_id: placeDetails.id,
+                name: placeDetails.displayName?.text || '',
+                formatted_address: placeDetails.formattedAddress,
+                geometry: {
+                    location: {
+                        lat: () => placeDetails.location.latitude,
+                        lng: () => placeDetails.location.longitude
+                    }
+                },
+                address_components: placeDetails.addressComponents
+            };
+            
+            onAddressSelect(placeResult);
+            // Reset Session Token after selection (End of Session)
+            setSessionToken(uuidv4());
+        }
+    } catch (error) {
+        console.error("Details Error:", error);
+    }
   };
 
   // Close on click outside
@@ -137,10 +143,10 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
               </div>
               <div>
                 <span className="block font-bold text-white">
-                  {prediction.structured_formatting.main_text}
+                  {prediction.main_text}
                 </span>
                 <span className="block text-xs text-gray-400 group-hover:text-gray-300">
-                  {prediction.structured_formatting.secondary_text}
+                  {prediction.secondary_text}
                 </span>
               </div>
             </button>
