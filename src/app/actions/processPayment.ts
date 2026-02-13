@@ -29,7 +29,7 @@ export async function processPayment({ sourceId, amount = 9900, customerDetails 
   try {
     // 1. Process Payment
     const idempotencyKey = randomUUID();
-    const response = await squareClient.payments.createPayment({
+    const response = await squareClient.payments.create({
       sourceId,
       idempotencyKey,
       amountMoney: {
@@ -40,7 +40,7 @@ export async function processPayment({ sourceId, amount = 9900, customerDetails 
       note: `Dispatch Fee - ${customerDetails.name}`,
     });
 
-    const payment = JSON.parse(JSON.stringify(response.result.payment, (key, value) =>
+    const payment = JSON.parse(JSON.stringify(response.payment, (key, value) =>
         typeof value === 'bigint' ? value.toString() : value
     ));
 
