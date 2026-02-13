@@ -1,13 +1,15 @@
 'use client'
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useMobileMenu } from '@/hooks/useMobileMenu';
 
 const Header: React.FC = () => {
-  const { isOpen, toggle, close } = useMobileMenu();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
+
+  // Close menu when route changes (optional optimization)
+  const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
 
   const isActive = (path: string) => pathname === path;
 
@@ -68,11 +70,11 @@ const Header: React.FC = () => {
           {/* MOBILE TOGGLE */}
           <button 
             className="md:hidden p-2 text-gray-300 hover:text-white"
-            onClick={toggle}
+            onClick={toggleMobileMenu}
             aria-label="Toggle menu"
           >
             <svg className="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              {isOpen ? (
+              {isMobileMenuOpen ? (
                 <path d="M6 18L18 6M6 6l12 12" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path>
               ) : (
                 <path d="M4 6h16M4 12h16m-7 6h7" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path>
@@ -84,7 +86,7 @@ const Header: React.FC = () => {
       
       {/* Mobile Navigation Menu - Full Screen Overlay */}
       <div className={`fixed inset-0 z-40 bg-charcoal-blue/98 backdrop-blur-3xl transition-all duration-300 md:hidden flex flex-col pt-24 px-6 ${
-        isOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-full pointer-events-none'
+        isMobileMenuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-full pointer-events-none'
       }`}>
         <div className="flex flex-col gap-6 text-center">
           {[
@@ -95,7 +97,7 @@ const Header: React.FC = () => {
             <Link 
               key={link.path}
               href={link.path} 
-              onClick={close}
+              onClick={() => setIsMobileMenuOpen(false)}
               className={`text-2xl font-bold transition-colors ${
                 isActive(link.path) ? 'text-golden-yellow' : 'text-white hover:text-golden-yellow'
               }`}
@@ -104,12 +106,12 @@ const Header: React.FC = () => {
             </Link>
           ))}
           <div className="h-px w-20 mx-auto bg-white/10 my-4"></div>
-          <Link href="/contact?type=contractor" onClick={close} className="text-lg font-bold text-golden-yellow uppercase tracking-widest">
+          <Link href="/contact?type=contractor" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-bold text-golden-yellow uppercase tracking-widest">
             Contractor Portal
           </Link>
           <Link href="/contact?type=repair" className="mt-8 bg-red-600 text-white font-bold py-5 rounded-2xl text-xl shadow-xl flex items-center justify-center gap-3">
              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
-             24/7 Emergency
+             Call 24/7 Emergency
           </Link>
         </div>
       </div>
