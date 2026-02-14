@@ -3,8 +3,11 @@ import Link from 'next/link';
 import ActiveUsers from '@/components/admin/ActiveUsers';
 import { KPIGrid } from '@/components/dashboard/KPIGrid';
 import { QuickActions } from '@/components/dashboard/QuickActions';
+import { getDashboardStats } from './actions';
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  const stats = await getDashboardStats();
+
   return (
     <div className="animate-in fade-in duration-500 slide-in-from-bottom-4">
       {/* HEADER */}
@@ -14,7 +17,7 @@ export default function DashboardPage() {
             <div className="bg-[#f1c40f] text-[#2c3e50] font-black rounded px-2 py-0.5 text-xs uppercase tracking-widest shadow-[0_0_15px_rgba(241,196,15,0.4)]">
               System Online
             </div>
-            <div className="text-[#7f8c8d] text-sm font-mono">v2.0.0 (Bespoke)</div>
+            <div className="text-[#7f8c8d] text-sm font-mono">v2.1.0 (Live Data)</div>
           </div>
           <h1 className="text-5xl font-black text-white tracking-tight">
             Command <span className="text-[#f1c40f]">Center</span>
@@ -30,7 +33,7 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      <KPIGrid />
+      <KPIGrid stats={stats} />
 
       {/* MAIN DASHBOARD CONTENT */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
