@@ -10,7 +10,8 @@ export default async function DispatchPage() {
     const headersList = await headers();
     const { user } = await payload.auth({ headers: headersList });
 
-    if (!user || (user.role !== 'admin' && user.role !== 'dispatcher')) {
+    // Type guard: user must exist and have a 'role' property (User collection)
+    if (!user || !('role' in user) || (user.role !== 'admin' && user.role !== 'dispatcher')) {
         redirect('/admin/login');
     }
 
