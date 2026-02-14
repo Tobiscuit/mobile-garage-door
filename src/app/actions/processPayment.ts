@@ -6,10 +6,12 @@ import { getPayload } from 'payload';
 import configPromise from '@payload-config';
 
 // Initialize Square Client
-// NOTE: In production, switch environment to SquareEnvironment.Production
+// Use SQUARE_ENVIRONMENT env var to control environment, default to Sandbox
+const isProduction = process.env.SQUARE_ENVIRONMENT === 'production';
+
 const squareClient = new SquareClient({
   token: process.env.SQUARE_ACCESS_TOKEN,
-  environment: process.env.NODE_ENV === 'production' ? SquareEnvironment.Production : SquareEnvironment.Sandbox,
+  environment: isProduction ? SquareEnvironment.Production : SquareEnvironment.Sandbox,
 });
 
 interface PaymentData {
@@ -27,6 +29,10 @@ interface PaymentData {
 
 export async function processPayment({ sourceId, amount = 9900, customerDetails }: PaymentData) {
   try {
+    // Debug logging to help troubleshoot auth issues
+    console.log(`[ProcessPayment] Env: ${isProduction ? 'Production' : 'Sandbox'}`);
+    console.log(`[ProcessPayment] Token: ${process.env.SQUARE_ACCESS_TOKEN ? 'Set (***)' : 'Missing'}`);
+    
     // 1. Process Payment
     const idempotencyKey = randomUUID();
     const response = await squareClient.payments.create({
