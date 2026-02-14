@@ -74,6 +74,7 @@ export async function createPost(formData: FormData) {
   }
 
   revalidatePath('/dashboard/posts');
+  revalidatePath('/blog');
   redirect('/dashboard/posts');
 }
 
