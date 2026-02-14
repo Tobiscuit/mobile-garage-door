@@ -8,11 +8,17 @@ import { randomUUID } from 'crypto';
 import webpush from 'web-push';
 
 // Configure Web Push (Move to global config if used elsewhere)
-webpush.setVapidDetails(
-    'mailto:admin@mobilegaragedoor.com',
-    process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,
-    process.env.VAPID_PRIVATE_KEY!
-);
+try {
+    if (process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
+        webpush.setVapidDetails(
+            'mailto:admin@mobilegaragedoor.com',
+            process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY,
+            process.env.VAPID_PRIVATE_KEY
+        );
+    }
+} catch (err) {
+    console.error('Error configuring Web Push in booking:', err);
+}
 
 interface CustomerData {
   guestName: string;
