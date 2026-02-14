@@ -149,17 +149,17 @@ export async function syncSquarePayments() {
     const payload = await getPayload({ config: configPromise });
     
     // List payments from Square (last 100)
-    const { result } = await squareClient.payments.listPayments({
-      limit: BigInt(100),
-      sortOrder: 'DESC',
+    // Using list() instead of listPayments() for newer Square SDK
+    // sortOrder is not explicitly supported in the list() options in recent versions, usually returns newest first.
+    const response = await squareClient.payments.list({
+      limit: 100,
     });
-
-    if (!result.payments) {
-      return { success: true, count: 0 };
-    }
-
+    
     let count = 0;
-    for (const payment of result.payments) {
+    // The response is async iterable in the new SDK
+    for await (const payment of response) {
+        if (count >= 100) break; // Limit to 100
+        
         const squarePaymentId = payment.id;
         if (!squarePaymentId) continue;
 
@@ -201,11 +201,11 @@ export async function syncSquarePayments() {
              }
         }
     }
-
+    
     revalidatePath('/dashboard');
     return { success: true, count };
   } catch (error) {
-    console.error('Sync Error:', error);
+    console.error('Sync Square Error:', error);
     return { success: false, error: 'Failed to sync payments' };
   }
 }
