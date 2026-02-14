@@ -39,9 +39,12 @@ export const ServiceRequests: CollectionConfig = {
     {
       name: 'customer',
       type: 'relationship',
-      relationTo: 'customers' as any,
+      relationTo: 'users',
       required: true,
       hasMany: false,
+      filterOptions: {
+        role: { equals: 'customer' },
+      },
     },
     {
       name: 'issueDescription',

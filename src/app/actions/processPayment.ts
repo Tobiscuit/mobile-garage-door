@@ -91,48 +91,54 @@ export async function processPayment({ sourceId, amount = 9900, customerDetails 
     // 3. Create/Find Customer & Service Request in Payload
     const payload = await getPayload({ config: configPromise });
     
-    // Check if customer exists in Payload
-    const existingCustomers = await payload.find({
-        collection: 'customers',
+    // Check if customer exists in Payload (Users collection)
+    const existingUsers = await payload.find({
+        collection: 'users',
         where: {
             email: { equals: customerDetails.email }
         }
     });
 
-    let payloadCustomerId;
+    let payloadUserId;
 
-    if (existingCustomers.totalDocs > 0) {
-        const existing = existingCustomers.docs[0];
-        payloadCustomerId = existing.id;
+    if (existingUsers.totalDocs > 0) {
+        const existing = existingUsers.docs[0];
+        payloadUserId = existing.id;
         
-        // Update Payload customer with Square ID if missing
+        // Update Payload user with Square ID if missing
         if (!existing.squareCustomerId && squareCustomerId) {
-            await payload.update({
-                collection: 'customers',
-                id: existing.id,
-                data: { squareCustomerId }
-            });
+            try {
+                await payload.update({
+                    collection: 'users',
+                    id: existing.id,
+                    data: { squareCustomerId }
+                });
+            } catch (e) {
+                console.error('Failed to update user with Square ID:', e);
+            }
         }
     } else {
-        const newCustomer = await payload.create({
-            collection: 'customers',
+        // Create new user (Customer role)
+        const newUser = await payload.create({
+            collection: 'users',
             data: {
                 email: customerDetails.email,
                 password: randomUUID(),
                 name: customerDetails.name,
                 phone: customerDetails.phone,
                 address: customerDetails.address,
+                role: 'customer',
                 squareCustomerId: squareCustomerId, // Save the link
             }
         });
-        payloadCustomerId = newCustomer.id;
+        payloadUserId = newUser.id;
     }
 
     // 4. Create Service Request
     const newTicket = await payload.create({
         collection: 'service-requests',
         data: {
-            customer: payloadCustomerId,
+            customer: payloadUserId, // Link to User
             issueDescription: customerDetails.issue,
             urgency: customerDetails.urgency === 'Emergency' ? 'emergency' : 'standard',
             status: 'confirmed', // Confirmed = Paid
