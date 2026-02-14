@@ -69,7 +69,7 @@ const Footer: React.FC = () => {
         <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
           <p>© 2026 Mobil Garage Door Inc. All rights reserved.</p>
           <div className="flex gap-6 text-xs">
-            <a href="#" className="hover:text-white">Privacy Policy</a>
+            <a href="/privacy" className="hover:text-white">Privacy Policy</a>
             <a href="#" className="hover:text-white">Terms of Service</a>
             <a href="#" className="hover:text-white">Sitemap</a>
           </div>
