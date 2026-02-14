@@ -84,6 +84,14 @@ export async function POST(req: NextRequest) {
 
                         if (existingUser.totalDocs > 0) {
                             userId = existingUser.docs[0].id;
+                            // Update squareCustomerId if missing
+                            if (!existingUser.docs[0].squareCustomerId) {
+                                await payload.update({
+                                    collection: 'users',
+                                    id: userId,
+                                    data: { squareCustomerId: customerId }
+                                });
+                            }
                         } else {
                             // Create new user
                             const newUser = await payload.create({
@@ -94,6 +102,7 @@ export async function POST(req: NextRequest) {
                                     phone: customer.phoneNumber || '',
                                     password: randomUUID(), // Random password
                                     role: 'customer',
+                                    squareCustomerId: customerId,
                                     // address: ... // Parse address if needed
                                 }
                             });
