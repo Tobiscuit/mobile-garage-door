@@ -7,12 +7,21 @@ export async function getDashboardStats() {
   const payload = await getPayload({ config: configPromise });
 
   // 1. Fetch Service Requests (for Revenue & Job Stats)
-  // In a real app with thousands of records, we'd use an aggregation query or raw SQL.
-  // For now, fetching all is fine for a small business dashboard.
   const { docs: requests } = await payload.find({
     collection: 'service-requests',
-    limit: 1000, // Reasonable limit for now
-    depth: 0, // We only need the data, not relations
+    limit: 1000,
+    depth: 0,
+  });
+
+  // 1b. Fetch External/Manual Payments
+  const { docs: payments } = await payload.find({
+    collection: 'payments',
+    where: {
+      sourceType: {
+        in: ['CASH', 'EXTERNAL']
+      }
+    },
+    limit: 1000,
   });
 
   // 2. Fetch Technicians
@@ -21,7 +30,7 @@ export async function getDashboardStats() {
     where: {
       role: { equals: 'technician' },
     },
-    limit: 0, // Just count
+    limit: 0, 
   });
 
   // 3. Calculate Metrics
@@ -39,6 +48,7 @@ export async function getDashboardStats() {
   let activeRequests = 0;
   let pendingQuotes = 0;
 
+  // Process Service Request Payments (Square Online)
   requests.forEach((req) => {
     // Revenue Calculation
     if (req.tripFeePayment && typeof req.tripFeePayment === 'object') {
@@ -62,6 +72,19 @@ export async function getDashboardStats() {
     if (req.status === 'pending') {
       pendingQuotes++;
     }
+  });
+
+  // Process Manual/External Payments
+  payments.forEach((p) => {
+      const amountCents = Number(p.amount || 0);
+      const amountDollars = amountCents / 100; // Assuming stored in cents like Square
+      
+      lifetimeRevenue += amountDollars;
+
+      const pDate = new Date(p.createdAt);
+      if (pDate >= startOfMonth) monthlyRevenue += amountDollars;
+      if (pDate >= startOfWeek) weeklyRevenue += amountDollars;
+      if (pDate >= startOfToday) todayRevenue += amountDollars;
   });
 
   return {
