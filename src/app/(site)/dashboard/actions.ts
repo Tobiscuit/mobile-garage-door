@@ -105,3 +105,34 @@ export async function getDashboardStats() {
     },
   };
 }
+
+export async function createManualPayment(amount: number, sourceType: 'CASH' | 'EXTERNAL', note: string) {
+    try {
+        const payload = await getPayload({ config: configPromise });
+        
+        // Ensure amount is valid (positive)
+        if (amount <= 0) throw new Error('Invalid amount');
+
+        // Create Payment Record
+        // We'll generate a pseudo-ID for manual payments: MANUAL-{TIMESTAMP}
+        const manualId = `MANUAL-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+
+        await payload.create({
+            collection: 'payments',
+            data: {
+                squarePaymentId: manualId, // Using this unique field for our ID
+                amount: Math.round(amount * 100), // Convert to cents
+                currency: 'USD',
+                status: 'COMPLETED',
+                sourceType,
+                note,
+            } as any // Type casting until types are regenerated
+        });
+
+        return { success: true };
+
+    } catch (error) {
+        console.error('Manual Payment Error:', error);
+        return { success: false, error: 'Failed to record payment' };
+    }
+}
