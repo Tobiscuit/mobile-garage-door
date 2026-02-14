@@ -48,8 +48,8 @@ export async function processPayment({ sourceId, amount = 9900, customerDetails 
         }
       });
 
-      if (searchReq.result.customers?.length) {
-        squareCustomerId = searchReq.result.customers[0].id;
+      if (searchReq.customers?.length) {
+        squareCustomerId = searchReq.customers[0].id;
       } else {
         // B. Create new customer in Square if not found
         const createReq = await squareClient.customers.create({
@@ -63,7 +63,7 @@ export async function processPayment({ sourceId, amount = 9900, customerDetails 
           referenceId: customerDetails.email, // Link back to our system logic
           note: 'Created via Dispatch App'
         });
-        squareCustomerId = createReq.result.customer?.id;
+        squareCustomerId = createReq.customer?.id;
       }
     } catch (e) {
       console.warn('Failed to sync Square Customer profile, proceeding with guest checkout:', e);
@@ -84,7 +84,7 @@ export async function processPayment({ sourceId, amount = 9900, customerDetails 
       note: `Dispatch Fee - ${customerDetails.name}`,
     });
 
-    const payment = JSON.parse(JSON.stringify(response.result.payment, (key, value) =>
+    const payment = JSON.parse(JSON.stringify(response.payment, (key, value) =>
         typeof value === 'bigint' ? value.toString() : value
     ));
 
