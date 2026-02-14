@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { dispatchJob } from '@/app/actions/dispatch';
+import { assignJobToTechnician } from '@/app/actions/dispatch';
 import { useRouter } from 'next/navigation';
 
 export function DispatchClient({ jobs, technicians }: { jobs: any[], technicians: any[] }) {
@@ -18,7 +18,7 @@ export function DispatchClient({ jobs, technicians }: { jobs: any[], technicians
 
         setLoading(jobId);
         try {
-            await dispatchJob(jobId, techId);
+            await assignJobToTechnician(jobId, techId);
             alert('Job Dispatched Successfully! Technician Notified.');
             router.refresh();
         } catch (e) {
