@@ -8,22 +8,30 @@ export default function ScrollSaver() {
   const pathname = usePathname()
 
   useEffect(() => {
+    // 1. Define the saver
     const handleScroll = () => {
       saveScrollPosition(pathname, window.scrollY)
     }
 
-    // Debounce slightly to improve performance
+    // 2. Debounce wrapper - Increased to 100ms to ensure cleanup runs before save
     let timeoutId: NodeJS.Timeout
     const debouncedScroll = () => {
       clearTimeout(timeoutId)
-      timeoutId = setTimeout(handleScroll, 50)
+      timeoutId = setTimeout(handleScroll, 100)
     }
 
-    window.addEventListener('scroll', debouncedScroll)
+    // 3. IGNORE initial scroll events (restoration/reset)
+    // Only start listening after 700ms (animation duration + buffer)
+    // This prevents capturing the "scroll to top" or "scroll to restored" as a user action
+    const startListeningTimer = setTimeout(() => {
+        window.addEventListener('scroll', debouncedScroll)
+    }, 700) 
     
     return () => {
+      // Cleanup
+      clearTimeout(startListeningTimer)
       window.removeEventListener('scroll', debouncedScroll)
-      clearTimeout(timeoutId)
+      clearTimeout(timeoutId) // CRITICAL: This cancels any pending save (like the scroll-to-top 0)
     }
   }, [pathname])
 
