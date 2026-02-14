@@ -8,9 +8,9 @@ export const Payments: CollectionConfig = {
     },
     access: {
       read: ({ req: { user } }) => !!user, // Allow any logged in user (technicians need to see earnings?) or restrict to admin
-      create: ({ req: { user } }) => user?.role === 'admin',
-      update: ({ req: { user } }) => user?.role === 'admin',
-      delete: ({ req: { user } }) => user?.role === 'admin',
+      create: ({ req: { user } }) => (user as any)?.role === 'admin',
+      update: ({ req: { user } }) => (user as any)?.role === 'admin',
+      delete: ({ req: { user } }) => (user as any)?.role === 'admin',
     },
     fields: [
       {
