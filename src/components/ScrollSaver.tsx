@@ -21,11 +21,11 @@ export default function ScrollSaver() {
     }
 
     // 3. IGNORE initial scroll events (restoration/reset)
-    // Only start listening after 700ms (animation duration + buffer)
-    // This prevents capturing the "scroll to top" or "scroll to restored" as a user action
+    // Only start listening after 300ms (enough for browser restoration/reset)
+    // Reduced from 700ms to capture fast interactions
     const startListeningTimer = setTimeout(() => {
         window.addEventListener('scroll', debouncedScroll)
-    }, 700) 
+    }, 300) 
     
     return () => {
       // Cleanup
