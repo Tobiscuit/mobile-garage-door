@@ -4,6 +4,10 @@ import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { getPayload } from 'payload';
 import configPromise from '@payload-config';
+import SmartLink from '@/components/SmartLink';
+import ProjectHeroImage from '@/components/ProjectHeroImage';
+
+export const dynamic = 'force-dynamic';
 
 // --- Lexical Serializer ---
 // Basic renderer for Lexical RichText nodes
@@ -138,10 +142,10 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
         </div>
         
         <div className="max-w-7xl mx-auto relative z-10">
-          <Link href="/portfolio" className="inline-flex items-center gap-2 text-steel-gray hover:text-charcoal-blue transition-colors mb-8 text-sm font-bold uppercase tracking-wider group">
+          <SmartLink href="/portfolio" className="inline-flex items-center gap-2 text-steel-gray hover:text-charcoal-blue transition-colors mb-8 text-sm font-bold uppercase tracking-wider group">
             <svg className="w-4 h-4 group-hover:-translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
             Back to Projects
-          </Link>
+          </SmartLink>
           
           <div className="flex flex-col lg:flex-row gap-12 items-end">
               <div className="flex-grow">
@@ -193,46 +197,14 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
         
         {/* MAIN IMAGE - Industrial Frame */}
         <div className="mb-20 relative rounded-2xl overflow-hidden shadow-2xl border-4 border-white ring-1 ring-gray-200 group bg-charcoal-blue">
-            <div className="w-full aspect-video relative">
-               {imageUrl ? (
-                   <Image 
-                       src={imageUrl} 
-                       alt={project.title} 
-                       fill 
-                       className="object-cover"
-                       priority
-                   />
-               ) : (
-                   /* BLUEPRINT FALLBACK - Matching Brand Aesthetics */
-                   <div className="w-full h-full flex flex-col items-center justify-center bg-[#2c3e50] relative overflow-hidden">
-                        {/* Blueprint Grid */}
-                        <div className="absolute inset-0 opacity-20" 
-                             style={{ 
-                                backgroundImage: 'linear-gradient(rgba(255,255,255,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.3) 1px, transparent 1px)', 
-                                backgroundSize: '40px 40px' 
-                             }}>
-                        </div>
-                        <div className="absolute inset-0 border-[20px] border-white/5 pointer-events-none"></div>
-                        
-                        {/* Technical Markers */}
-                        <div className="absolute top-8 left-8 text-white/40 font-mono text-xs">REF: {project.slug?.toUpperCase()}</div>
-                        <div className="absolute bottom-8 right-8 text-white/40 font-mono text-xs">SCALE: 1:1</div>
-                        
-                        {/* Center Logo */}
-                        <div className="text-center z-10 opacity-50">
-                            <div className="text-6xl text-white mb-4"><svg className="w-24 h-24 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg></div>
-                            <span className="text-white font-black text-4xl uppercase tracking-tighter block">Image Pending</span>
-                            <span className="text-golden-yellow font-mono text-sm mt-2 block">AWAITING_UPLOAD</span>
-                        </div>
-                   </div>
-               )}
-            </div>
+            <ProjectHeroImage 
+              slug={project.slug || ''}
+              imageUrl={imageUrl}
+              title={project.title}
+            />
             
-            {/* Overlay Badge */}
-            <div className="absolute bottom-6 left-6 bg-white/90 backdrop-blur text-charcoal-blue px-5 py-2 rounded-lg border border-gray-200 font-bold flex items-center gap-3 text-sm shadow-lg">
-               <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-               System Verified
-            </div>
+            {/* Overlay Gradient (Subtle) */}
+            <div className="absolute inset-0 bg-gradient-to-t from-charcoal-blue/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
         </div>
 
         {/* BIFURCATED CHALLENGE / SOLUTION - Echoing Home Page Split */}
