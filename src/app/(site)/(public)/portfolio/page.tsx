@@ -3,6 +3,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { getPayload } from 'payload';
 import configPromise from '@/payload.config';
+import SmartLink from '@/components/SmartLink';
+import { motion } from 'motion/react';
 
 export const dynamic = 'force-dynamic';
 
@@ -87,13 +89,13 @@ export default async function PortfolioPage() {
                                 : null;
                             
                             return (
-                                <Link 
+                                <SmartLink 
                                     href={`/portfolio/${project.slug}`} 
                                     key={project.id}
                                     className="group relative block w-full aspect-[4/3] rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 bg-white"
                                 >
                                     {/* IMAGE LAYER */}
-                                    <div className={`absolute inset-0 transition-transform duration-700 group-hover:scale-105 bg-[#2c3e50]`}>
+                                    <div className="absolute inset-0 transition-transform duration-700 group-hover:scale-105 bg-[#2c3e50]">
                                         {imageUrl ? (
                                             <Image 
                                                 src={imageUrl} 
@@ -153,7 +155,7 @@ export default async function PortfolioPage() {
                                             )}
                                         </div>
                                     </div>
-                                </Link>
+                                </SmartLink>
                             );
                         })}
                     </div>
