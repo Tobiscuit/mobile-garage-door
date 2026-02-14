@@ -173,6 +173,7 @@ export interface User {
     | number
     | boolean
     | null;
+  squareCustomerId?: string | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -444,7 +445,7 @@ export interface Customer {
 export interface ServiceRequest {
   id: number;
   ticketId?: string | null;
-  customer: number | Customer;
+  customer: number | User;
   issueDescription: string;
   urgency?: ('standard' | 'emergency') | null;
   scheduledTime?: string | null;
@@ -488,6 +489,10 @@ export interface Payment {
   currency?: string | null;
   status?: string | null;
   sourceType?: string | null;
+  /**
+   * Optional note for manual payments
+   */
+  note?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -618,6 +623,7 @@ export interface UsersSelect<T extends boolean = true> {
   address?: T;
   lastLogin?: T;
   pushSubscription?: T;
+  squareCustomerId?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -808,6 +814,7 @@ export interface PaymentsSelect<T extends boolean = true> {
   currency?: T;
   status?: T;
   sourceType?: T;
+  note?: T;
   updatedAt?: T;
   createdAt?: T;
 }
