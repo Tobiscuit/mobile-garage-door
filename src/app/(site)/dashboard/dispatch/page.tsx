@@ -2,9 +2,17 @@ import React from 'react';
 import { getPayload } from 'payload';
 import configPromise from '@payload-config';
 import { DispatchClient } from './DispatchClient';
+import { headers } from 'next/headers';
+import { redirect } from 'next/navigation';
 
 export default async function DispatchPage() {
     const payload = await getPayload({ config: configPromise });
+    const headersList = await headers();
+    const { user } = await payload.auth({ headers: headersList });
+
+    if (!user || (user.role !== 'admin' && user.role !== 'dispatcher')) {
+        redirect('/admin/login');
+    }
 
     // 1. Fetch unassigned (confirmed) jobs
     const jobs = await payload.find({
