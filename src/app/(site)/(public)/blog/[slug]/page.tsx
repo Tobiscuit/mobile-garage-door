@@ -20,7 +20,7 @@ const RichTextRenderer = ({ content }: { content: any }) => {
                     </p>
                 );
             case 'heading':
-                const Tag = node.tag as keyof JSX.IntrinsicElements;
+                const Tag = node.tag as 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
                 const sizeClasses = {
                     h1: 'text-4xl font-black text-white mt-12 mb-6',
                     h2: 'text-3xl font-bold text-white mt-10 mb-5 border-l-4 border-[#f1c40f] pl-4',
