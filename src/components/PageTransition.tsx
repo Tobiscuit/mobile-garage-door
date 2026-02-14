@@ -57,18 +57,22 @@ export default function PageTransition({ children }: { children: ReactNode }) {
         observer.disconnect()
         clearTimeout(timeout)
       }
+    } else {
+      // If no saved position (new page or top), ensure we start at the top
+      // This is critical when using mode="popLayout" or manual restoration
+      window.scrollTo(0, 0)
     }
   }, [pathname])
 
   return (
-    <AnimatePresence mode="wait">
+    <AnimatePresence mode="popLayout">
       <motion.div
         key={pathname}
-        initial={{ opacity: 0, x: 10 }}
-        animate={{ opacity: 1, x: 0 }}
-        exit={{ opacity: 0, x: -10 }}
-        transition={{ duration: 0.25, ease: 'easeOut' }}
-        className="w-full h-full"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.3, ease: 'easeInOut' }}
+        className="w-full"
       >
         {children}
       </motion.div>

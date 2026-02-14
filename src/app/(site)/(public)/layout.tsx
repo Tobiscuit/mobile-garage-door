@@ -3,6 +3,7 @@ import React from 'react'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import ScrollSaver from '@/components/ScrollSaver'
+import PageTransition from '@/components/PageTransition'
 
 export default function PublicLayout({
   children,
@@ -14,7 +15,9 @@ export default function PublicLayout({
       <ScrollSaver />
       <Header />
       <main className="flex-grow relative">
-        {children}
+        <PageTransition>
+          {children}
+        </PageTransition>
       </main>
       <Footer />
     </div>
