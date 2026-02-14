@@ -329,8 +329,6 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
             </div>
          </div>
       </section>
-
-      <Footer />
     </div>
   );
 }
