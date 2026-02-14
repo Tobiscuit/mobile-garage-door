@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { getPayload } from 'payload';
 import configPromise from '@/payload.config';
 import SmartLink from '@/components/SmartLink';
-import { motion } from 'motion/react';
+import ProjectCardImage from '@/components/ProjectCardImage';
 
 export const dynamic = 'force-dynamic';
 
@@ -95,24 +95,11 @@ export default async function PortfolioPage() {
                                     className="group relative block w-full aspect-[4/3] rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 bg-white"
                                 >
                                     {/* IMAGE LAYER */}
-                                    <div className="absolute inset-0 transition-transform duration-700 group-hover:scale-105 bg-[#2c3e50]">
-                                        {imageUrl ? (
-                                            <Image 
-                                                src={imageUrl} 
-                                                alt={project.title} 
-                                                fill 
-                                                className="object-cover"
-                                                sizes="(max-width: 768px) 100vw, 50vw"
-                                            />
-                                        ) : (
-                                            // Fallback Pattern: Blueprint Style
-                                            <div className="w-full h-full flex flex-col items-center justify-center bg-[#2c3e50] relative overflow-hidden">
-                                                <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'radial-gradient(#fff 1px, transparent 1px)', backgroundSize: '20px 20px' }}></div>
-                                                <span className="text-white/10 font-black text-6xl uppercase tracking-tighter relative z-10">Mobil</span>
-                                                <div className="mt-4 px-3 py-1 border border-white/10 rounded text-[10px] font-mono text-white/30">IMG_MISSING_001</div>
-                                            </div>
-                                        )}
-                                    </div>
+                                    <ProjectCardImage 
+                                      slug={project.slug || ''} 
+                                      imageUrl={imageUrl} 
+                                      title={project.title} 
+                                    />
 
                                     {/* OVERLAY GRADIENT */}
                                     <div className="absolute inset-0 bg-gradient-to-t from-[#2c3e50] via-[#2c3e50]/40 to-transparent opacity-90 group-hover:opacity-100 transition-opacity" />
