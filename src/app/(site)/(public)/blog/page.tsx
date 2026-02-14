@@ -66,7 +66,7 @@ export default async function BlogIndex() {
                             >
                                 {/* Image Container */}
                                 <div className="aspect-video relative bg-[#0f172a] overflow-hidden">
-                                    {post.featuredImage && typeof post.featuredImage !== 'string' && post.featuredImage.url ? (
+                                    {post.featuredImage && typeof post.featuredImage !== 'string' && typeof post.featuredImage !== 'number' && post.featuredImage.url ? (
                                         <Image
                                             src={post.featuredImage.url}
                                             alt={post.featuredImage.alt || post.title}
