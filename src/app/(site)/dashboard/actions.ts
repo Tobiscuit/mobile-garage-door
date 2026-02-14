@@ -2,6 +2,13 @@
 
 import { getPayload } from 'payload';
 import configPromise from '@payload-config';
+import { revalidatePath } from 'next/cache';
+import { SquareClient, SquareEnvironment } from 'square';
+
+const squareClient = new SquareClient({
+  token: process.env.SQUARE_ACCESS_TOKEN,
+  environment: process.env.SQUARE_ENVIRONMENT === 'production' ? SquareEnvironment.Production : SquareEnvironment.Sandbox,
+});
 
 export async function getDashboardStats() {
   const payload = await getPayload({ config: configPromise });
@@ -135,4 +142,70 @@ export async function createManualPayment(amount: number, sourceType: 'CASH' | '
         console.error('Manual Payment Error:', error);
         return { success: false, error: 'Failed to record payment' };
     }
+}
+
+export async function syncSquarePayments() {
+  try {
+    const payload = await getPayload({ config: configPromise });
+    
+    // List payments from Square (last 100)
+    const { result } = await squareClient.payments.listPayments({
+      limit: BigInt(100),
+      sortOrder: 'DESC',
+    });
+
+    if (!result.payments) {
+      return { success: true, count: 0 };
+    }
+
+    let count = 0;
+    for (const payment of result.payments) {
+        const squarePaymentId = payment.id;
+        if (!squarePaymentId) continue;
+
+        const status = payment.status;
+        const amount = Number(payment.amountMoney?.amount || 0);
+        const currency = payment.amountMoney?.currency || 'USD';
+        const sourceType = payment.sourceType;
+        const note = payment.note || '';
+
+        // Check if exists
+        const existingPayments = await payload.find({
+          collection: 'payments',
+          where: {
+            squarePaymentId: { equals: squarePaymentId },
+          },
+        });
+
+        if (existingPayments.totalDocs === 0) {
+           await payload.create({
+            collection: 'payments',
+            data: {
+              squarePaymentId,
+              amount,
+              currency,
+              status,
+              sourceType,
+              note,
+            } as any
+          });
+          count++;
+        } else {
+             // Optional: Update status if changed
+             if (existingPayments.docs[0].status !== status) {
+                 await payload.update({
+                     collection: 'payments',
+                     id: existingPayments.docs[0].id,
+                     data: { status } as any
+                 });
+             }
+        }
+    }
+
+    revalidatePath('/dashboard');
+    return { success: true, count };
+  } catch (error) {
+    console.error('Sync Error:', error);
+    return { success: false, error: 'Failed to sync payments' };
+  }
 }
