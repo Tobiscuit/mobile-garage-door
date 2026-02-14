@@ -1,8 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
@@ -42,7 +40,6 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-cloudy-white font-work-sans flex flex-col">
-      <Header />
       <main className="flex-grow flex items-center justify-center px-6 py-24">
         <div className="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
           <div className="bg-charcoal-blue p-8 text-center">

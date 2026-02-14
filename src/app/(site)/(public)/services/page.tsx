@@ -1,6 +1,4 @@
 import React from 'react';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
 import { getPayloadClient } from '@/lib/payload';
 
 // Icon mapping helper
@@ -32,11 +30,9 @@ export default async function ServicesPage() {
 
   return (
     <div className="min-h-screen bg-cloudy-white font-work-sans">
-      <Header />
-      <main className="flex-grow">
-        
-        {/* BIFURCATED HERO: Services Edition */}
-        <section className="relative flex flex-col md:flex-row text-white overflow-hidden font-display min-h-[60vh]">
+      
+      {/* BIFURCATED HERO: Services Edition */}
+      <section className="relative flex flex-col md:flex-row text-white overflow-hidden font-display min-h-[60vh]">
             {/* LEFT: URGENT */}
             <div className="relative w-full md:w-1/2 bg-dark-charcoal flex flex-col justify-center px-8 md:px-16 pt-48 pb-20 border-r border-white/5">
                 <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'radial-gradient(#ffffff 1px, transparent 1px)', backgroundSize: '16px 16px' }}></div>
@@ -147,8 +143,6 @@ export default async function ServicesPage() {
             </div>
         </section>
 
-      </main>
-      <Footer />
     </div>
   );
 }
