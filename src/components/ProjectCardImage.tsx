@@ -13,9 +13,9 @@ export default function ProjectCardImage({ slug, imageUrl, title }: ProjectCardI
   return (
     <motion.div 
       layoutId={`project-image-${slug}`}
-      className="absolute inset-0 bg-[#2c3e50]"
+      className="absolute inset-0 bg-[#2c3e50] z-0"
     >
-      <div className="w-full h-full relative transition-transform duration-700 group-hover:scale-105">
+      <div className="w-full h-full relative transition-transform duration-700 group-hover:scale-105 pointer-events-none">
         {imageUrl ? (
           <Image 
             src={imageUrl} 
