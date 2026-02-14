@@ -1,11 +1,11 @@
 import React from 'react';
-import Navbar from '@/components/Navbar';
+import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 
 export default function PrivacyPolicy() {
   return (
     <main className="min-h-screen bg-white">
-      <Navbar />
+      <Header />
       
       <div className="pt-32 pb-24 px-6 container mx-auto max-w-4xl">
         <h1 className="text-4xl md:text-5xl font-black text-charcoal-blue mb-8">Privacy Policy</h1>
