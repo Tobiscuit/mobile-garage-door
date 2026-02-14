@@ -71,7 +71,7 @@ export async function POST(req: NextRequest) {
                 
                 // Fetch customer details from Square to get email
                 try {
-                    const response = await squareClient.customers.retrieve(customerId);
+                    const response = await squareClient.customers.get({ customerId });
                     const customer = response.customer;
                     
                     if (customer && customer.emailAddress) {
