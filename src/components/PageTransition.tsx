@@ -68,9 +68,9 @@ export default function PageTransition({ children }: { children: ReactNode }) {
     <AnimatePresence mode="popLayout">
       <motion.div
         key={pathname}
-        initial={{ opacity: 0 }}
+        initial={{ opacity: 1 }} // Start fully visible to allow shared element morph
         animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
+        exit={{ opacity: 1 }} // Do not fade out, let the new page cover it or use a different transition
         transition={{ duration: 0.3, ease: 'easeInOut' }}
         className="w-full"
       >
