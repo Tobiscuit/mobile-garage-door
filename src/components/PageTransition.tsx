@@ -11,12 +11,26 @@ export default function PageTransition({ children }: { children: ReactNode }) {
 
   // Restore scroll position when the new page mounts
   useEffect(() => {
-    const savedPos = getScrollPosition(pathname)
-    if (savedPos > 0) {
-      window.scrollTo({
-        top: savedPos,
-        behavior: 'instant' // Instant jump before fade-in makes it seamless
-      })
+    const restore = () => {
+      const savedPos = getScrollPosition(pathname)
+      if (savedPos > 0) {
+        window.scrollTo({
+          top: savedPos,
+          behavior: 'instant'
+        })
+      }
+    }
+
+    // Attempt immediately
+    restore()
+
+    // Retry to override Next.js default scroll-to-top
+    const t1 = setTimeout(restore, 10)
+    const t2 = setTimeout(restore, 50)
+
+    return () => {
+      clearTimeout(t1)
+      clearTimeout(t2)
     }
   }, [pathname])
 
