@@ -118,34 +118,34 @@ export default async function PortfolioPage() {
                                     <div className="absolute inset-0 bg-gradient-to-t from-[#2c3e50] via-[#2c3e50]/40 to-transparent opacity-90 group-hover:opacity-100 transition-opacity" />
 
                                     {/* CONTENT LAYER */}
-                                    <div className="absolute inset-0 p-8 flex flex-col justify-end">
+                                    <div className="absolute inset-0 p-6 md:p-8 flex flex-col justify-between z-10">
                                         
                                         {/* TOP BADGES */}
-                                        <div className="absolute top-8 right-8 flex gap-2">
+                                        <div className="flex justify-end items-start w-full">
                                             {project.client && (
-                                                <span className="bg-[#f1c40f] text-[#2c3e50] text-xs font-black uppercase tracking-wider px-3 py-1.5 rounded shadow-lg">
+                                                <span className="bg-[#f1c40f] text-[#2c3e50] text-[10px] md:text-xs font-black uppercase tracking-wider px-2 py-1 md:px-3 md:py-1.5 rounded shadow-lg">
                                                     {project.client}
                                                 </span>
                                             )}
                                         </div>
 
                                         {/* TEXT CONTENT */}
-                                        <div className="transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
-                                            <div className="flex items-center gap-2 text-[#f1c40f] text-xs font-bold uppercase tracking-widest mb-3">
-                                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <div className="transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300 mt-auto pt-4 md:pt-12">
+                                            <div className="flex items-center gap-2 text-[#f1c40f] text-[10px] md:text-xs font-bold uppercase tracking-widest mb-2 md:mb-3">
+                                                <svg className="w-3 h-3 md:w-4 md:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                                                 </svg>
                                                 {project.location || 'Houston, TX'}
                                             </div>
                                             
-                                            <h2 className="text-3xl md:text-4xl font-black text-white leading-tight mb-4 group-hover:text-[#f1c40f] transition-colors">
+                                            <h2 className="text-2xl md:text-4xl font-black text-white leading-tight mb-2 md:mb-4 group-hover:text-[#f1c40f] transition-colors [text-wrap:balance]">
                                                 {project.title}
                                             </h2>
 
                                             {/* TAGS */}
                                             {project.tags && project.tags.length > 0 && (
-                                                <div className="flex flex-wrap gap-2 mt-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100">
+                                                <div className="flex flex-wrap gap-2 mt-2 md:mt-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100">
                                                     {project.tags.map((t: any, i: number) => (
                                                         <span key={i} className="text-[10px] font-bold uppercase tracking-wider text-white/80 border border-white/20 px-2 py-1 rounded hover:bg-white/10">
                                                             {t.tag}

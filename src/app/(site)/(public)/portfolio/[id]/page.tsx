@@ -11,6 +11,7 @@ export const dynamic = 'force-dynamic';
 
 // --- Lexical Serializer ---
 // Basic renderer for Lexical RichText nodes
+// UPDATED: Removed hardcoded colors to allow parent containers (like prose-invert) to control contrast
 const SerializeLexical = ({ nodes }: { nodes: any[] }) => {
   if (!nodes || !Array.isArray(nodes)) return null;
 
@@ -22,7 +23,7 @@ const SerializeLexical = ({ nodes }: { nodes: any[] }) => {
         if (node.type === 'text') {
           let text = <span key={i}>{node.text}</span>;
           // Bitwise checks for Lexical formats: 1=Bold, 2=Italic, 8=Underline, etc.
-          if (node.format & 1) text = <strong key={i} className="font-bold text-white">{text}</strong>;
+          if (node.format & 1) text = <strong key={i} className="font-bold">{text}</strong>;
           if (node.format & 2) text = <em key={i} className="italic">{text}</em>;
           if (node.format & 8) text = <u key={i} className="underline">{text}</u>;
           return text;
@@ -44,20 +45,20 @@ const SerializeLexical = ({ nodes }: { nodes: any[] }) => {
               h6: 'text-base md:text-lg',
             };
             return (
-              <Tag key={i} className={`${sizes[node.tag as keyof typeof sizes] || 'text-2xl'} font-bold mb-4 text-golden-yellow mt-6 first:mt-0`}>
+              <Tag key={i} className={`${sizes[node.tag as keyof typeof sizes] || 'text-2xl'} font-bold mb-4 mt-6 first:mt-0`}>
                 {serializedChildren}
               </Tag>
             );
           case 'paragraph':
             return (
-              <p key={i} className="mb-4 leading-relaxed text-gray-300 last:mb-0">
+              <p key={i} className="mb-4 leading-relaxed last:mb-0">
                 {serializedChildren}
               </p>
             );
           case 'list':
             const ListTag = node.listType === 'number' ? 'ol' : 'ul';
             return (
-              <ListTag key={i} className={`mb-6 ${node.listType === 'number' ? 'list-decimal' : 'list-disc'} list-inside text-gray-300 pl-4`}>
+              <ListTag key={i} className={`mb-6 ${node.listType === 'number' ? 'list-decimal' : 'list-disc'} list-inside pl-4`}>
                 {serializedChildren}
               </ListTag>
             );
@@ -65,7 +66,7 @@ const SerializeLexical = ({ nodes }: { nodes: any[] }) => {
             return <li key={i} className="mb-2">{serializedChildren}</li>;
           case 'quote':
             return (
-              <blockquote key={i} className="border-l-4 border-golden-yellow pl-4 italic text-gray-400 my-6">
+              <blockquote key={i} className="border-l-4 border-golden-yellow pl-4 italic text-slate-500 my-6">
                 {serializedChildren}
               </blockquote>
             );
