@@ -51,6 +51,14 @@ export const Users: CollectionConfig = {
         readOnly: true,
       },
     },
+    {
+      name: 'squareCustomerId',
+      type: 'text',
+      admin: {
+        position: 'sidebar',
+        readOnly: true,
+      },
+    },
   ],
   hooks: {
     afterLogin: [
