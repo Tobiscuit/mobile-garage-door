@@ -1,15 +1,15 @@
 'use server';
 
-import { SquareClient } from 'square';
+import { SquareClient, SquareEnvironment } from 'square';
 import { randomUUID } from 'crypto';
 import { getPayload } from 'payload';
 import configPromise from '@payload-config';
 
 // Initialize Square Client
-// NOTE: In production, switch environment to 'production'
+// NOTE: In production, switch environment to SquareEnvironment.Production
 const squareClient = new SquareClient({
   token: process.env.SQUARE_ACCESS_TOKEN,
-  environment: 'sandbox', 
+  environment: process.env.NODE_ENV === 'production' ? SquareEnvironment.Production : SquareEnvironment.Sandbox,
 });
 
 interface PaymentData {
