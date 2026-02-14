@@ -116,7 +116,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
         <div className="bg-[#0f172a] min-h-screen pb-24">
             {/* Hero Section */}
             <div className="relative h-[60vh] min-h-[400px] w-full overflow-hidden">
-                {post.featuredImage && typeof post.featuredImage !== 'string' && post.featuredImage.url ? (
+                {post.featuredImage && typeof post.featuredImage !== 'string' && typeof post.featuredImage !== 'number' && post.featuredImage.url ? (
                     <Image
                         src={post.featuredImage.url}
                         alt={post.featuredImage.alt || post.title}
