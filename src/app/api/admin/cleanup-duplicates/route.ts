@@ -24,7 +24,7 @@ export async function GET() {
         },
       })
       
-      if (result.totalDocs > 0) {
+      if (result.docs.length > 0) {
         results.push(`Removed: ${email}`)
       } else {
         results.push(`Not found: ${email}`)
