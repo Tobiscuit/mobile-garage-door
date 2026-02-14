@@ -325,6 +325,9 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   // 3. Columns (Safe addition)
   await db.execute(sql`ALTER TABLE "users" ADD COLUMN IF NOT EXISTS "role" "enum_users_role" DEFAULT 'admin' NOT NULL;`)
   await db.execute(sql`ALTER TABLE "users" ADD COLUMN IF NOT EXISTS "push_subscription" jsonb;`)
+  await db.execute(sql`ALTER TABLE "service_requests" ADD COLUMN IF NOT EXISTS "assigned_tech_id" integer;`)
+  await db.execute(sql`ALTER TABLE "service_requests" ADD COLUMN IF NOT EXISTS "trip_fee_payment" jsonb;`)
+  await db.execute(sql`ALTER TABLE "service_requests" ADD COLUMN IF NOT EXISTS "ticket_id" varchar;`)
 
   // 4. Constraints (Safe addition)
   // We check information_schema to see if the constraint already exists
