@@ -30,7 +30,7 @@ export async function GET() {
         results.push(`Not found: ${email}`)
       }
     } catch (error) {
-      results.push(`Error removing ${email}: ${error.message}`)
+      results.push(`Error removing ${email}: ${(error as Error).message}`)
     }
   }
 
