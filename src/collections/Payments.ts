@@ -7,10 +7,10 @@ export const Payments: CollectionConfig = {
       group: 'Finance',
     },
     access: {
-      read: ({ req: { user } }) => user?.collection === 'users',
-      create: () => false,
-      update: () => false,
-      delete: () => false,
+      read: ({ req: { user } }) => !!user, // Allow any logged in user (technicians need to see earnings?) or restrict to admin
+      create: ({ req: { user } }) => user?.role === 'admin',
+      update: ({ req: { user } }) => user?.role === 'admin',
+      delete: ({ req: { user } }) => user?.role === 'admin',
     },
     fields: [
       {
