@@ -14,30 +14,49 @@ export default function PageTransition({ children }: { children: ReactNode }) {
 
   // Restore scroll position when the new page mounts
   useIsomorphicLayoutEffect(() => {
+    // Disable browser's native scroll restoration to prevent conflicts
+    if (typeof window !== 'undefined' && window.history) {
+      window.history.scrollRestoration = 'manual'
+    }
+
     const savedPos = getScrollPosition(pathname)
     
     if (savedPos > 0) {
-      // We need to wait for the DOM to be painted and have height
-      const attemptScroll = (attempts = 0) => {
-        // If we've tried too many times (e.g., 500ms), give up
-        if (attempts > 50) return
-
+      const restoreScroll = () => {
         const docHeight = document.documentElement.scrollHeight
         const winHeight = window.innerHeight
 
-        // If the page is tall enough to scroll to the saved position
-        if (docHeight >= savedPos + winHeight || docHeight >= savedPos) {
+        // If page is ready to support the scroll position
+        if (docHeight >= savedPos + winHeight / 2) { // Allow some slack (half screen)
           window.scrollTo({
             top: savedPos,
             behavior: 'instant'
           })
-        } else {
-          // If page not tall enough yet, wait for next frame
-          requestAnimationFrame(() => attemptScroll(attempts + 1))
+          return true // Success
         }
+        return false // Keep waiting
       }
 
-      attemptScroll()
+      // 1. Try immediately
+      if (restoreScroll()) return
+
+      // 2. Use ResizeObserver to detect content loading (images, data, etc.)
+      const observer = new ResizeObserver(() => {
+        if (restoreScroll()) {
+          observer.disconnect() // Stop watching once success
+        }
+      })
+      
+      observer.observe(document.body)
+      observer.observe(document.documentElement)
+
+      // 3. Safety timeout to stop observing after 2 seconds (in case page is just short)
+      const timeout = setTimeout(() => observer.disconnect(), 2000)
+
+      return () => {
+        observer.disconnect()
+        clearTimeout(timeout)
+      }
     }
   }, [pathname])
 
