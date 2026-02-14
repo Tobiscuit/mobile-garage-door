@@ -71,13 +71,13 @@ export default function BookingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-cloudy-white py-12 px-4 font-work-sans">
+    <div className="min-h-screen bg-cloudy-white pt-24 pb-12 px-4 font-work-sans">
       <Script 
         src={SQUARE_SCRIPT_SRC}
         onLoad={() => setSdkLoaded(true)} 
       />
 
-      <div className="max-w-2xl mx-auto">
+      <div className="max-w-3xl mx-auto">
         {/* Progress Bar */}
         <div className="mb-12">
           <div className="flex justify-between text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">
@@ -91,7 +91,7 @@ export default function BookingPage() {
           </div>
         </div>
 
-        <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 p-8 md:p-12 relative overflow-hidden">
+        <div className="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100 relative p-8 md:p-12">
 
           {/* Background Pattern */}
           <div className="absolute top-0 right-0 p-8 opacity-5 pointer-events-none">

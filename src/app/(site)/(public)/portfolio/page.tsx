@@ -1,8 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
 import { getPayload } from 'payload';
 import configPromise from '@/payload.config';
 
@@ -18,7 +16,6 @@ export default async function PortfolioPage() {
 
   return (
     <div className="min-h-screen bg-cloudy-white font-work-sans text-charcoal-blue flex flex-col">
-      <Header />
       <main className="flex-grow">
         
         {/* HERO: Contractor Focused - Industrial/Premium (Blueprint Style) */}

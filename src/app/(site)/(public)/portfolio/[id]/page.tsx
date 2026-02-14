@@ -4,8 +4,6 @@ import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { getPayload } from 'payload';
 import configPromise from '@payload-config';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
 
 // --- Lexical Serializer ---
 // Basic renderer for Lexical RichText nodes
@@ -131,7 +129,6 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
 
   return (
     <div className="flex flex-col min-h-screen bg-cloudy-white text-charcoal-blue font-work-sans overflow-x-hidden">
-      <Header />
       
       {/* HEADER SECTION - Matches Home Page "Contractor" Side */}
       <section className="relative pt-32 pb-12 px-6 md:px-12 bg-cloudy-white border-b border-gray-200 overflow-hidden">

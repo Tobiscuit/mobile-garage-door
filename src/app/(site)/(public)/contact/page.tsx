@@ -2,8 +2,6 @@
 
 import React, { useState, Suspense, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
 import { ContactHero } from '@/components/contact/ContactHero';
 import { AddressAutocomplete } from '@/components/ui/AddressAutocomplete';
 import { ServiceAreaMap } from '@/components/ui/ServiceAreaMap';
@@ -270,20 +268,16 @@ const ContactContent = () => {
 export default function ContactPage() {
   return (
     <div className="min-h-screen bg-cloudy-white font-work-sans flex flex-col">
-      <Header />
-      <main className="flex-grow">
-        <Suspense fallback={
-             <div className="h-screen flex items-center justify-center bg-charcoal-blue">
-                <div className="text-center">
-                    <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-white/10 border-t-golden-yellow mb-4"></div>
-                    <p className="text-gray-400 text-xs font-bold uppercase tracking-widest">Establishing Uplink...</p>
-                </div>
-             </div>
-        }>
-            <ContactContent />
-        </Suspense>
-      </main>
-      <Footer />
+      <Suspense fallback={
+            <div className="h-screen flex items-center justify-center bg-charcoal-blue">
+            <div className="text-center">
+                <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-white/10 border-t-golden-yellow mb-4"></div>
+                <p className="text-gray-400 text-xs font-bold uppercase tracking-widest">Establishing Uplink...</p>
+            </div>
+            </div>
+      }>
+        <ContactContent />
+      </Suspense>
     </div>
   );
 }
