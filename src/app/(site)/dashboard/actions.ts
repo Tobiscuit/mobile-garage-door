@@ -132,10 +132,9 @@ export async function syncSquarePayments() {
     
     // List payments from Square (last 100)
     // Using list() instead of listPayments() for newer Square SDK
-    // sortOrder is not explicitly supported in the list() options in recent versions, usually returns newest first.
-    const response = await squareClient.payments.list({
-      limit: 100,
-    });
+    // Note: Passing empty string or invalid params caused sort_field error.
+    // We rely on default sorting (usually NEWEST first for list endpoint)
+    const response = await squareClient.payments.list();
     
     let count = 0;
     // The response is async iterable in the new SDK
