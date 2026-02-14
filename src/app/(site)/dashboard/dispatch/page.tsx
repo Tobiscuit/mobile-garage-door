@@ -40,8 +40,8 @@ export default async function DispatchPage() {
         urgency: job.urgency,
         issueDescription: job.issueDescription,
         customer: {
-            name: (job.customer as any).name || 'Unknown',
-            address: (job.customer as any).address || 'No Address',
+            name: (job.customer as any).name || (job.customer as any).email || 'Unknown Customer',
+            address: (job.customer as any).address || 'No Address Provided',
         },
         createdAt: job.createdAt
     }));
