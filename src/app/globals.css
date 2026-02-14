@@ -15,6 +15,10 @@
   --background-image-gradient-conic: conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops));
 }
 
+html {
+  overflow-y: scroll; /* Prevents layout shift from scrollbar appearance/disappearance */
+}
+
 :root {
   --charcoal-blue: #2c3e50;
   --cloudy-white: #f7f9fb;
