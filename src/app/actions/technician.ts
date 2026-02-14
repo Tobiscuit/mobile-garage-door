@@ -2,6 +2,7 @@
 
 import { getPayload } from 'payload';
 import configPromise from '@payload-config';
+import { headers } from 'next/headers';
 
 export async function savePushSubscription(subscription: any) {
     try {
@@ -48,7 +49,7 @@ export async function getAvailableJobs() {
             where: {
                 and: [
                     {
-                        assignedTechId: {
+                        assignedTech: {
                             equals: user.id
                         }
                     },
