@@ -20,8 +20,9 @@ const RichTextRenderer = ({ content }: { content: any }) => {
                     </p>
                 );
             case 'heading':
-                const Tag = node.tag as 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
-                const sizeClasses = {
+                const headingTag = node.tag as 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
+                const Tag = headingTag;
+                const sizeClasses: Record<string, string> = {
                     h1: 'text-4xl font-black text-white mt-12 mb-6',
                     h2: 'text-3xl font-bold text-white mt-10 mb-5 border-l-4 border-[#f1c40f] pl-4',
                     h3: 'text-2xl font-bold text-white mt-8 mb-4',
@@ -30,7 +31,7 @@ const RichTextRenderer = ({ content }: { content: any }) => {
                     h6: 'text-base font-bold text-white mt-4 mb-2',
                 };
                 return (
-                    <Tag key={index} className={sizeClasses[node.tag] || sizeClasses.h2}>
+                    <Tag key={index} className={sizeClasses[headingTag] || sizeClasses.h2}>
                         {node.children?.map((child: any, i: number) => renderChild(child, i))}
                     </Tag>
                 );
