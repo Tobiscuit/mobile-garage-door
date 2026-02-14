@@ -37,71 +37,122 @@ export function DispatchClient({ jobs, technicians }: { jobs: any[], technicians
     };
 
     return (
-        <div className="space-y-6">
-            <h1 className="text-3xl font-black text-white uppercase tracking-tight mb-8">
-                Dispatch <span className="text-[#f1c40f]">Board</span>
-            </h1>
+        <div className="space-y-8 pb-20">
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+                <div>
+                    <h1 className="text-4xl font-black text-white uppercase tracking-tighter">
+                        Dispatch <span className="text-[#f1c40f]">Board</span>
+                    </h1>
+                    <p className="text-gray-400 mt-2 font-mono text-sm">
+                        / ASSIGN TECHNICIANS TO PENDING REQUESTS
+                    </p>
+                </div>
+                <div className="bg-[#2c3e50] px-4 py-2 rounded-lg border border-white/10">
+                    <span className="text-gray-400 text-xs font-bold uppercase tracking-wider mr-2">Pending Jobs:</span>
+                    <span className="text-[#f1c40f] font-mono font-bold text-xl">{jobs.length}</span>
+                </div>
+            </div>
 
             {jobs.length === 0 ? (
-                <div className="bg-[#34495e]/50 border border-white/10 rounded-2xl p-12 text-center">
-                    <div className="w-16 h-16 bg-[#f1c40f]/20 text-[#f1c40f] rounded-full flex items-center justify-center mx-auto mb-4">
-                        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                <div className="bg-[#1e293b] border border-white/5 rounded-3xl p-16 text-center shadow-2xl">
+                    <div className="w-20 h-20 bg-[#f1c40f]/10 text-[#f1c40f] rounded-full flex items-center justify-center mx-auto mb-6 border border-[#f1c40f]/20">
+                        <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
                     </div>
-                    <h3 className="text-xl font-bold text-white mb-2">All Clear!</h3>
-                    <p className="text-gray-400">No pending jobs waiting for assignment.</p>
+                    <h3 className="text-2xl font-bold text-white mb-2 tracking-tight">All Clear!</h3>
+                    <p className="text-gray-400 max-w-md mx-auto">No pending service requests waiting for assignment. Good job keeping the queue empty.</p>
                 </div>
             ) : (
                 <div className="grid gap-6">
                     {jobs.map(job => (
-                        <div key={job.id} className="bg-[#34495e] border border-white/10 rounded-2xl p-6 flex flex-col md:flex-row gap-6 items-start md:items-center justify-between shadow-lg">
-                            {/* Job Info */}
-                            <div className="flex-1">
-                                <div className="flex items-center gap-3 mb-2">
-                                    <span className={`px-2 py-0.5 rounded text-xs font-bold uppercase tracking-wide ${job.urgency === 'emergency' ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-blue-500/20 text-blue-400 border border-blue-500/30'}`}>
-                                        {job.urgency}
-                                    </span>
-                                    <span className="text-gray-400 text-sm font-mono">#{job.ticketId || job.id.substring(0, 8)}</span>
-                                </div>
-                                <h3 className="text-xl font-bold text-white mb-1">{job.customer?.name || 'Unknown Customer'}</h3>
-                                <p className="text-gray-300 mb-2">{job.customer?.address || 'No Address'}</p>
-                                <div className="bg-[#2c3e50] rounded p-3 text-sm text-gray-400 italic">
-                                    "{job.issueDescription}"
-                                </div>
-                            </div>
+                        <div key={job.id} className="group bg-[#1e293b] border border-white/5 hover:border-[#f1c40f]/30 rounded-2xl overflow-hidden shadow-xl transition-all duration-300">
+                            <div className="flex flex-col lg:flex-row">
+                                {/* Left: Job Context */}
+                                <div className="p-8 flex-1 lg:border-r border-white/5 relative">
+                                    <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-[#f1c40f] to-transparent opacity-50"></div>
+                                    
+                                    <div className="flex flex-wrap items-center gap-3 mb-4">
+                                        <span className={`px-3 py-1 rounded-md text-xs font-bold uppercase tracking-wide border ${
+                                            job.urgency === 'emergency' 
+                                                ? 'bg-red-500/10 text-red-400 border-red-500/20' 
+                                                : 'bg-blue-500/10 text-blue-400 border-blue-500/20'
+                                        }`}>
+                                            {job.urgency} Priority
+                                        </span>
+                                        <span className="text-gray-500 text-xs font-mono bg-black/20 px-2 py-1 rounded">
+                                            ID: {job.ticketId || job.id.substring(0, 8)}
+                                        </span>
+                                        <span className="text-gray-500 text-xs font-mono">
+                                            {new Date(job.createdAt).toLocaleString()}
+                                        </span>
+                                    </div>
 
-                            {/* Assignment Control */}
-                            <div className="w-full md:w-auto flex flex-col gap-3 min-w-[250px]">
-                                <label className="text-xs font-bold text-gray-500 uppercase tracking-widest">Assign Technician</label>
-                                <div className="flex gap-2">
-                                    <select 
-                                        className="flex-1 bg-[#2c3e50] border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#f1c40f]"
-                                        value={selectedTechs[job.id] || ''}
-                                        onChange={(e) => handleTechSelect(job.id, e.target.value)}
-                                    >
-                                        <option value="">Select Tech...</option>
-                                        {technicians.map(tech => (
-                                            <option key={tech.id} value={tech.id}>
-                                                {tech.name} {tech.pushSubscription ? '🟢' : '⚪'}
-                                            </option>
-                                        ))}
-                                    </select>
+                                    <h3 className="text-2xl font-bold text-white mb-2 group-hover:text-[#f1c40f] transition-colors">
+                                        {job.customer?.name || 'Unknown Customer'}
+                                    </h3>
+                                    
+                                    <div className="flex items-start gap-2 text-gray-400 mb-6">
+                                        <svg className="w-5 h-5 mt-0.5 flex-shrink-0 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                                        <p className="leading-relaxed">{job.customer?.address || 'No Address Provided'}</p>
+                                    </div>
+
+                                    <div className="bg-black/20 rounded-xl p-4 border border-white/5">
+                                        <p className="text-sm text-gray-300 italic leading-relaxed">
+                                            "{job.issueDescription}"
+                                        </p>
+                                    </div>
+                                </div>
+
+                                {/* Right: Action Area */}
+                                <div className="bg-[#16202e] p-8 lg:w-[350px] flex flex-col justify-center gap-4">
+                                    <div>
+                                        <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-3">
+                                            Select Technician
+                                        </label>
+                                        <div className="relative">
+                                            <select 
+                                                className="w-full bg-[#2c3e50] border border-white/10 hover:border-white/20 rounded-xl px-4 py-4 text-white appearance-none focus:outline-none focus:border-[#f1c40f] focus:ring-1 focus:ring-[#f1c40f] transition-all cursor-pointer"
+                                                value={selectedTechs[job.id] || ''}
+                                                onChange={(e) => handleTechSelect(job.id, e.target.value)}
+                                            >
+                                                <option value="" className="text-gray-500">Choose available tech...</option>
+                                                {technicians.map(tech => (
+                                                    <option key={tech.id} value={tech.id}>
+                                                        {tech.name} {tech.pushSubscription ? '🟢' : '⚪'}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-400">
+                                                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                     <button 
                                         onClick={() => handleAssign(job.id)}
                                         disabled={loading === job.id || !selectedTechs[job.id]}
-                                        className="bg-[#f1c40f] hover:bg-yellow-400 disabled:opacity-50 disabled:cursor-not-allowed text-[#2c3e50] font-bold px-4 rounded-lg transition-colors flex items-center justify-center"
+                                        className="w-full bg-[#f1c40f] hover:bg-[#f39c12] disabled:opacity-50 disabled:cursor-not-allowed text-[#2c3e50] font-bold text-lg py-4 rounded-xl transition-all transform active:scale-[0.98] shadow-lg hover:shadow-[#f1c40f]/20 flex items-center justify-center gap-2 group/btn"
                                     >
                                         {loading === job.id ? (
-                                            <svg className="animate-spin h-5 w-5 text-[#2c3e50]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                            </svg>
+                                            <>
+                                                <svg className="animate-spin h-5 w-5 text-[#2c3e50]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                </svg>
+                                                <span>Dispatching...</span>
+                                            </>
                                         ) : (
-                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"></path></svg>
+                                            <>
+                                                <span>DISPATCH JOB</span>
+                                                <svg className="w-5 h-5 transition-transform group-hover/btn:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"></path></svg>
+                                            </>
                                         )}
                                     </button>
-                                </div>
-                                <div className="text-[10px] text-gray-500 text-center">
-                                    🟢 = Notifications Enabled
+                                    
+                                    <div className="text-center">
+                                         <span className="text-[10px] text-gray-600 uppercase tracking-wider font-mono">
+                                            Status: {technicians.find(t => t.id === selectedTechs[job.id])?.pushSubscription ? 'Online 🟢' : 'Offline ⚪'}
+                                         </span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
