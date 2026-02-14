@@ -34,7 +34,14 @@ export const Payments: CollectionConfig = {
       },
       {
           name: 'sourceType',
-          type: 'text', // CARD, CASH
+          type: 'text', // CARD, CASH, EXTERNAL
+      },
+      {
+          name: 'note',
+          type: 'textarea',
+          admin: {
+              description: 'Optional note for manual payments',
+          }
       },
     ],
   };
