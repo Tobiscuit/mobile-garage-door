@@ -20,14 +20,10 @@ export async function getDashboardStats() {
     depth: 0,
   });
 
-  // 1b. Fetch External/Manual Payments
+  // 1b. Fetch ALL Payments (Square + Manual)
+  // This is the Financial Source of Truth
   const { docs: payments } = await payload.find({
     collection: 'payments',
-    where: {
-      sourceType: {
-        in: ['CASH', 'EXTERNAL']
-      }
-    },
     limit: 1000,
   });
 
@@ -55,22 +51,8 @@ export async function getDashboardStats() {
   let activeRequests = 0;
   let pendingQuotes = 0;
 
-  // Process Service Request Payments (Square Online)
+  // Process Service Requests (Job Stats Only)
   requests.forEach((req) => {
-    // Revenue Calculation
-    if (req.tripFeePayment && typeof req.tripFeePayment === 'object') {
-      const payment = req.tripFeePayment as any;
-      const amountCents = Number(payment.amountMoney?.amount || 0);
-      const amountDollars = amountCents / 100;
-
-      lifetimeRevenue += amountDollars;
-
-      const reqDate = new Date(req.createdAt);
-      if (reqDate >= startOfMonth) monthlyRevenue += amountDollars;
-      if (reqDate >= startOfWeek) weeklyRevenue += amountDollars;
-      if (reqDate >= startOfToday) todayRevenue += amountDollars;
-    }
-
     // Job Status Counts
     if (['pending', 'confirmed', 'dispatched', 'on_site'].includes(req.status || '')) {
       activeRequests++;
@@ -81,10 +63,10 @@ export async function getDashboardStats() {
     }
   });
 
-  // Process Manual/External Payments
+  // Process ALL Payments for Revenue
   payments.forEach((p) => {
       const amountCents = Number(p.amount || 0);
-      const amountDollars = amountCents / 100; // Assuming stored in cents like Square
+      const amountDollars = amountCents / 100; // Assuming stored in cents
       
       lifetimeRevenue += amountDollars;
 

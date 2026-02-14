@@ -5,6 +5,14 @@ import configPromise from '@/payload.config';
 import { redirect } from 'next/navigation';
 import { squareService } from '@/services/squareService';
 import { randomUUID } from 'crypto';
+import webpush from 'web-push';
+
+// Configure Web Push (Move to global config if used elsewhere)
+webpush.setVapidDetails(
+    'mailto:admin@mobilegaragedoor.com',
+    process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,
+    process.env.VAPID_PRIVATE_KEY!
+);
 
 interface CustomerData {
   guestName: string;
@@ -78,13 +86,13 @@ export async function createBooking(prevState: any, formData: FormData) {
     );
 
     // C. Service Request Logic
-    await payload.create({
+    const newServiceRequest = await payload.create({
       collection: 'service-requests',
       data: {
         customer: customerId as number, // Cast to number or correct ID type
-        issueDescription,
+        issueDescription: issueDescription,
         urgency: urgency as 'standard' | 'emergency',
-        scheduledTime,
+        scheduledTime: scheduledTime,
         status: 'pending',
         tripFeePayment: {
             paymentId: payment.id,
@@ -93,6 +101,36 @@ export async function createBooking(prevState: any, formData: FormData) {
         },
       },
     });
+
+    // Notify Admins & Dispatchers
+    try {
+        const admins = await payload.find({
+            collection: 'users',
+            where: {
+                or: [
+                    { role: { equals: 'admin' } },
+                    { role: { equals: 'dispatcher' } }
+                ]
+            }
+        });
+
+        const notifications = admins.docs
+            .filter((user: any) => user.pushSubscription)
+            .map((user: any) => 
+                webpush.sendNotification(
+                    user.pushSubscription,
+                    JSON.stringify({
+                        title: 'New Service Request!',
+                        body: `${guestName}: ${issueDescription}`,
+                        url: '/admin/mission-control'
+                    })
+                ).catch(err => console.error(`Failed to notify admin ${user.email}:`, err))
+            );
+        
+        await Promise.all(notifications);
+    } catch (notifyError) {
+        console.error('Error sending admin notifications:', notifyError);
+    }
 
     // D. Payment Logging Logic
     if (payment.id) {
