@@ -13,17 +13,41 @@ const model = genAI.getGenerativeModel({
   },
 });
 
-export async function generatePostContent(prompt: string): Promise<AIPostResponse> {
+export async function generatePostContent(prompt: string, format: 'json' | 'markdown' = 'json'): Promise<any> {
   if (!apiKey) {
     throw new Error('GEMINI_API_KEY is not set');
   }
 
-  const systemPrompt = `
+  let systemPrompt = `
     You are an expert blog post writer for a Garage Door Service company.
     Generate a blog post based on the user's prompt.
     
-    You must return a JSON object that matches the following structure exactly:
+    You must return a JSON object.
     
+    Common fields:
+    - title: string
+    - excerpt: string
+    - category: 'repair-tips' | 'product-spotlight' | 'contractor-insights' | 'maintenance-guide' | 'industry-news'
+    - keywords: string[]
+  `;
+
+  if (format === 'markdown') {
+    systemPrompt += `
+    - content: string (Markdown format)
+
+    Example JSON structure:
+    {
+      "title": "...",
+      "excerpt": "...",
+      "category": "...",
+      "keywords": ["..."],
+      "content": "# Heading\n\nParagraph text..."
+    }
+    `;
+  } else {
+    systemPrompt += `
+    - content: Lexical Editor State JSON Object
+
     interface AIPostResponse {
       title: string;
       excerpt: string;
@@ -31,16 +55,8 @@ export async function generatePostContent(prompt: string): Promise<AIPostRespons
       keywords: string[];
       content: {
         root: {
-          children: Array<{
-            type: string;
-            version: number;
-            [key: string]: any;
-          }>;
-          direction: 'ltr' | 'rtl' | null;
-          format: string;
-          indent: number;
-          type: string;
-          version: number;
+          children: Array<any>;
+          // ... Standard Lexical Root
         };
       };
     }
@@ -68,33 +84,17 @@ export async function generatePostContent(prompt: string): Promise<AIPostRespons
       ],
       "direction": "ltr"
     }
+    `;
+  }
 
-    Example of a heading node:
-    {
-        "type": "heading",
-        "tag": "h2",
-        "format": "",
-        "indent": 0,
-        "version": 1,
-        "children": [
-            {
-                "type": "text",
-                "text": "Heading Text",
-                // ...
-            }
-        ],
-        "direction": "ltr"
-    }
-
-    Make the content engaging, SEO-optimized, and professional.
-  `;
+  systemPrompt += `\nMake the content engaging, SEO-optimized, and professional.`;
 
   const result = await model.generateContent(`${systemPrompt}\n\nUser Prompt: ${prompt}`);
   const response = result.response;
   const text = response.text();
 
   try {
-    return JSON.parse(text) as AIPostResponse;
+    return JSON.parse(text);
   } catch (error) {
     console.error('Failed to parse Gemini response:', text);
     throw new Error('Failed to generate valid JSON content');

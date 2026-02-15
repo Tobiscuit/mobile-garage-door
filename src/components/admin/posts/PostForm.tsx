@@ -1,8 +1,9 @@
 'use client';
 
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import MediaUpload from '@/components/admin/ui/MediaUpload';
+import { generatePostContent } from '@/actions/ai';
 
 interface PostFormProps {
   action: (formData: FormData) => Promise<any>;
@@ -14,6 +15,19 @@ export default function PostForm({ action, initialData, buttonLabel }: PostFormP
   const router = useRouter();
 
   const [featuredImageId, setFeaturedImageId] = React.useState<string | null>(initialData?.featuredImage?.id || initialData?.featuredImage || null);
+  
+  // AI State
+  const [isAiOpen, setIsAiOpen] = useState(false);
+  const [aiPrompt, setAiPrompt] = useState('');
+  const [isAiLoading, setIsAiLoading] = useState(false);
+
+  // Form Refs for direct manipulation
+  const titleRef = useRef<HTMLInputElement>(null);
+  const slugRef = useRef<HTMLInputElement>(null);
+  const contentRef = useRef<HTMLTextAreaElement>(null);
+  const excerptRef = useRef<HTMLTextAreaElement>(null);
+  const keywordsRef = useRef<HTMLInputElement>(null);
+  const categoryRef = useRef<HTMLSelectElement>(null);
 
   // Helper to extract text from Lexical JSON if it exists
   const getInitialContent = () => {
@@ -34,8 +48,88 @@ export default function PostForm({ action, initialData, buttonLabel }: PostFormP
     return initialData.keywords.map((k: any) => k.keyword).join(', ');
   };
 
+  const handleAiGenerate = async () => {
+      if (!aiPrompt) return;
+      setIsAiLoading(true);
+      try {
+          const result = await generatePostContent(aiPrompt, 'markdown');
+          
+          if (titleRef.current) titleRef.current.value = result.title || '';
+          if (slugRef.current && result.title) slugRef.current.value = result.title.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
+          if (excerptRef.current) excerptRef.current.value = result.excerpt || '';
+          if (contentRef.current) contentRef.current.value = result.content || '';
+          if (keywordsRef.current && result.keywords) keywordsRef.current.value = Array.isArray(result.keywords) ? result.keywords.join(', ') : result.keywords;
+          if (categoryRef.current && result.category) categoryRef.current.value = result.category;
+
+          setIsAiOpen(false);
+          setAiPrompt('');
+      } catch (e) {
+          console.error('AI Error:', e);
+          alert('Failed to generate content. Check API Key.');
+      } finally {
+          setIsAiLoading(false);
+      }
+  };
+
   return (
+    <div className="relative">
+        {/* AI POPUP */}
+        {isAiOpen && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+                <div className="bg-[#2c3e50] border border-[#ffffff10] rounded-2xl p-6 shadow-2xl w-full max-w-md animate-in zoom-in-95 duration-200">
+                    <h3 className="text-xl font-black text-white mb-4 flex items-center gap-2">
+                        <span>✨</span> AI Magic Writer
+                    </h3>
+                    <div className="mb-4">
+                        <label className="block text-xs font-bold text-[#bdc3c7] uppercase tracking-wider mb-2">What should I write about?</label>
+                        <textarea 
+                            value={aiPrompt}
+                            onChange={(e) => setAiPrompt(e.target.value)}
+                            className="w-full bg-[#1e2b38] border border-[#ffffff10] rounded-xl p-3 text-white focus:border-[#f1c40f] outline-none min-h-[100px]"
+                            placeholder="e.g. Write a guide about how to fix a noisy garage door opener..."
+                            autoFocus
+                        />
+                    </div>
+                    <div className="flex justify-end gap-3">
+                        <button 
+                            onClick={() => setIsAiOpen(false)}
+                            className="px-4 py-2 text-[#bdc3c7] hover:text-white font-bold text-sm"
+                        >
+                            Cancel
+                        </button>
+                        <button 
+                            onClick={handleAiGenerate}
+                            disabled={isAiLoading || !aiPrompt}
+                            className="px-6 py-2 bg-gradient-to-r from-[#f1c40f] to-[#f39c12] text-[#2c3e50] font-black rounded-lg shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                        >
+                            {isAiLoading ? (
+                                <>
+                                    <div className="w-4 h-4 border-2 border-[#2c3e50] border-t-transparent rounded-full animate-spin"></div>
+                                    Thinking...
+                                </>
+                            ) : (
+                                <>
+                                    <span>Generate</span>
+                                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                                </>
+                            )}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        )}
+
     <form action={action} className="max-w-6xl">
+      <div className="flex justify-end mb-4">
+          <button 
+            type="button"
+            onClick={() => setIsAiOpen(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-[#6366f1] hover:bg-[#4f46e5] text-white font-bold rounded-xl shadow-[0_4px_14px_0_rgba(99,102,241,0.39)] hover:shadow-[0_6px_20px_rgba(99,102,241,0.23)] transition-all transform hover:-translate-y-1"
+          >
+             <span>✨</span> AI Magic Writer
+          </button>
+      </div>
+
       <input type="hidden" name="featuredImage" value={featuredImageId || ''} />
       
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -47,6 +141,7 @@ export default function PostForm({ action, initialData, buttonLabel }: PostFormP
                  <div className="mb-6">
                     <label className="block text-xs font-bold text-[#bdc3c7] uppercase tracking-wider mb-2">Article Title</label>
                     <input 
+                      ref={titleRef}
                       name="title"
                       type="text" 
                       defaultValue={initialData?.title}
@@ -62,6 +157,7 @@ export default function PostForm({ action, initialData, buttonLabel }: PostFormP
                     <div className="flex bg-[#2c3e50] border border-[#ffffff10] rounded-xl px-4 py-3 text-gray-400">
                         <span className="select-none">/posts/</span>
                         <input 
+                        ref={slugRef}
                         name="slug"
                         type="text" 
                         defaultValue={initialData?.slug}
@@ -75,6 +171,7 @@ export default function PostForm({ action, initialData, buttonLabel }: PostFormP
                  <div className="mb-6">
                     <label className="block text-xs font-bold text-[#bdc3c7] uppercase tracking-wider mb-2">Content (Markdown / Text)</label>
                     <textarea 
+                      ref={contentRef}
                       name="content"
                       defaultValue={getInitialContent()}
                       required
@@ -88,6 +185,7 @@ export default function PostForm({ action, initialData, buttonLabel }: PostFormP
                  <div>
                     <label className="block text-xs font-bold text-[#bdc3c7] uppercase tracking-wider mb-2">Short Summary (Excerpt)</label>
                     <textarea 
+                      ref={excerptRef}
                       name="excerpt"
                       defaultValue={initialData?.excerpt}
                       rows={3}
@@ -103,6 +201,7 @@ export default function PostForm({ action, initialData, buttonLabel }: PostFormP
                  <div>
                     <label className="block text-xs font-bold text-[#bdc3c7] uppercase tracking-wider mb-2">Keywords (Comma Separated)</label>
                     <input 
+                      ref={keywordsRef}
                       name="keywords"
                       type="text" 
                       defaultValue={getInitialKeywords()}
@@ -146,6 +245,7 @@ export default function PostForm({ action, initialData, buttonLabel }: PostFormP
                 <div className="mb-6">
                     <label className="block text-xs text-[#bdc3c7] mb-1">Category</label>
                      <select 
+                        ref={categoryRef}
                         name="category"
                         defaultValue={initialData?.category || 'repair-tips'}
                         className="w-full bg-[#2c3e50] border border-[#ffffff10] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-[#f1c40f]"
@@ -205,5 +305,6 @@ export default function PostForm({ action, initialData, buttonLabel }: PostFormP
 
       </div>
     </form>
+    </div>
   );
 }

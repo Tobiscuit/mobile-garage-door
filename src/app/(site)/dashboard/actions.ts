@@ -132,14 +132,14 @@ export async function syncSquarePayments() {
     const payload = await getPayload({ config: configPromise });
     
     // List payments from Square (last 100)
-    // Using list() with object params for newer Square SDK
-    const response = await squareClient.payments.list({
+    const { result } = await squareClient.payments.list({
         sortOrder: 'DESC'
     });
     
     let count = 0;
-    // The response is async iterable in the new SDK
-    for await (const payment of response) {
+    const payments = result.payments || [];
+
+    for (const payment of payments) {
         if (count >= 100) break; // Limit to 100
         
         const squarePaymentId = payment.id;
