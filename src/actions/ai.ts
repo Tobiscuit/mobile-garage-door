@@ -1,10 +1,10 @@
 'use server';
 
-import { GoogleGenerativeAI, SchemaType, Schema } from '@google/generative-ai';
+import { GoogleGenAI, Type, Schema } from '@google/genai';
 import { EXAMPLE_LEXICAL_STRUCTURE } from '@/lib/ai-contract';
 
 const apiKey = process.env.GEMINI_API_KEY;
-const genAI = new GoogleGenerativeAI(apiKey || '');
+const genAI = new GoogleGenAI({ apiKey: apiKey || '' });
 
 export async function generatePostContent(prompt: string, format: 'json' | 'markdown' = 'json'): Promise<any> {
   if (!apiKey) {
@@ -13,32 +13,22 @@ export async function generatePostContent(prompt: string, format: 'json' | 'mark
 
   // Define schema for Markdown (Custom Dashboard)
   const markdownSchema: Schema = {
-    type: SchemaType.OBJECT,
+    type: Type.OBJECT,
     properties: {
-      title: { type: SchemaType.STRING },
-      excerpt: { type: SchemaType.STRING },
+      title: { type: Type.STRING },
+      excerpt: { type: Type.STRING },
       category: { 
-        type: SchemaType.STRING, 
-        format: 'enum',
+        type: Type.STRING, 
         enum: ['repair-tips', 'product-spotlight', 'contractor-insights', 'maintenance-guide', 'industry-news'] 
       },
       keywords: { 
-        type: SchemaType.ARRAY, 
-        items: { type: SchemaType.STRING } 
+        type: Type.ARRAY, 
+        items: { type: Type.STRING } 
       },
-      content: { type: SchemaType.STRING },
+      content: { type: Type.STRING },
     },
     required: ['title', 'excerpt', 'category', 'keywords', 'content'],
   };
-
-  // Initialize model with specific config based on format
-  const model = genAI.getGenerativeModel({
-    model: 'gemini-2.0-flash',
-    generationConfig: {
-      responseMimeType: 'application/json',
-      responseSchema: format === 'markdown' ? markdownSchema : undefined,
-    },
-  });
 
   let systemPrompt = `
     You are an expert blog post writer for a Garage Door Service company.
@@ -77,10 +67,27 @@ export async function generatePostContent(prompt: string, format: 'json' | 'mark
   systemPrompt += `\nMake the content engaging, SEO-optimized, and professional.`;
 
   try {
-    const result = await model.generateContent(`${systemPrompt}\n\nUser Prompt: ${prompt}`);
-    const response = result.response;
-    const text = response.text();
+    const response = await genAI.models.generateContent({
+      model: 'gemini-3-pro-preview',
+      contents: [
+        {
+          role: 'user',
+          parts: [{ text: `${systemPrompt}\n\nUser Prompt: ${prompt}` }]
+        }
+      ],
+      config: {
+        responseMimeType: 'application/json',
+        responseSchema: format === 'markdown' ? markdownSchema : undefined,
+      },
+    });
+
+    const text = response.text;
     console.log('AI Response:', text);
+    
+    if (!text) {
+      throw new Error('No content generated');
+    }
+
     return JSON.parse(text);
   } catch (error) {
     console.error('AI Generation Error:', error);
