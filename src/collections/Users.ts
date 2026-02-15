@@ -1,5 +1,10 @@
 import type { CollectionConfig } from 'payload'
 
+type AccessUser = {
+  id: string | number
+  role?: string
+} | null | undefined
+
 export const Users: CollectionConfig = {
   slug: 'users',
   auth: true,
@@ -11,16 +16,16 @@ export const Users: CollectionConfig = {
     // Anyone can create a user (signup), but roles are protected by field-level access
     create: () => true,
     // Only admins can delete
-    delete: ({ req: { user } }) => (user as User)?.role === 'admin',
+    delete: ({ req: { user } }) => (user as AccessUser)?.role === 'admin',
     // Admins can update anyone, users can update themselves
     update: ({ req: { user } }) => {
-        if ((user as User)?.role === 'admin') return true;
+        if ((user as AccessUser)?.role === 'admin') return true;
         if (user) return { id: { equals: user.id } };
         return false;
     },
     // Admins read all, users read themselves
     read: ({ req: { user } }) => {
-        if ((user as User)?.role === 'admin' || (user as User)?.role === 'dispatcher') return true;
+        if ((user as AccessUser)?.role === 'admin' || (user as AccessUser)?.role === 'dispatcher') return true;
         if (user) return { id: { equals: user.id } };
         return false;
     },
