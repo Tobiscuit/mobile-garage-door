@@ -11,7 +11,6 @@ export const dynamic = 'force-dynamic';
 
 // --- Lexical Serializer ---
 // Basic renderer for Lexical RichText nodes
-// UPDATED: Removed hardcoded colors to allow parent containers (like prose-invert) to control contrast
 const SerializeLexical = ({ nodes }: { nodes: any[] }) => {
   if (!nodes || !Array.isArray(nodes)) return null;
 
@@ -23,8 +22,8 @@ const SerializeLexical = ({ nodes }: { nodes: any[] }) => {
         if (node.type === 'text') {
           let text = <span key={i}>{node.text}</span>;
           // Bitwise checks for Lexical formats: 1=Bold, 2=Italic, 8=Underline, etc.
-          if (node.format & 1) text = <strong key={i} className="font-bold">{text}</strong>;
-          if (node.format & 2) text = <em key={i} className="italic">{text}</em>;
+          if (node.format & 1) text = <strong key={i} className="font-bold text-white">{text}</strong>;
+          if (node.format & 2) text = <em key={i} className="italic text-gray-300">{text}</em>;
           if (node.format & 8) text = <u key={i} className="underline">{text}</u>;
           return text;
         }
@@ -45,34 +44,34 @@ const SerializeLexical = ({ nodes }: { nodes: any[] }) => {
               h6: 'text-base md:text-lg',
             };
             return (
-              <Tag key={i} className={`${sizes[node.tag as keyof typeof sizes] || 'text-2xl'} font-bold mb-4 mt-6 first:mt-0`}>
+              <Tag key={i} className={`${sizes[node.tag as keyof typeof sizes] || 'text-2xl'} font-bold text-white mb-4 mt-8 first:mt-0`}>
                 {serializedChildren}
               </Tag>
             );
           case 'paragraph':
             return (
-              <p key={i} className="mb-4 leading-relaxed last:mb-0">
+              <p key={i} className="mb-4 leading-relaxed last:mb-0 text-gray-300">
                 {serializedChildren}
               </p>
             );
           case 'list':
             const ListTag = node.listType === 'number' ? 'ol' : 'ul';
             return (
-              <ListTag key={i} className={`mb-6 ${node.listType === 'number' ? 'list-decimal' : 'list-disc'} list-inside pl-4`}>
+              <ListTag key={i} className={`mb-6 ${node.listType === 'number' ? 'list-decimal' : 'list-disc'} list-inside pl-4 text-gray-300`}>
                 {serializedChildren}
               </ListTag>
             );
           case 'listitem':
-            return <li key={i} className="mb-2">{serializedChildren}</li>;
+            return <li key={i} className="mb-2 text-gray-300">{serializedChildren}</li>;
           case 'quote':
             return (
-              <blockquote key={i} className="border-l-4 border-golden-yellow pl-4 italic text-slate-500 my-6">
+              <blockquote key={i} className="border-l-4 border-[#f1c40f] pl-4 italic text-gray-400 my-6">
                 {serializedChildren}
               </blockquote>
             );
           case 'link':
             return (
-              <a key={i} href={node.fields?.url} target={node.fields?.newTab ? '_blank' : undefined} className="text-golden-yellow hover:underline transition-colors">
+              <a key={i} href={node.fields?.url} target={node.fields?.newTab ? '_blank' : undefined} className="text-[#f1c40f] hover:text-white hover:underline transition-colors">
                 {serializedChildren}
               </a>
             );
@@ -133,48 +132,48 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
   const descriptionContent = (project.description as any)?.root?.children;
 
   return (
-    <div className="flex flex-col min-h-screen bg-cloudy-white text-charcoal-blue font-work-sans overflow-x-hidden">
+    <div className="flex flex-col min-h-screen bg-[#0f172a] text-white font-work-sans overflow-x-hidden">
       
-      {/* HEADER SECTION - Matches Home Page "Contractor" Side */}
-      <section className="relative pt-32 pb-12 px-6 md:px-12 bg-cloudy-white border-b border-gray-200 overflow-hidden">
-         {/* Dot Grid Pattern (Matches Hero) */}
-         <div className="absolute inset-0 opacity-30 pointer-events-none" 
-             style={{ backgroundImage: 'radial-gradient(#bdc3c7 1px, transparent 1px)', backgroundSize: '24px 24px' }}>
+      {/* HEADER SECTION */}
+      <section className="relative pt-32 pb-12 px-6 md:px-12 bg-[#0f172a] border-b border-white/5 overflow-hidden">
+         {/* Dot Grid Pattern */}
+         <div className="absolute inset-0 opacity-10 pointer-events-none" 
+             style={{ backgroundImage: 'radial-gradient(#ffffff 1px, transparent 1px)', backgroundSize: '24px 24px' }}>
         </div>
         
         <div className="max-w-7xl mx-auto relative z-10">
-          <SmartLink href="/portfolio" className="inline-flex items-center gap-2 text-steel-gray hover:text-charcoal-blue transition-colors mb-8 text-sm font-bold uppercase tracking-wider group">
+          <SmartLink href="/portfolio" className="inline-flex items-center gap-2 text-[#f1c40f] hover:text-white transition-colors mb-8 text-sm font-bold uppercase tracking-wider group">
             <svg className="w-4 h-4 group-hover:-translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
             Back to Projects
           </SmartLink>
           
           <div className="flex flex-col lg:flex-row gap-12 items-end">
               <div className="flex-grow">
-                  <div className="inline-flex items-center gap-2 bg-golden-yellow/10 border border-golden-yellow/40 text-charcoal-blue px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-6">
-                    <svg className="w-3 h-3 text-golden-yellow" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                  <div className="inline-flex items-center gap-2 bg-[#f1c40f]/10 border border-[#f1c40f]/20 text-[#f1c40f] px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-6">
+                    <svg className="w-3 h-3 text-[#f1c40f]" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
                     Project Report
                   </div>
-                  <h1 className="text-4xl md:text-6xl font-black mb-6 tracking-tight leading-none text-charcoal-blue">
+                  <h1 className="text-4xl md:text-6xl font-black mb-6 tracking-tight leading-none text-white">
                     {project.title}
                   </h1>
                   
-                  <div className="flex flex-wrap gap-6 md:gap-12 text-sm font-bold uppercase tracking-wider text-steel-gray">
+                  <div className="flex flex-wrap gap-6 md:gap-12 text-sm font-bold uppercase tracking-wider text-gray-400">
                     {project.client && (
                         <div className="flex flex-col">
-                           <span className="text-[10px] text-gray-400 mb-1">Client</span>
-                           <span className="text-charcoal-blue border-l-2 border-golden-yellow pl-3">{project.client}</span>
+                           <span className="text-[10px] text-gray-500 mb-1">Client</span>
+                           <span className="text-white border-l-2 border-[#f1c40f] pl-3">{project.client}</span>
                         </div>
                     )}
                     {project.location && (
                         <div className="flex flex-col">
-                           <span className="text-[10px] text-gray-400 mb-1">Location</span>
-                           <span className="text-charcoal-blue border-l-2 border-golden-yellow pl-3">{project.location}</span>
+                           <span className="text-[10px] text-gray-500 mb-1">Location</span>
+                           <span className="text-white border-l-2 border-[#f1c40f] pl-3">{project.location}</span>
                         </div>
                     )}
                     {project.completionDate && (
                          <div className="flex flex-col">
-                            <span className="text-[10px] text-gray-400 mb-1">Completion</span>
-                            <span className="text-charcoal-blue border-l-2 border-golden-yellow pl-3">{new Date(project.completionDate).toLocaleDateString()}</span>
+                            <span className="text-[10px] text-gray-500 mb-1">Completion</span>
+                            <span className="text-white border-l-2 border-[#f1c40f] pl-3">{new Date(project.completionDate).toLocaleDateString()}</span>
                          </div>
                     )}
                   </div>
@@ -184,7 +183,7 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
               {project.tags && project.tags.length > 0 && (
                   <div className="flex flex-wrap gap-2 max-w-md justify-end">
                       {project.tags.map((t: any, i: number) => (
-                          <span key={i} className="text-[10px] font-bold uppercase tracking-wider text-charcoal-blue bg-white border border-gray-200 shadow-sm px-3 py-1 rounded-full">
+                          <span key={i} className="text-[10px] font-bold uppercase tracking-wider text-gray-300 bg-[#1e293b] border border-white/10 shadow-sm px-3 py-1 rounded-full">
                               {t.tag}
                           </span>
                       ))}
@@ -197,7 +196,7 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
       <main className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-12 max-w-7xl">
         
         {/* MAIN IMAGE - Industrial Frame */}
-        <div className="mb-20 relative rounded-2xl overflow-hidden shadow-2xl border-4 border-white ring-1 ring-gray-200 group bg-charcoal-blue">
+        <div className="mb-20 relative rounded-2xl overflow-hidden shadow-2xl border border-white/10 group bg-[#1e293b]">
             <ProjectHeroImage 
               slug={project.slug || ''}
               imageUrl={imageUrl}
@@ -205,19 +204,19 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
             />
             
             {/* Overlay Gradient (Subtle) */}
-            <div className="absolute inset-0 bg-gradient-to-t from-charcoal-blue/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
+            <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a]/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
         </div>
 
-        {/* BIFURCATED CHALLENGE / SOLUTION - Echoing Home Page Split */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-0 mb-20 rounded-3xl overflow-hidden shadow-xl border border-gray-200">
-          {/* Challenge - Dark Side (Echoes "Something Broken?") */}
-          <div className="bg-charcoal-blue p-10 md:p-16 relative overflow-hidden group text-white">
-            <div className="absolute inset-0 opacity-10 pointer-events-none" 
+        {/* BIFURCATED CHALLENGE / SOLUTION */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-0 mb-20 rounded-3xl overflow-hidden shadow-xl border border-white/10">
+          {/* Challenge - Dark Side */}
+          <div className="bg-[#1e293b] p-10 md:p-16 relative overflow-hidden group text-white">
+            <div className="absolute inset-0 opacity-5 pointer-events-none" 
                  style={{ backgroundImage: 'radial-gradient(#ffffff 1px, transparent 1px)', backgroundSize: '24px 24px' }}>
             </div>
             
             <div className="relative z-10">
-                <div className="inline-block bg-red-500/20 text-red-400 border border-red-500/30 px-3 py-1 rounded text-xs font-bold uppercase tracking-widest mb-6">
+                <div className="inline-block bg-red-500/10 text-red-400 border border-red-500/30 px-3 py-1 rounded text-xs font-bold uppercase tracking-widest mb-6">
                     The Challenge
                 </div>
                 <h2 className="text-3xl font-black mb-6 leading-tight">
@@ -233,24 +232,24 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
             </div>
           </div>
 
-          {/* Solution - Light Side (Echoes "Something New?") */}
-          <div className="bg-white p-10 md:p-16 relative overflow-hidden group text-charcoal-blue">
+          {/* Solution - Darker Side with Accent */}
+          <div className="bg-[#0f172a] p-10 md:p-16 relative overflow-hidden group text-white border-l border-white/5">
              <div className="absolute inset-0 opacity-5 pointer-events-none" 
-                 style={{ backgroundImage: 'radial-gradient(#000000 1px, transparent 1px)', backgroundSize: '24px 24px' }}>
+                 style={{ backgroundImage: 'radial-gradient(#ffffff 1px, transparent 1px)', backgroundSize: '24px 24px' }}>
             </div>
             
             <div className="relative z-10">
-                <div className="inline-block bg-golden-yellow/20 text-yellow-700 border border-golden-yellow/40 px-3 py-1 rounded text-xs font-bold uppercase tracking-widest mb-6">
+                <div className="inline-block bg-[#f1c40f]/10 text-[#f1c40f] border border-[#f1c40f]/20 px-3 py-1 rounded text-xs font-bold uppercase tracking-widest mb-6">
                     The Solution
                 </div>
                 <h2 className="text-3xl font-black mb-6 leading-tight">
-                    Engineered for <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-600 to-golden-yellow">Longevity.</span>
+                    Engineered for <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#f1c40f] to-yellow-200">Longevity.</span>
                 </h2>
-                <div className="prose prose-lg text-gray-600">
+                <div className="prose prose-invert prose-lg text-gray-300">
                    {solutionContent ? (
                       <SerializeLexical nodes={solutionContent} />
                    ) : (
-                      <p className="text-gray-400 italic">No solution details documented.</p>
+                      <p className="text-gray-500 italic">No solution details documented.</p>
                    )}
                 </div>
             </div>
@@ -261,22 +260,22 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
         {project.stats && project.stats.length > 0 && (
            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-20">
               {project.stats.map((stat, idx) => (
-                 <div key={idx} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-lg text-center group hover:-translate-y-1 transition-transform">
-                    <div className="text-4xl font-black text-charcoal-blue mb-2">{stat.value}</div>
-                    <div className="text-xs font-bold text-gray-400 uppercase tracking-wider">{stat.label}</div>
+                 <div key={idx} className="bg-[#1e293b] p-6 rounded-2xl border border-white/5 shadow-lg text-center group hover:-translate-y-1 transition-transform">
+                    <div className="text-4xl font-black text-white mb-2">{stat.value}</div>
+                    <div className="text-xs font-bold text-[#f1c40f] uppercase tracking-wider">{stat.label}</div>
                  </div>
               ))}
            </div>
         )}
 
-        {/* FULL CASE STUDY (Description) */}
+        {/* FULL CASE STUDY (Technical Breakdown) */}
         {descriptionContent && (
            <div className="max-w-4xl mx-auto">
-              <h3 className="text-charcoal-blue font-black text-2xl uppercase tracking-tight mb-8 flex items-center gap-4">
-                 <span className="w-8 h-1 bg-golden-yellow"></span>
+              <h3 className="text-white font-black text-2xl uppercase tracking-tight mb-8 flex items-center gap-4">
+                 <span className="w-8 h-1 bg-[#f1c40f]"></span>
                  Technical Breakdown
               </h3>
-              <div className="prose prose-lg max-w-none text-gray-600">
+              <div className="prose prose-invert prose-lg max-w-none text-gray-300">
                  <SerializeLexical nodes={descriptionContent} />
               </div>
            </div>
@@ -285,15 +284,15 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
       </main>
 
       {/* CTA */}
-      <section className="bg-charcoal-blue text-white py-24 text-center relative overflow-hidden border-t border-white/10">
-         <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(#ffffff 1px, transparent 1px)', backgroundSize: '24px 24px' }}></div>
+      <section className="bg-[#1e293b] text-white py-24 text-center relative overflow-hidden border-t border-white/10">
+         <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'radial-gradient(#ffffff 1px, transparent 1px)', backgroundSize: '24px 24px' }}></div>
          <div className="container mx-auto px-6 relative z-10">
             <h2 className="text-3xl md:text-5xl font-black mb-6">Ready to upgrade your infrastructure?</h2>
             <p className="text-xl mb-10 max-w-2xl mx-auto text-gray-400">
                Mobil Garage Door delivers industrial-grade security and performance.
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-4">
-                <Link href="/contact?type=contractor" className="bg-golden-yellow text-charcoal-blue font-bold py-4 px-10 rounded-xl hover:bg-white transition-all shadow-lg hover:scale-105">
+                <Link href="/contact?type=contractor" className="bg-[#f1c40f] text-[#0f172a] font-bold py-4 px-10 rounded-xl hover:bg-white transition-all shadow-lg hover:scale-105">
                    Contractor Portal
                 </Link>
                 <Link href="/contact" className="bg-transparent border-2 border-white/20 text-white font-bold py-4 px-10 rounded-xl hover:bg-white/10 transition-all">
