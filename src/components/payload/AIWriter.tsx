@@ -37,7 +37,7 @@ export const AIWriter: React.FC<any> = () => {
          dispatchFields({ 
              type: 'UPDATE', 
              path: 'keywords', 
-             value: result.keywords.map((k) => ({ keyword: k })) 
+             value: result.keywords.map((k: string) => ({ keyword: k })) 
          });
       }
 
