@@ -10,9 +10,9 @@ export default async function DispatchPage() {
     const headersList = await headers();
     const session = await auth.api.getSession({ headers: headersList });
     const payload = await getPayload({ config: configPromise });
+    const userRole = (session?.user as { role?: string } | undefined)?.role;
 
-    // Type guard: user must exist and have a 'role' property (User collection)
-    if (!session || session.user.role !== 'admin' && session.user.role !== 'dispatcher') {
+    if (!session || (userRole !== 'admin' && userRole !== 'dispatcher')) {
         redirect('/admin/login');
     }
 

@@ -1,4 +1,5 @@
 import React from 'react';
+import { PasskeyManager } from './PasskeyManager';
 
 interface Customer {
   name: string;
@@ -38,6 +39,8 @@ export function AccountSidebar({ customer }: AccountSidebarProps) {
           (555) 000-0000
         </a>
       </div>
+
+      <PasskeyManager />
     </div>
   );
 }

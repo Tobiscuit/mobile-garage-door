@@ -1,9 +1,8 @@
 import { betterAuth } from 'better-auth';
-import { pgDrizzle } from 'better-auth/adapters/drizzle-adapter';
+import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
-import { siwe } from 'better-auth/plugins/siwe';
-import { twoFactor } from 'better-auth/plugins/two-factor';
+import { passkey } from '@better-auth/passkey';
 
 const dbUri = process.env.DATABASE_URI;
 
@@ -13,36 +12,21 @@ if (!dbUri) {
 
 const pool = new Pool({ connectionString: dbUri });
 export const db = drizzle(pool);
+const baseURL = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000';
+const rpID = new URL(baseURL).hostname;
 
 export const auth = betterAuth({
-  database: pgDrizzle(db, {
-    models: {
-      user: {
-        fields: {
-          id: { type: 'integer', primaryKey: true },
-          email: { type: 'varchar', unique: true },
-          password: { type: 'varchar' },
-          role: { type: 'enum', enumName: 'enum_users_role' },
-          name: { type: 'varchar' },
-          phone: { type: 'varchar' },
-          address: { type: 'varchar' },
-          // Additional fields for MFA/Passkey if needed
-        },
-      },
-    },
+  database: drizzleAdapter(db, {
+    provider: 'pg',
   }),
   emailAndPassword: {
     enabled: true,
   },
-  session: {
-    expiresIn: '30d',
-    strategy: 'jwt',
-  },
   plugins: [
-    siwe(), // Enables Passkey (WebAuthn) for passwordless auth
-    twoFactor({
-      // MFA config: e.g., via email or TOTP
-      method: 'totp', // Or 'email' for codes
+    passkey({
+      rpName: 'Mobil Garage Door',
+      rpID,
+      origin: baseURL,
     }),
   ],
 });

@@ -4,10 +4,9 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
-import { createAuthClient } from 'better-auth/react';
+import { authClient } from '@/lib/auth-client';
 
 export default function LoginPage() {
-  const authClient = createAuthClient(); // Initialize client
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -20,18 +19,33 @@ export default function LoginPage() {
     setLoading(true);
     setError('');
 
+    if (usePasskey) {
+      try {
+        const result = await authClient.signIn.passkey();
+        if (result.data) {
+          const userRole = (result.data.user as { role?: string } | undefined)?.role;
+          if (userRole === 'admin') router.push('/dashboard');
+          else if (userRole === 'technician') router.push('/dashboard/technician');
+          else router.push('/portal');
+          return;
+        }
+        setError(result.error?.message || 'Passkey sign-in failed.');
+      } catch {
+        setError('Passkey sign-in was cancelled or failed.');
+      } finally {
+        setLoading(false);
+      }
+      return;
+    }
+
     try {
-      const result = await authClient.email({ // BetterAuth signIn
+      const result = await authClient.signIn.email({
         email,
-        password: usePasskey ? undefined : password, // Skip password if Passkey
-        options: {
-          usePasskey, // Enable Passkey (WebAuthn)
-          mfa: !usePasskey, // Skip MFA if using Passkey
-        },
+        password,
       });
 
       if (result.data) {
-        const userRole = result.data.user?.role; // Assuming role is in session data
+        const userRole = (result.data.user as { role?: string } | undefined)?.role;
         if (userRole === 'admin') router.push('/dashboard');
         else if (userRole === 'technician') router.push('/dashboard/technician');
         else router.push('/portal');

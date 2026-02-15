@@ -22,6 +22,7 @@
   },
   "packageManager": "npm@11.7.0",
   "dependencies": {
+    "@better-auth/passkey": "^1.4.18",
     "@google/genai": "^1.41.0",
     "@modelcontextprotocol/sdk": "^1.26.0",
     "@payloadcms/db-postgres": "^3.76.1",
