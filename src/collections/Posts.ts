@@ -1,5 +1,4 @@
 import type { CollectionConfig } from 'payload';
-import { AIWriter } from '@/components/payload/AIWriter';
 
 export const Posts: CollectionConfig = {
   slug: 'posts',
@@ -14,7 +13,7 @@ export const Posts: CollectionConfig = {
       type: 'ui',
       admin: {
         components: {
-          Field: AIWriter,
+          Field: '/src/components/payload/AIWriter.tsx#AIWriter' as any,
         },
       },
     },

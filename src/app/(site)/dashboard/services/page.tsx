@@ -21,7 +21,7 @@ export default async function ServicesPage() {
                 Operations
               </span>
            </div>
-           <h1 className="text-4xl font-black text-white">Services</h1>
+           <h1 className="text-4xl font-black text-white">Edit Services</h1>
         </div>
 
         <Link 
