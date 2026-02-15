@@ -90,6 +90,19 @@ export async function processPayment({ sourceId, amount = 9900, customerDetails 
 
     // 3. Create/Find Customer & Service Request in Payload
     const payload = await getPayload({ config: configPromise });
+
+    // 3b. Create Payment Record in Payload (Source of Truth for Finance)
+    const paymentRecord = await payload.create({
+      collection: 'payments',
+      data: {
+        squarePaymentId: payment.id,
+        amount: Number(payment.amountMoney.amount), // Store in cents
+        currency: payment.amountMoney.currency,
+        status: payment.status,
+        sourceType: payment.sourceType || 'CARD',
+        note: `Dispatch Fee - ${customerDetails.name} (via App)`,
+      },
+    });
     
     // Check if customer exists in Payload (Users collection)
     const existingUsers = await payload.find({
