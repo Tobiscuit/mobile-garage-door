@@ -1,6 +1,7 @@
 'use server';
 
 import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai';
+import { EXAMPLE_LEXICAL_STRUCTURE } from '@/lib/ai-contract';
 
 const apiKey = process.env.GEMINI_API_KEY;
 const genAI = new GoogleGenerativeAI(apiKey || '');
@@ -67,25 +68,8 @@ export async function generatePostContent(prompt: string, format: 'json' | 'mark
     Use 'heading' nodes for titles (h2, h3), 'paragraph' nodes for text, and 'list' nodes for bullet points.
     Ensure the JSON structure is valid for Payload CMS Lexical Editor.
     
-    Example of a paragraph node in Lexical:
-    {
-      "type": "paragraph",
-      "format": "",
-      "indent": 0,
-      "version": 1,
-      "children": [
-        {
-          "type": "text",
-          "text": "Your text content here",
-          "format": 0,
-          "detail": 0,
-          "mode": "normal",
-          "style": "",
-          "version": 1
-        }
-      ],
-      "direction": "ltr"
-    }
+    Here is an example of the expected Lexical JSON structure for the 'content' field (use this as a template):
+    ${JSON.stringify(EXAMPLE_LEXICAL_STRUCTURE, null, 2)}
     `;
   }
 
