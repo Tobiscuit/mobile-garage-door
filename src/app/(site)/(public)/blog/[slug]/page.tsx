@@ -4,6 +4,7 @@ import configPromise from '@payload-config';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
+import SmartLink from '@/components/SmartLink';
 
 export const dynamic = 'force-dynamic';
 
@@ -131,10 +132,10 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
                 
                 <div className="absolute bottom-0 left-0 w-full p-8 md:p-16">
                     <div className="container mx-auto max-w-5xl">
-                        <Link href="/blog" className="inline-flex items-center text-golden-yellow hover:text-white mb-6 font-bold uppercase tracking-wider text-sm transition-colors group">
+                        <SmartLink href="/blog" className="inline-flex items-center text-golden-yellow hover:text-white mb-6 font-bold uppercase tracking-wider text-sm transition-colors group">
                             <svg className="w-4 h-4 mr-2 transform group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                             Back to Intel
-                        </Link>
+                        </SmartLink>
                         
                         <div className="flex flex-wrap items-center gap-4 mb-4">
                             <span className="bg-golden-yellow text-charcoal-blue px-3 py-1 text-xs font-bold uppercase tracking-wider rounded-sm">

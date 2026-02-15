@@ -3,6 +3,7 @@ import { getPayload } from 'payload';
 import configPromise from '@payload-config';
 import Link from 'next/link';
 import Image from 'next/image';
+import SmartLink from '@/components/SmartLink';
 
 export const dynamic = 'force-dynamic';
 
@@ -58,7 +59,7 @@ export default async function BlogIndex() {
                 ) : (
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {posts.docs.map((post) => (
-                            <Link 
+                            <SmartLink 
                                 key={post.id} 
                                 href={`/blog/${post.slug}`}
                                 className="group bg-white border border-gray-100 hover:border-golden-yellow/50 rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl flex flex-col h-full"
@@ -108,7 +109,7 @@ export default async function BlogIndex() {
                                         <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
                                     </div>
                                 </div>
-                            </Link>
+                            </SmartLink>
                         ))}
                     </div>
                 )}
