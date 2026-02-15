@@ -222,47 +222,39 @@ export async function resetAndSyncSquarePayments() {
             }
         });
 
-        // 2. Fetch fresh from Square
-        // We'll increase limit to ensure we get everything (or pagination loop)
-        // For now, let's try 200, or loop until done.
-        
-        let cursor: string | undefined;
+        // 2. Fetch fresh from Square using the async iterator pattern
+        const response = await squareClient.payments.list({
+            limit: 100,
+            sortOrder: 'DESC',
+            sortField: 'CREATED_AT'
+        });
+
         let totalSynced = 0;
 
-        do {
-            const response = await squareClient.payments.list({
-                limit: 100,
-                cursor,
-                sortOrder: 'DESC',
-                sortField: 'CREATED_AT'
-            });
+        for await (const payment of response) {
+            const squarePaymentId = payment.id;
+            if (!squarePaymentId) continue;
+    
+            const status = payment.status;
+            const amount = Number(payment.amountMoney?.amount || 0);
+            const currency = payment.amountMoney?.currency || 'USD';
+            const sourceType = payment.sourceType;
+            const note = payment.note || '';
 
-            for (const payment of response.result.payments || []) {
-                 const squarePaymentId = payment.id;
-                 if (!squarePaymentId) continue;
-         
-                 const status = payment.status;
-                 const amount = Number(payment.amountMoney?.amount || 0);
-                 const currency = payment.amountMoney?.currency || 'USD';
-                 const sourceType = payment.sourceType;
-                 const note = payment.note || '';
-
-                 // We know we deleted them, so just create
-                 await payload.create({
-                    collection: 'payments',
-                    data: {
-                      squarePaymentId,
-                      amount,
-                      currency,
-                      status,
-                      sourceType,
-                      note,
-                    } as any
-                  });
-                  totalSynced++;
-            }
-            cursor = response.cursor;
-        } while (cursor);
+            // We know we deleted them, so just create
+            await payload.create({
+               collection: 'payments',
+               data: {
+                 squarePaymentId,
+                 amount,
+                 currency,
+                 status,
+                 sourceType,
+                 note,
+               } as any
+             });
+             totalSynced++;
+        }
 
         revalidatePath('/dashboard');
         return { success: true, count: totalSynced };
