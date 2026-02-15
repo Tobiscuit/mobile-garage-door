@@ -61,9 +61,28 @@ const Sidebar: React.FC = () => {
 
   return (
     <>
-      {/* MOBILE TOGGLE (TODO: Connect to Layout) */}
-      
-      <aside className="fixed left-0 top-0 h-screen w-[280px] bg-[#2c3e50]/95 backdrop-blur-xl border-r border-[#ffffff08] flex flex-col z-50">
+      {/* MOBILE BOTTOM NAV - Visible only on small screens */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-[#2c3e50]/95 backdrop-blur-xl border-t border-[#ffffff08] z-50 flex justify-around items-center p-2 pb-safe">
+        <Link href="/dashboard" className={`p-2 rounded-lg flex flex-col items-center gap-1 ${isActive('/dashboard') && !isActive('/dashboard/dispatch') ? 'text-[#f1c40f]' : 'text-[#bdc3c7]'}`}>
+            <CommandIcon />
+            <span className="text-[10px] font-bold">Home</span>
+        </Link>
+        <Link href="/dashboard/dispatch" className={`p-2 rounded-lg flex flex-col items-center gap-1 ${isActive('/dashboard/dispatch') ? 'text-[#f1c40f]' : 'text-[#bdc3c7]'}`}>
+            <DispatchIcon />
+            <span className="text-[10px] font-bold">Dispatch</span>
+        </Link>
+        <Link href="/dashboard/services" className={`p-2 rounded-lg flex flex-col items-center gap-1 ${isActive('/dashboard/services') ? 'text-[#f1c40f]' : 'text-[#bdc3c7]'}`}>
+            <ServiceIcon />
+            <span className="text-[10px] font-bold">Services</span>
+        </Link>
+        <Link href="/dashboard/settings" className={`p-2 rounded-lg flex flex-col items-center gap-1 ${isActive('/dashboard/settings') ? 'text-[#f1c40f]' : 'text-[#bdc3c7]'}`}>
+            <SettingsIcon />
+            <span className="text-[10px] font-bold">Settings</span>
+        </Link>
+      </nav>
+
+      {/* DESKTOP SIDEBAR - Hidden on small screens */}
+      <aside className="hidden md:flex fixed left-0 top-0 h-screen w-[280px] bg-[#2c3e50]/95 backdrop-blur-xl border-r border-[#ffffff08] flex-col z-50">
         {/* LOGO AREA */}
         <div className="p-6 mb-2 shrink-0">
             <Link href="/dashboard" className="block w-40 hover:opacity-90 transition-opacity">

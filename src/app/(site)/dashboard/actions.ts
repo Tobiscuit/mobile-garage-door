@@ -186,8 +186,14 @@ export async function syncSquarePayments() {
     
     revalidatePath('/dashboard');
     return { success: true, count };
-  } catch (error) {
+  } catch (error: any) {
     console.error('Sync Square Error:', error);
-    return { success: false, error: 'Failed to sync payments' };
+    
+    // Check if it's a JSON serialization error from the Square SDK response
+    if (error.message?.includes('JSON') || error.type === 'invalid_json') {
+         return { success: false, error: 'Square API returned invalid JSON. Check API version or network.' };
+    }
+
+    return { success: false, error: error.message || 'Failed to sync payments' };
   }
 }
