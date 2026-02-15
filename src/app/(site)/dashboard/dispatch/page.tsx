@@ -5,13 +5,17 @@ import { DispatchClient } from './DispatchClient';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 
+import { auth } from '@/lib/auth';
+import { headers } from 'next/headers';
+import { redirect } from 'next/navigation';
+import { DispatchClient } from './DispatchClient';
+
 export default async function DispatchPage() {
-    const payload = await getPayload({ config: configPromise });
     const headersList = await headers();
-    const { user } = await payload.auth({ headers: headersList });
+    const session = await auth.api.getSession({ headers: headersList });
 
     // Type guard: user must exist and have a 'role' property (User collection)
-    if (!user || !('role' in user) || (user.role !== 'admin' && user.role !== 'dispatcher')) {
+    if (!session || session.user.role !== 'admin' && session.user.role !== 'dispatcher') {
         redirect('/admin/login');
     }
 

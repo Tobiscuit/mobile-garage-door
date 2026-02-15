@@ -4,10 +4,13 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
+import { signIn } from '@better-auth/client'; // Client hook for signIn
+
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [usePasskey, setUsePasskey] = useState(false); // Option for Passkey
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -17,28 +20,22 @@ export default function LoginPage() {
     setError('');
 
     try {
-      // Use Users collection login
-      const res = await fetch('/api/users/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+      const result = await signIn.email({ // BetterAuth signIn
+        email,
+        password: usePasskey ? undefined : password, // Skip password if Passkey
+        options: {
+          usePasskey, // Enable Passkey (WebAuthn)
+          mfa: !usePasskey, // Skip MFA if using Passkey
+        },
       });
 
-      if (res.ok) {
-        const data = await res.json();
-        // Role-based redirection
-        const userRole = data.user?.role;
-
-        if (userRole === 'admin') {
-            router.push('/dashboard'); // Mission Control
-        } else if (userRole === 'technician') {
-            router.push('/dashboard/technician'); // Tech View
-        } else {
-            router.push('/portal'); // Customer/Contractor Portal
-        }
+      if (result.data) {
+        const userRole = result.data.user?.role; // Assuming role is in session data
+        if (userRole === 'admin') router.push('/dashboard');
+        else if (userRole === 'technician') router.push('/dashboard/technician');
+        else router.push('/portal');
       } else {
-        const err = await res.json();
-        setError(err.errors?.[0]?.message || 'Invalid email or password.');
+        setError(result.error?.message || 'Invalid credentials');
       }
     } catch (err) {
       setError('Something went wrong. Please try again.');
@@ -82,13 +79,23 @@ export default function LoginPage() {
                 <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Password</label>
                 <input 
                   type="password" 
-                  required
+                  required={!usePasskey} // Optional if using Passkey
                   className="w-full bg-white border border-gray-200 rounded-lg p-4 font-medium text-black focus:ring-2 focus:ring-[#f1c40f] focus:border-transparent outline-none transition-all"
                   style={{ color: '#000000', backgroundColor: '#ffffff' }}
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
+              </div>
+
+              <div className="flex items-center">
+                <input 
+                  type="checkbox" 
+                  checked={usePasskey} 
+                  onChange={(e) => setUsePasskey(e.target.checked)} 
+                  className="mr-2"
+                />
+                <label>Use Passkey (skip password/MFA)</label>
               </div>
 
               <button 
