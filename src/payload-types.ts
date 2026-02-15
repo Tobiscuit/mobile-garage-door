@@ -64,7 +64,6 @@ export type SupportedTimezones =
 export interface Config {
   auth: {
     users: UserAuthOperations;
-    customers: CustomerAuthOperations;
   };
   blocks: {};
   collections: {
@@ -74,7 +73,6 @@ export interface Config {
     projects: Project;
     testimonials: Testimonial;
     posts: Post;
-    customers: Customer;
     'service-requests': ServiceRequest;
     invoices: Invoice;
     payments: Payment;
@@ -91,7 +89,6 @@ export interface Config {
     projects: ProjectsSelect<false> | ProjectsSelect<true>;
     testimonials: TestimonialsSelect<false> | TestimonialsSelect<true>;
     posts: PostsSelect<false> | PostsSelect<true>;
-    customers: CustomersSelect<false> | CustomersSelect<true>;
     'service-requests': ServiceRequestsSelect<false> | ServiceRequestsSelect<true>;
     invoices: InvoicesSelect<false> | InvoicesSelect<true>;
     payments: PaymentsSelect<false> | PaymentsSelect<true>;
@@ -111,31 +108,13 @@ export interface Config {
     'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
   };
   locale: null;
-  user: User | Customer;
+  user: User;
   jobs: {
     tasks: unknown;
     workflows: unknown;
   };
 }
 export interface UserAuthOperations {
-  forgotPassword: {
-    email: string;
-    password: string;
-  };
-  login: {
-    email: string;
-    password: string;
-  };
-  registerFirstUser: {
-    email: string;
-    password: string;
-  };
-  unlock: {
-    email: string;
-    password: string;
-  };
-}
-export interface CustomerAuthOperations {
   forgotPassword: {
     email: string;
     password: string;
@@ -160,6 +139,11 @@ export interface CustomerAuthOperations {
 export interface User {
   id: number;
   role: 'admin' | 'technician' | 'dispatcher' | 'customer';
+  /**
+   * Classifies the customer for portal experience (B2B vs B2C)
+   */
+  customerType?: ('residential' | 'builder') | null;
+  companyName?: string | null;
   name?: string | null;
   phone?: string | null;
   address?: string | null;
@@ -411,35 +395,6 @@ export interface Post {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "customers".
- */
-export interface Customer {
-  id: number;
-  name: string;
-  phone: string;
-  address?: string | null;
-  squareCustomerId?: string | null;
-  updatedAt: string;
-  createdAt: string;
-  email: string;
-  resetPasswordToken?: string | null;
-  resetPasswordExpiration?: string | null;
-  salt?: string | null;
-  hash?: string | null;
-  loginAttempts?: number | null;
-  lockUntil?: string | null;
-  sessions?:
-    | {
-        id: string;
-        createdAt?: string | null;
-        expiresAt: string;
-      }[]
-    | null;
-  password?: string | null;
-  collection: 'customers';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "service-requests".
  */
 export interface ServiceRequest {
@@ -473,7 +428,7 @@ export interface Invoice {
   orderId?: string | null;
   amount: number;
   status?: string | null;
-  customer?: (number | null) | Customer;
+  customer?: (number | null) | User;
   publicUrl?: string | null;
   updatedAt: string;
   createdAt: string;
@@ -545,10 +500,6 @@ export interface PayloadLockedDocument {
         value: number | Post;
       } | null)
     | ({
-        relationTo: 'customers';
-        value: number | Customer;
-      } | null)
-    | ({
         relationTo: 'service-requests';
         value: number | ServiceRequest;
       } | null)
@@ -561,15 +512,10 @@ export interface PayloadLockedDocument {
         value: number | Payment;
       } | null);
   globalSlug?: string | null;
-  user:
-    | {
-        relationTo: 'users';
-        value: number | User;
-      }
-    | {
-        relationTo: 'customers';
-        value: number | Customer;
-      };
+  user: {
+    relationTo: 'users';
+    value: number | User;
+  };
   updatedAt: string;
   createdAt: string;
 }
@@ -579,15 +525,10 @@ export interface PayloadLockedDocument {
  */
 export interface PayloadPreference {
   id: number;
-  user:
-    | {
-        relationTo: 'users';
-        value: number | User;
-      }
-    | {
-        relationTo: 'customers';
-        value: number | Customer;
-      };
+  user: {
+    relationTo: 'users';
+    value: number | User;
+  };
   key?: string | null;
   value?:
     | {
@@ -618,6 +559,8 @@ export interface PayloadMigration {
  */
 export interface UsersSelect<T extends boolean = true> {
   role?: T;
+  customerType?: T;
+  companyName?: T;
   name?: T;
   phone?: T;
   address?: T;
@@ -747,32 +690,6 @@ export interface PostsSelect<T extends boolean = true> {
   quickNotes?: T;
   updatedAt?: T;
   createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "customers_select".
- */
-export interface CustomersSelect<T extends boolean = true> {
-  name?: T;
-  phone?: T;
-  address?: T;
-  squareCustomerId?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  email?: T;
-  resetPasswordToken?: T;
-  resetPasswordExpiration?: T;
-  salt?: T;
-  hash?: T;
-  loginAttempts?: T;
-  lockUntil?: T;
-  sessions?:
-    | T
-    | {
-        id?: T;
-        createdAt?: T;
-        expiresAt?: T;
-      };
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
