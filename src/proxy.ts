@@ -1,17 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getToken } from 'next-auth/jwt'
-import { getSession } from 'next-auth/react'
+import { headers } from 'next/headers'
+import { auth } from '@/lib/auth'
 
-export async function proxy(req: NextRequest) {
-  const token = await getToken({ req })
-  const isAuthenticated = !!token
+export async function proxy(request: NextRequest) {
+  const session = await auth.api.getSession({
+    headers: await headers()
+  })
 
-  if (req.nextUrl.pathname.startsWith('/auth') && isAuthenticated) {
-    return NextResponse.redirect(new URL('/dashboard', req.url))
+  const { pathname } = request.nextUrl
+
+  if (session && pathname.startsWith('/auth')) {
+    return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 
-  if (req.nextUrl.pathname.startsWith('/dashboard') && !isAuthenticated) {
-    return NextResponse.redirect(new URL('/auth/signin', req.url))
+  if (!session && pathname.startsWith('/dashboard')) {
+    return NextResponse.redirect(new URL('/auth/signin', request.url))
   }
 
   return NextResponse.next()
