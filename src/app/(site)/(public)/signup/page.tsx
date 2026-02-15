@@ -12,12 +12,15 @@ export default function SignupPage() {
     phone: '',
     password: '',
     confirmPassword: '',
+    isBuilder: false,
+    companyName: '',
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
+    setFormData({ ...formData, [e.target.name]: value });
   };
 
   const handleSignup = async (e: React.FormEvent) => {
@@ -41,6 +44,8 @@ export default function SignupPage() {
             password: formData.password,
             name: formData.name,
             phone: formData.phone,
+            customerType: formData.isBuilder ? 'builder' : 'residential',
+            companyName: formData.isBuilder ? formData.companyName : undefined,
             // role: 'customer' is enforced by default in Users collection
         }),
       });
@@ -110,9 +115,40 @@ export default function SignupPage() {
                     placeholder="name@company.com"
                     onChange={handleChange}
                     />
-                </div>
-                <div>
-                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Phone</label>
+              </div>
+
+              {/* Builder Toggle */}
+              <div className="bg-gray-50 p-4 rounded-xl border border-gray-200">
+                <label className="flex items-center gap-3 cursor-pointer">
+                    <input 
+                        type="checkbox"
+                        name="isBuilder"
+                        checked={formData.isBuilder}
+                        onChange={handleChange}
+                        className="w-5 h-5 text-golden-yellow rounded focus:ring-golden-yellow border-gray-300"
+                    />
+                    <div>
+                        <div className="font-bold text-charcoal-blue text-sm">I represent a Builder / Company</div>
+                        <div className="text-xs text-gray-500">Manage multiple job sites and access commercial pricing.</div>
+                    </div>
+                </label>
+
+                {formData.isBuilder && (
+                    <div className="mt-4 animate-in fade-in slide-in-from-top-2">
+                        <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Company Name</label>
+                        <input 
+                            type="text" 
+                            name="companyName"
+                            className="w-full bg-white border border-gray-200 rounded-lg p-3 font-medium text-[#2c3e50] focus:ring-2 focus:ring-[#f1c40f] outline-none"
+                            placeholder="Acme Construction LLC"
+                            onChange={handleChange}
+                        />
+                    </div>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Password</label>
                     <input 
                     type="tel" 
                     name="phone"

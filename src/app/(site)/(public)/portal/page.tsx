@@ -19,6 +19,7 @@ export default async function PortalDashboard() {
   if (!user) return null; // Should be handled by layout/middleware
 
   const customer = user as any;
+  const isBuilder = customer.customerType === 'builder';
 
   // Use Service Layer for data fetching
   const activeRequests = await serviceRequestService.getActiveRequests(payload, user.id);
@@ -41,7 +42,22 @@ export default async function PortalDashboard() {
 
   return (
     <div className="space-y-8">
-      <PortalHeader customerName={customer.name} />
+      <PortalHeader customerName={customer.companyName || customer.name} isBuilder={isBuilder} />
+      
+      {isBuilder && (
+         <div className="bg-blue-900/10 border border-blue-900/20 rounded-xl p-4 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+                <div className="bg-blue-900 text-white p-2 rounded-lg">
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                </div>
+                <div>
+                    <h3 className="font-bold text-charcoal-blue">Builder Account</h3>
+                    <p className="text-sm text-gray-600">You have access to multi-site management features.</p>
+                </div>
+            </div>
+            {/* Future: Add "Add Job Site" button */}
+         </div>
+      )}
 
       <div className="grid lg:grid-cols-3 gap-8">
         {/* Main Content */}

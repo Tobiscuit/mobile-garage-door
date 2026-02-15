@@ -45,6 +45,25 @@ export const Users: CollectionConfig = {
       },
     },
     {
+      name: 'customerType',
+      type: 'select',
+      defaultValue: 'residential',
+      options: [
+        { label: 'Residential (Homeowner)', value: 'residential' },
+        { label: 'Commercial / Builder', value: 'builder' },
+      ],
+      admin: {
+        description: 'Classifies the customer for portal experience (B2B vs B2C)',
+      },
+    },
+    {
+      name: 'companyName',
+      type: 'text',
+      admin: {
+        condition: (data) => data.customerType === 'builder',
+      },
+    },
+    {
       name: 'name',
       type: 'text',
     },
