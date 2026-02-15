@@ -19,6 +19,7 @@ export async function generatePostContent(prompt: string, format: 'json' | 'mark
       excerpt: { type: SchemaType.STRING },
       category: { 
         type: SchemaType.STRING, 
+        format: 'enum',
         enum: ['repair-tips', 'product-spotlight', 'contractor-insights', 'maintenance-guide', 'industry-news'] 
       },
       keywords: { 
