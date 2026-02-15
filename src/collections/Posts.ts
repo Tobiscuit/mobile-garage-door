@@ -6,6 +6,12 @@ export const Posts: CollectionConfig = {
     useAsTitle: 'title',
     defaultColumns: ['title', 'category', 'publishedAt', 'status'],
     group: 'Content',
+    components: {
+       edit: {
+         // Inject a custom component into the Edit View to trigger AI generation
+         // This is a placeholder for where the AI Button would go in a full implementation
+       }
+    }
   },
   fields: [
     {
