@@ -52,20 +52,39 @@ export default function PostForm({ action, initialData, buttonLabel }: PostFormP
       if (!aiPrompt) return;
       setIsAiLoading(true);
       try {
+          console.log('Generating content for:', aiPrompt);
           const result = await generatePostContent(aiPrompt, 'markdown');
+          console.log('AI Result:', result);
           
           if (titleRef.current) titleRef.current.value = result.title || '';
-          if (slugRef.current && result.title) slugRef.current.value = result.title.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
+          
+          if (slugRef.current) {
+              const slugSource = result.title || '';
+              slugRef.current.value = slugSource.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
+          }
+          
           if (excerptRef.current) excerptRef.current.value = result.excerpt || '';
           if (contentRef.current) contentRef.current.value = result.content || '';
-          if (keywordsRef.current && result.keywords) keywordsRef.current.value = Array.isArray(result.keywords) ? result.keywords.join(', ') : result.keywords;
-          if (categoryRef.current && result.category) categoryRef.current.value = result.category;
+          
+          if (keywordsRef.current) {
+               const keywords = result.keywords;
+               keywordsRef.current.value = Array.isArray(keywords) ? keywords.join(', ') : (keywords || '');
+          }
+          
+          if (categoryRef.current && result.category) {
+              const validCategories = ['repair-tips', 'product-spotlight', 'contractor-insights', 'maintenance-guide', 'industry-news'];
+              if (validCategories.includes(result.category)) {
+                  categoryRef.current.value = result.category;
+              } else {
+                  console.warn('AI returned invalid category:', result.category);
+              }
+          }
 
           setIsAiOpen(false);
           setAiPrompt('');
-      } catch (e) {
+      } catch (e: any) {
           console.error('AI Error:', e);
-          alert('Failed to generate content. Check API Key.');
+          alert(`Failed to generate content: ${e.message || 'Unknown error'}`);
       } finally {
           setIsAiLoading(false);
       }
