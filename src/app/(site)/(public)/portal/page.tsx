@@ -22,8 +22,9 @@ export default async function PortalDashboard() {
   const isBuilder = customer.customerType === 'builder';
 
   // Use Service Layer for data fetching
-  const activeRequests = await serviceRequestService.getActiveRequests(payload, user.id);
-  const pastRequests = await serviceRequestService.getPastRequests(payload, user.id);
+  // Ensure we are passing a valid user ID string
+  const activeRequests = await serviceRequestService.getActiveRequests(payload, String(user.id));
+  const pastRequests = await serviceRequestService.getPastRequests(payload, String(user.id));
 
   const activeMapped = activeRequests.docs.map(doc => ({
     id: String(doc.id),

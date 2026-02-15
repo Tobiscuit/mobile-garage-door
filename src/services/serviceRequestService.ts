@@ -6,7 +6,9 @@ export const serviceRequestService = {
       collection: 'service-requests' as any,
       where: {
         customer: { equals: userId },
-        status: { not_equals: 'completed' }, // and not cancelled
+        status: { 
+            not_in: ['completed', 'cancelled'] // Exclude both completed and cancelled
+        }, 
       },
       sort: '-createdAt',
     });
@@ -17,7 +19,9 @@ export const serviceRequestService = {
       collection: 'service-requests' as any,
       where: {
         customer: { equals: userId },
-        status: { equals: 'completed' },
+        status: { 
+            in: ['completed', 'cancelled'] // Include cancelled in history
+        },
       },
       sort: '-createdAt',
     });
