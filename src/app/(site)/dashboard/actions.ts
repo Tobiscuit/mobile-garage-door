@@ -118,6 +118,7 @@ export async function createManualPayment(amount: number, sourceType: 'CASH' | '
             } as any // Type casting until types are regenerated
         });
 
+        revalidatePath('/dashboard');
         return { success: true };
 
     } catch (error) {

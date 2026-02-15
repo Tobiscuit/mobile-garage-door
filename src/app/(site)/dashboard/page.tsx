@@ -5,6 +5,8 @@ import { KPIGrid } from '@/components/dashboard/KPIGrid';
 import { QuickActions } from '@/components/dashboard/QuickActions';
 import { getDashboardStats } from './actions';
 
+export const dynamic = 'force-dynamic';
+
 export default async function DashboardPage() {
   const stats = await getDashboardStats();
 

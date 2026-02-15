@@ -50,8 +50,8 @@ export default function PageTransition({ children }: { children: ReactNode }) {
       observer.observe(document.body)
       observer.observe(document.documentElement)
 
-      // 3. Safety timeout to stop observing after 5 seconds (for slow networks/heavy content)
-      const timeout = setTimeout(() => observer.disconnect(), 5000)
+      // 3. Safety timeout to stop observing after 2 seconds (in case page is just short)
+      const timeout = setTimeout(() => observer.disconnect(), 2000)
 
       return () => {
         observer.disconnect()
@@ -60,8 +60,7 @@ export default function PageTransition({ children }: { children: ReactNode }) {
     } else {
       // If no saved position (new page or top), ensure we start at the top
       // This is critical when using mode="popLayout" or manual restoration
-      // We use 'instant' to prevent smooth scrolling from interfering with the new page feel
-      window.scrollTo({ top: 0, behavior: 'instant' })
+      window.scrollTo(0, 0)
     }
   }, [pathname])
 

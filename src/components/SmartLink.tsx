@@ -32,7 +32,6 @@ export default function SmartLink({
   return (
     <Link 
       {...props} 
-      scroll={false} // CRITICAL: Disable Next.js default scroll handling to allow custom restoration
       onMouseEnter={handleMouseEnter}
       onTouchStart={handleTouchStart}
     >

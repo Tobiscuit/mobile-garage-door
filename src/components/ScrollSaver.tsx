@@ -32,11 +32,6 @@ export default function ScrollSaver() {
       clearTimeout(startListeningTimer)
       window.removeEventListener('scroll', debouncedScroll)
       clearTimeout(timeoutId)
-      
-      // FORCE SAVE ON UNMOUNT
-      // This ensures that if the user clicks a link immediately after scrolling,
-      // or if the debounce hasn't fired yet, we capture the final position.
-      saveScrollPosition(pathname, window.scrollY)
     }
   }, [pathname])
 
