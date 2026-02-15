@@ -8,9 +8,9 @@ export const Invoices: CollectionConfig = {
   },
   access: {
     read: ({ req: { user } }) => {
-        if (user?.collection === 'users') return true;
+        if (user?.role === 'admin') return true;
         // If linked to a customer, allow them to read
-        if (user?.collection === 'customers') return { 'customer.email': { equals: user.email } }; // Simplified check, ideally relation based
+        if (user?.role === 'customer') return { 'customer.email': { equals: user.email } }; 
         return false;
     },
     create: () => false, // Created via Webhook only
@@ -38,9 +38,9 @@ export const Invoices: CollectionConfig = {
         type: 'text', // PAID, OPEN, VOIDED
     },
     {
-        name: 'customer', // Changed from customerEmail
-        type: 'relationship', // Changed from text
-        relationTo: 'customers' as any,
+        name: 'customer', 
+        type: 'relationship', 
+        relationTo: 'users',
     },
     {
         name: 'publicUrl',

@@ -8,14 +8,28 @@ export const Users: CollectionConfig = {
     group: 'System',
   },
   access: {
-    delete: () => false,
-    update: () => true, // Admins can update
+    // Anyone can create a user (signup), but roles are protected by field-level access
+    create: () => true,
+    // Only admins can delete
+    delete: ({ req: { user } }) => user?.role === 'admin',
+    // Admins can update anyone, users can update themselves
+    update: ({ req: { user } }) => {
+        if (user?.role === 'admin') return true;
+        if (user) return { id: { equals: user.id } };
+        return false;
+    },
+    // Admins read all, users read themselves
+    read: ({ req: { user } }) => {
+        if (user?.role === 'admin' || user?.role === 'dispatcher') return true;
+        if (user) return { id: { equals: user.id } };
+        return false;
+    },
   },
   fields: [
     {
       name: 'role',
       type: 'select',
-      defaultValue: 'admin',
+      defaultValue: 'customer',
       options: [
         { label: 'Admin', value: 'admin' },
         { label: 'Technician', value: 'technician' },
@@ -23,6 +37,12 @@ export const Users: CollectionConfig = {
         { label: 'Customer', value: 'customer' },
       ],
       required: true,
+      access: {
+        // Only admins can change roles
+        update: ({ req: { user } }) => user?.role === 'admin',
+        // Only admins can set roles on create (others get default)
+        create: ({ req: { user } }) => user?.role === 'admin',
+      },
     },
     {
       name: 'name',
