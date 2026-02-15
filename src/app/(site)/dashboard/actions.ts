@@ -132,9 +132,10 @@ export async function syncSquarePayments() {
     const payload = await getPayload({ config: configPromise });
     
     // List payments from Square (last 100)
-    // Removed sortOrder as it might require a sortField to be valid
     const response = await squareClient.payments.list({
-        limit: 100
+        limit: 100,
+        sortOrder: 'DESC',
+        sortField: 'CREATED_AT'
     });
     
     let count = 0;
