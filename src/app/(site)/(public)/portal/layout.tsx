@@ -11,9 +11,14 @@ export default async function PortalLayout({ children }: { children: React.React
   const headersList = await headers();
   const { user } = await payload.auth({ headers: headersList });
 
-  if (!user || (user as any).collection !== 'customers') {
+  // UPDATED: Check for 'users' collection instead of 'customers'
+  // Also allow admins/techs to view portal for testing if needed, or strictly enforce customer role
+  if (!user || user.collection !== 'users') {
     redirect('/login');
   }
+
+  // Optional: Redirect non-customers back to dashboard if they try to access portal?
+  // For now, let's allow it so admins can see what customers see.
 
   return (
     <div className="min-h-screen bg-cloudy-white font-work-sans flex flex-col">
