@@ -39,16 +39,6 @@ export function QuickActions() {
       </h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Link href="/dashboard/services" className="group p-6 bg-[#34495e]/30 border border-[#ffffff08] rounded-2xl hover:bg-[#f1c40f] transition-all flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-[#ffffff10] flex items-center justify-center group-hover:bg-white/20 transition-colors">
-                  <svg className="w-6 h-6 text-[#f1c40f] group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
-              </div>
-              <div>
-                  <div className="font-bold text-lg text-white group-hover:text-[#2c3e50]">Edit Services</div>
-                  <div className="text-sm text-[#7f8c8d] group-hover:text-[#2c3e50]/70">Manage service offerings</div>
-              </div>
-          </Link>
-
           <button 
             onClick={() => setIsPaymentModalOpen(true)}
             className="group p-6 bg-[#34495e]/30 border border-[#ffffff08] rounded-2xl hover:bg-[#2ecc71] transition-all flex items-center gap-4 text-left w-full"
