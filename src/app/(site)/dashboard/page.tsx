@@ -13,23 +13,23 @@ export default async function DashboardPage() {
   return (
     <div className="animate-in fade-in duration-500 slide-in-from-bottom-4">
       {/* HEADER */}
-      <div className="flex justify-between items-end mb-12 border-b border-[#ffffff10] pb-6">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-6 md:mb-12 border-b border-[#ffffff10] pb-4 md:pb-6 gap-4">
         <div>
           <div className="flex items-center gap-3 mb-2">
             <div className="bg-[#f1c40f] text-[#2c3e50] font-black rounded px-2 py-0.5 text-xs uppercase tracking-widest shadow-[0_0_15px_rgba(241,196,15,0.4)]">
               System Online
             </div>
-            <div className="text-[#7f8c8d] text-sm font-mono">v2.1.0 (Live Data)</div>
+            <div className="text-[#7f8c8d] text-xs md:text-sm font-mono">v2.1.0 (Live Data)</div>
           </div>
-          <h1 className="text-5xl font-black text-white tracking-tight">
+          <h1 className="text-3xl md:text-5xl font-black text-white tracking-tight">
             Command <span className="text-[#f1c40f]">Center</span>
           </h1>
         </div>
-        <div className="text-right">
-            <div className="text-2xl font-bold text-[#f1c40f]">
+        <div className="text-left md:text-right">
+            <div className="text-xl md:text-2xl font-bold text-[#f1c40f]">
                 {new Date().toLocaleDateString('en-US', { weekday: 'long' })}
             </div>
-            <div className="text-[#bdc3c7]">
+            <div className="text-sm md:text-base text-[#bdc3c7]">
                 {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
             </div>
         </div>
@@ -38,7 +38,7 @@ export default async function DashboardPage() {
       <KPIGrid stats={stats} />
 
       {/* MAIN DASHBOARD CONTENT */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
         
         <QuickActions />
 

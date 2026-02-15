@@ -41,11 +41,11 @@ export default function ActiveUsers() {
   )
 
   return (
-    <div className="bg-[#2c3e50]/40 backdrop-blur-md border border-[#ffffff10] rounded-xl p-6 h-full">
-      <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-        <span className="relative flex h-3 w-3">
+    <div className="bg-[#2c3e50]/40 backdrop-blur-md border border-[#ffffff10] rounded-xl p-4 md:p-6 h-full">
+      <h3 className="text-lg md:text-xl font-bold text-white mb-4 flex items-center gap-2">
+        <span className="relative flex h-2.5 w-2.5 md:h-3 md:w-3">
           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-          <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+          <span className="relative inline-flex rounded-full h-2.5 w-2.5 md:h-3 md:w-3 bg-green-500"></span>
         </span>
         Active Users
       </h3>
@@ -55,20 +55,20 @@ export default function ActiveUsers() {
             const isOnline = lastLogin && (new Date().getTime() - lastLogin.getTime() < 15 * 60 * 1000); // 15 mins
             
             return (
-                <div key={user.id} className="flex items-center justify-between p-3 bg-[#ffffff05] rounded-lg hover:bg-[#ffffff0a] transition-colors group">
+                <div key={user.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-3 bg-[#ffffff05] rounded-lg hover:bg-[#ffffff0a] transition-colors group gap-2 sm:gap-0">
                     <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#f1c40f] to-[#f39c12] flex items-center justify-center text-[#2c3e50] font-bold text-lg shadow-lg">
+                    <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-gradient-to-br from-[#f1c40f] to-[#f39c12] flex items-center justify-center text-[#2c3e50] font-bold text-sm md:text-lg shadow-lg shrink-0">
                         {user.email?.charAt(0).toUpperCase() || '?'}
                     </div>
-                    <div>
-                        <div className="text-sm font-medium text-white group-hover:text-[#f1c40f] transition-colors">{user.email}</div>
-                        <div className="text-xs text-[#7f8c8d]">
+                    <div className="min-w-0">
+                        <div className="text-xs md:text-sm font-medium text-white group-hover:text-[#f1c40f] transition-colors truncate">{user.email}</div>
+                        <div className="text-[10px] md:text-xs text-[#7f8c8d] truncate">
                         {lastLogin ? lastLogin.toLocaleString() : 'Never logged in'}
                         </div>
                     </div>
                     </div>
                     {isOnline && (
-                    <span className="px-2 py-1 rounded text-[10px] font-bold bg-green-500/20 text-green-400 uppercase tracking-wide border border-green-500/30">
+                    <span className="px-2 py-1 rounded text-[10px] font-bold bg-green-500/20 text-green-400 uppercase tracking-wide border border-green-500/30 self-start sm:self-center">
                         Online
                     </span>
                     )}

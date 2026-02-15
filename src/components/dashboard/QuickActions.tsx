@@ -20,7 +20,12 @@ export function QuickActions() {
             console.error('Sync failed');
         }
     } catch (e) {
-        console.error(e);
+        console.error('Detailed Sync Error:', e);
+        // If it's an object with a message, log that too
+        if (e instanceof Error) {
+            console.error('Error Message:', e.message);
+            console.error('Error Stack:', e.stack);
+        }
     } finally {
         setIsSyncing(false);
     }
