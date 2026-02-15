@@ -15,9 +15,9 @@ export default function ActiveUsers() {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        // Fetch users sorted by lastLogin descending, EXCLUDING customers
+        // Fetch users sorted by lastLogin descending, ONLY Technicians
         // Using Payload REST API
-        const res = await fetch('/api/users?where[role][not_equals]=customer&sort=-lastLogin&limit=5')
+        const res = await fetch('/api/users?where[role][equals]=technician&sort=-lastLogin&limit=5')
         if (!res.ok) throw new Error('Failed to fetch users')
         const data = await res.json()
         setUsers(data.docs)

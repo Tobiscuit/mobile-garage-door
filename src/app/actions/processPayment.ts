@@ -146,6 +146,15 @@ export async function processPayment({ sourceId, amount = 9900, customerDetails 
         }
     });
 
+    // Revalidate dashboard to update revenue stats immediately
+    // Importing revalidatePath from next/cache at top of file
+    try {
+        const { revalidatePath } = await import('next/cache');
+        revalidatePath('/dashboard');
+    } catch (e) {
+        console.warn('Failed to revalidate dashboard path', e);
+    }
+
     return { success: true, payment, ticket: newTicket };
 
   } catch (error: any) {
