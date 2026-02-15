@@ -65,6 +65,9 @@ export async function getDashboardStats() {
 
   // Process ALL Payments for Revenue
   payments.forEach((p) => {
+      // Only count COMPLETED or APPROVED payments
+      if (p.status !== 'COMPLETED' && p.status !== 'APPROVED') return;
+
       const amountCents = Number(p.amount || 0);
       const amountDollars = amountCents / 100; // Assuming stored in cents
       
@@ -198,4 +201,140 @@ export async function syncSquarePayments() {
 
     return { success: false, error: error.message || 'Failed to sync payments' };
   }
+}
+
+// NEW: Force Reset & Sync to ensure 100% accuracy with Square
+export async function resetAndSyncSquarePayments() {
+    try {
+        const payload = await getPayload({ config: configPromise });
+
+        // 1. Delete ALL payments that are NOT manual (assuming manual start with MANUAL-)
+        // Actually, to be safe and "Mirror Square", we should probably keep Manual ones but delete Square ones.
+        // But the user wants "accurate as to what Square has".
+        // Let's delete all payments where squarePaymentId does NOT start with MANUAL
+        
+        await payload.delete({
+            collection: 'payments',
+            where: {
+                squarePaymentId: {
+                    not_like: 'MANUAL-%'
+                }
+            }
+        });
+
+        // 2. Fetch fresh from Square
+        // We'll increase limit to ensure we get everything (or pagination loop)
+        // For now, let's try 200, or loop until done.
+        
+        let cursor: string | undefined;
+        let totalSynced = 0;
+
+        do {
+            const response = await squareClient.payments.list({
+                limit: 100,
+                cursor,
+                sortOrder: 'DESC',
+                sortField: 'CREATED_AT'
+            });
+
+            for (const payment of response.result.payments || []) {
+                 const squarePaymentId = payment.id;
+                 if (!squarePaymentId) continue;
+         
+                 const status = payment.status;
+                 const amount = Number(payment.amountMoney?.amount || 0);
+                 const currency = payment.amountMoney?.currency || 'USD';
+                 const sourceType = payment.sourceType;
+                 const note = payment.note || '';
+
+                 // We know we deleted them, so just create
+                 await payload.create({
+                    collection: 'payments',
+                    data: {
+                      squarePaymentId,
+                      amount,
+                      currency,
+                      status,
+                      sourceType,
+                      note,
+                    } as any
+                  });
+                  totalSynced++;
+            }
+            cursor = response.cursor;
+        } while (cursor);
+
+        revalidatePath('/dashboard');
+        return { success: true, count: totalSynced };
+
+    } catch (error: any) {
+        console.error('Reset Sync Error:', error);
+        return { success: false, error: error.message };
+    }
+}
+
+export async function getRecentPayments(limit = 20) {
+  const payload = await getPayload({ config: configPromise });
+  const { docs } = await payload.find({
+    collection: 'payments',
+    sort: '-createdAt',
+    limit,
+  });
+  return docs;
+}
+
+// === NEW ACTIONS FOR KPI SHEETS ===
+
+export async function getActiveJobsList() {
+    try {
+        const payload = await getPayload({ config: configPromise });
+        const result = await payload.find({
+            collection: 'service-requests',
+            where: {
+                status: {
+                    in: ['pending', 'confirmed', 'dispatched', 'on_site']
+                }
+            },
+            sort: '-createdAt',
+            limit: 20,
+            depth: 0,
+        });
+
+        return result.docs.map(doc => ({
+            id: doc.id,
+            status: doc.status,
+            customerName: (doc.customer as any)?.name || 'Unknown Customer', // If customer is populated or not
+            urgency: doc.urgency,
+            createdAt: doc.createdAt,
+            issue: doc.issueDescription
+        }));
+    } catch (error) {
+        console.error('Error fetching active jobs:', error);
+        return [];
+    }
+}
+
+export async function getTechnicianStatusList() {
+    try {
+        const payload = await getPayload({ config: configPromise });
+        const result = await payload.find({
+            collection: 'users',
+            where: {
+                role: { equals: 'technician' }
+            }
+        });
+
+        // In a real app, we'd check a "lastSeen" or "status" field.
+        // For now, we'll assume they are "Online" if they exist.
+        return result.docs.map(tech => ({
+            id: tech.id,
+            name: tech.name,
+            email: tech.email,
+            status: 'online', // Mock status
+            lastActive: new Date().toISOString() // Mock time
+        }));
+    } catch (error) {
+        console.error('Error fetching technicians:', error);
+        return [];
+    }
 }
