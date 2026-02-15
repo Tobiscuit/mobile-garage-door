@@ -1,8 +1,9 @@
-import { createAuth } from 'better-auth';
-import { pgAdapter } from 'better-auth/adapters/pg';
-import { passkey } from 'better-auth/plugins/passkey';
+import { betterAuth } from 'better-auth';
+import { pgDrizzle } from 'better-auth/adapters/drizzle-adapter';
+import { drizzle } from 'drizzle-orm/node-postgres';
+import { Pool } from 'pg';
+import { siwe } from 'better-auth/plugins/siwe';
 import { twoFactor } from 'better-auth/plugins/two-factor';
-import { saml } from 'better-auth/plugins/saml'; // For SSO
 
 const dbUri = process.env.DATABASE_URI;
 
@@ -10,8 +11,11 @@ if (!dbUri) {
   throw new Error('DATABASE_URI is required for BetterAuth setup');
 }
 
-export const auth = createAuth({
-  database: pgAdapter(dbUri, {
+const pool = new Pool({ connectionString: dbUri });
+export const db = drizzle(pool);
+
+export const auth = betterAuth({
+  database: pgDrizzle(db, {
     models: {
       user: {
         fields: {
@@ -35,14 +39,10 @@ export const auth = createAuth({
     strategy: 'jwt',
   },
   plugins: [
-    passkey(), // Enables Passkey (WebAuthn) for passwordless auth
+    siwe(), // Enables Passkey (WebAuthn) for passwordless auth
     twoFactor({
       // MFA config: e.g., via email or TOTP
       method: 'totp', // Or 'email' for codes
-    }),
-    saml({
-      // SSO config: Provide your SAML provider details here
-      // e.g., idp: { entityId: '...', cert: '...' }
     }),
   ],
 });

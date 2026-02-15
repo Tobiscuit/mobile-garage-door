@@ -1,4 +1,3 @@
-import React from 'react';
 import { getPayload } from 'payload';
 import configPromise from '@/payload.config';
 import { headers } from 'next/headers';
@@ -7,11 +6,9 @@ import { PortalHeader } from '@/components/portal/PortalHeader';
 import { ActiveRequestList } from '@/components/portal/ActiveRequestList';
 import { ServiceHistory } from '@/components/portal/ServiceHistory';
 import { AccountSidebar } from '@/components/portal/AccountSidebar';
+import { auth } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
-
-import { auth } from '@/lib/auth';
-import { headers } from 'next/headers';
 
 export default async function PortalDashboard() {
   const headerList = await headers();
@@ -19,6 +16,7 @@ export default async function PortalDashboard() {
 
   if (!session) return null; // Should be handled by layout/middleware
 
+  const payload = await getPayload({ config: configPromise });
   const user = session.user;
   const customer = user as any;
   const isBuilder = customer.customerType === 'builder';

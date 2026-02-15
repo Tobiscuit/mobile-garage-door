@@ -4,9 +4,10 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
-import { signIn } from '@better-auth/client'; // Client hook for signIn
+import { createAuthClient } from 'better-auth/react';
 
 export default function LoginPage() {
+  const authClient = createAuthClient(); // Initialize client
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -20,7 +21,7 @@ export default function LoginPage() {
     setError('');
 
     try {
-      const result = await signIn.email({ // BetterAuth signIn
+      const result = await authClient.email({ // BetterAuth signIn
         email,
         password: usePasskey ? undefined : password, // Skip password if Passkey
         options: {

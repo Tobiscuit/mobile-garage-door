@@ -9,6 +9,7 @@
     "build": "echo \"y\" | payload migrate && payload generate:types && payload generate:importmap && next build",
     "start": "next start",
     "lint": "next lint",
+    "type-check": "tsc --noEmit",
     "generate:importmap": "payload generate:importmap",
     "generate:types": "payload generate:types",
     "payload": "payload",
@@ -21,7 +22,6 @@
   },
   "packageManager": "npm@11.7.0",
   "dependencies": {
-    "@better-auth/client": "^0.0.2-alpha.3",
     "@google/genai": "^1.41.0",
     "@modelcontextprotocol/sdk": "^1.26.0",
     "@payloadcms/db-postgres": "^3.76.1",
