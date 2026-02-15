@@ -135,7 +135,11 @@ export async function syncSquarePayments() {
     // Using list() instead of listPayments() for newer Square SDK
     // Note: Passing empty string or invalid params caused sort_field error.
     // We rely on default sorting (usually NEWEST first for list endpoint)
-    const response = await squareClient.payments.list();
+    const response = await squareClient.payments.list(
+        undefined, // begin_time
+        undefined, // end_time
+        'DESC' // sort_order
+    );
     
     let count = 0;
     // The response is async iterable in the new SDK
