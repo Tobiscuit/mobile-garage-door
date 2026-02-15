@@ -21,5 +21,16 @@ export const serviceRequestService = {
       },
       sort: '-createdAt',
     });
+  },
+
+  getAssignedRequests: async (payload: Payload, techId: string | number) => {
+    return payload.find({
+      collection: 'service-requests' as any,
+      where: {
+        assignedTech: { equals: techId },
+        status: { not_equals: 'completed' },
+      },
+      sort: 'scheduledTime', // Sort by schedule for techs
+    });
   }
 };

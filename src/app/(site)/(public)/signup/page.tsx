@@ -32,7 +32,8 @@ export default function SignupPage() {
     }
 
     try {
-      const res = await fetch('/api/customers', {
+      // Use Users collection (unified IAM)
+      const res = await fetch('/api/users', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -40,13 +41,13 @@ export default function SignupPage() {
             password: formData.password,
             name: formData.name,
             phone: formData.phone,
+            // role: 'customer' is enforced by default in Users collection
         }),
       });
 
       if (res.ok) {
-        // Signup successful, now login automatically or redirect to login
-        // Let's try to login automatically to be smooth
-        const loginRes = await fetch('/api/customers/login', {
+        // Signup successful, now login automatically
+        const loginRes = await fetch('/api/users/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email: formData.email, password: formData.password }),

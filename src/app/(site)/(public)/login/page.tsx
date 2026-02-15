@@ -17,7 +17,8 @@ export default function LoginPage() {
     setError('');
 
     try {
-      const res = await fetch('/api/customers/login', {
+      // Use Users collection login
+      const res = await fetch('/api/users/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -25,8 +26,16 @@ export default function LoginPage() {
 
       if (res.ok) {
         const data = await res.json();
-        // Login successful, redirect to portal
-        router.push('/portal');
+        // Role-based redirection
+        const userRole = data.user?.role;
+
+        if (userRole === 'admin') {
+            router.push('/dashboard'); // Mission Control
+        } else if (userRole === 'technician') {
+            router.push('/dashboard/technician'); // Tech View
+        } else {
+            router.push('/portal'); // Customer/Contractor Portal
+        }
       } else {
         const err = await res.json();
         setError(err.errors?.[0]?.message || 'Invalid email or password.');

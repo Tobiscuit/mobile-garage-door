@@ -35,7 +35,7 @@ const Footer: React.FC = () => {
             <h4 className="text-white font-bold mb-6 uppercase tracking-wider text-xs">Client Support</h4>
             <ul className="space-y-3">
               <li><a href="/contact" className="hover:text-white transition-colors">Submit Warranty Claim</a></li>
-              <li><a href="/contact?type=contractor" className="hover:text-white transition-colors">Contractor Portal Login</a></li>
+              <li><a href="/login?type=contractor" className="hover:text-white transition-colors">Contractor Portal Login</a></li>
               <li><a href="#" className="hover:text-white transition-colors">Emergency Dispatch</a></li>
               <li><a href="#" className="hover:text-white transition-colors">SLA Documentation</a></li>
             </ul>

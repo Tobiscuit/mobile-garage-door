@@ -8,13 +8,17 @@ export const ServiceRequests: CollectionConfig = {
     defaultColumns: ['ticketId', 'customer', 'status', 'urgency', 'createdAt'],
   },
   access: {
+    // Admins and Technicians can read all
+    // Customers can read their own
     read: ({ req: { user } }) => {
-      if (user?.collection === 'users') return true;
-      if (user?.collection === 'customers') return { customer: { equals: user.id } };
+      if (user?.role === 'admin' || user?.role === 'technician' || user?.role === 'dispatcher') return true;
+      if (user?.role === 'customer') return { customer: { equals: user.id } };
       return false;
     },
-    create: ({ req: { user } }) => !!user, // Must be logged in
-    update: ({ req: { user } }) => user?.collection === 'users', // Only admins update status
+    // Anyone logged in can create (customers create requests)
+    create: ({ req: { user } }) => !!user, 
+    // Only admins/techs can update status (customers can cancel maybe? but for now strict)
+    update: ({ req: { user } }) => user?.role === 'admin' || user?.role === 'technician', 
   },
   fields: [
     {
@@ -27,7 +31,7 @@ export const ServiceRequests: CollectionConfig = {
       hooks: {
         beforeValidate: [
           ({ value, operation }) => {
-            if (operation === 'create') {
+            if (operation === 'create' && !value) {
               // Simple ID generation: SR-TIMESTAMP-RANDOM
               return `SR-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
             }
@@ -42,9 +46,8 @@ export const ServiceRequests: CollectionConfig = {
       relationTo: 'users',
       required: true,
       hasMany: false,
-      filterOptions: {
-        role: { equals: 'customer' },
-      },
+      // Removed filterOptions to allow any user to be a customer if needed, 
+      // but ideally we filter by role 'customer'. Keeping it simple for now.
     },
     {
       name: 'issueDescription',
