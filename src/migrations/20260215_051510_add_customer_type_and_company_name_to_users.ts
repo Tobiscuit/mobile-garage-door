@@ -2,29 +2,45 @@ import { MigrateUpArgs, MigrateDownArgs, sql } from '@payloadcms/db-postgres'
 
 export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   await db.execute(sql`
-   CREATE TYPE "public"."enum_users_customer_type" AS ENUM('residential', 'builder');
+   DO $$ BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'enum_users_customer_type') THEN
+        CREATE TYPE "public"."enum_users_customer_type" AS ENUM('residential', 'builder');
+    END IF;
+   END $$;
+
   ALTER TABLE "customers_sessions" DISABLE ROW LEVEL SECURITY;
   ALTER TABLE "customers" DISABLE ROW LEVEL SECURITY;
-  DROP TABLE "customers_sessions" CASCADE;
-  DROP TABLE "customers" CASCADE;
-  ALTER TABLE "service_requests" DROP CONSTRAINT "service_requests_customer_id_customers_id_fk";
+  DROP TABLE IF EXISTS "customers_sessions" CASCADE;
+  DROP TABLE IF EXISTS "customers" CASCADE;
+  ALTER TABLE "service_requests" DROP CONSTRAINT IF EXISTS "service_requests_customer_id_customers_id_fk";
   
-  ALTER TABLE "invoices" DROP CONSTRAINT "invoices_customer_id_customers_id_fk";
+  ALTER TABLE "invoices" DROP CONSTRAINT IF EXISTS "invoices_customer_id_customers_id_fk";
   
-  ALTER TABLE "payload_locked_documents_rels" DROP CONSTRAINT "payload_locked_documents_rels_customers_fk";
+  ALTER TABLE "payload_locked_documents_rels" DROP CONSTRAINT IF EXISTS "payload_locked_documents_rels_customers_fk";
   
-  ALTER TABLE "payload_preferences_rels" DROP CONSTRAINT "payload_preferences_rels_customers_fk";
+  ALTER TABLE "payload_preferences_rels" DROP CONSTRAINT IF EXISTS "payload_preferences_rels_customers_fk";
   
-  DROP INDEX "payload_locked_documents_rels_customers_id_idx";
-  DROP INDEX "payload_preferences_rels_customers_id_idx";
+  DROP INDEX IF EXISTS "payload_locked_documents_rels_customers_id_idx";
+  DROP INDEX IF EXISTS "payload_preferences_rels_customers_id_idx";
   ALTER TABLE "users" ALTER COLUMN "role" SET DEFAULT 'customer';
-  ALTER TABLE "users" ADD COLUMN "customer_type" "enum_users_customer_type" DEFAULT 'residential';
-  ALTER TABLE "users" ADD COLUMN "company_name" varchar;
-  ALTER TABLE "users" ADD COLUMN "square_customer_id" varchar;
-  ALTER TABLE "service_requests" ADD CONSTRAINT "service_requests_customer_id_users_id_fk" FOREIGN KEY ("customer_id") REFERENCES "public"."users"("id") ON DELETE set null ON UPDATE no action;
-  ALTER TABLE "invoices" ADD CONSTRAINT "invoices_customer_id_users_id_fk" FOREIGN KEY ("customer_id") REFERENCES "public"."users"("id") ON DELETE set null ON UPDATE no action;
-  ALTER TABLE "payload_locked_documents_rels" DROP COLUMN "customers_id";
-  ALTER TABLE "payload_preferences_rels" DROP COLUMN "customers_id";`)
+  ALTER TABLE "users" ADD COLUMN IF NOT EXISTS "customer_type" "enum_users_customer_type" DEFAULT 'residential';
+  ALTER TABLE "users" ADD COLUMN IF NOT EXISTS "company_name" varchar;
+  ALTER TABLE "users" ADD COLUMN IF NOT EXISTS "square_customer_id" varchar;
+  
+  DO $$ BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE constraint_name = 'service_requests_customer_id_users_id_fk') THEN
+      ALTER TABLE "service_requests" ADD CONSTRAINT "service_requests_customer_id_users_id_fk" FOREIGN KEY ("customer_id") REFERENCES "public"."users"("id") ON DELETE set null ON UPDATE no action;
+    END IF;
+  END $$;
+
+  DO $$ BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE constraint_name = 'invoices_customer_id_users_id_fk') THEN
+      ALTER TABLE "invoices" ADD CONSTRAINT "invoices_customer_id_users_id_fk" FOREIGN KEY ("customer_id") REFERENCES "public"."users"("id") ON DELETE set null ON UPDATE no action;
+    END IF;
+  END $$;
+
+  ALTER TABLE "payload_locked_documents_rels" DROP COLUMN IF EXISTS "customers_id";
+  ALTER TABLE "payload_preferences_rels" DROP COLUMN IF EXISTS "customers_id";`)
 }
 
 export async function down({ db, payload, req }: MigrateDownArgs): Promise<void> {
