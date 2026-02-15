@@ -132,14 +132,10 @@ export async function syncSquarePayments() {
     const payload = await getPayload({ config: configPromise });
     
     // List payments from Square (last 100)
-    // Using list() instead of listPayments() for newer Square SDK
-    // Note: Passing empty string or invalid params caused sort_field error.
-    // We rely on default sorting (usually NEWEST first for list endpoint)
-    const response = await squareClient.payments.list(
-        undefined, // begin_time
-        undefined, // end_time
-        'DESC' // sort_order
-    );
+    // Using list() with object params for newer Square SDK
+    const response = await squareClient.payments.list({
+        sortOrder: 'DESC'
+    });
     
     let count = 0;
     // The response is async iterable in the new SDK

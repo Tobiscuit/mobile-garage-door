@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload';
+import { AIWriter } from '@/components/payload/AIWriter';
 
 export const Posts: CollectionConfig = {
   slug: 'posts',
@@ -6,14 +7,17 @@ export const Posts: CollectionConfig = {
     useAsTitle: 'title',
     defaultColumns: ['title', 'category', 'publishedAt', 'status'],
     group: 'Content',
-    components: {
-       edit: {
-         // Inject a custom component into the Edit View to trigger AI generation
-         // This is a placeholder for where the AI Button would go in a full implementation
-       }
-    }
   },
   fields: [
+    {
+      name: 'aiWriter',
+      type: 'ui',
+      admin: {
+        components: {
+          Field: AIWriter,
+        },
+      },
+    },
     {
       name: 'title',
       type: 'text',
