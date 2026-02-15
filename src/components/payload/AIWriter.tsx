@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useForm } from '@payloadcms/ui';
 import { generatePostContent } from '@/actions/ai';
+import { AIPostResponse } from '@/lib/ai-contract';
 
 export const AIWriter: React.FC<any> = () => {
   const { dispatchFields } = useForm();
@@ -18,11 +19,17 @@ export const AIWriter: React.FC<any> = () => {
     setError('');
 
     try {
-      const result = await generatePostContent(prompt);
+      console.log('Generating content for Payload Admin...');
+      // Explicitly request JSON format (Lexical)
+      const result = await generatePostContent(prompt, 'json') as AIPostResponse;
+      console.log('AI Result:', result);
 
       // Update Form Fields
       if (result.title) {
         dispatchFields({ type: 'UPDATE', path: 'title', value: result.title });
+        // Also auto-generate slug from title
+        const slug = result.title.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
+        dispatchFields({ type: 'UPDATE', path: 'slug', value: slug });
       }
       if (result.excerpt) {
         dispatchFields({ type: 'UPDATE', path: 'excerpt', value: result.excerpt });
