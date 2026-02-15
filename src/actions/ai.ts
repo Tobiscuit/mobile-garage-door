@@ -1,6 +1,6 @@
 'use server';
 
-import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai';
+import { GoogleGenerativeAI, SchemaType, Schema } from '@google/generative-ai';
 import { EXAMPLE_LEXICAL_STRUCTURE } from '@/lib/ai-contract';
 
 const apiKey = process.env.GEMINI_API_KEY;
@@ -12,7 +12,7 @@ export async function generatePostContent(prompt: string, format: 'json' | 'mark
   }
 
   // Define schema for Markdown (Custom Dashboard)
-  const markdownSchema = {
+  const markdownSchema: Schema = {
     type: SchemaType.OBJECT,
     properties: {
       title: { type: SchemaType.STRING },
