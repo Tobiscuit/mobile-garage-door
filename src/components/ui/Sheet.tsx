@@ -64,7 +64,7 @@ export function Sheet({ isOpen, onClose, title, children, side = 'right' }: Shee
       scale: 0.95,
       transition: { 
         duration: 0.2,
-        ease: 'easeInOut' 
+        ease: 'easeInOut' as const
       }
     }
   };
