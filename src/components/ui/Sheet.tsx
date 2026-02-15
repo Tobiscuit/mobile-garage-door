@@ -40,26 +40,26 @@ export function Sheet({ isOpen, onClose, title, children, side = 'right' }: Shee
 
   const variants = {
     hidden: { 
-      x: effectiveSide === 'right' ? '100%' : 0, 
-      y: effectiveSide === 'bottom' ? '100%' : 0,
+      x: effectiveSide === 'right' ? '100%' : '0', 
+      y: effectiveSide === 'bottom' ? '100%' : '0',
       opacity: 0.5,
       scale: 0.95
     },
     visible: { 
-      x: 0, 
-      y: 0,
+      x: '0', 
+      y: '0',
       opacity: 1,
       scale: 1,
       transition: { 
-        type: 'spring', 
+        type: 'spring' as const, 
         damping: 25, 
         stiffness: 300, 
         mass: 0.8 
       }
     },
     exit: { 
-      x: effectiveSide === 'right' ? '100%' : 0, 
-      y: effectiveSide === 'bottom' ? '100%' : 0,
+      x: effectiveSide === 'right' ? '100%' : '0', 
+      y: effectiveSide === 'bottom' ? '100%' : '0',
       opacity: 0,
       scale: 0.95,
       transition: { 
