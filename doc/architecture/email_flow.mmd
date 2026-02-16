@@ -1,0 +1,19 @@
+graph TD
+    subgraph "Hetzner Server (Next.js)"
+        A[Admin Dashboard] -->|Write Reply| B(PayloadCMS API)
+        B -->|Store Copy| DB[(Database: Emails)]
+        B -->|Send| C{Nodemailer Transport}
+        H[API Route: /api/webhooks/ses] -->|Download & Parse| I[Mailparser]
+        I -->|Store| DB
+    end
+
+    subgraph "AWS Ecosystem"
+        C -->|SES API| D[Amazon SES]
+        D -->|SMTP Delivery| E[Recipient Inbox]
+        E -->|Reply| D
+        D -->|Action 1: Save| F[S3 Bucket: Inbound Mail]
+        F -->|Action 2: Notify| G[SNS Topic]
+    end
+
+    G -->|HTTP POST| H
+    H -.->|Fetch Raw Object| F

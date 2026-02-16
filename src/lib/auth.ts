@@ -7,6 +7,7 @@ import { passkey } from '@better-auth/passkey';
 import { magicLink } from 'better-auth/plugins/magic-link';
 import { nextCookies } from 'better-auth/next-js';
 import { authSchema } from './auth-schema';
+import { sendEmail } from './email';
 
 const dbUri = process.env.DATABASE_URI;
 
@@ -52,8 +53,18 @@ export const auth = betterAuth({
     nextCookies(),
     magicLink({
       sendMagicLink: async ({ email, url }) => {
-        // Until an SMTP provider is configured, expose the link in server logs.
-        console.log(`[magic-link] send to ${email}: ${url}`);
+        try {
+          await sendEmail({
+             to: email,
+             subject: 'Sign in to Mobile Garage Door',
+             html: `<p>Click the link below to sign in:</p><a href="${url}">${url}</a><p>If you didn't request this, you can ignore this email.</p>`,
+             text: `Click the link below to sign in:\n\n${url}\n\nIf you didn't request this, you can ignore this email.`
+          });
+        } catch (error) {
+          console.error('Failed to send magic link:', error);
+          // Fallback log for development if credentials fail
+          console.log(`[magic-link] send to ${email}: ${url}`);
+        }
       },
     }),
     passkey({

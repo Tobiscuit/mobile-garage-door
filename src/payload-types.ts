@@ -68,6 +68,9 @@ export interface Config {
   blocks: {};
   collections: {
     users: User;
+    'staff-invites': StaffInvite;
+    'email-threads': EmailThread;
+    emails: Email;
     media: Media;
     services: Service;
     projects: Project;
@@ -84,6 +87,9 @@ export interface Config {
   collectionsJoins: {};
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
+    'staff-invites': StaffInvitesSelect<false> | StaffInvitesSelect<true>;
+    'email-threads': EmailThreadsSelect<false> | EmailThreadsSelect<true>;
+    emails: EmailsSelect<false> | EmailsSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     services: ServicesSelect<false> | ServicesSelect<true>;
     projects: ProjectsSelect<false> | ProjectsSelect<true>;
@@ -176,6 +182,79 @@ export interface User {
     | null;
   password?: string | null;
   collection: 'users';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "staff-invites".
+ */
+export interface StaffInvite {
+  id: number;
+  email: string;
+  role: 'technician' | 'admin';
+  firstName?: string | null;
+  lastName?: string | null;
+  status: 'pending' | 'accepted' | 'revoked';
+  acceptedAt?: string | null;
+  invitedBy?: (number | null) | User;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "email-threads".
+ */
+export interface EmailThread {
+  id: number;
+  subject: string;
+  participants?: (number | User)[] | null;
+  status: 'open' | 'closed' | 'archived';
+  lastMessageAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "emails".
+ */
+export interface Email {
+  id: number;
+  from: string;
+  to: string;
+  subject?: string | null;
+  body?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  bodyRaw?: string | null;
+  thread: number | EmailThread;
+  direction: 'inbound' | 'outbound';
+  attachments?: (number | Media)[] | null;
+  /**
+   * Raw headers and message-id for debugging
+   */
+  rawMetadata?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  messageId?: string | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -480,6 +559,18 @@ export interface PayloadLockedDocument {
         value: number | User;
       } | null)
     | ({
+        relationTo: 'staff-invites';
+        value: number | StaffInvite;
+      } | null)
+    | ({
+        relationTo: 'email-threads';
+        value: number | EmailThread;
+      } | null)
+    | ({
+        relationTo: 'emails';
+        value: number | Email;
+      } | null)
+    | ({
         relationTo: 'media';
         value: number | Media;
       } | null)
@@ -583,6 +674,51 @@ export interface UsersSelect<T extends boolean = true> {
         createdAt?: T;
         expiresAt?: T;
       };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "staff-invites_select".
+ */
+export interface StaffInvitesSelect<T extends boolean = true> {
+  email?: T;
+  role?: T;
+  firstName?: T;
+  lastName?: T;
+  status?: T;
+  acceptedAt?: T;
+  invitedBy?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "email-threads_select".
+ */
+export interface EmailThreadsSelect<T extends boolean = true> {
+  subject?: T;
+  participants?: T;
+  status?: T;
+  lastMessageAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "emails_select".
+ */
+export interface EmailsSelect<T extends boolean = true> {
+  from?: T;
+  to?: T;
+  subject?: T;
+  body?: T;
+  bodyRaw?: T;
+  thread?: T;
+  direction?: T;
+  attachments?: T;
+  rawMetadata?: T;
+  messageId?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

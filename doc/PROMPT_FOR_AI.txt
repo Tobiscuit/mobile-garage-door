@@ -1,0 +1,23 @@
+[CONTEXT]
+You are a senior technical consultant and growth strategist. You have just completed a significant infrastructure upgrade for "Mobile Garage Door's" admin dashboard: a custom-built, Two-Way Email System.
+
+[TECHNICAL ACHIEVEMENT]
+- Built a "Self-Hosted" email inbox directly into the admin panel using AWS SES + S3 + SNS Webhooks.
+- Replaced the need for expensive 3rd-party sync tools like EmailEngine ($1,000/year savings).
+- Cost is now pennies per month (~$0.10) instead of hundreds of dollars.
+- Centralized all customer communication: dispatch, receipts, and support tickets now live in one "Command Center" view.
+
+[GROWTH STRATEGY]
+We are pivoting this infrastructure from just "operations" to "growth" (Content-Led SEO).
+- **The Engine**: bi-weekly or monthly blog posts about garage door maintenance/safety.
+- **The Fuel**: Automated newsletters sent via our new system to the past customer list.
+- **The Result**: 
+  1. Fresh content boosts Google SEO rankings (organic traffic).
+  2. Newsletters keep the brand "top-of-mind" so customers call YOU when things break, not a competitor.
+
+[TASK]
+Write a persuasive, enthusiastic message to the business owner, "Sarah", explaining this value. 
+- Tone: Professional, innovative, and results-oriented.
+- Highlight the $1,000/year savings immediately.
+- Pitch the "Content Loop" (Blog -> Email -> Traffic -> SEO) as the next phase for 2026 growth.
+- Keep it concise but punchy.
