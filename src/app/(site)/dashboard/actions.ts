@@ -330,3 +330,27 @@ export async function getTechnicianStatusList() {
         return [];
     }
 }
+
+export async function getRecentTechnicians(limit = 5) {
+  try {
+    const payload = await getPayload({ config: configPromise });
+    const result = await payload.find({
+      collection: 'users',
+      where: {
+        role: { equals: 'technician' },
+      },
+      sort: '-lastLogin',
+      limit,
+      depth: 0,
+    });
+
+    return result.docs.map((tech) => ({
+      id: tech.id,
+      email: tech.email,
+      lastLogin: tech.lastLogin,
+    }));
+  } catch (error) {
+    console.error('Error fetching recent technicians:', error);
+    return [];
+  }
+}

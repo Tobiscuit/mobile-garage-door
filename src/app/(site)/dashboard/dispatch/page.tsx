@@ -10,10 +10,9 @@ export default async function DispatchPage() {
     const headersList = await headers();
     const session = await auth.api.getSession({ headers: headersList });
     const payload = await getPayload({ config: configPromise });
-    const userRole = (session?.user as { role?: string } | undefined)?.role;
 
-    if (!session || (userRole !== 'admin' && userRole !== 'dispatcher')) {
-        redirect('/admin/login');
+    if (!session) {
+        redirect('/login');
     }
 
     // 1. Fetch unassigned (confirmed) jobs

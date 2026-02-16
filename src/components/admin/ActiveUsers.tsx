@@ -1,9 +1,10 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
+import { getRecentTechnicians } from '@/app/(site)/dashboard/actions'
 
 interface User {
-  id: number
+  id: number | string
   email: string
   lastLogin?: string
 }
@@ -15,12 +16,8 @@ export default function ActiveUsers() {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        // Fetch users sorted by lastLogin descending, ONLY Technicians
-        // Using Payload REST API
-        const res = await fetch('/api/users?where[role][equals]=technician&sort=-lastLogin&limit=5')
-        if (!res.ok) throw new Error('Failed to fetch users')
-        const data = await res.json()
-        setUsers(data.docs)
+        const data = await getRecentTechnicians(5)
+        setUsers(data as User[])
       } catch (error) {
         console.error('Error fetching active users:', error)
       } finally {
@@ -35,14 +32,14 @@ export default function ActiveUsers() {
   }, [])
 
   if (loading) return (
-    <div className="bg-[#2c3e50]/40 backdrop-blur-md border border-[#ffffff10] rounded-xl p-6 h-full min-h-[200px] flex items-center justify-center">
-        <div className="animate-spin w-8 h-8 border-2 border-[#ffffff10] border-t-[#f1c40f] rounded-full"></div>
+    <div className="backdrop-blur-md rounded-xl p-6 h-full min-h-[200px] flex items-center justify-center" style={{ backgroundColor: 'var(--staff-surface)', border: '1px solid var(--staff-border)' }}>
+        <div className="animate-spin w-8 h-8 border-2 border-[var(--staff-border)] border-t-[#f1c40f] rounded-full"></div>
     </div>
   )
 
   return (
-    <div className="bg-[#2c3e50]/40 backdrop-blur-md border border-[#ffffff10] rounded-xl p-4 md:p-6 h-full">
-      <h3 className="text-lg md:text-xl font-bold text-white mb-4 flex items-center gap-2">
+    <div className="backdrop-blur-md rounded-xl p-4 md:p-6 h-full" style={{ backgroundColor: 'var(--staff-surface)', border: '1px solid var(--staff-border)' }}>
+      <h3 className="text-lg md:text-xl font-bold mb-4 flex items-center gap-2" style={{ color: 'var(--staff-text)' }}>
         <span className="relative flex h-2.5 w-2.5 md:h-3 md:w-3">
           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
           <span className="relative inline-flex rounded-full h-2.5 w-2.5 md:h-3 md:w-3 bg-green-500"></span>
@@ -55,14 +52,14 @@ export default function ActiveUsers() {
             const isOnline = lastLogin && (new Date().getTime() - lastLogin.getTime() < 15 * 60 * 1000); // 15 mins
             
             return (
-                <div key={user.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-3 bg-[#ffffff05] rounded-lg hover:bg-[#ffffff0a] transition-colors group gap-2 sm:gap-0">
+                <div key={user.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-3 rounded-lg transition-colors group gap-2 sm:gap-0" style={{ backgroundColor: 'var(--staff-surface-alt)' }}>
                     <div className="flex items-center gap-3">
                     <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-gradient-to-br from-[#f1c40f] to-[#f39c12] flex items-center justify-center text-[#2c3e50] font-bold text-sm md:text-lg shadow-lg shrink-0">
                         {user.email?.charAt(0).toUpperCase() || '?'}
                     </div>
                     <div className="min-w-0">
-                        <div className="text-xs md:text-sm font-medium text-white group-hover:text-[#f1c40f] transition-colors truncate">{user.email}</div>
-                        <div className="text-[10px] md:text-xs text-[#7f8c8d] truncate">
+                        <div className="text-xs md:text-sm font-medium transition-colors truncate" style={{ color: 'var(--staff-text)' }}>{user.email}</div>
+                        <div className="text-[10px] md:text-xs truncate" style={{ color: 'var(--staff-muted)' }}>
                         {lastLogin ? lastLogin.toLocaleString() : 'Never logged in'}
                         </div>
                     </div>
@@ -76,7 +73,7 @@ export default function ActiveUsers() {
             )
         })}
         {users.length === 0 && (
-          <div className="text-center text-[#7f8c8d] py-4">No users found</div>
+          <div className="text-center py-4" style={{ color: 'var(--staff-muted)' }}>No users found</div>
         )}
       </div>
     </div>

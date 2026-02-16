@@ -93,8 +93,8 @@ export function Sheet({ isOpen, onClose, title, children, side = 'right' }: Shee
           <motion.div
             className={`
               pointer-events-auto
-              bg-[#1e293b]/90 backdrop-blur-2xl 
-              border-l border-t border-[#ffffff15] 
+              backdrop-blur-2xl 
+              border-l border-t 
               shadow-[0_0_50px_-12px_rgba(0,0,0,0.8)]
               w-full 
               ${effectiveSide === 'right' 
@@ -116,20 +116,22 @@ export function Sheet({ isOpen, onClose, title, children, side = 'right' }: Shee
                 onClose();
               }
             }}
+            style={{ backgroundColor: 'var(--staff-surface)', borderColor: 'var(--staff-border)' }}
           >
             {/* Drag Handle for Mobile */}
             {effectiveSide === 'bottom' && (
               <div className="w-full flex justify-center pt-4 pb-2 cursor-grab active:cursor-grabbing">
-                <div className="w-12 h-1.5 bg-white/20 rounded-full" />
+              <div className="w-12 h-1.5 rounded-full" style={{ backgroundColor: 'var(--staff-border)' }} />
               </div>
             )}
 
             {/* Header */}
-            <div className="px-6 py-5 flex items-center justify-between border-b border-[#ffffff08] shrink-0">
-              <h2 className="text-xl font-bold text-white tracking-tight">{title}</h2>
+            <div className="px-6 py-5 flex items-center justify-between border-b shrink-0" style={{ borderColor: 'var(--staff-border)' }}>
+              <h2 className="text-xl font-bold tracking-tight" style={{ color: 'var(--staff-text)' }}>{title}</h2>
               <button 
                 onClick={onClose}
-                className="p-2 rounded-full hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
+                className="p-2 rounded-full transition-colors"
+                style={{ color: 'var(--staff-muted)' }}
               >
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
