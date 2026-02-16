@@ -4,6 +4,8 @@ import { postgresAdapter } from '@payloadcms/db-postgres';
 import { lexicalEditor } from '@payloadcms/richtext-lexical';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { nodemailerAdapter } from '@payloadcms/email-nodemailer';
+import { emailTransport } from './lib/email';
 
 // Collections
 import { Services } from './collections/Services';
@@ -15,6 +17,8 @@ import { Invoices } from './collections/Invoices';
 import { Payments } from './collections/Payments';
 import { Users } from './collections/Users';
 import { StaffInvites } from './collections/StaffInvites';
+import { EmailThreads } from './collections/EmailThreads';
+import { Emails } from './collections/Emails';
 
 // Globals
 import { SiteSettings } from './globals/SiteSettings';
@@ -66,6 +70,8 @@ export default buildConfig({
   collections: [
     Users,
     StaffInvites,
+    EmailThreads,
+    Emails,
     {
       slug: 'media',
       upload: true,
@@ -96,5 +102,10 @@ export default buildConfig({
     pool: {
       connectionString: process.env.DATABASE_URI || '',
     },
+  }),
+  email: nodemailerAdapter({
+    defaultFromAddress: process.env.SES_FROM_NOTIFY || 'dispatch@mobilegaragedoor.com',
+    defaultFromName: 'Mobile Garage Door Dispatch',
+    transport: emailTransport,
   }),
 });
