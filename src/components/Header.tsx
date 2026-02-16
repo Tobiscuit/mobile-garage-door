@@ -52,19 +52,10 @@ const Header: React.FC = () => {
             ))}
           </nav>
 
-          {/* DESKTOP ACTIONS: Bifurcated (Pro vs Emergency) */}
+          {/* DESKTOP ACTIONS */}
           <div className="hidden md:flex items-center gap-4">
-             {/* Pro Link */}
-            <Link href="/contact?type=contractor" className="text-sm font-bold text-golden-yellow hover:text-yellow-300 transition-colors uppercase tracking-wider text-[10px]">
-              For Contractors
-            </Link>
-            
-            <div className="h-8 w-px bg-white/10"></div>
-
-            {/* Emergency CTA */}
-            <Link href="/contact?type=repair" className="flex items-center gap-2 bg-red-600 hover:bg-red-500 text-white text-sm font-bold py-2.5 px-5 rounded-lg shadow-lg shadow-red-900/20 transition-all hover:scale-105">
-              <svg className="w-4 h-4 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
-              <span>24/7 Repair</span>
+            <Link href="/login" className="text-sm font-bold text-golden-yellow hover:text-yellow-300 transition-colors uppercase tracking-wider text-[10px]">
+              Portal Login
             </Link>
           </div>
 
@@ -108,12 +99,8 @@ const Header: React.FC = () => {
             </Link>
           ))}
           <div className="h-px w-20 mx-auto bg-white/10 my-4"></div>
-          <Link href="/contact?type=contractor" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-bold text-golden-yellow uppercase tracking-widest">
-            Contractor Portal
-          </Link>
-          <Link href="/contact?type=repair" className="mt-8 bg-red-600 text-white font-bold py-5 rounded-2xl text-xl shadow-xl flex items-center justify-center gap-3">
-             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
-             Call 24/7 Emergency
+          <Link href="/login" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-bold text-golden-yellow uppercase tracking-widest">
+            Portal Login
           </Link>
         </div>
       </div>

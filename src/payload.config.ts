@@ -14,6 +14,7 @@ import { ServiceRequests } from './collections/ServiceRequests';
 import { Invoices } from './collections/Invoices';
 import { Payments } from './collections/Payments';
 import { Users } from './collections/Users';
+import { StaffInvites } from './collections/StaffInvites';
 
 // Globals
 import { SiteSettings } from './globals/SiteSettings';
@@ -64,6 +65,7 @@ export default buildConfig({
   },
   collections: [
     Users,
+    StaffInvites,
     {
       slug: 'media',
       upload: true,

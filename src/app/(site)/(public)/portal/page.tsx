@@ -6,15 +6,15 @@ import { PortalHeader } from '@/components/portal/PortalHeader';
 import { ActiveRequestList } from '@/components/portal/ActiveRequestList';
 import { ServiceHistory } from '@/components/portal/ServiceHistory';
 import { AccountSidebar } from '@/components/portal/AccountSidebar';
-import { auth } from '@/lib/auth';
+import { getSessionSafe } from '@/lib/get-session-safe';
 
 export const dynamic = 'force-dynamic';
 
 export default async function PortalDashboard() {
   const headerList = await headers();
-  const session = await auth.api.getSession({ headers: headerList });
+  const session = await getSessionSafe(headerList);
 
-  if (!session) return null; // Should be handled by layout/middleware
+  if (!session) return null; // Handled by layout/middleware
 
   const payload = await getPayload({ config: configPromise });
   const user = session.user;
