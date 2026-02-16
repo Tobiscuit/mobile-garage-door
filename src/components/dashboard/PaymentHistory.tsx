@@ -55,7 +55,7 @@ export function PaymentHistory() {
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center mb-4">
-          <p className="text-sm text-gray-400">Recent transactions</p>
+          <p className="text-sm" style={{ color: 'var(--staff-muted)' }}>Recent transactions</p>
           <button 
             onClick={handleHardSync}
             disabled={syncing}
@@ -68,19 +68,19 @@ export function PaymentHistory() {
       {loading ? (
         <div className="space-y-3">
             {[1,2,3].map(i => (
-                <div key={i} className="h-16 bg-[#ffffff05] rounded-xl animate-pulse" />
+                <div key={i} className="h-16 rounded-xl animate-pulse" style={{ backgroundColor: 'var(--staff-surface-alt)' }} />
             ))}
         </div>
       ) : (
         <div className="space-y-3">
           {payments.length === 0 && (
-              <div className="text-center py-8 text-gray-500">No payments found</div>
+              <div className="text-center py-8" style={{ color: 'var(--staff-muted)' }}>No payments found</div>
           )}
           {payments.map((payment) => (
-            <div key={payment.id} className="bg-[#ffffff05] p-3 rounded-xl flex justify-between items-center border border-[#ffffff05] hover:border-[#ffffff10] transition-colors">
+            <div key={payment.id} className="p-3 rounded-xl flex justify-between items-center transition-colors" style={{ backgroundColor: 'var(--staff-surface)', border: '1px solid var(--staff-border)' }}>
               <div>
-                <div className="font-bold text-white">{formatCurrency(payment.amount)}</div>
-                <div className="text-xs text-gray-500">{formatDate(payment.createdAt)}</div>
+                <div className="font-bold" style={{ color: 'var(--staff-text)' }}>{formatCurrency(payment.amount)}</div>
+                <div className="text-xs" style={{ color: 'var(--staff-muted)' }}>{formatDate(payment.createdAt)}</div>
               </div>
               <div className="text-right">
                 <span className={`text-xs px-2 py-1 rounded-full ${
@@ -90,7 +90,7 @@ export function PaymentHistory() {
                 }`}>
                   {payment.status}
                 </span>
-                <div className="text-[10px] text-gray-500 mt-1 uppercase">{payment.sourceType}</div>
+                <div className="text-[10px] mt-1 uppercase" style={{ color: 'var(--staff-muted)' }}>{payment.sourceType}</div>
               </div>
             </div>
           ))}

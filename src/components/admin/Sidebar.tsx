@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import Logo from '@/components/payload/Logo';
+import ThemeToggle from './ThemeToggle';
 
 // Icons (Same as CustomNav but inline for simplicity or imported if shared)
 const CommandIcon = () => <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>;
@@ -36,10 +37,14 @@ const Sidebar: React.FC = () => {
         className={`
           flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 group relative overflow-hidden
           ${active 
-            ? 'bg-[#f1c40f] text-[#2c3e50] font-bold shadow-[0_0_20px_rgba(241,196,15,0.4)]' 
-            : 'text-[#bdc3c7] hover:bg-[#ffffff08] hover:text-white'
+            ? 'text-[#2c3e50] font-bold shadow-[0_0_20px_rgba(241,196,15,0.4)]' 
+            : 'hover:bg-[#ffffff08]'
           }
         `}
+        style={{
+          backgroundColor: active ? 'var(--staff-accent)' : 'transparent',
+          color: active ? '#2c3e50' : 'var(--staff-muted)',
+        }}
       >
         <span className={`relative z-10 ${active ? 'text-[#2c3e50]' : 'group-hover:text-[#f1c40f] transition-colors'}`}>
           <Icon />
@@ -52,7 +57,7 @@ const Sidebar: React.FC = () => {
 
   const NavGroup = ({ title, children }: { title: string; children: React.ReactNode }) => (
     <div className="mb-6">
-      <h3 className="px-4 text-xs font-bold text-[#547085] uppercase tracking-widest mb-2">{title}</h3>
+      <h3 className="px-4 text-xs font-bold uppercase tracking-widest mb-2" style={{ color: 'var(--staff-muted)' }}>{title}</h3>
       <div className="space-y-1">
         {children}
       </div>
@@ -62,27 +67,27 @@ const Sidebar: React.FC = () => {
   return (
     <>
       {/* MOBILE BOTTOM NAV - Visible only on small screens */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-[#2c3e50]/95 backdrop-blur-xl border-t border-[#ffffff08] z-50 flex justify-around items-center p-2 pb-safe">
-        <Link href="/dashboard" className={`p-2 rounded-lg flex flex-col items-center gap-1 ${isActive('/dashboard') && !isActive('/dashboard/dispatch') ? 'text-[#f1c40f]' : 'text-[#bdc3c7]'}`}>
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 backdrop-blur-xl z-50 flex justify-around items-center p-2 pb-safe" style={{ backgroundColor: 'var(--staff-surface)', borderTop: '1px solid var(--staff-border)' }}>
+        <Link href="/dashboard" className={`p-2 rounded-lg flex flex-col items-center gap-1 ${isActive('/dashboard') && !isActive('/dashboard/dispatch') ? 'text-[#f1c40f]' : ''}`} style={{ color: isActive('/dashboard') && !isActive('/dashboard/dispatch') ? 'var(--staff-accent)' : 'var(--staff-muted)' }}>
             <CommandIcon />
             <span className="text-[10px] font-bold">Home</span>
         </Link>
-        <Link href="/dashboard/dispatch" className={`p-2 rounded-lg flex flex-col items-center gap-1 ${isActive('/dashboard/dispatch') ? 'text-[#f1c40f]' : 'text-[#bdc3c7]'}`}>
+        <Link href="/dashboard/dispatch" className={`p-2 rounded-lg flex flex-col items-center gap-1 ${isActive('/dashboard/dispatch') ? 'text-[#f1c40f]' : ''}`} style={{ color: isActive('/dashboard/dispatch') ? 'var(--staff-accent)' : 'var(--staff-muted)' }}>
             <DispatchIcon />
             <span className="text-[10px] font-bold">Dispatch</span>
         </Link>
-        <Link href="/dashboard/services" className={`p-2 rounded-lg flex flex-col items-center gap-1 ${isActive('/dashboard/services') ? 'text-[#f1c40f]' : 'text-[#bdc3c7]'}`}>
+        <Link href="/dashboard/services" className={`p-2 rounded-lg flex flex-col items-center gap-1 ${isActive('/dashboard/services') ? 'text-[#f1c40f]' : ''}`} style={{ color: isActive('/dashboard/services') ? 'var(--staff-accent)' : 'var(--staff-muted)' }}>
             <ServiceIcon />
             <span className="text-[10px] font-bold">Services</span>
         </Link>
-        <Link href="/dashboard/settings" className={`p-2 rounded-lg flex flex-col items-center gap-1 ${isActive('/dashboard/settings') ? 'text-[#f1c40f]' : 'text-[#bdc3c7]'}`}>
+        <Link href="/dashboard/settings" className={`p-2 rounded-lg flex flex-col items-center gap-1 ${isActive('/dashboard/settings') ? 'text-[#f1c40f]' : ''}`} style={{ color: isActive('/dashboard/settings') ? 'var(--staff-accent)' : 'var(--staff-muted)' }}>
             <SettingsIcon />
             <span className="text-[10px] font-bold">Settings</span>
         </Link>
       </nav>
 
       {/* DESKTOP SIDEBAR - Hidden on small screens */}
-      <aside className="hidden md:flex fixed left-0 top-0 h-screen w-[280px] bg-[#2c3e50]/95 backdrop-blur-xl border-r border-[#ffffff08] flex-col z-50">
+      <aside className="hidden md:flex fixed left-0 top-0 h-screen w-[280px] backdrop-blur-xl flex-col z-50" style={{ backgroundColor: 'var(--staff-surface)', borderRight: '1px solid var(--staff-border)' }}>
         {/* LOGO AREA */}
         <div className="p-6 mb-2 shrink-0">
             <Link href="/dashboard" className="block w-40 hover:opacity-90 transition-opacity">
@@ -115,12 +120,15 @@ const Sidebar: React.FC = () => {
         </nav>
 
         {/* FOOTER */}
-        <div className="p-4 border-t border-[#ffffff08]">
+        <div className="p-4" style={{ borderTop: '1px solid var(--staff-border)' }}>
+            <div className="mb-3">
+                <ThemeToggle />
+            </div>
             <Link href="/dashboard/logout" className="flex items-center gap-3 px-4 py-3 text-red-400 hover:bg-red-500/10 rounded-lg transition-all group">
                 <LogoutIcon />
                 <span className="font-bold group-hover:text-red-300">Log Out</span>
             </Link>
-             <div className="mt-4 px-4 text-[10px] text-[#547085] font-mono text-center">
+             <div className="mt-4 px-4 text-[10px] font-mono text-center" style={{ color: 'var(--staff-muted)' }}>
                 Mobil Garage v2.0
             </div>
         </div>

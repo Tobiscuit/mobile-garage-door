@@ -84,16 +84,16 @@ export function KPIGrid({ stats }: KPIGridProps) {
             key={i} 
             onClick={kpi.action}
             className="
-              bg-[#34495e]/40 backdrop-blur-md 
-              border border-[#ffffff08] 
+              backdrop-blur-md 
               p-4 md:p-6 rounded-3xl 
-              hover:border-[#f1c40f]/30 hover:bg-[#34495e]/60 
+              hover:border-[#f1c40f]/30
               transition-all duration-300 ease-out
               group 
               shadow-lg hover:shadow-[0_0_30px_-10px_rgba(241,196,15,0.1)]
               relative overflow-hidden cursor-pointer
               active:scale-[0.98]
             "
+            style={{ backgroundColor: 'var(--staff-surface)', border: '1px solid var(--staff-border)' }}
           >
              {/* Background Glow Effect */}
              <div 
@@ -102,18 +102,18 @@ export function KPIGrid({ stats }: KPIGridProps) {
              />
              
              <div className="flex flex-col md:flex-row justify-between items-start mb-2 md:mb-4 relative z-10 gap-2">
-                <div className="text-[#95a5a6] text-[10px] md:text-xs font-bold uppercase tracking-widest">{kpi.label}</div>
-                <span className="text-[10px] md:text-xs font-bold px-2 py-1 rounded-full bg-white/5 text-white/90 border border-white/5 group-hover:border-white/20 transition-colors hidden md:inline-block backdrop-blur-sm">
+                <div className="text-[10px] md:text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--staff-muted)' }}>{kpi.label}</div>
+                <span className="text-[10px] md:text-xs font-bold px-2 py-1 rounded-full hidden md:inline-block backdrop-blur-sm transition-colors" style={{ color: 'var(--staff-text)', backgroundColor: 'var(--staff-surface-alt)', border: '1px solid var(--staff-border)' }}>
                   {kpi.change}
                 </span>
              </div>
              
-             <div className="text-2xl md:text-4xl font-black text-white group-hover:scale-105 transition-transform origin-left mb-1 relative z-10 truncate tracking-tight">
+             <div className="text-2xl md:text-4xl font-black group-hover:scale-105 transition-transform origin-left mb-1 relative z-10 truncate tracking-tight" style={{ color: 'var(--staff-text)' }}>
                 {kpi.value}
              </div>
              
              {kpi.subtext && (
-               <div className="text-[10px] md:text-xs text-[#bdc3c7] font-medium relative z-10 truncate opacity-80 group-hover:opacity-100 transition-opacity">
+               <div className="text-[10px] md:text-xs font-medium relative z-10 truncate opacity-80 group-hover:opacity-100 transition-opacity" style={{ color: 'var(--staff-muted)' }}>
                  {kpi.subtext}
                </div>
              )}

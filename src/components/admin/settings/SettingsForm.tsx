@@ -3,7 +3,6 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { updateSettings } from '@/app/(site)/dashboard/settings/actions';
-import Image from 'next/image';
 
 interface SettingsFormProps {
   initialData: any;
@@ -71,26 +70,28 @@ export default function SettingsForm({ initialData }: SettingsFormProps) {
 
   const InputField = ({ label, name, defaultValue, type = 'text', placeholder = '' }: any) => (
     <div className="space-y-2">
-      <label className="text-xs font-bold text-[#bdc3c7] uppercase tracking-wider">{label}</label>
+      <label className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--staff-muted)' }}>{label}</label>
       <input
         type={type}
         name={name}
         defaultValue={defaultValue}
         placeholder={placeholder}
-        className="w-full bg-[#2c3e50] border border-[#ffffff10] rounded-xl p-4 text-[#f7f9fb] focus:outline-none focus:border-[#f1c40f] transition-colors"
+        className="w-full rounded-xl p-4 focus:outline-none focus:border-[#f1c40f] transition-colors"
+        style={{ backgroundColor: 'var(--staff-surface)', border: '1px solid var(--staff-border)', color: 'var(--staff-text)' }}
       />
     </div>
   );
 
   const TextareaField = ({ label, name, defaultValue, rows = 4, placeholder = '' }: any) => (
     <div className="space-y-2">
-      <label className="text-xs font-bold text-[#bdc3c7] uppercase tracking-wider">{label}</label>
+      <label className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--staff-muted)' }}>{label}</label>
       <textarea
         name={name}
         defaultValue={defaultValue}
         rows={rows}
         placeholder={placeholder}
-        className="w-full bg-[#2c3e50] border border-[#ffffff10] rounded-xl p-4 text-[#f7f9fb] focus:outline-none focus:border-[#f1c40f] transition-colors resize-none"
+        className="w-full rounded-xl p-4 focus:outline-none focus:border-[#f1c40f] transition-colors resize-none"
+        style={{ backgroundColor: 'var(--staff-surface)', border: '1px solid var(--staff-border)', color: 'var(--staff-text)' }}
       />
     </div>
   );
@@ -99,8 +100,8 @@ export default function SettingsForm({ initialData }: SettingsFormProps) {
     <form onSubmit={handleSubmit} className="space-y-8 max-w-5xl">
       
       {/* COMPANY INFO */}
-      <section className="bg-[#34495e]/50 backdrop-blur-md border border-[#ffffff08] rounded-3xl p-8 shadow-xl">
-        <h2 className="text-2xl font-black text-white mb-6 flex items-center gap-3">
+      <section className="backdrop-blur-md rounded-3xl p-8 shadow-xl" style={{ backgroundColor: 'var(--staff-surface)', border: '1px solid var(--staff-border)' }}>
+        <h2 className="text-2xl font-black mb-6 flex items-center gap-3" style={{ color: 'var(--staff-text)' }}>
           <span className="text-[#f1c40f]">01.</span> Company Information
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -114,8 +115,8 @@ export default function SettingsForm({ initialData }: SettingsFormProps) {
       </section>
 
       {/* ABOUT PAGE CONTENT */}
-      <section className="bg-[#34495e]/50 backdrop-blur-md border border-[#ffffff08] rounded-3xl p-8 shadow-xl">
-        <h2 className="text-2xl font-black text-white mb-6 flex items-center gap-3">
+      <section className="backdrop-blur-md rounded-3xl p-8 shadow-xl" style={{ backgroundColor: 'var(--staff-surface)', border: '1px solid var(--staff-border)' }}>
+        <h2 className="text-2xl font-black mb-6 flex items-center gap-3" style={{ color: 'var(--staff-text)' }}>
           <span className="text-[#f1c40f]">02.</span> About Page Content
         </h2>
         
@@ -125,12 +126,12 @@ export default function SettingsForm({ initialData }: SettingsFormProps) {
           {/* STATS ARRAY */}
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <label className="text-xs font-bold text-[#bdc3c7] uppercase tracking-wider">Company Stats</label>
+              <label className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--staff-muted)' }}>Company Stats</label>
               <button type="button" onClick={addStat} className="text-[#f1c40f] text-xs font-bold hover:underline">+ ADD STAT</button>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {stats.map((stat: any, index: number) => (
-                <div key={index} className="bg-[#2c3e50] border border-[#ffffff10] rounded-xl p-4 relative group">
+                <div key={index} className="rounded-xl p-4 relative group" style={{ backgroundColor: 'var(--staff-surface-alt)', border: '1px solid var(--staff-border)' }}>
                   <button 
                     type="button" 
                     onClick={() => removeStat(index)}
@@ -144,14 +145,16 @@ export default function SettingsForm({ initialData }: SettingsFormProps) {
                       value={stat.value} 
                       onChange={(e) => handleStatsChange(index, 'value', e.target.value)}
                       placeholder="Value (e.g. 15+)"
-                      className="w-full bg-transparent border-b border-[#ffffff10] pb-1 text-[#f7f9fb] font-bold focus:outline-none focus:border-[#f1c40f]"
+                      className="w-full bg-transparent border-b pb-1 font-bold focus:outline-none focus:border-[#f1c40f]"
+                      style={{ borderColor: 'var(--staff-border)', color: 'var(--staff-text)' }}
                     />
                     <input 
                       type="text" 
                       value={stat.label} 
                       onChange={(e) => handleStatsChange(index, 'label', e.target.value)}
                       placeholder="Label (e.g. Years)"
-                      className="w-full bg-transparent border-b border-[#ffffff10] pb-1 text-[#bdc3c7] text-sm focus:outline-none focus:border-[#f1c40f]"
+                      className="w-full bg-transparent border-b pb-1 text-sm focus:outline-none focus:border-[#f1c40f]"
+                      style={{ borderColor: 'var(--staff-border)', color: 'var(--staff-muted)' }}
                     />
                   </div>
                 </div>
@@ -162,12 +165,12 @@ export default function SettingsForm({ initialData }: SettingsFormProps) {
           {/* VALUES ARRAY */}
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <label className="text-xs font-bold text-[#bdc3c7] uppercase tracking-wider">Core Values</label>
+              <label className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--staff-muted)' }}>Core Values</label>
               <button type="button" onClick={addValue} className="text-[#f1c40f] text-xs font-bold hover:underline">+ ADD VALUE</button>
             </div>
             <div className="space-y-4">
               {values.map((val: any, index: number) => (
-                <div key={index} className="bg-[#2c3e50] border border-[#ffffff10] rounded-xl p-6 relative group">
+                <div key={index} className="rounded-xl p-6 relative group" style={{ backgroundColor: 'var(--staff-surface-alt)', border: '1px solid var(--staff-border)' }}>
                    <button 
                     type="button" 
                     onClick={() => removeValue(index)}
@@ -181,14 +184,16 @@ export default function SettingsForm({ initialData }: SettingsFormProps) {
                       value={val.title} 
                       onChange={(e) => handleValuesChange(index, 'title', e.target.value)}
                       placeholder="Value Title"
-                      className="w-full bg-transparent border-b border-[#ffffff10] pb-2 text-[#f1c40f] font-bold text-lg focus:outline-none focus:border-[#f1c40f]"
+                      className="w-full bg-transparent border-b pb-2 text-[#f1c40f] font-bold text-lg focus:outline-none focus:border-[#f1c40f]"
+                      style={{ borderColor: 'var(--staff-border)' }}
                     />
                      <textarea 
                       value={val.description} 
                       onChange={(e) => handleValuesChange(index, 'description', e.target.value)}
                       placeholder="Description"
                       rows={2}
-                      className="w-full bg-transparent border-b border-[#ffffff10] pb-2 text-[#bdc3c7] focus:outline-none focus:border-[#f1c40f] resize-none"
+                      className="w-full bg-transparent border-b pb-2 focus:outline-none focus:border-[#f1c40f] resize-none"
+                      style={{ borderColor: 'var(--staff-border)', color: 'var(--staff-muted)' }}
                     />
                   </div>
                 </div>
@@ -199,8 +204,8 @@ export default function SettingsForm({ initialData }: SettingsFormProps) {
       </section>
 
       {/* BRAND VOICE */}
-      <section className="bg-[#34495e]/50 backdrop-blur-md border border-[#ffffff08] rounded-3xl p-8 shadow-xl">
-        <h2 className="text-2xl font-black text-white mb-6 flex items-center gap-3">
+      <section className="backdrop-blur-md rounded-3xl p-8 shadow-xl" style={{ backgroundColor: 'var(--staff-surface)', border: '1px solid var(--staff-border)' }}>
+        <h2 className="text-2xl font-black mb-6 flex items-center gap-3" style={{ color: 'var(--staff-text)' }}>
           <span className="text-[#f1c40f]">03.</span> Brand Voice (AI Persona)
         </h2>
         <div className="space-y-6">
@@ -211,8 +216,8 @@ export default function SettingsForm({ initialData }: SettingsFormProps) {
       </section>
 
       {/* ACTION BAR */}
-      <div className="sticky bottom-8 bg-[#2c3e50]/90 backdrop-blur-xl border border-[#ffffff10] p-4 rounded-2xl shadow-2xl flex items-center justify-between">
-        <div className="text-[#bdc3c7] text-sm">
+      <div className="sticky bottom-8 backdrop-blur-xl p-4 rounded-2xl shadow-2xl flex items-center justify-between" style={{ backgroundColor: 'var(--staff-surface)', border: '1px solid var(--staff-border)' }}>
+        <div className="text-sm" style={{ color: 'var(--staff-muted)' }}>
           Changes will reflect immediately across the site.
         </div>
         <button

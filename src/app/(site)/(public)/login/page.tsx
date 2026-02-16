@@ -9,15 +9,16 @@ import { authClient } from '@/lib/auth-client';
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [usePasskey, setUsePasskey] = useState(false); // Option for Passkey
+  const [usePasskey, setUsePasskey] = useState(false);
   const [error, setError] = useState('');
+  const [info, setInfo] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
+    setInfo('');
 
     if (usePasskey) {
       try {
@@ -39,20 +40,17 @@ export default function LoginPage() {
     }
 
     try {
-      const result = await authClient.signIn.email({
+      const result = await authClient.signIn.magicLink({
         email,
-        password,
+        callbackURL: `${window.location.origin}/app`,
       });
 
       if (result.data) {
-        const userRole = (result.data.user as { role?: string } | undefined)?.role;
-        if (userRole === 'admin') router.push('/dashboard');
-        else if (userRole === 'technician') router.push('/dashboard/technician');
-        else router.push('/portal');
+        setInfo('Magic link sent. Check your email (or server logs in local dev).');
       } else {
-        setError(result.error?.message || 'Invalid credentials');
+        setError(result.error?.message || 'Failed to send magic link');
       }
-    } catch (err) {
+    } catch {
       setError('Something went wrong. Please try again.');
     } finally {
       setLoading(false);
@@ -75,6 +73,11 @@ export default function LoginPage() {
                 {error}
               </div>
             )}
+            {info && (
+              <div className="bg-green-50 text-green-700 p-4 rounded-lg mb-6 text-sm font-medium border border-green-100">
+                {info}
+              </div>
+            )}
 
             <form onSubmit={handleLogin} className="space-y-6">
               <div>
@@ -87,19 +90,6 @@ export default function LoginPage() {
                   placeholder="name@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Password</label>
-                <input 
-                  type="password" 
-                  required={!usePasskey} // Optional if using Passkey
-                  className="w-full bg-white border border-gray-200 rounded-lg p-4 font-medium text-black focus:ring-2 focus:ring-[#f1c40f] focus:border-transparent outline-none transition-all"
-                  style={{ color: '#000000', backgroundColor: '#ffffff' }}
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
                 />
               </div>
 
@@ -124,7 +114,7 @@ export default function LoginPage() {
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
                 ) : (
-                    'SIGN IN TO PORTAL'
+                    usePasskey ? 'SIGN IN WITH PASSKEY' : 'EMAIL ME A MAGIC LINK'
                 )}
               </button>
             </form>
@@ -133,6 +123,12 @@ export default function LoginPage() {
               Don't have an account?{' '}
               <Link href="/signup" className="text-golden-yellow font-bold hover:underline">
                 Register here
+              </Link>
+            </div>
+            <div className="mt-3 text-center text-sm text-gray-400">
+              Staff member?{' '}
+              <Link href="/staff-login" className="text-charcoal-blue font-bold hover:underline">
+                Staff sign in
               </Link>
             </div>
           </div>
