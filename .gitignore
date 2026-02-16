@@ -43,8 +43,24 @@ next-env.d.ts
 
 # OS
 Thumbs.db
+
+# Databases
+*.db
+*.db-journal
+
+# Logs
+*.log
+build_error_log.txt
+build_final_log.txt
+build_success_log.txt
+build_success_log_final.txt
+build_verification_log.txt
+dev_output.log
+dev_server.log
+
 # Terraform
 .terraform/
 *.tfstate
 *.tfstate.backup
 *.tfvars
+*.tfvars.json
