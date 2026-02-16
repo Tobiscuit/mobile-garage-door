@@ -3,12 +3,11 @@ import configPromise from '@/payload.config';
 import { DispatchClient } from './DispatchClient';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
-
-import { auth } from '@/lib/auth';
+import { getSessionSafe } from '@/lib/get-session-safe';
 
 export default async function DispatchPage() {
     const headersList = await headers();
-    const session = await auth.api.getSession({ headers: headersList });
+    const session = await getSessionSafe(headersList);
     const payload = await getPayload({ config: configPromise });
 
     if (!session) {

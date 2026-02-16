@@ -2,7 +2,8 @@ import React from 'react';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import Sidebar from '@/components/admin/Sidebar';
-import { auth } from '@/lib/auth';
+import { getSessionSafe } from '@/lib/get-session-safe';
+import NativeSignInPrompt from '@/components/auth/NativeSignInPrompt';
 
 export default async function DashboardLayout({
   children,
@@ -12,6 +13,7 @@ export default async function DashboardLayout({
   if (process.env.AUTH_BYPASS === 'true') {
     return (
       <div className="min-h-screen font-sans selection:bg-[#f1c40f] selection:text-[#2c3e50]" style={{ backgroundColor: 'var(--staff-bg)', color: 'var(--staff-text)' }}>
+        <NativeSignInPrompt />
         <script
           dangerouslySetInnerHTML={{
             __html:
@@ -28,7 +30,7 @@ export default async function DashboardLayout({
   }
 
   const headersList = await headers();
-  const session = await auth.api.getSession({ headers: headersList });
+  const session = await getSessionSafe(headersList);
 
   if (!session) {
     redirect('/login');
@@ -36,6 +38,7 @@ export default async function DashboardLayout({
 
   return (
     <div className="min-h-screen font-sans selection:bg-[#f1c40f] selection:text-[#2c3e50]" style={{ backgroundColor: 'var(--staff-bg)', color: 'var(--staff-text)' }}>
+      <NativeSignInPrompt />
       <script
         dangerouslySetInnerHTML={{
           __html:

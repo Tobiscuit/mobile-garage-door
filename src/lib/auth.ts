@@ -6,6 +6,7 @@ import { Pool } from 'pg';
 import { passkey } from '@better-auth/passkey';
 import { magicLink } from 'better-auth/plugins/magic-link';
 import { nextCookies } from 'better-auth/next-js';
+import { authSchema } from './auth-schema';
 
 const dbUri = process.env.DATABASE_URI;
 
@@ -22,8 +23,7 @@ const baseURL =
 const rpID = new URL(baseURL).hostname;
 const authSecret = process.env.BETTER_AUTH_SECRET || process.env.PAYLOAD_SECRET;
 const useMemoryAuth =
-  process.env.BETTER_AUTH_USE_MEMORY === 'true' ||
-  process.env.NODE_ENV !== 'production';
+  process.env.BETTER_AUTH_USE_MEMORY === 'true';
 const memoryDB: Record<string, any[]> = {
   user: [],
   session: [],
@@ -43,6 +43,7 @@ export const auth = betterAuth({
     ? memoryAdapter(memoryDB)
     : drizzleAdapter(db, {
         provider: 'pg',
+        schema: authSchema,
       }),
   emailAndPassword: {
     enabled: false,

@@ -1,23 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { headers } from 'next/headers'
-import { auth } from '@/lib/auth'
+import { getSessionSafe } from '@/lib/get-session-safe'
 
 export async function proxy(request: NextRequest) {
   if (process.env.AUTH_BYPASS === 'true') {
     return NextResponse.next()
   }
 
-  const session = await auth.api.getSession({
-    headers: await headers()
-  })
+  const session = await getSessionSafe(await headers())
 
   const { pathname } = request.nextUrl
 
-  if (session && (pathname.startsWith('/login') || pathname.startsWith('/signup') || pathname.startsWith('/staff-login'))) {
+  if (session && (pathname.startsWith('/login') || pathname.startsWith('/signup'))) {
     return NextResponse.redirect(new URL('/app', request.url))
   }
 
-  if (!session && pathname.startsWith('/dashboard')) {
+  if (!session && (pathname.startsWith('/dashboard') || pathname.startsWith('/portal') || pathname.startsWith('/app') || pathname.startsWith('/profile'))) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
@@ -25,5 +23,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*', '/login', '/staff-login', '/signup'],
+  matcher: ['/dashboard/:path*', '/portal/:path*', '/app/:path*', '/profile/:path*', '/login', '/signup'],
 }

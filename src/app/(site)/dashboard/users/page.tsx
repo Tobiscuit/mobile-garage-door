@@ -22,18 +22,18 @@ export default async function UsersPage() {
            <h1 className="text-4xl font-black text-white">Users</h1>
         </div>
 
-        <Link 
+          <Link 
           href="/dashboard/users/create" 
           className="
             flex items-center gap-2 bg-[#f1c40f] text-[#2c3e50] font-bold px-6 py-3 rounded-xl 
             shadow-[0_4px_20px_rgba(241,196,15,0.3)] hover:shadow-[0_6px_25px_rgba(241,196,15,0.5)] 
             hover:-translate-y-1 transition-all duration-300
           "
-        >
+          >
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
           </svg>
-          <span>New User</span>
+          <span>Invite Staff</span>
         </Link>
       </div>
 

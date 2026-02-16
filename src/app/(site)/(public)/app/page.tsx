@@ -1,6 +1,7 @@
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { auth } from '@/lib/auth';
+import { getSessionSafe } from '@/lib/get-session-safe';
+import { provisionUserFromSession } from '@/lib/provision-user-from-session';
 
 export default async function AppEntryPage() {
   if (process.env.AUTH_BYPASS === 'true') {
@@ -8,13 +9,18 @@ export default async function AppEntryPage() {
   }
 
   const headerList = await headers();
-  const session = await auth.api.getSession({ headers: headerList });
+  const session = await getSessionSafe(headerList);
 
   if (!session) {
     redirect('/login');
   }
 
-  const role = (session.user as { role?: string } | undefined)?.role;
+  const { role, profileComplete } = await provisionUserFromSession(session.user as { email?: string; role?: string } | undefined);
+
+  if ((role === 'admin' || role === 'technician' || role === 'dispatcher') && !profileComplete) {
+    redirect('/profile/complete');
+  }
+
   if (role === 'admin' || role === 'dispatcher') {
     redirect('/dashboard/dispatch');
   }
