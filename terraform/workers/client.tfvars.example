@@ -1,0 +1,12 @@
+cloudflare_api_token = "REPLACE_WITH_CLIENT_API_TOKEN"
+cloudflare_account_id = "REPLACE_WITH_CLIENT_ACCOUNT_ID"
+cloudflare_zone_id = "REPLACE_WITH_CLIENT_ZONE_ID"
+
+service_name = "mobile-garage-door-realtime-proxy"
+environment = "client"
+
+routes = [
+  "realtime.client-domain.com/*"
+]
+
+create_kv_namespace = false

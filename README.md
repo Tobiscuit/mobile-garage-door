@@ -51,6 +51,29 @@ vercel
 
 3. Follow the prompts to configure your project.
 
+## Cloudflare Workers (Realtime Proxy)
+
+This repo also supports deploying a realtime multimodal proxy worker.
+
+### Deploy model
+
+- Git remains in this repository.
+- Infrastructure (routes/KV) is managed via Terraform in `terraform/workers`.
+- Worker code and secrets are deployed via Wrangler from this same repo.
+- You can target either your account (`owner`) or client account (`client`) without moving source code.
+
+### Commands
+
+```bash
+npm run worker:deploy:owner
+npm run worker:secrets:owner
+npm run worker:deploy:client
+npm run worker:secrets:client
+```
+
+See `terraform/workers/README.md` for Terraform details and migration flow.
+CI deploy is also included at `.github/workflows/deploy-worker.yml`.
+
 ## Project Structure
 
 ```
