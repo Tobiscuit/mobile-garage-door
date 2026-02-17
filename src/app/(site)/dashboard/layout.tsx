@@ -1,23 +1,15 @@
-```typescript
-'use client';
-import React, { useEffect } from 'react';
-import { Sidebar } from '@/components/admin/Sidebar'; // Assuming Sidebar is now a named export or needs to be adjusted
+import { headers } from 'next/headers';
+import { redirect } from 'next/navigation';
+import { getSessionSafe } from '@/lib/get-session-safe';
+import { NativeSignInPrompt } from '@/components/auth/NativeSignInPrompt';
+import Sidebar from '@/components/admin/Sidebar';
+import React from 'react';
 
-export default function DashboardLayout({
+export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-        />
-        <Sidebar />
-        <main className="md:ml-[280px] min-h-screen relative z-0 pb-20 md:pb-0">
-          <div className="fixed inset-0 pointer-events-none z-[-1] bg-[radial-gradient(circle_at_top_right,rgba(241,196,15,0.08),transparent_40%)]" />
-          <div className="p-4 md:p-8 max-w-7xl mx-auto">{children}</div>
-        </main>
-      </div>
-    );
-  }
-
   const headersList = await headers();
   const session = await getSessionSafe(headersList);
 
