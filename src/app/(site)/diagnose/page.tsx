@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 
 export default function DiagnosePage() {
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
-  const [status, setStatus] = useState<'idle' | 'connected' | 'error'>('idle');
+  const [status, setStatus] = useState<'idle' | 'connecting' | 'connected' | 'error'>('idle');
   const [aiMessage, setAiMessage] = useState("I'm listening. Please press the wall button.");
   
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -45,6 +45,8 @@ export default function DiagnosePage() {
       
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
+        // Explicitly play for mobile browsers
+        videoRef.current.play().catch(e => console.error("Video Play Error:", e));
       }
       setHasPermission(true);
       connectWebSocket(stream);
@@ -57,7 +59,7 @@ export default function DiagnosePage() {
   };
 
   const connectWebSocket = (stream: MediaStream) => {
-      setStatus('connected');
+      setStatus('connecting'); // New state
       // Use Cloudflare Worker in Production, Localhost in Dev (or switch manually for testing)
       const wsUrl = window.location.hostname === 'localhost' 
           ? 'ws://localhost:3001' 
@@ -68,6 +70,7 @@ export default function DiagnosePage() {
 
       ws.onopen = () => {
           console.log('WS Connected');
+          setStatus('connected');
           startAudioStreaming(stream);
       };
 
@@ -149,14 +152,24 @@ export default function DiagnosePage() {
            <span className="text-sm font-bold uppercase tracking-widest">Exit</span>
         </Link>
         <div className={`px-3 py-1 border rounded-full flex items-center gap-2 backdrop-blur-md transition-colors ${
-            status === 'connected' ? 'bg-green-600/30 border-green-500/50' : 'bg-red-600/30 border-red-500/50'
+            status === 'connected' ? 'bg-green-600/30 border-green-500/50' : 
+            status === 'error' ? 'bg-red-600/30 border-red-500/50' : 
+            'bg-yellow-600/30 border-yellow-500/50'
         }`}>
             <span className="relative flex h-2 w-2">
-              <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${status === 'connected' ? 'bg-green-400' : 'bg-red-400'}`}></span>
-              <span className={`relative inline-flex rounded-full h-2 w-2 ${status === 'connected' ? 'bg-green-500' : 'bg-red-500'}`}></span>
+              <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${
+                  status === 'connected' ? 'bg-green-400' : 
+                  status === 'error' ? 'bg-red-400' : 'bg-yellow-400'
+              }`}></span>
+              <span className={`relative inline-flex rounded-full h-2 w-2 ${
+                  status === 'connected' ? 'bg-green-500' : 
+                  status === 'error' ? 'bg-red-500' : 'bg-yellow-500'
+              }`}></span>
             </span>
             <span className="text-xs font-bold text-white uppercase tracking-wider">
-                {status === 'connected' ? 'Live Connection' : 'Offline'}
+                {status === 'connected' ? 'Live Connection' : 
+                 status === 'connecting' ? 'Connecting...' :
+                 status === 'error' ? 'Connection Failed' : 'Ready to Connect'}
             </span>
         </div>
       </div>
