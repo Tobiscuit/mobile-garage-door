@@ -7,6 +7,10 @@ import { fileURLToPath } from 'url';
 import { nodemailerAdapter } from '@payloadcms/email-nodemailer';
 import { emailTransport } from './lib/email';
 
+// Allow broad CORS for PWA/Manifest fetch
+const cors = ['https://garage-door.jrcodex.dev', 'http://localhost:3000']; 
+
+
 // Collections
 import { Services } from './collections/Services';
 import { Projects } from './collections/Projects';
@@ -105,6 +109,8 @@ export default buildConfig({
       connectionString: process.env.DATABASE_URI || '',
     },
   }),
+  cors: cors,
+  csrf: cors,
   email: nodemailerAdapter({
     defaultFromAddress: process.env.SES_FROM_NOTIFY || 'dispatch@mobilegaragedoor.com',
     defaultFromName: 'Mobile Garage Door Dispatch',
