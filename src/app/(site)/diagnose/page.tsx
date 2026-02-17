@@ -34,6 +34,16 @@ export default function DiagnosePage() {
 
   const startCamera = async () => {
     try {
+      // 1. Create AudioContext immediately within user gesture (Click)
+      // This is critical for iOS/Mobile Safari autoplay policies
+      const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 16000 });
+      audioContextRef.current = audioCtx;
+      
+      // Ensure it's running (some browsers start suspended)
+      if (audioCtx.state === 'suspended') {
+        await audioCtx.resume();
+      }
+
       const stream = await navigator.mediaDevices.getUserMedia({ 
         video: { facingMode: 'environment' }, 
         audio: {
@@ -49,7 +59,7 @@ export default function DiagnosePage() {
         videoRef.current.play().catch(e => console.error("Video Play Error:", e));
       }
       setHasPermission(true);
-      connectWebSocket(stream);
+      connectWebSocket(stream); // AudioContext is already in ref
 
     } catch (err) {
       console.error("Camera Error:", err);
@@ -72,6 +82,7 @@ export default function DiagnosePage() {
           console.log('WS Connected');
           setStatus('connected');
           startAudioStreaming(stream);
+          startVideoStreaming();
       };
 
       ws.onmessage = async (event) => {
@@ -97,8 +108,8 @@ export default function DiagnosePage() {
   };
 
   const startAudioStreaming = (stream: MediaStream) => {
-      const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 16000 });
-      audioContextRef.current = audioCtx;
+      const audioCtx = audioContextRef.current;
+      if (!audioCtx) return;
 
       const source = audioCtx.createMediaStreamSource(stream);
       // ScriptProcessor is deprecated but easiest for raw PCM in PoC without AudioWorklet setup
@@ -133,14 +144,88 @@ export default function DiagnosePage() {
       processor.connect(audioCtx.destination); // Start processing
   };
 
+  const startVideoStreaming = () => {
+      // Send frames at ~2 FPS (every 500ms)
+      // This is sufficient for the model to "see" without overloading bandwidth
+      const interval = window.setInterval(() => {
+          if (wsRef.current?.readyState !== WebSocket.OPEN || !videoRef.current) return;
+
+          const canvas = document.createElement('canvas');
+          canvas.width = videoRef.current.videoWidth || 640;
+          canvas.height = videoRef.current.videoHeight || 480;
+          
+          const ctx = canvas.getContext('2d');
+          if (!ctx) return;
+
+          ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
+          
+          // Convert to Base64 JPEG (Quality 0.6 is good balance)
+          const base64Image = canvas.toDataURL('image/jpeg', 0.6).split(',')[1];
+
+          wsRef.current.send(JSON.stringify({
+              realtimeInput: {
+                  mediaChunks: [{
+                      mimeType: "image/jpeg",
+                      data: base64Image
+                  }]
+              }
+          }));
+
+      }, 500);
+
+      // Store interval ID for cleanup (we'll hack it onto the ref for now or adding a new ref would be cleaner)
+      // Let's add a refined ref for video interval
+      (window as any).videoInterval = interval;
+  };
+
+  const stopMedia = () => {
+    if ((window as any).videoInterval) clearInterval((window as any).videoInterval);
+    if (videoRef.current && videoRef.current.srcObject) {
+       const tracks = (videoRef.current.srcObject as MediaStream).getTracks();
+       tracks.forEach(track => track.stop());
+    }
+    audioContextRef.current?.close();
+    processorRef.current?.disconnect();
+  };
+
   const playPcmAudio = (base64String: string) => {
-      // Very simple PCM playback queue implementation is complex.
-      // For PoC, we decode and assume 24kHz (Gemini Default)? Or matches our input?
-      // Actually Gemini output is usually 24kHz.
-      // We'll skip complex playback implementation for this specific response step 
-      // and focus on the UI "listening" state unless we want full audio.
-      console.log("Received Audio Chunk:", base64String.length);
-      // NOTE: Full PCM playback implementation requires a dedicated AudioWorklet / Queue.
+    try {
+      const audioCtx = audioContextRef.current;
+      if (!audioCtx) return;
+
+      // decode base64
+      const binaryString = atob(base64String);
+      const len = binaryString.length;
+      const bytes = new Uint8Array(len);
+      for (let i = 0; i < len; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+      }
+
+      // PCM 16-bit LE -> Float32
+      const samples = new Float32Array(bytes.length / 2);
+      const dataView = new DataView(bytes.buffer);
+      
+      for (let i = 0; i < samples.length; i++) {
+        const int16 = dataView.getInt16(i * 2, true); // true = little-endian
+        samples[i] = int16 / 32768;
+      }
+
+      // Create AudioBuffer
+      // Gemini usually defaults to 24000Hz via WebSocket if not specified
+      // But we can check response headers or assume 24k
+      // Let's assume 24kHz standard for Gemini Multimodal Live
+      const buffer = audioCtx.createBuffer(1, samples.length, 24000); 
+      buffer.getChannelData(0).set(samples);
+
+      // Play
+      const source = audioCtx.createBufferSource();
+      source.buffer = buffer;
+      source.connect(audioCtx.destination);
+      source.start();
+
+    } catch (e) {
+      console.error("Audio Playback Error:", e);
+    }
   };
 
   return (
