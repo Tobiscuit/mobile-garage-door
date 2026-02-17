@@ -64,7 +64,7 @@ export async function getThreadDetails(threadId: string) {
         id: msg.id,
         from: msg.from,
         to: msg.to,
-        bodyRaw: msg.bodyRaw, 
+        bodyRaw: msg.bodyRaw || '', 
         createdAt: msg.createdAt,
         direction: msg.direction,
       })),
