@@ -38,7 +38,7 @@ export default async function EmailThreadPage({ params }: PageProps) {
                  </span>
                  <span className="text-[#ffffff20]">|</span>
                  <span className="text-[#7f8c8d] text-xs">
-                   #{threadData.thread.id.slice(-6)}
+                   #{String(threadData.thread.id).slice(-6)}
                  </span>
               </div>
               <h1 className="text-2xl font-black text-white">{threadData.thread.subject}</h1>
