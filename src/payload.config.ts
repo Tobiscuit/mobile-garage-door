@@ -22,6 +22,7 @@ import { Emails } from './collections/Emails';
 
 // Globals
 import { SiteSettings } from './globals/SiteSettings';
+import { GlobalSettings } from './globals/GlobalSettings';
 
 // Custom Branding Components
 // import Logo from './components/payload/Logo';
@@ -92,6 +93,7 @@ export default buildConfig({
   ],
   globals: [
     SiteSettings,
+    GlobalSettings,
   ],
   editor: lexicalEditor({}),
   secret: process.env.PAYLOAD_SECRET || 'fallback-secret-do-not-use-in-production',

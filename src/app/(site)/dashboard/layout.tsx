@@ -1,24 +1,13 @@
-import React from 'react';
-import { headers } from 'next/headers';
-import { redirect } from 'next/navigation';
-import Sidebar from '@/components/admin/Sidebar';
-import { getSessionSafe } from '@/lib/get-session-safe';
-import NativeSignInPrompt from '@/components/auth/NativeSignInPrompt';
+```typescript
+'use client';
+import React, { useEffect } from 'react';
+import { Sidebar } from '@/components/admin/Sidebar'; // Assuming Sidebar is now a named export or needs to be adjusted
 
-export default async function DashboardLayout({
+export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  if (process.env.AUTH_BYPASS === 'true') {
-    return (
-      <div className="min-h-screen font-sans selection:bg-[#f1c40f] selection:text-[#2c3e50]" style={{ backgroundColor: 'var(--staff-bg)', color: 'var(--staff-text)' }}>
-        <NativeSignInPrompt />
-        <script
-          dangerouslySetInnerHTML={{
-            __html:
-              "try{var t=localStorage.getItem('app-theme')||'light';document.documentElement.setAttribute('data-app-theme',t);}catch(e){}",
-          }}
         />
         <Sidebar />
         <main className="md:ml-[280px] min-h-screen relative z-0 pb-20 md:pb-0">

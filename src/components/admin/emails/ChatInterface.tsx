@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { sendReply, getThreadDetails } from '@/app/(site)/dashboard/emails/actions';
+import { generateEmailDrafts, EmailDraftOption } from '@/actions/ai'; // Ensure this path is correct
 import { RichTextEditor } from './RichTextEditor';
 import { useRouter } from 'next/navigation';
 
@@ -33,6 +34,8 @@ export function ChatInterface({ threadId, initialMessages }: { threadId: string,
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [replyText, setReplyText] = useState('');
   const [isSending, setIsSending] = useState(false);
+  const [isGeneratingAI, setIsGeneratingAI] = useState(false);
+  const [aiOptions, setAiOptions] = useState<EmailDraftOption[]>([]);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [showMobileDrawer, setShowMobileDrawer] = useState(false); // State for Mobile Drawer
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -119,6 +122,31 @@ export function ChatInterface({ threadId, initialMessages }: { threadId: string,
     }
   };
 
+  const handleAIDraft = async () => {
+      setIsGeneratingAI(true);
+      try {
+          // Prepare context: Last 5 messages, formatted for AI
+          const context = messages.slice(-5).map(m => ({
+              id: String(m.id),
+              from: m.from,
+              body: m.bodyRaw.replace(/<[^>]*>/g, ''), // Strip HTML for context clarity if needed, or keep it. 
+              // Better to send raw text if the body is complex HTML to save tokens. 
+              // But bodyRaw here might be HTML. Let's send it but maybe truncated? 
+              // Actually, simply stripping tags is safer for a prompt.
+              date: new Date(m.createdAt).toLocaleString()
+          }));
+
+          const options = await generateEmailDrafts(context);
+          setAiOptions(options);
+
+      } catch (err) {
+          console.error("AI Draft Error:", err);
+          alert("Failed to generate AI drafts. Please check API Key.");
+      } finally {
+          setIsGeneratingAI(false);
+      }
+  };
+
   return (
     <>
       {/* MOBILE HEADER - Visible only on small screens */}
@@ -180,7 +208,7 @@ export function ChatInterface({ threadId, initialMessages }: { threadId: string,
                 content={replyText}
                 onChange={setReplyText}
                 onSend={handleSend}
-                disabled={isSending}
+                disabled={isSending || isGeneratingAI}
              />
              
              {/* TOOLBAR */}
@@ -192,11 +220,28 @@ export function ChatInterface({ threadId, initialMessages }: { threadId: string,
                              Draft saved {lastSaved.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
                          </span>
                      )}
-                     <span className="text-yellow-600 dark:text-[#f1c40f] flex items-center gap-1">
-                        <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                        AI Draft
-                     </span>
+                     <button 
+                         onClick={handleAIDraft}
+                         disabled={isGeneratingAI}
+                         className={`
+                             flex items-center gap-1 transition-all
+                             ${isGeneratingAI ? 'text-gray-400 animate-pulse' : 'text-yellow-600 dark:text-[#f1c40f] hover:underline'}
+                         `}
+                     >
+                        {isGeneratingAI ? (
+                            <>
+                                <svg className="w-3 h-3 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+                                Thinking...
+                            </>
+                        ) : (
+                            <>
+                                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                                AI Draft
+                            </>
+                        )}
+                     </button>
                  </div>
+
 
                  <div className="flex items-center gap-2">
                     <button 
@@ -262,39 +307,78 @@ export function ChatInterface({ threadId, initialMessages }: { threadId: string,
                       </button>
                   </div>
                   
-                  {/* Reuse the logic from the Sidebar Page Wrapper if possible, or render placeholder for now since we are inside ChatInterface and passing data out is complex without Context */}
-                  <div className="space-y-6">
-                       {/* This content duplicates the sidebar logic from page.tsx. 
-                           Ideally, we would pass this in as a prop or slot. 
-                           For now, duplicating the static placeholder behavior to match current state.
-                       */}
-                       <div className="flex flex-col items-center text-center">
-                            <div className="w-20 h-20 rounded-full bg-linear-to-br from-purple-500 to-indigo-600 flex items-center justify-center text-2xl font-bold text-white mb-3 shadow-lg">
-                                {messages.find(m => m.direction === 'inbound')?.from?.[0]?.toUpperCase() || '?'}
-                            </div>
-                            <h2 className="text-xl font-bold text-gray-800 dark:text-white">
-                                {messages.find(m => m.direction === 'inbound')?.from || 'Unknown User'}
-                            </h2>
-                            <span className="text-sm text-gray-500 dark:text-gray-400">Customer</span>
+                   <div className="flex flex-col items-center text-center">
+                        <div className="w-20 h-20 rounded-full bg-linear-to-br from-purple-500 to-indigo-600 flex items-center justify-center text-2xl font-bold text-white mb-3 shadow-lg">
+                            {messages.find(m => m.direction === 'inbound')?.from?.[0]?.toUpperCase() || '?'}
                         </div>
+                        <h2 className="text-xl font-bold text-gray-800 dark:text-white">
+                            {messages.find(m => m.direction === 'inbound')?.from || 'Unknown User'}
+                        </h2>
+                        <span className="text-sm text-gray-500 dark:text-gray-400">Customer</span>
+                    </div>
 
-                        <div className="p-4 rounded-xl bg-gray-50 dark:bg-[#ffffff05] border border-gray-200 dark:border-[#ffffff05]">
-                            <h3 className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-3">Lifetime Value</h3>
-                            <div className="text-2xl font-black text-[#f1c40f]">$0.00</div>
-                            <div className="text-xs text-gray-400 mt-1">0 completed jobs</div>
-                        </div>
+                    <div className="p-4 rounded-xl bg-gray-50 dark:bg-[#ffffff05] border border-gray-200 dark:border-[#ffffff05] mt-6">
+                        <h3 className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-3">Lifetime Value</h3>
+                        <div className="text-2xl font-black text-[#f1c40f]">$0.00</div>
+                        <div className="text-xs text-gray-400 mt-1">0 completed jobs</div>
+                    </div>
 
-                        <div>
-                            <button className="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm transition-all shadow-lg shadow-blue-500/20 mb-3">
-                                Create New Job
-                            </button>
-                            <button className="w-full py-3 rounded-xl bg-gray-100 dark:bg-[#ffffff05] hover:bg-gray-200 dark:hover:bg-[#ffffff10] text-gray-800 dark:text-white font-bold text-sm transition-all border border-gray-200 dark:border-[#ffffff05]">
-                                View Invoices
-                            </button>
-                        </div>
-                  </div>
+                    <div className="mt-6">
+                        <button className="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm transition-all shadow-lg shadow-blue-500/20 mb-3">
+                            Create New Job
+                        </button>
+                        <button className="w-full py-3 rounded-xl bg-gray-100 dark:bg-[#ffffff05] hover:bg-gray-200 dark:hover:bg-[#ffffff10] text-gray-800 dark:text-white font-bold text-sm transition-all border border-gray-200 dark:border-[#ffffff05]">
+                            View Invoices
+                        </button>
+                    </div>
               </div>
           </div>
+      )}
+
+      {/* AI DRAFT SELECTION MODAL */}
+      {aiOptions.length > 0 && (
+         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setAiOptions([])}></div>
+            <div className="relative w-full max-w-2xl bg-white dark:bg-[#2c3e50] rounded-2xl shadow-2xl border border-gray-200 dark:border-[#ffffff10] overflow-hidden animate-in zoom-in-95 duration-200">
+               <div className="bg-[#f1c40f] p-4 text-[#2c3e50] flex justify-between items-center">
+                   <h3 className="font-bold flex items-center gap-2">
+                       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                       Service Hero Suggestions
+                   </h3>
+                   <button onClick={() => setAiOptions([])} className="hover:bg-black/10 rounded-full p-1">
+                       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                   </button>
+               </div>
+               
+               <div className="p-6 grid gap-4">
+                   {aiOptions.map((option, idx) => (
+                       <button 
+                         key={idx}
+                         onClick={() => {
+                             setReplyText(option.content);
+                             setAiOptions([]);
+                         }}
+                         className="text-left group relative p-4 rounded-xl border-2 border-transparent hover:border-[#f1c40f] bg-gray-50 dark:bg-[#ffffff05] transition-all"
+                       >
+                           <div className="flex justify-between items-center mb-2">
+                               <span className={`
+                                 text-xs font-bold px-2 py-1 rounded uppercase tracking-wider
+                                 ${option.tone === 'Professional' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' : ''}
+                                 ${option.tone === 'Empathetic' ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300' : ''}
+                                 ${option.tone === 'Urgent' ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300' : ''}
+                               `}>
+                                   {option.tone}
+                               </span>
+                               <span className="opacity-0 group-hover:opacity-100 text-[#f1c40f] text-sm font-bold flex items-center gap-1 transition-opacity">
+                                   Use this <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+                               </span>
+                           </div>
+                           <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2">{option.preview}</p>
+                       </button>
+                   ))}
+               </div>
+            </div>
+         </div>
       )}
     </>
   );

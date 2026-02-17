@@ -49,6 +49,37 @@ export const Projects: CollectionConfig = {
       },
     },
     {
+      name: 'installDate',
+      type: 'date',
+      label: 'Installation Date',
+      admin: {
+        position: 'sidebar',
+        description: 'Used for warranty tracking',
+      },
+    },
+    {
+      name: 'warrantyExpiration',
+      type: 'date',
+      label: 'Labor Warranty Expiration',
+      admin: {
+        position: 'sidebar',
+        description: 'Triggers automated checkup email',
+      },
+      hooks: {
+        beforeValidate: [
+          ({ value, data }) => {
+            // Auto-calculate 1 year from installDate if not set
+            if (!value && data?.installDate) {
+              const date = new Date(data.installDate);
+              date.setFullYear(date.getFullYear() + 1);
+              return date.toISOString();
+            }
+            return value;
+          },
+        ],
+      },
+    },
+    {
       name: 'description',
       type: 'richText',
       required: true,
