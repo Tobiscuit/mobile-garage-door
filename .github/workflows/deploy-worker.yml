@@ -1,0 +1,41 @@
+name: Deploy Cloudflare Worker
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: "Deployment target"
+        required: true
+        default: "owner"
+        type: choice
+        options:
+          - owner
+          - client
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy-owner-on-main:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy owner environment
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CF_API_TOKEN_OWNER }}
+          accountId: ${{ secrets.CF_ACCOUNT_ID_OWNER }}
+          command: deploy --env owner
+
+  deploy-manual:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy selected environment
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ github.event.inputs.target == 'client' && secrets.CF_API_TOKEN_CLIENT || secrets.CF_API_TOKEN_OWNER }}
+          accountId: ${{ github.event.inputs.target == 'client' && secrets.CF_ACCOUNT_ID_CLIENT || secrets.CF_ACCOUNT_ID_OWNER }}
+          command: deploy --env ${{ github.event.inputs.target }}
