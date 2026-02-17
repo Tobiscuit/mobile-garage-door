@@ -25,18 +25,13 @@ export default {
     
     let geminiWs: WebSocket | null = null;
 
-    try {
-        // Cloudflare Workers can "fetch" a WebSocket URL to connect upstream
-        const response = await fetch(geminiUrl, {
-            headers: { 'Upgrade': 'websocket' }
-        });
+        // Cloudflare Workers - Use standard WebSocket constructor for external connections
+        geminiWs = new WebSocket(geminiUrl);
         
-        // Check if the upstream connection was accepted
-        if (response.status !== 101) {
-             throw new Error(`Gemini refused connection: ${response.status} ${response.statusText}`);
-        }
-
-        geminiWs = response.webSocket;
+        // We cannot await 'open' on the standard WebSocket object in the same way as a response
+        // Setup will happen in the 'open' event listener below.
+        
+        // Note: We don't need to check response.status here because the 'error' event will fire if connection fails.
     } catch (e: any) {
         console.error("Gemini Connection Error:", e);
         return new Response(`Failed to connect to Gemini: ${e.message}`, { status: 502 });
@@ -46,40 +41,42 @@ export default {
     server.accept();
     
     if (geminiWs) {
-        geminiWs.accept();
+        // Standard WebSocket does not have an .accept() method.
+        // It connects automatically.
 
         // 4. Setup "Pass-through" Bridge
         
-        // Client -> Gemini
+        // Client -> Gemini (Wait for Open)
         server.addEventListener('message', event => {
-            // Forward raw data chunks
-            geminiWs?.send(event.data);
+            if (geminiWs?.readyState === WebSocket.OPEN) {
+                geminiWs.send(event.data);
+            }
         });
 
         // Gemini -> Client
         geminiWs.addEventListener('message', event => {
+            // Cloudflare Workers WebSocket 'message' event data can be string or ArrayBuffer
             server.send(event.data);
         });
 
         // 5. Setup Live Persona (The "Service Hero")
-        // We send this system prompt immediately upon the 'open' event of the *upstream* connection
-        // However, since we just accepted it, we can send it now.
-        // NOTE: The Gemini API might need a moment or an initial setup message structure.
-        
-        const setupMessage = {
-          setup: {
-            model: "models/gemini-2.0-flash-exp", 
-            generationConfig: {
-              responseModalities: ["AUDIO", "TEXT"],
-            },
-            systemInstruction: {
-              parts: [{ 
-                 text: "You are 'Service Hero', a veteran Garage Door Technician. You are analyzing a video stream. Your goal is to diagnose issues. Be professional, reassuring, and concise. Identify noise, movement, and broken parts." 
-              }]
-            }
-          }
-        };
-        geminiWs.send(JSON.stringify(setupMessage));
+        geminiWs.addEventListener('open', () => {
+            console.log("Connected to Gemini API");
+            const setupMessage = {
+              setup: {
+                model: "models/gemini-2.0-flash-exp", 
+                generationConfig: {
+                  responseModalities: ["AUDIO", "TEXT"],
+                },
+                systemInstruction: {
+                  parts: [{ 
+                     text: "You are 'Service Hero', a veteran Garage Door Technician. You are analyzing a video stream. Your goal is to diagnose issues. Be professional, reassuring, and concise. Identify noise, movement, and broken parts." 
+                  }]
+                }
+              }
+            };
+            geminiWs?.send(JSON.stringify(setupMessage));
+        });
         
         // Handle Closures
         const safeClose = () => {
