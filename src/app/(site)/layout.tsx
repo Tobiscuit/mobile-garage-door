@@ -47,6 +47,8 @@ export const metadata: Metadata = {
   },
 }
 
+import { FloatingAiButton } from '@/components/FloatingAiButton';
+
 export default function RootLayout({
   children,
 }: {
@@ -54,7 +56,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${inter.className} bg-background text-primary`}>{children}</body>
+      <body className={`${inter.className} bg-background text-primary`}>
+        {children}
+        <FloatingAiButton />
+      </body>
     </html>
   )
 }

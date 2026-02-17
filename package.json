@@ -15,7 +15,9 @@
     "payload": "payload",
     "migrate:create": "payload migrate:create",
     "migrate": "payload migrate",
-    "seed": "tsx src/scripts/seed.ts"
+    "seed": "tsx src/scripts/seed.ts",
+    "dev:ws": "tsx src/server/live-proxy.ts",
+    "check:warranty": "tsx src/scripts/warranty-check.ts"
   },
   "engines": {
     "node": ">=25.0.0"
