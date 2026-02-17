@@ -58,7 +58,12 @@ export default function DiagnosePage() {
 
   const connectWebSocket = (stream: MediaStream) => {
       setStatus('connected');
-      const ws = new WebSocket('ws://localhost:3001');
+      // Use Cloudflare Worker in Production, Localhost in Dev (or switch manually for testing)
+      const wsUrl = window.location.hostname === 'localhost' 
+          ? 'ws://localhost:3001' 
+          : 'wss://mobile-garage-door-realtime-proxy.tobiasramzy.workers.dev';
+          
+      const ws = new WebSocket(wsUrl);
       wsRef.current = ws;
 
       ws.onopen = () => {
