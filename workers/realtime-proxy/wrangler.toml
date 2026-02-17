@@ -1,0 +1,13 @@
+name = "mobile-garage-door-realtime-proxy"
+main = "src/index.ts"
+compatibility_date = "2024-02-17"
+workers_dev = true
+
+# Default Environment (Production)
+# No specific env needed, simpler deployment
+
+[vars]
+# Public variables (none needed for now)
+
+# Secrets are managed via `wrangler secret put`
+# GEMINI_API_KEY
