@@ -1,7 +1,7 @@
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { getSessionSafe } from '@/lib/get-session-safe';
-import { NativeSignInPrompt } from '@/components/auth/NativeSignInPrompt';
+import NativeSignInPrompt from '@/components/auth/NativeSignInPrompt';
 import Sidebar from '@/components/admin/Sidebar';
 import React from 'react';
 
