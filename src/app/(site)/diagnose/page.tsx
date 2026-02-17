@@ -178,15 +178,7 @@ export default function DiagnosePage() {
       (window as any).videoInterval = interval;
   };
 
-  const stopMedia = () => {
-    if ((window as any).videoInterval) clearInterval((window as any).videoInterval);
-    if (videoRef.current && videoRef.current.srcObject) {
-       const tracks = (videoRef.current.srcObject as MediaStream).getTracks();
-       tracks.forEach(track => track.stop());
-    }
-    audioContextRef.current?.close();
-    processorRef.current?.disconnect();
-  };
+
 
   const playPcmAudio = (base64String: string) => {
     try {
