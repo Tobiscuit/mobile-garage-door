@@ -32,18 +32,28 @@ export default function DiagnosePage() {
     processorRef.current?.disconnect();
   };
 
+  // Debug Logger state
+  const [logs, setLogs] = useState<string[]>([]);
+  const addLog = (msg: string) => {
+      setLogs(prev => [...prev.slice(-19), `[${new Date().toLocaleTimeString()}] ${msg}`]);
+      console.log(msg);
+  };
+
   const startCamera = async () => {
+    addLog("Starting Camera...");
     try {
       // 1. Create AudioContext immediately within user gesture (Click)
-      // This is critical for iOS/Mobile Safari autoplay policies
+      addLog("Creating AudioContext...");
       const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 16000 });
       audioContextRef.current = audioCtx;
       
-      // Ensure it's running (some browsers start suspended)
+      addLog(`AudioContext State: ${audioCtx.state}`);
       if (audioCtx.state === 'suspended') {
         await audioCtx.resume();
+        addLog("AudioContext Resumed");
       }
 
+      addLog("Requesting getUserMedia...");
       const stream = await navigator.mediaDevices.getUserMedia({ 
         video: { facingMode: 'environment' }, 
         audio: {
@@ -52,25 +62,29 @@ export default function DiagnosePage() {
             echoCancellation: true
         }
       });
+      addLog("Stream Acquired");
       
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
-        // Explicitly play for mobile browsers
-        videoRef.current.play().catch(e => console.error("Video Play Error:", e));
+        videoRef.current.onloadedmetadata = () => {
+            addLog(`Video Metadata Loaded: ${videoRef.current?.videoWidth}x${videoRef.current?.videoHeight}`);
+            videoRef.current?.play().catch(e => addLog(`Video Play Error: ${e.message}`));
+        };
       }
       setHasPermission(true);
-      connectWebSocket(stream); // AudioContext is already in ref
+      connectWebSocket(stream);
 
-    } catch (err) {
-      console.error("Camera Error:", err);
+    } catch (err: any) {
+      addLog(`Camera Error: ${err.message}`);
       setHasPermission(false);
       alert("We need camera access. Please check permissions.");
     }
   };
 
   const connectWebSocket = (stream: MediaStream) => {
-      setStatus('connecting'); // New state
-      // Use Cloudflare Worker in Production, Localhost in Dev (or switch manually for testing)
+      setStatus('connecting');
+      addLog("Connecting WebSocket...");
+      
       const wsUrl = window.location.hostname === 'localhost' 
           ? 'ws://localhost:3001' 
           : 'wss://mobile-garage-door-realtime-proxy.tobiasramzy.workers.dev';
@@ -79,74 +93,85 @@ export default function DiagnosePage() {
       wsRef.current = ws;
 
       ws.onopen = () => {
-          console.log('WS Connected');
+          addLog("WS Connected");
           setStatus('connected');
           startAudioStreaming(stream);
           startVideoStreaming();
       };
 
       ws.onmessage = async (event) => {
-          const data = JSON.parse(event.data);
-          
-          // Handle Audio Output
-          if (data.serverContent?.modelTurn?.parts) {
-              for (const part of data.serverContent.modelTurn.parts) {
-                  if (part.text) {
-                      setAiMessage(part.text);
-                  }
-                  if (part.inlineData && part.inlineData.mimeType.startsWith('audio/pcm')) {
-                      playPcmAudio(part.inlineData.data);
-                  }
-              }
+          try {
+            const data = JSON.parse(event.data);
+            
+            // Handle Audio Output
+            if (data.serverContent?.modelTurn?.parts) {
+                for (const part of data.serverContent.modelTurn.parts) {
+                    if (part.text) {
+                        setAiMessage(part.text);
+                    }
+                    if (part.inlineData && part.inlineData.mimeType.startsWith('audio/pcm')) {
+                        playPcmAudio(part.inlineData.data);
+                    }
+                }
+            }
+          } catch (e) {
+              // Ignore parse errors for non-JSON messages if any, or log them
           }
       };
 
       ws.onerror = (err) => {
-          console.error("WS Error", err);
+          addLog("WS Error Event");
+          console.error(err);
           setStatus('error');
+      };
+
+      ws.onclose = (e) => {
+          addLog(`WS Closed: ${e.code} ${e.reason}`);
+          setStatus('idle');
       };
   };
 
-  const startAudioStreaming = (stream: MediaStream) => {
+  const startAudioStreaming = async (stream: MediaStream) => {
+      addLog("Starting Audio Stream (Worklet)...");
       const audioCtx = audioContextRef.current;
       if (!audioCtx) return;
 
-      const source = audioCtx.createMediaStreamSource(stream);
-      // ScriptProcessor is deprecated but easiest for raw PCM in PoC without AudioWorklet setup
-      const processor = audioCtx.createScriptProcessor(4096, 1, 1);
-      processorRef.current = processor;
+      try {
+          // Load the worklet module from public folder
+          await audioCtx.audioWorklet.addModule('/worklets/pcm-processor.js');
+          addLog("AudioWorklet Module Loaded");
 
-      processor.onaudioprocess = (e) => {
-          if (wsRef.current?.readyState !== WebSocket.OPEN) return;
+          const source = audioCtx.createMediaStreamSource(stream);
+          const workletNode = new AudioWorkletNode(audioCtx, 'pcm-processor');
+          
+          workletNode.port.onmessage = (event) => {
+              if (wsRef.current?.readyState !== WebSocket.OPEN) return;
 
-          const inputData = e.inputBuffer.getChannelData(0);
-          // Convert Float32 to Int16
-          const pcmData = new Int16Array(inputData.length);
-          for (let i = 0; i < inputData.length; i++) {
-              pcmData[i] = Math.max(-1, Math.min(1, inputData[i])) * 0x7FFF;
-          }
+              const pcmBuffer = event.data; // ArrayBuffer from worklet
+              const base64Audio = btoa(String.fromCharCode(...new Uint8Array(pcmBuffer)));
 
-          // Base64 Encode
-          const base64Audio = btoa(String.fromCharCode(...new Uint8Array(pcmData.buffer)));
+              wsRef.current.send(JSON.stringify({
+                  realtimeInput: {
+                      mediaChunks: [{
+                          mimeType: "audio/pcm",
+                          data: base64Audio
+                      }]
+                  }
+              }));
+          };
 
-          // Send to Gemini
-          wsRef.current.send(JSON.stringify({
-              realtimeInput: {
-                  mediaChunks: [{
-                      mimeType: "audio/pcm",
-                      data: base64Audio
-                  }]
-              }
-          }));
-      };
+          source.connect(workletNode);
+          workletNode.connect(audioCtx.destination); // Keep pipeline alive
+          addLog("Audio Pipeline Active");
 
-      source.connect(processor);
-      processor.connect(audioCtx.destination); // Start processing
+      } catch (e: any) {
+          addLog(`AudioWorklet Error: ${e.message}`);
+          console.error(e);
+      }
   };
 
   const startVideoStreaming = () => {
-      // Send frames at ~2 FPS (every 500ms)
-      // This is sufficient for the model to "see" without overloading bandwidth
+      addLog("Starting Video Stream...");
       const interval = window.setInterval(() => {
           if (wsRef.current?.readyState !== WebSocket.OPEN || !videoRef.current) return;
 
@@ -158,8 +183,6 @@ export default function DiagnosePage() {
           if (!ctx) return;
 
           ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
-          
-          // Convert to Base64 JPEG (Quality 0.6 is good balance)
           const base64Image = canvas.toDataURL('image/jpeg', 0.6).split(',')[1];
 
           wsRef.current.send(JSON.stringify({
@@ -172,20 +195,14 @@ export default function DiagnosePage() {
           }));
 
       }, 500);
-
-      // Store interval ID for cleanup (we'll hack it onto the ref for now or adding a new ref would be cleaner)
-      // Let's add a refined ref for video interval
       (window as any).videoInterval = interval;
   };
-
-
 
   const playPcmAudio = (base64String: string) => {
     try {
       const audioCtx = audioContextRef.current;
       if (!audioCtx) return;
 
-      // decode base64
       const binaryString = atob(base64String);
       const len = binaryString.length;
       const bytes = new Uint8Array(len);
@@ -193,35 +210,34 @@ export default function DiagnosePage() {
         bytes[i] = binaryString.charCodeAt(i);
       }
 
-      // PCM 16-bit LE -> Float32
       const samples = new Float32Array(bytes.length / 2);
       const dataView = new DataView(bytes.buffer);
       
       for (let i = 0; i < samples.length; i++) {
-        const int16 = dataView.getInt16(i * 2, true); // true = little-endian
+        const int16 = dataView.getInt16(i * 2, true);
         samples[i] = int16 / 32768;
       }
 
-      // Create AudioBuffer
-      // Gemini usually defaults to 24000Hz via WebSocket if not specified
-      // But we can check response headers or assume 24k
-      // Let's assume 24kHz standard for Gemini Multimodal Live
       const buffer = audioCtx.createBuffer(1, samples.length, 24000); 
       buffer.getChannelData(0).set(samples);
 
-      // Play
       const source = audioCtx.createBufferSource();
       source.buffer = buffer;
       source.connect(audioCtx.destination);
       source.start();
 
-    } catch (e) {
-      console.error("Audio Playback Error:", e);
+    } catch (e: any) {
+      addLog(`Audio Out Error: ${e.message}`);
     }
   };
 
   return (
     <div className="fixed inset-0 bg-black text-white flex flex-col z-50">
+      {/* DEBUG OVERLAY */}
+      <div className="absolute top-20 left-4 z-50 pointer-events-none opacity-50 text-[10px] font-mono text-green-400 bg-black/80 p-2 rounded max-w-[200px] overflow-hidden">
+          {logs.map((log, i) => <div key={i}>{log}</div>)}
+      </div>
+
       {/* HEADER */}
       <div className="absolute top-0 left-0 right-0 p-4 flex justify-between items-center z-20 bg-gradient-to-b from-black/80 to-transparent">
         <Link href="/" className="text-white/80 hover:text-white flex items-center gap-2">
@@ -291,7 +307,7 @@ export default function DiagnosePage() {
                                  </p>
                              </div>
                              
-                             {/* AUDIO WAVEFORM VISUALIZER (Static Mock for now) */}
+                             {/* AUDIO WAVEFORM VISUALIZER */}
                              <div className="flex items-center justify-center gap-1 h-8 opacity-50">
                                  {[...Array(20)].map((_, i) => (
                                      <div key={i} className="w-1 bg-white/50 rounded-full animate-bounce" style={{ height: `${Math.random() * 100}%`, animationDelay: `${i * 0.05}s` }}></div>
