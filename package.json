@@ -17,7 +17,11 @@
     "migrate": "payload migrate",
     "seed": "tsx src/scripts/seed.ts",
     "dev:ws": "tsx src/server/live-proxy.ts",
-    "check:warranty": "tsx src/scripts/warranty-check.ts"
+    "check:warranty": "tsx src/scripts/warranty-check.ts",
+    "worker:deploy:owner": "powershell -ExecutionPolicy Bypass -File scripts/deploy-worker.ps1 -Environment owner",
+    "worker:deploy:client": "powershell -ExecutionPolicy Bypass -File scripts/deploy-worker.ps1 -Environment client",
+    "worker:secrets:owner": "powershell -ExecutionPolicy Bypass -File scripts/set-worker-secrets.ps1 -Environment owner",
+    "worker:secrets:client": "powershell -ExecutionPolicy Bypass -File scripts/set-worker-secrets.ps1 -Environment client"
   },
   "engines": {
     "node": ">=25.0.0"
