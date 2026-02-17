@@ -127,7 +127,7 @@ export async function sendReply(threadId: string, content: string) {
       const emailRecord = await payload.create({
           collection: 'emails',
           data: {
-              thread: threadId,
+              thread: parseInt(threadId),
               from: process.env.SES_FROM_ADDRESS || 'dispatch@mobilegaragedoor.com',
               to: recipientEmail,
               subject: `Re: ${thread.subject}`,
