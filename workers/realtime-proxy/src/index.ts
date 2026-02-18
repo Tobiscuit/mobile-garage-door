@@ -90,17 +90,26 @@ export default {
         messageBuffer = [];
       });
 
-      // Gemini -> Client (log first few messages for diagnostics)
+      // Gemini -> Client (decode binary frames to text for JSON parsing on client)
+      const textDecoder = new TextDecoder();
       let geminiMsgCount = 0;
       geminiWs.addEventListener("message", event => {
         geminiMsgCount++;
+        // Gemini sends binary WebSocket frames even for JSON content
+        // Convert to string so the browser client can JSON.parse
+        let forwarded: string | ArrayBuffer;
+        if (typeof event.data === 'string') {
+          forwarded = event.data;
+        } else {
+          forwarded = textDecoder.decode(event.data as ArrayBuffer);
+        }
         if (geminiMsgCount <= 3) {
-          const preview = typeof event.data === 'string' 
-            ? event.data.substring(0, 300) 
-            : `[binary ${(event.data as ArrayBuffer).byteLength} bytes]`;
+          const preview = typeof forwarded === 'string' 
+            ? forwarded.substring(0, 300) 
+            : `[binary]`;
           console.log(`Gemini msg #${geminiMsgCount}: ${preview}`);
         }
-        server.send(event.data);
+        server.send(forwarded);
       });
 
       // Handle closures
