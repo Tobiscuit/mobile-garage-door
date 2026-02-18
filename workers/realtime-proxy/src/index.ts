@@ -22,21 +22,14 @@ export default {
     const [client, server] = Object.values(new WebSocketPair()) as [WebSocket, WebSocket & { accept: () => void }];
 
     // 2. Connect to Google Gemini
-    // Using the "GenerativeService" which is the simpler v1beta endpoint for Multimodal Live
-    const geminiUrl = `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent?key=${env.GEMINI_API_KEY}`;
+    const geminiUrl = `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent?key=${env.GEMINI_API_KEY}&alt=json`;
     
     let geminiWs: WebSocket | null = null;
 
     try {
-        // Cloudflare Workers - Use standard WebSocket constructor for external connections
         geminiWs = new WebSocket(geminiUrl);
-        
-        // We cannot await 'open' on the standard WebSocket object in the same way as a response
-        // Setup will happen in the 'open' event listener below.
-        
-        // Note: We don't need to check response.status here because the 'error' event will fire if connection fails.
     } catch (e: any) {
-        console.error("Gemini Connection Error:", e);
+        console.error("Gemini Connection Error:", e?.message || e);
         return new Response(`Failed to connect to Gemini: ${e.message}`, { status: 502 });
     }
 
@@ -44,8 +37,6 @@ export default {
     server.accept();
 
     if (geminiWs) {
-      // Standard WebSocket does not have an .accept() method.
-      // It connects automatically.
       let isGeminiReady = false;
       let messageBuffer: Array<string | ArrayBuffer> = [];
       const maxBufferedMessages = 200;
@@ -84,16 +75,14 @@ export default {
             }
           }
         };
-        geminiWs?.send(JSON.stringify(setupMessage));
+        const payload = JSON.stringify(setupMessage);
+        console.log("Sending setup:", payload.substring(0, 200));
+        geminiWs?.send(payload);
         
-        // BRIDGE: Gemini 2.0 might not send 'setupComplete', but client expects it.
-        // We force it here to unblock the client.
+        // BRIDGE: Force setupComplete to unblock client
         isGeminiReady = true;
-        
-        // 1. Tell Client we are ready
         server.send(JSON.stringify({ setupComplete: true }));
 
-        // 2. Flush Buffer
         console.log(`Flushing ${messageBuffer.length} buffered messages`);
         for (const msg of messageBuffer) {
            geminiWs?.send(msg);
@@ -101,9 +90,16 @@ export default {
         messageBuffer = [];
       });
 
-      // Gemini -> Client
+      // Gemini -> Client (log first few messages for diagnostics)
+      let geminiMsgCount = 0;
       geminiWs.addEventListener("message", event => {
-        // Forward all messages explicitly
+        geminiMsgCount++;
+        if (geminiMsgCount <= 3) {
+          const preview = typeof event.data === 'string' 
+            ? event.data.substring(0, 300) 
+            : `[binary ${(event.data as ArrayBuffer).byteLength} bytes]`;
+          console.log(`Gemini msg #${geminiMsgCount}: ${preview}`);
+        }
         server.send(event.data);
       });
 
@@ -114,19 +110,19 @@ export default {
       };
 
       server.addEventListener("close", (e) => {
-        console.log(`Client closed: ${e.code} ${e.reason}`);
+        console.log(`Client closed: code=${e.code} reason="${e.reason}"`);
         safeClose();
       });
-      server.addEventListener("error", (e) => {
-        console.error("Client error:", e);
+      server.addEventListener("error", (e: any) => {
+        console.error(`Client error: message="${e?.message || 'unknown'}" type="${e?.type || 'unknown'}"`);
         safeClose();
       });
       geminiWs.addEventListener("close", (e) => {
-        console.log(`Gemini closed: ${e.code} ${e.reason}`);
+        console.log(`Gemini closed: code=${e.code} reason="${e.reason}"`);
         safeClose();
       });
-      geminiWs.addEventListener("error", (e) => {
-        console.error("Gemini error:", e);
+      geminiWs.addEventListener("error", (e: any) => {
+        console.error(`Gemini error: message="${e?.message || 'unknown'}" type="${e?.type || 'unknown'}"`);
         safeClose();
       });
     }
