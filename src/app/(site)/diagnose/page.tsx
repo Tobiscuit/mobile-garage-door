@@ -13,6 +13,7 @@ export default function DiagnosePage() {
   const wsRef = useRef<WebSocket | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
   const playbackContextRef = useRef<AudioContext | null>(null);
+  const nextStartTimeRef = useRef(0);
   const videoIntervalRef = useRef<number | null>(null);
   const streamsStartedRef = useRef(false);
 
@@ -268,13 +269,15 @@ export default function DiagnosePage() {
 
   const playPcmAudio = (base64String: string) => {
     try {
-      // Use a dedicated 24kHz context for playback (Gemini outputs at 24kHz)
+      // Initialize playback context once at 24kHz (Gemini's output rate)
       if (!playbackContextRef.current || playbackContextRef.current.state === 'closed') {
         playbackContextRef.current = new AudioContext({ sampleRate: 24000 });
+        nextStartTimeRef.current = playbackContextRef.current.currentTime;
       }
       const audioCtx = playbackContextRef.current;
       if (!audioCtx) return;
 
+      // Decode base64 → raw bytes
       const binaryString = atob(base64String);
       const len = binaryString.length;
       const bytes = new Uint8Array(len);
@@ -282,21 +285,27 @@ export default function DiagnosePage() {
         bytes[i] = binaryString.charCodeAt(i);
       }
 
+      // Int16 PCM → Float32 for Web Audio
       const samples = new Float32Array(bytes.length / 2);
       const dataView = new DataView(bytes.buffer);
-      
       for (let i = 0; i < samples.length; i++) {
         const int16 = dataView.getInt16(i * 2, true);
         samples[i] = int16 / 32768;
       }
 
-      const buffer = audioCtx.createBuffer(1, samples.length, 24000); 
+      const buffer = audioCtx.createBuffer(1, samples.length, 24000);
       buffer.getChannelData(0).set(samples);
 
       const source = audioCtx.createBufferSource();
       source.buffer = buffer;
       source.connect(audioCtx.destination);
-      source.start();
+
+      // Schedule sequentially — don't overlap chunks
+      if (nextStartTimeRef.current < audioCtx.currentTime) {
+        nextStartTimeRef.current = audioCtx.currentTime;
+      }
+      source.start(nextStartTimeRef.current);
+      nextStartTimeRef.current += buffer.duration;
 
     } catch (e: any) {
       addLog(`Audio Out Error: ${e.message}`);
