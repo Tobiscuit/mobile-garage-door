@@ -3,8 +3,8 @@
 import React, { useState, Suspense, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { ContactHero } from '@/components/contact/ContactHero';
-import { AddressAutocomplete } from '@/components/ui/AddressAutocomplete';
-import { ServiceAreaMap } from '@/components/ui/ServiceAreaMap';
+import { AddressAutocomplete } from '@/shared/ui/AddressAutocomplete';
+import { ServiceAreaMap } from '@/shared/ui/ServiceAreaMap';
 import { SquarePaymentModal } from '@/components/payment/SquarePaymentModal';
 
 const ContactContent = () => {

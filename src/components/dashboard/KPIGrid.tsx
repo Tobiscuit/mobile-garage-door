@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Sheet } from '@/components/ui/Sheet';
+import { Sheet } from '@/shared/ui/Sheet';
 import { PaymentHistory } from './PaymentHistory';
 import { ActiveJobsList, TechnicianList } from './QuickLists';
 

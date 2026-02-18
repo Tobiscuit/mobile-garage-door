@@ -1,9 +1,9 @@
 
 import React from 'react'
-import Header from '@/components/Header'
-import Footer from '@/components/Footer'
-import ScrollSaver from '@/components/ScrollSaver'
-import PageTransition from '@/components/PageTransition'
+import Header from '@/shared/layout/Header'
+import Footer from '@/shared/layout/Footer'
+import ScrollSaver from '@/shared/layout/ScrollSaver'
+import PageTransition from '@/shared/layout/PageTransition'
 
 export default function PublicLayout({
   children,
