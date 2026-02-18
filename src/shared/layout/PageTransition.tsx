@@ -4,7 +4,7 @@
 import { motion, AnimatePresence } from 'motion/react'
 import { usePathname } from 'next/navigation'
 import { ReactNode, useEffect, useLayoutEffect, useState } from 'react'
-import { getScrollPosition } from '@/utils/scrollStore'
+import { getScrollPosition } from '@/shared/store/scrollStore'
 
 // Use useLayoutEffect on client, useEffect on server to avoid warnings
 const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect

@@ -2,7 +2,7 @@
 
 import { usePathname } from 'next/navigation'
 import { useEffect } from 'react'
-import { saveScrollPosition } from '@/utils/scrollStore'
+import { saveScrollPosition } from '@/shared/store/scrollStore'
 
 export default function ScrollSaver() {
   const pathname = usePathname()

@@ -1,5 +1,5 @@
 import React from 'react';
-import Hero from '@/components/Hero';
+import Hero from '@/shared/layout/Hero';
 import Services from '@/components/Services';
 import TrustIndicators from '@/components/TrustIndicators';
 import ValueStack from '@/components/ValueStack';
