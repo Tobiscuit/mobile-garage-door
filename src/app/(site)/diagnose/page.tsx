@@ -95,6 +95,15 @@ export default function DiagnosePage() {
                     streamsStartedRef.current = true;
                     startAudioStreaming(stream);
                     startVideoStreaming();
+                    ws.send(JSON.stringify({
+                      clientContent: {
+                        turns: [{
+                          role: "user",
+                          parts: [{ text: "Hey, I'm having an issue with my garage door." }]
+                        }],
+                        turnComplete: true
+                      }
+                    }));
                 }
             }
             
