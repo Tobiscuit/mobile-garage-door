@@ -63,15 +63,33 @@ export default function DiagnosePage() {
         }
       });
       addLog("Stream Acquired");
+      setHasPermission(true);
+      // We don't assign videoRef.current.srcObject here anymore.
+      // We pass the stream to the state or a ref that the useEffect watches.
+      // However, to keep it simple with the current structure, we will use a dedicated helper function 
+      // that is called HERE, but uses the proper event listeners.
       
       if (videoRef.current) {
+        addLog("Assigning Stream to Video Element...");
         videoRef.current.srcObject = stream;
-        videoRef.current.onloadedmetadata = () => {
-            addLog(`Video Metadata Loaded: ${videoRef.current?.videoWidth}x${videoRef.current?.videoHeight}`);
-            videoRef.current?.play().catch(e => addLog(`Video Play Error: ${e.message}`));
+        
+        // Proper Event Listener Pattern
+        videoRef.current.onloadedmetadata = async () => {
+            addLog(`Metadata Loaded: ${videoRef.current?.videoWidth}x${videoRef.current?.videoHeight}`);
+            try {
+                await videoRef.current?.play();
+                addLog("Video Playing (Promise Resolved)");
+            } catch (e: any) {
+                addLog(`Play Error: ${e.message}`);
+                // Auto-retry once for mobile?
+            }
+        };
+
+        videoRef.current.onerror = (e) => {
+            addLog(`Video Element Error: ${(e.target as HTMLVideoElement).error?.message}`);
         };
       }
-      setHasPermission(true);
+      
       connectWebSocket(stream);
 
     } catch (err: any) {
@@ -174,6 +192,18 @@ export default function DiagnosePage() {
       addLog("Starting Video Stream...");
       const interval = window.setInterval(() => {
           if (wsRef.current?.readyState !== WebSocket.OPEN || !videoRef.current) return;
+
+          // Debug: Check if video is actually ready
+          if (videoRef.current.readyState < 2) {
+             // 0=HAVE_NOTHING, 1=HAVE_METADATA, 2=HAVE_CURRENT_DATA
+             return; 
+          }
+          
+          if (videoRef.current.videoWidth === 0) {
+              // Log only once per second to avoid spam (simple throttle check could be added here but keeping it simple)
+              // addLog("Video Width is 0!"); 
+              return;
+          }
 
           const canvas = document.createElement('canvas');
           canvas.width = videoRef.current.videoWidth || 640;
