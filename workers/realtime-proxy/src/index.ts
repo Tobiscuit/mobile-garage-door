@@ -25,6 +25,7 @@ export default {
     
     let geminiWs: WebSocket | null = null;
 
+    try {
         // Cloudflare Workers - Use standard WebSocket constructor for external connections
         geminiWs = new WebSocket(geminiUrl);
         
@@ -39,55 +40,81 @@ export default {
 
     // 3. Accept the client connection
     server.accept();
-    
+
     if (geminiWs) {
-        // Standard WebSocket does not have an .accept() method.
-        // It connects automatically.
+      // Standard WebSocket does not have an .accept() method.
+      // It connects automatically.
+      let isGeminiReady = false;
+      let messageBuffer: Array<string | ArrayBuffer> = [];
+      const maxBufferedMessages = 200;
 
-        // 4. Setup "Pass-through" Bridge
-        
-        // Client -> Gemini (Wait for Open)
-        server.addEventListener('message', event => {
-            if (geminiWs?.readyState === WebSocket.OPEN) {
-                geminiWs.send(event.data);
+      // Client -> Gemini (buffer until setupComplete)
+      server.addEventListener("message", event => {
+        const payload = event.data as string | ArrayBuffer;
+
+        if (isGeminiReady && geminiWs?.readyState === WebSocket.OPEN) {
+          geminiWs.send(payload);
+          return;
+        }
+
+        if (messageBuffer.length >= maxBufferedMessages) {
+          messageBuffer.shift();
+        }
+        messageBuffer.push(payload);
+      });
+
+      geminiWs.addEventListener("open", () => {
+        console.log("Connected to Gemini API");
+        const setupMessage = {
+          setup: {
+            model: "models/gemini-2.5-flash-native-audio-preview-12-2025",
+            generationConfig: {
+              responseModalities: ["AUDIO"],
+            },
+            outputAudioTranscription: {},
+            systemInstruction: {
+              parts: [{
+                text: "You are 'Service Hero', a veteran Garage Door Technician. You are analyzing a video stream. Your goal is to diagnose issues. Be professional, reassuring, and concise. Identify noise, movement, and broken parts."
+              }]
             }
-        });
+          }
+        };
+        geminiWs?.send(JSON.stringify(setupMessage));
+      });
 
-        // Gemini -> Client
-        geminiWs.addEventListener('message', event => {
-            // Cloudflare Workers WebSocket 'message' event data can be string or ArrayBuffer
-            server.send(event.data);
-        });
-
-        // 5. Setup Live Persona (The "Service Hero")
-        geminiWs.addEventListener('open', () => {
-            console.log("Connected to Gemini API");
-            const setupMessage = {
-              setup: {
-                model: "models/gemini-2.0-flash-exp", 
-                generationConfig: {
-                  responseModalities: ["AUDIO", "TEXT"],
-                },
-                systemInstruction: {
-                  parts: [{ 
-                     text: "You are 'Service Hero', a veteran Garage Door Technician. You are analyzing a video stream. Your goal is to diagnose issues. Be professional, reassuring, and concise. Identify noise, movement, and broken parts." 
-                  }]
+      // Gemini -> Client (detect setupComplete and flush buffered media once ready)
+      geminiWs.addEventListener("message", event => {
+        try {
+          if (typeof event.data === "string") {
+            const parsed = JSON.parse(event.data) as { setupComplete?: unknown };
+            if (!isGeminiReady && parsed.setupComplete) {
+              isGeminiReady = true;
+              console.log(`Gemini setup complete, flushing ${messageBuffer.length} buffered messages`);
+              for (const msg of messageBuffer) {
+                if (geminiWs?.readyState === WebSocket.OPEN) {
+                  geminiWs.send(msg);
                 }
               }
-            };
-            geminiWs?.send(JSON.stringify(setupMessage));
-        });
-        
-        // Handle Closures
-        const safeClose = () => {
-            try { server.close(); } catch(e){}
-            try { geminiWs?.close(); } catch(e){}
-        };
+              messageBuffer = [];
+            }
+          }
+        } catch {
+          // Non-JSON payloads are forwarded as-is.
+        }
 
-        server.addEventListener('close', safeClose);
-        server.addEventListener('error', safeClose);
-        geminiWs.addEventListener('close', safeClose);
-        geminiWs.addEventListener('error', safeClose);
+        server.send(event.data);
+      });
+
+      // Handle closures
+      const safeClose = () => {
+        try { server.close(); } catch {}
+        try { geminiWs?.close(); } catch {}
+      };
+
+      server.addEventListener("close", safeClose);
+      server.addEventListener("error", safeClose);
+      geminiWs.addEventListener("close", safeClose);
+      geminiWs.addEventListener("error", safeClose);
     }
 
     return new Response(null, {
