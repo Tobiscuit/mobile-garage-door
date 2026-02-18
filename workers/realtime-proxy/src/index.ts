@@ -69,7 +69,7 @@ export default {
         console.log("Connected to Gemini API");
         const setupMessage = {
           setup: {
-            model: "models/gemini-2.5-flash-native-audio",
+            model: "models/gemini-2.5-flash-native-audio-preview-12-2025",
             generationConfig: {
               responseModalities: ["AUDIO"],
               thinkingConfig: {
@@ -113,10 +113,22 @@ export default {
         try { geminiWs?.close(); } catch {}
       };
 
-      server.addEventListener("close", safeClose);
-      server.addEventListener("error", safeClose);
-      geminiWs.addEventListener("close", safeClose);
-      geminiWs.addEventListener("error", safeClose);
+      server.addEventListener("close", (e) => {
+        console.log(`Client closed: ${e.code} ${e.reason}`);
+        safeClose();
+      });
+      server.addEventListener("error", (e) => {
+        console.error("Client error:", e);
+        safeClose();
+      });
+      geminiWs.addEventListener("close", (e) => {
+        console.log(`Gemini closed: ${e.code} ${e.reason}`);
+        safeClose();
+      });
+      geminiWs.addEventListener("error", (e) => {
+        console.error("Gemini error:", e);
+        safeClose();
+      });
     }
 
     return new Response(null, {
