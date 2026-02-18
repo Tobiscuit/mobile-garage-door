@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import MediaUpload from '@/components/admin/ui/MediaUpload';
+import MediaUpload from '@/features/admin/ui/MediaUpload';
 
 export default function QuickUpload() {
   const router = useRouter();

@@ -2,7 +2,7 @@ import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import React from 'react';
 import { getSessionSafe } from '@/lib/get-session-safe';
-import NativeSignInPrompt from '@/components/auth/NativeSignInPrompt';
+import NativeSignInPrompt from '@/features/auth/NativeSignInPrompt';
 
 export const dynamic = 'force-dynamic';
 

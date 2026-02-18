@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { getPayload } from 'payload';
 import configPromise from '@payload-config';
 import Image from 'next/image';
-import QuickUpload from '@/components/admin/media/QuickUpload';
+import QuickUpload from '@/features/admin/media/QuickUpload';
 
 async function getMedia() {
   const payload = await getPayload({ config: configPromise });

@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import PostForm from '@/components/admin/posts/PostForm';
+import PostForm from '@/features/admin/posts/PostForm';
 import { createPost } from '../actions';
 
 export default function CreatePostPage() {

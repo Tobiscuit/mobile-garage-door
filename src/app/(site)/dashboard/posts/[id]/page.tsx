@@ -2,7 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getPostById, updatePost } from '../actions';
-import PostForm from '@/components/admin/posts/PostForm';
+import PostForm from '@/features/admin/posts/PostForm';
 
 export default async function EditPostPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;

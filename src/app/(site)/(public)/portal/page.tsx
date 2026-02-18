@@ -2,10 +2,10 @@ import { getPayload } from 'payload';
 import configPromise from '@/payload.config';
 import { headers } from 'next/headers';
 import { serviceRequestService } from '@/services/serviceRequestService';
-import { PortalHeader } from '@/components/portal/PortalHeader';
-import { ActiveRequestList } from '@/components/portal/ActiveRequestList';
-import { ServiceHistory } from '@/components/portal/ServiceHistory';
-import { AccountSidebar } from '@/components/portal/AccountSidebar';
+import { PortalHeader } from '@/features/portal/PortalHeader';
+import { ActiveRequestList } from '@/features/portal/ActiveRequestList';
+import { ServiceHistory } from '@/features/portal/ServiceHistory';
+import { AccountSidebar } from '@/features/portal/AccountSidebar';
 import { getSessionSafe } from '@/lib/get-session-safe';
 
 export const dynamic = 'force-dynamic';

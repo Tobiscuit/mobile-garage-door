@@ -2,7 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getServiceById } from '../actions';
-import ServiceForm from '@/components/admin/services/ServiceForm';
+import ServiceForm from '@/features/admin/services/ServiceForm';
 
 export default async function EditServicePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;

@@ -6,11 +6,13 @@ import Link from 'next/link';
 export default function DiagnosePage() {
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [status, setStatus] = useState<'idle' | 'connecting' | 'connected' | 'error'>('idle');
+  const [aiState, setAiState] = useState<'listening' | 'thinking' | 'speaking'>('listening');
   const [aiMessage, setAiMessage] = useState("I'm listening. Please press the wall button.");
   
   const videoRef = useRef<HTMLVideoElement>(null);
   const wsRef = useRef<WebSocket | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
+  const playbackContextRef = useRef<AudioContext | null>(null);
   const videoIntervalRef = useRef<number | null>(null);
   const streamsStartedRef = useRef(false);
 
@@ -27,6 +29,7 @@ export default function DiagnosePage() {
        tracks.forEach(track => track.stop());
     }
     audioContextRef.current?.close();
+    playbackContextRef.current?.close();
     if (videoIntervalRef.current !== null) {
       window.clearInterval(videoIntervalRef.current);
       videoIntervalRef.current = null;
@@ -146,6 +149,7 @@ export default function DiagnosePage() {
             
             // Handle Audio Output
             if (data.serverContent?.modelTurn?.parts) {
+                setAiState('speaking');
                 for (const part of data.serverContent.modelTurn.parts) {
                     if (part.text) {
                         setAiMessage(part.text);
@@ -158,6 +162,10 @@ export default function DiagnosePage() {
 
             if (data.serverContent?.outputTranscription?.text) {
                 setAiMessage(data.serverContent.outputTranscription.text);
+            }
+
+            if (data.serverContent?.turnComplete) {
+                setAiState('listening');
             }
           } catch (e) {
               // Ignore parse errors for non-JSON messages if any, or log them
@@ -197,12 +205,15 @@ export default function DiagnosePage() {
 
               wsRef.current.send(JSON.stringify({
                   realtimeInput: {
-                      audio: {
+                      mediaChunks: [{
                           mimeType: "audio/pcm;rate=16000",
                           data: base64Audio
-                      }
+                      }]
                   }
               }));
+              // When we send audio, we can assume we are "listening" (user speaking)
+              // If we wanted to show "thinking", we'd need VAD to know when user *stopped*.
+              // For now, let's just make the UI responsive.
           };
 
           source.connect(workletNode);
@@ -244,10 +255,10 @@ export default function DiagnosePage() {
 
           wsRef.current.send(JSON.stringify({
               realtimeInput: {
-                  video: {
+                  mediaChunks: [{
                       mimeType: "image/jpeg",
                       data: base64Image
-                  }
+                  }]
               }
           }));
 
@@ -257,7 +268,11 @@ export default function DiagnosePage() {
 
   const playPcmAudio = (base64String: string) => {
     try {
-      const audioCtx = audioContextRef.current;
+      // Use a dedicated 24kHz context for playback (Gemini outputs at 24kHz)
+      if (!playbackContextRef.current || playbackContextRef.current.state === 'closed') {
+        playbackContextRef.current = new AudioContext({ sampleRate: 24000 });
+      }
+      const audioCtx = playbackContextRef.current;
       if (!audioCtx) return;
 
       const binaryString = atob(base64String);
@@ -326,6 +341,15 @@ export default function DiagnosePage() {
 
       {/* MAIN CONTENT LAYER */}
       <div className="flex-1 relative flex items-center justify-center">
+        {/* Video is always in the DOM so videoRef survives re-renders */}
+        <video 
+            ref={videoRef} 
+            autoPlay 
+            playsInline 
+            muted 
+            className={`absolute inset-0 w-full h-full object-cover ${!hasPermission ? 'hidden' : ''}`}
+        />
+
         {!hasPermission ? (
             <div className="text-center p-8 max-w-md animate-in fade-in zoom-in duration-500">
                 <div className="w-24 h-24 bg-[#f1c40f]/10 rounded-full flex items-center justify-center mx-auto mb-8 border border-[#f1c40f]/30 relative">
@@ -345,14 +369,6 @@ export default function DiagnosePage() {
             </div>
         ) : (
             <>
-                <video 
-                    ref={videoRef} 
-                    autoPlay 
-                    playsInline 
-                    muted 
-                    className="absolute inset-0 w-full h-full object-cover"
-                />
-                
                 {/* AI OVERLAY UI */}
                 <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/80 to-transparent pt-32 pb-10 px-6">
                     <div className="flex items-end gap-4">

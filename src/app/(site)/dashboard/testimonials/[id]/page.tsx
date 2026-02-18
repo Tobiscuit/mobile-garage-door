@@ -2,7 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getTestimonialById, updateTestimonial } from '../actions';
-import TestimonialForm from '@/components/admin/testimonials/TestimonialForm';
+import TestimonialForm from '@/features/admin/testimonials/TestimonialForm';
 
 export default async function EditTestimonialPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;

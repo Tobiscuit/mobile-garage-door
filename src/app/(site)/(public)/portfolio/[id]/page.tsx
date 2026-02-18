@@ -4,8 +4,8 @@ import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { getPayload } from 'payload';
 import configPromise from '@payload-config';
-import SmartLink from '@/components/SmartLink';
-import ProjectHeroImage from '@/components/ProjectHeroImage';
+import SmartLink from '@/shared/ui/SmartLink';
+import ProjectHeroImage from '@/features/landing/ProjectHeroImage';
 
 export const dynamic = 'force-dynamic';
 

@@ -1,3 +1,5 @@
+/// <reference types="@cloudflare/workers-types" />
+
 /**
  * Cloudflare Worker: Gemini Multimodal Live Proxy
  * 
@@ -17,7 +19,7 @@ export default {
     }
 
     // 1. Create a WebSocket pair for the Client <-> Worker connection
-    const [client, server] = Object.values(new WebSocketPair());
+    const [client, server] = Object.values(new WebSocketPair()) as [WebSocket, WebSocket & { accept: () => void }];
 
     // 2. Connect to Google Gemini
     // Using the "GenerativeService" which is the simpler v1beta endpoint for Multimodal Live
@@ -67,13 +69,17 @@ export default {
         console.log("Connected to Gemini API");
         const setupMessage = {
           setup: {
-            model: "models/gemini-2.0-flash-exp",
+            model: "models/gemini-2.5-flash-native-audio",
             generationConfig: {
               responseModalities: ["AUDIO"],
+              thinkingConfig: {
+                includeThoughts: true,
+                thinkingBudget: 1024 
+              }
             },
             systemInstruction: {
               parts: [{
-                text: "You are 'Service Hero', a veteran Garage Door Technician. You are analyzing a video stream. Your goal is to diagnose issues. Be professional, reassuring, and concise. Identify noise, movement, and broken parts."
+                text: "You are 'Service Hero', a veteran Garage Door Technician. You are analyzing a live video/audio stream. Your goal is to diagnose issues. Be professional, reassuring, and concise. Identify noise, movement, and broken parts. Use your mechanical reasoning to deduce problems before speaking."
               }]
             }
           }

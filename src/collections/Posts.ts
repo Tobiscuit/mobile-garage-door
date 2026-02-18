@@ -13,7 +13,7 @@ export const Posts: CollectionConfig = {
       type: 'ui',
       admin: {
         components: {
-          Field: '/src/components/payload/AIWriter.tsx#AIWriter' as any,
+          Field: '/src/features/payload/AIWriter.tsx#AIWriter' as any,
         },
       },
     },

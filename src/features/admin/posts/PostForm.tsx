@@ -1,12 +1,12 @@
 'use client';
 
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useActionState } from 'react';
 import { useRouter } from 'next/navigation';
-import MediaUpload from '@/components/admin/ui/MediaUpload';
+import MediaUpload from '@/features/admin/ui/MediaUpload';
 import { generatePostContent } from '@/actions/ai';
 
 interface PostFormProps {
-  action: (formData: FormData) => Promise<any>;
+  action: (prevState: any, formData: FormData) => Promise<any>;
   initialData?: any;
   buttonLabel: string;
 }
@@ -16,6 +16,9 @@ export default function PostForm({ action, initialData, buttonLabel }: PostFormP
 
   const [featuredImageId, setFeaturedImageId] = React.useState<string | null>(initialData?.featuredImage?.id || initialData?.featuredImage || null);
   
+  // React 19 Action State
+  const [state, formAction, isPending] = useActionState(action, null);
+
   // AI State
   const [isAiOpen, setIsAiOpen] = useState(false);
   const [aiPrompt, setAiPrompt] = useState('');
@@ -138,7 +141,7 @@ export default function PostForm({ action, initialData, buttonLabel }: PostFormP
             </div>
         )}
 
-    <form action={action} className="max-w-6xl">
+    <form action={formAction} className="max-w-6xl">
       <div className="flex justify-end mb-4">
           <button 
             type="button"
@@ -148,6 +151,12 @@ export default function PostForm({ action, initialData, buttonLabel }: PostFormP
              <span>✨</span> AI Magic Writer
           </button>
       </div>
+
+      {state?.error && (
+        <div className="bg-red-500/10 border border-red-500/20 p-4 rounded-xl mb-6 text-red-500 font-bold animate-in fade-in slide-in-from-top-2">
+            ⚠️ {state.error}
+        </div>
+      )}
 
       <input type="hidden" name="featuredImage" value={featuredImageId || ''} />
       
@@ -283,7 +292,7 @@ export default function PostForm({ action, initialData, buttonLabel }: PostFormP
                         type="submit"
                         className="w-full py-3 bg-[#f1c40f] text-[#2c3e50] font-bold rounded-xl hover:bg-[#f39c12] hover:scale-105 transition-all shadow-[0_4px_20px_rgba(241,196,15,0.3)]"
                     >
-                        {buttonLabel}
+                        {isPending ? 'Saving...' : buttonLabel}
                     </button>
                     <button 
                         type="button"

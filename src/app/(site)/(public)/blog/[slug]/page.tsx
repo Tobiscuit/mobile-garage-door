@@ -4,7 +4,7 @@ import configPromise from '@payload-config';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import SmartLink from '@/components/SmartLink';
+import SmartLink from '@/shared/ui/SmartLink';
 
 export const dynamic = 'force-dynamic';
 

@@ -1,8 +1,11 @@
 import React from 'react';
 import Hero from '@/shared/layout/Hero';
-import Services from '@/components/Services';
-import TrustIndicators from '@/components/TrustIndicators';
-import ValueStack from '@/components/ValueStack';
+import Services from '@/features/landing/Services';
+import TrustIndicators from '@/features/landing/TrustIndicators';
+import ValueStack from '@/features/landing/ValueStack';
+import Testimonials from '@/features/landing/Testimonials';
+import ProjectCardImage from '@/features/landing/ProjectCardImage';
+import ProjectHeroImage from '@/features/landing/ProjectHeroImage';
 import { getPayload } from 'payload';
 import configPromise from '@/payload.config';
 

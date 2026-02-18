@@ -8,10 +8,10 @@ import { useRouter } from 'next/navigation';
 import { createBooking } from '@/app/actions/booking';
 import { useBookingForm } from '@/hooks/useBookingForm';
 import { useSquarePayment } from '@/hooks/useSquarePayment';
-import { ContactStep } from '@/components/booking/ContactStep';
-import { IssueStep } from '@/components/booking/IssueStep';
-import { ScheduleStep } from '@/components/booking/ScheduleStep';
-import { PaymentStep } from '@/components/booking/PaymentStep';
+import { ContactStep } from '@/features/booking/ContactStep';
+import { IssueStep } from '@/features/booking/IssueStep';
+import { ScheduleStep } from '@/features/booking/ScheduleStep';
+import { PaymentStep } from '@/features/booking/PaymentStep';
 
 export default function BookingPage() {
   const router = useRouter();

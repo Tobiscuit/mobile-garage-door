@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { getSettings } from './actions';
-import SettingsForm from '@/components/admin/settings/SettingsForm';
+import SettingsForm from '@/features/admin/settings/SettingsForm';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {

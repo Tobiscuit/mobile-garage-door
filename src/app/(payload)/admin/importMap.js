@@ -21,9 +21,9 @@ import { StrikethroughFeatureClient as StrikethroughFeatureClient_e70f5e05f09f93
 import { UnderlineFeatureClient as UnderlineFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { BoldFeatureClient as BoldFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { ItalicFeatureClient as ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
-import { AIWriter as AIWriter_8952f744506a66b87860987f8d64b203 } from '../../../../src/components/payload/AIWriter.tsx'
-import { default as default_7ef6c9406780f133f0cc791d107419cc } from '../../../../src/components/payload/Icon.tsx'
-import { default as default_0d6da744954dac0a20c72934f3881376 } from '../../../../src/components/payload/Logo.tsx'
+import { AIWriter as AIWriter_9c543e75bd084e7f2ee1d78d3bb54b49 } from '../../../../src/features/payload/AIWriter.tsx'
+import { default as default_5ed177eac5969456a82a377ac089b97f } from '../../../../src/features/payload/Icon.tsx'
+import { default as default_8e410a6ac9d02e1e8a5ac2e69f570057 } from '../../../../src/features/payload/Logo.tsx'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 
 export const importMap = {
@@ -50,8 +50,8 @@ export const importMap = {
   "@payloadcms/richtext-lexical/client#UnderlineFeatureClient": UnderlineFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#BoldFeatureClient": BoldFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#ItalicFeatureClient": ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
-  "/src/components/payload/AIWriter.tsx#AIWriter": AIWriter_8952f744506a66b87860987f8d64b203,
-  "/src/components/payload/Icon.tsx#default": default_7ef6c9406780f133f0cc791d107419cc,
-  "/src/components/payload/Logo.tsx#default": default_0d6da744954dac0a20c72934f3881376,
+  "/src/features/payload/AIWriter.tsx#AIWriter": AIWriter_9c543e75bd084e7f2ee1d78d3bb54b49,
+  "/src/features/payload/Icon.tsx#default": default_5ed177eac5969456a82a377ac089b97f,
+  "/src/features/payload/Logo.tsx#default": default_8e410a6ac9d02e1e8a5ac2e69f570057,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1
 }

@@ -2,7 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getProjectById } from '../actions';
-import ProjectForm from '@/components/admin/projects/ProjectForm';
+import ProjectForm from '@/features/admin/projects/ProjectForm';
 
 export default async function EditProjectPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;

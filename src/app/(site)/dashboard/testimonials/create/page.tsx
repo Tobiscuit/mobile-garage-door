@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import TestimonialForm from '@/components/admin/testimonials/TestimonialForm';
+import TestimonialForm from '@/features/admin/testimonials/TestimonialForm';
 import { createTestimonial } from '../actions';
 
 export default function CreateTestimonialPage() {

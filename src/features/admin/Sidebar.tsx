@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import Logo from '@/components/payload/Logo';
+import Logo from '@/features/payload/Logo';
 import ThemeToggle from './ThemeToggle';
 
 // Icons (Same as CustomNav but inline for simplicity or imported if shared)

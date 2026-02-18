@@ -3,7 +3,7 @@ import { getPayload } from 'payload';
 import configPromise from '@payload-config';
 import Link from 'next/link';
 import Image from 'next/image';
-import SmartLink from '@/components/SmartLink';
+import SmartLink from '@/shared/ui/SmartLink';
 
 export const dynamic = 'force-dynamic';
 

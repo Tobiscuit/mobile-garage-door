@@ -1,8 +1,8 @@
 import React from 'react';
 import Link from 'next/link';
-import ActiveUsers from '@/components/admin/ActiveUsers';
-import { KPIGrid } from '@/components/dashboard/KPIGrid';
-import { QuickActions } from '@/components/dashboard/QuickActions';
+import ActiveUsers from '@/features/admin/ActiveUsers';
+import { KPIGrid } from '@/features/dashboard/KPIGrid';
+import { QuickActions } from '@/features/dashboard/QuickActions';
 import { getDashboardStats } from './actions';
 
 export const dynamic = 'force-dynamic';

@@ -5,7 +5,7 @@ import configPromise from '@payload-config';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
-export async function createPost(formData: FormData) {
+export async function createPost(prevState: any, formData: FormData) {
   const payload = await getPayload({ config: configPromise });
   
   const title = formData.get('title') as string;
@@ -78,7 +78,12 @@ export async function createPost(formData: FormData) {
   redirect('/dashboard/posts');
 }
 
-export async function updatePost(id: string, formData: FormData) {
+// Note: updatePost needs binding for ID, so signature will be (id, prevState, formData) or similar.
+// For simplicity with bind: updatePost.bind(null, id) -> returns (prevState, formData) => ...
+// But standard useActionState expects (state, payload).
+// Let's keep updatePost validation for another time or wrap it.
+// Actually, let's just fix createPost first to be safe.
+export async function updatePost(id: string, prevState: any, formData: FormData) {
   const payload = await getPayload({ config: configPromise });
 
   const title = formData.get('title') as string;
