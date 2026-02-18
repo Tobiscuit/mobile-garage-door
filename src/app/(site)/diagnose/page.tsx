@@ -86,7 +86,9 @@ export default function DiagnosePage() {
         };
 
         videoRef.current.onerror = (e) => {
-            addLog(`Video Element Error: ${(e.target as HTMLVideoElement).error?.message}`);
+            const target = e.target as HTMLVideoElement;
+            const msg = target?.error?.message || "Unknown Video Error";
+            addLog(`Video Element Error: ${msg}`);
         };
       }
       
