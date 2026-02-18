@@ -2,7 +2,6 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 
 export default function DiagnosePage() {
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
@@ -12,9 +11,8 @@ export default function DiagnosePage() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const wsRef = useRef<WebSocket | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
-  const processorRef = useRef<ScriptProcessorNode | null>(null);
-  const audioQueueRef = useRef<Float32Array[]>([]);
-  const isPlayingRef = useRef(false);
+  const videoIntervalRef = useRef<number | null>(null);
+  const streamsStartedRef = useRef(false);
 
   useEffect(() => {
     return () => {
@@ -29,7 +27,11 @@ export default function DiagnosePage() {
        tracks.forEach(track => track.stop());
     }
     audioContextRef.current?.close();
-    processorRef.current?.disconnect();
+    if (videoIntervalRef.current !== null) {
+      window.clearInterval(videoIntervalRef.current);
+      videoIntervalRef.current = null;
+    }
+    streamsStartedRef.current = false;
   };
 
   // Debug Logger state
@@ -119,13 +121,28 @@ export default function DiagnosePage() {
       ws.onopen = () => {
           addLog("WS Connected");
           setStatus('connected');
-          startAudioStreaming(stream);
-          startVideoStreaming();
       };
 
       ws.onmessage = async (event) => {
           try {
             const data = JSON.parse(event.data);
+            if (data.setupComplete) {
+                addLog("Gemini setup complete");
+                if (!streamsStartedRef.current) {
+                    streamsStartedRef.current = true;
+                    startAudioStreaming(stream);
+                    startVideoStreaming();
+                    ws.send(JSON.stringify({
+                      clientContent: {
+                        turns: [{
+                          role: "user",
+                          parts: [{ text: "I'm ready. Please guide me through the diagnostic now." }]
+                        }],
+                        turnComplete: true
+                      }
+                    }));
+                }
+            }
             
             // Handle Audio Output
             if (data.serverContent?.modelTurn?.parts) {
@@ -137,6 +154,10 @@ export default function DiagnosePage() {
                         playPcmAudio(part.inlineData.data);
                     }
                 }
+            }
+
+            if (data.serverContent?.outputTranscription?.text) {
+                setAiMessage(data.serverContent.outputTranscription.text);
             }
           } catch (e) {
               // Ignore parse errors for non-JSON messages if any, or log them
@@ -176,10 +197,10 @@ export default function DiagnosePage() {
 
               wsRef.current.send(JSON.stringify({
                   realtimeInput: {
-                      mediaChunks: [{
-                          mimeType: "audio/pcm",
+                      audio: {
+                          mimeType: "audio/pcm;rate=16000",
                           data: base64Audio
-                      }]
+                      }
                   }
               }));
           };
@@ -223,15 +244,15 @@ export default function DiagnosePage() {
 
           wsRef.current.send(JSON.stringify({
               realtimeInput: {
-                  mediaChunks: [{
+                  video: {
                       mimeType: "image/jpeg",
                       data: base64Image
-                  }]
+                  }
               }
           }));
 
       }, 500);
-      (window as any).videoInterval = interval;
+      videoIntervalRef.current = interval;
   };
 
   const playPcmAudio = (base64String: string) => {
