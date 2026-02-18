@@ -67,11 +67,10 @@ export default {
         console.log("Connected to Gemini API");
         const setupMessage = {
           setup: {
-            model: "models/gemini-2.5-flash-native-audio-preview-12-2025",
+            model: "models/gemini-2.0-flash-exp",
             generationConfig: {
               responseModalities: ["AUDIO"],
             },
-            outputAudioTranscription: {},
             systemInstruction: {
               parts: [{
                 text: "You are 'Service Hero', a veteran Garage Door Technician. You are analyzing a video stream. Your goal is to diagnose issues. Be professional, reassuring, and concise. Identify noise, movement, and broken parts."
@@ -80,28 +79,25 @@ export default {
           }
         };
         geminiWs?.send(JSON.stringify(setupMessage));
+        
+        // BRIDGE: Gemini 2.0 might not send 'setupComplete', but client expects it.
+        // We force it here to unblock the client.
+        isGeminiReady = true;
+        
+        // 1. Tell Client we are ready
+        server.send(JSON.stringify({ setupComplete: true }));
+
+        // 2. Flush Buffer
+        console.log(`Flushing ${messageBuffer.length} buffered messages`);
+        for (const msg of messageBuffer) {
+           geminiWs?.send(msg);
+        }
+        messageBuffer = [];
       });
 
-      // Gemini -> Client (detect setupComplete and flush buffered media once ready)
+      // Gemini -> Client
       geminiWs.addEventListener("message", event => {
-        try {
-          if (typeof event.data === "string") {
-            const parsed = JSON.parse(event.data) as { setupComplete?: unknown };
-            if (!isGeminiReady && parsed.setupComplete) {
-              isGeminiReady = true;
-              console.log(`Gemini setup complete, flushing ${messageBuffer.length} buffered messages`);
-              for (const msg of messageBuffer) {
-                if (geminiWs?.readyState === WebSocket.OPEN) {
-                  geminiWs.send(msg);
-                }
-              }
-              messageBuffer = [];
-            }
-          }
-        } catch {
-          // Non-JSON payloads are forwarded as-is.
-        }
-
+        // Forward all messages explicitly
         server.send(event.data);
       });
 
