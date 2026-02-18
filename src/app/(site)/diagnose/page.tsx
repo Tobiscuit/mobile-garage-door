@@ -73,16 +73,16 @@ export default function DiagnosePage() {
         addLog("Assigning Stream to Video Element...");
         videoRef.current.srcObject = stream;
         
-        // Proper Event Listener Pattern
-        videoRef.current.onloadedmetadata = async () => {
+        // Context7/MDN Standard: Call play() immediately to trigger loading
+        videoRef.current.play().then(() => {
+            addLog("Video Playing (Promise Resolved)");
+        }).catch(e => {
+             addLog(`Play Error: ${e.message}`);
+        });
+
+        // Use metadata event just for logging dimensions
+        videoRef.current.onloadedmetadata = () => {
             addLog(`Metadata Loaded: ${videoRef.current?.videoWidth}x${videoRef.current?.videoHeight}`);
-            try {
-                await videoRef.current?.play();
-                addLog("Video Playing (Promise Resolved)");
-            } catch (e: any) {
-                addLog(`Play Error: ${e.message}`);
-                // Auto-retry once for mobile?
-            }
         };
 
         videoRef.current.onerror = (e) => {
