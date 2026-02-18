@@ -38,28 +38,17 @@ export default function DiagnosePage() {
     streamsStartedRef.current = false;
   };
 
-  // Debug Logger state
-  const [logs, setLogs] = useState<string[]>([]);
-  const addLog = (msg: string) => {
-      setLogs(prev => [...prev.slice(-19), `[${new Date().toLocaleTimeString()}] ${msg}`]);
-      console.log(msg);
-  };
+
 
   const startCamera = async () => {
-    addLog("Starting Camera...");
     try {
-      // 1. Create AudioContext immediately within user gesture (Click)
-      addLog("Creating AudioContext...");
       const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 16000 });
       audioContextRef.current = audioCtx;
       
-      addLog(`AudioContext State: ${audioCtx.state}`);
       if (audioCtx.state === 'suspended') {
         await audioCtx.resume();
-        addLog("AudioContext Resumed");
       }
 
-      addLog("Requesting getUserMedia...");
       const stream = await navigator.mediaDevices.getUserMedia({ 
         video: { facingMode: 'environment' }, 
         audio: {
@@ -68,44 +57,17 @@ export default function DiagnosePage() {
             echoCancellation: true
         }
       });
-      addLog("Stream Acquired");
       setHasPermission(true);
-      // We don't assign videoRef.current.srcObject here anymore.
-      // We pass the stream to the state or a ref that the useEffect watches.
-      // However, to keep it simple with the current structure, we will use a dedicated helper function 
-      // that is called HERE, but uses the proper event listeners.
       
       if (videoRef.current) {
-        addLog("Assigning Stream to Video Element...");
         videoRef.current.srcObject = stream;
-        
-        // Context7/MDN Standard: Call play() immediately to trigger loading
-        videoRef.current.play().then(() => {
-            addLog("Video Playing (Promise Resolved)");
-        }).catch(e => {
-             addLog(`Play Error: ${e.message}`);
-        });
-
-        // Use metadata event just for logging dimensions
-        videoRef.current.onloadedmetadata = () => {
-            addLog(`Metadata Loaded: ${videoRef.current?.videoWidth}x${videoRef.current?.videoHeight}`);
-        };
-
-        videoRef.current.onerror = (e) => {
-            if (typeof e === 'string') {
-                addLog(`Video Error: ${e}`);
-                return;
-            }
-            const target = e.target as HTMLVideoElement;
-            const msg = target?.error?.message || "Unknown Video Error";
-            addLog(`Video Element Error: ${msg}`);
-        };
+        videoRef.current.play().catch(e => console.error('Play Error:', e));
       }
       
       connectWebSocket(stream);
 
     } catch (err: any) {
-      addLog(`Camera Error: ${err.message}`);
+      console.error('Camera Error:', err);
       setHasPermission(false);
       alert("We need camera access. Please check permissions.");
     }
@@ -113,7 +75,6 @@ export default function DiagnosePage() {
 
   const connectWebSocket = (stream: MediaStream) => {
       setStatus('connecting');
-      addLog("Connecting WebSocket...");
       
       const wsUrl = window.location.hostname === 'localhost' 
           ? 'ws://localhost:3001' 
@@ -123,7 +84,6 @@ export default function DiagnosePage() {
       wsRef.current = ws;
 
       ws.onopen = () => {
-          addLog("WS Connected");
           setStatus('connected');
       };
 
@@ -131,20 +91,10 @@ export default function DiagnosePage() {
           try {
             const data = JSON.parse(event.data);
             if (data.setupComplete) {
-                addLog("Gemini setup complete");
                 if (!streamsStartedRef.current) {
                     streamsStartedRef.current = true;
                     startAudioStreaming(stream);
                     startVideoStreaming();
-                    ws.send(JSON.stringify({
-                      clientContent: {
-                        turns: [{
-                          role: "user",
-                          parts: [{ text: "I'm ready. Please guide me through the diagnostic now." }]
-                        }],
-                        turnComplete: true
-                      }
-                    }));
                 }
             }
             
@@ -174,26 +124,21 @@ export default function DiagnosePage() {
       };
 
       ws.onerror = (err) => {
-          addLog("WS Error Event");
-          console.error(err);
+          console.error('WS Error:', err);
           setStatus('error');
       };
 
-      ws.onclose = (e) => {
-          addLog(`WS Closed: ${e.code} ${e.reason}`);
+      ws.onclose = () => {
           setStatus('idle');
       };
   };
 
   const startAudioStreaming = async (stream: MediaStream) => {
-      addLog("Starting Audio Stream (Worklet)...");
       const audioCtx = audioContextRef.current;
       if (!audioCtx) return;
 
       try {
-          // Load the worklet module from public folder
           await audioCtx.audioWorklet.addModule('/worklets/pcm-processor.js');
-          addLog("AudioWorklet Module Loaded");
 
           const source = audioCtx.createMediaStreamSource(stream);
           const workletNode = new AudioWorkletNode(audioCtx, 'pcm-processor');
@@ -201,7 +146,7 @@ export default function DiagnosePage() {
           workletNode.port.onmessage = (event) => {
               if (wsRef.current?.readyState !== WebSocket.OPEN) return;
 
-              const pcmBuffer = event.data; // ArrayBuffer from worklet
+              const pcmBuffer = event.data;
               const base64Audio = btoa(String.fromCharCode(...new Uint8Array(pcmBuffer)));
 
               wsRef.current.send(JSON.stringify({
@@ -212,23 +157,17 @@ export default function DiagnosePage() {
                       }]
                   }
               }));
-              // When we send audio, we can assume we are "listening" (user speaking)
-              // If we wanted to show "thinking", we'd need VAD to know when user *stopped*.
-              // For now, let's just make the UI responsive.
           };
 
           source.connect(workletNode);
-          workletNode.connect(audioCtx.destination); // Keep pipeline alive
-          addLog("Audio Pipeline Active");
+          workletNode.connect(audioCtx.destination);
 
       } catch (e: any) {
-          addLog(`AudioWorklet Error: ${e.message}`);
-          console.error(e);
+          console.error('AudioWorklet Error:', e);
       }
   };
 
   const startVideoStreaming = () => {
-      addLog("Starting Video Stream...");
       const interval = window.setInterval(() => {
           if (wsRef.current?.readyState !== WebSocket.OPEN || !videoRef.current) return;
 
@@ -240,7 +179,7 @@ export default function DiagnosePage() {
           
           if (videoRef.current.videoWidth === 0) {
               // Log only once per second to avoid spam (simple throttle check could be added here but keeping it simple)
-              // addLog("Video Width is 0!"); 
+
               return;
           }
 
@@ -308,16 +247,13 @@ export default function DiagnosePage() {
       nextStartTimeRef.current += buffer.duration;
 
     } catch (e: any) {
-      addLog(`Audio Out Error: ${e.message}`);
+      console.error('Audio Out Error:', e);
     }
   };
 
   return (
     <div className="fixed inset-0 bg-black text-white flex flex-col z-50">
-      {/* DEBUG OVERLAY */}
-      <div className="absolute top-20 left-4 z-50 pointer-events-none opacity-50 text-[10px] font-mono text-green-400 bg-black/80 p-2 rounded max-w-[200px] overflow-hidden">
-          {logs.map((log, i) => <div key={i}>{log}</div>)}
-      </div>
+
 
       {/* HEADER */}
       <div className="absolute top-0 left-0 right-0 p-4 flex justify-between items-center z-20 bg-gradient-to-b from-black/80 to-transparent">
