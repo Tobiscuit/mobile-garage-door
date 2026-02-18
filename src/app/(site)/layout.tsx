@@ -47,7 +47,7 @@ export const metadata: Metadata = {
   },
 }
 
-import { FloatingAiButton } from '@/components/FloatingAiButton';
+import { FloatingAiButton } from '@/features/landing/FloatingAiButton';
 
 export default function RootLayout({
   children,

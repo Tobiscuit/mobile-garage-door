@@ -1,4 +1,4 @@
-# SES Implementation Plan
+# Email Architecture Strategy
 
 ## Purpose
 Implement production-grade email for:

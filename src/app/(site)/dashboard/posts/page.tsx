@@ -1,7 +1,9 @@
+
 import React from 'react';
 import Link from 'next/link';
 import { getPosts } from './actions';
-import { DataTable } from '@/components/admin/ui/DataTable';
+import { DataTable } from '@/features/admin/ui/DataTable';
+import { Post } from '@/payload-types';
 
 export default async function PostsPage() {
   const posts = await getPosts();

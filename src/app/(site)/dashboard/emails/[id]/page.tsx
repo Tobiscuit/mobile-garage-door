@@ -2,7 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import { getThreadDetails } from '../actions'; // We'll update actions.ts to export this
 import { notFound } from 'next/navigation';
-import { ChatInterface } from '@/components/admin/emails/ChatInterface'; // We will create this
+import { ChatInterface } from '@/features/admin/emails/ChatInterface'; // We will create this
 
 export const dynamic = 'force-dynamic';
 

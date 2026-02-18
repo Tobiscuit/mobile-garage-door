@@ -62,11 +62,11 @@ export default buildConfig({
     components: {
       graphics: {
         Logo: {
-          path: '/src/components/payload/Logo.tsx#default',
+          path: '/src/features/payload/Logo.tsx#default',
           exportName: 'default',
         },
         Icon: {
-          path: '/src/components/payload/Icon.tsx#default',
+          path: '/src/features/payload/Icon.tsx#default',
           exportName: 'default',
         },
       },

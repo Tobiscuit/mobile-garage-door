@@ -1,8 +1,8 @@
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { getSessionSafe } from '@/lib/get-session-safe';
-import NativeSignInPrompt from '@/components/auth/NativeSignInPrompt';
-import Sidebar from '@/components/admin/Sidebar';
+import NativeSignInPrompt from '@/features/auth/NativeSignInPrompt';
+import Sidebar from '@/features/admin/Sidebar';
 import React from 'react';
 
 export default async function DashboardLayout({

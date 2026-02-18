@@ -2,10 +2,10 @@
 
 import React, { useState, Suspense, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { ContactHero } from '@/components/contact/ContactHero';
+import { ContactHero } from '@/features/contact/ContactHero';
 import { AddressAutocomplete } from '@/shared/ui/AddressAutocomplete';
 import { ServiceAreaMap } from '@/shared/ui/ServiceAreaMap';
-import { SquarePaymentModal } from '@/components/payment/SquarePaymentModal';
+import { SquarePaymentModal } from '@/features/payment/SquarePaymentModal';
 
 const ContactContent = () => {
     const searchParams = useSearchParams();

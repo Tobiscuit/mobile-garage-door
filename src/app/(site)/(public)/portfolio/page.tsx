@@ -3,8 +3,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { getPayload } from 'payload';
 import configPromise from '@/payload.config';
-import SmartLink from '@/components/SmartLink';
-import ProjectCardImage from '@/components/ProjectCardImage';
+import SmartLink from '@/shared/ui/SmartLink';
+import ProjectCardImage from '@/features/landing/ProjectCardImage';
 
 export const dynamic = 'force-dynamic';
 

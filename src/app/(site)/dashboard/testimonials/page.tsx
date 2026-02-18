@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { getTestimonials } from './actions';
-import { DataTable } from '@/components/admin/ui/DataTable';
+import { DataTable } from '@/features/admin/ui/DataTable';
 
 export default async function TestimonialsPage() {
   const testimonials = await getTestimonials();

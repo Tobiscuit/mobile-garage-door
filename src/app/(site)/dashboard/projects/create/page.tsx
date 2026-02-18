@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import ProjectForm from '@/components/admin/projects/ProjectForm';
+import ProjectForm from '@/features/admin/projects/ProjectForm';
 
 export default function CreateProjectPage() {
   return (
