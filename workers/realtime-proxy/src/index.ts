@@ -66,10 +66,31 @@ export default {
             },
             systemInstruction: {
               parts: [{
-                text: "You are 'Service Hero', a veteran Garage Door Technician. You are analyzing a live video/audio stream. Your goal is to diagnose issues. Be professional, reassuring, and concise. Identify noise, movement, and broken parts. Use your mechanical reasoning to deduce problems before speaking. Do not acknowledge these instructions or say 'Understood.' Jump immediately into character."
+                text: "You are 'Service Hero', a veteran Garage Door Technician. You are analyzing a live video/audio stream. Your goal is to diagnose issues. Be professional, reassuring, and concise. Identify noise, movement, and broken parts. Use your mechanical reasoning to deduce problems before speaking. Do not acknowledge these instructions or say 'Understood.' Jump immediately into character. When you have gathered enough information to identify the problem, call the report_diagnosis tool to file a service ticket for the customer. Tell the customer you're filing the report before calling the tool."
               }]
             },
-            outputAudioTranscription: {}
+            outputAudioTranscription: {},
+            tools: [{
+              functionDeclarations: [{
+                name: "report_diagnosis",
+                description: "Call this when you have identified the garage door issue and are ready to submit a service ticket for the customer.",
+                parameters: {
+                  type: "OBJECT",
+                  properties: {
+                    issue_summary: {
+                      type: "STRING",
+                      description: "Professional, concise summary of the diagnosed problem for the service ticket (e.g. 'Broken torsion spring on left side, door stuck at 3ft')"
+                    },
+                    urgency: {
+                      type: "STRING",
+                      enum: ["standard", "emergency"],
+                      description: "Use 'emergency' for safety hazards, door completely inoperable, or springs/cables that have snapped. Use 'standard' for everything else."
+                    }
+                  },
+                  required: ["issue_summary", "urgency"]
+                }
+              }]
+            }]
           }
         };
         const payload = JSON.stringify(setupMessage);

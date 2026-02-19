@@ -25,8 +25,36 @@ const INITIAL_DATA: BookingFormData = {
 };
 
 export function useBookingForm() {
-  const [step, setStep] = useState<BookingStep>(0);
-  const [formData, setFormData] = useState<BookingFormData>(INITIAL_DATA);
+  const [step, setStep] = useState<BookingStep>(() => {
+    if (typeof window !== 'undefined') {
+      const raw = sessionStorage.getItem('aiDiagnosis');
+      if (raw) {
+        try {
+          const diagnosis = JSON.parse(raw);
+          if (diagnosis.fromDiagnosis) return 1; // Skip to Issue step
+        } catch {}
+      }
+    }
+    return 0;
+  });
+  
+  const [formData, setFormData] = useState<BookingFormData>(() => {
+    const data = { ...INITIAL_DATA };
+    if (typeof window !== 'undefined') {
+      const raw = sessionStorage.getItem('aiDiagnosis');
+      if (raw) {
+        try {
+          const diagnosis = JSON.parse(raw);
+          if (diagnosis.fromDiagnosis) {
+            data.issueDescription = diagnosis.issueDescription || '';
+            data.urgency = diagnosis.urgency || 'standard';
+            sessionStorage.removeItem('aiDiagnosis'); // Clean up
+          }
+        } catch {}
+      }
+    }
+    return data;
+  });
 
   const updateField = <K extends keyof BookingFormData>(key: K, value: BookingFormData[K]) => {
     setFormData((prev) => ({ ...prev, [key]: value }));

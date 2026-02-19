@@ -1,9 +1,11 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 export default function DiagnosePage() {
+  const router = useRouter();
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [status, setStatus] = useState<'idle' | 'connecting' | 'connected' | 'error'>('idle');
   const [aiState, setAiState] = useState<'listening' | 'thinking' | 'speaking'>('listening');
@@ -19,12 +21,30 @@ export default function DiagnosePage() {
   const streamsStartedRef = useRef(false);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const animFrameRef = useRef<number | null>(null);
+  const fullTranscriptRef = useRef('');
+  const typewriterTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const displayedLenRef = useRef(0);
 
   useEffect(() => {
     return () => {
       stopMedia();
       wsRef.current?.close();
+      if (typewriterTimerRef.current) clearInterval(typewriterTimerRef.current);
     };
+  }, []);
+
+  // Visibility API: kill audio/WS on Android swipe-away or tab switch
+  useEffect(() => {
+    const handler = () => {
+      if (document.hidden) {
+        audioContextRef.current?.suspend();
+        playbackContextRef.current?.suspend();
+        wsRef.current?.close();
+        setStatus('idle');
+      }
+    };
+    document.addEventListener('visibilitychange', handler);
+    return () => document.removeEventListener('visibilitychange', handler);
   }, []);
 
   const stopMedia = () => {
@@ -121,15 +141,63 @@ export default function DiagnosePage() {
                     if (part.inlineData && part.inlineData.mimeType.startsWith('audio/pcm')) {
                         playPcmAudio(part.inlineData.data);
                     }
+                    // Handle tool call from AI
+                    if (part.functionCall) {
+                        const { name, args } = part.functionCall;
+                        if (name === 'report_diagnosis') {
+                            const hour = new Date().getHours();
+                            const isAfterHours = hour < 7 || hour >= 19;
+                            const finalUrgency = args.urgency === 'emergency' || isAfterHours
+                                ? 'emergency' : 'standard';
+                            
+                            // Store diagnosis in sessionStorage for the booking form
+                            sessionStorage.setItem('aiDiagnosis', JSON.stringify({
+                                issueDescription: args.issue_summary,
+                                urgency: finalUrgency,
+                                fromDiagnosis: true
+                            }));
+
+                            // Clean up and navigate
+                            setTimeout(() => {
+                                wsRef.current?.close();
+                                stopMedia();
+                                router.push('/book-service');
+                            }, 3000); // Give AI 3s to finish speaking
+                        }
+                    }
                 }
             }
 
+            // Show transcription of AI speech (typewriter effect)
             if (data.serverContent?.outputTranscription?.text) {
-                setAiMessage(data.serverContent.outputTranscription.text);
+                fullTranscriptRef.current = data.serverContent.outputTranscription.text;
+                // Start typewriter if not already running
+                if (!typewriterTimerRef.current) {
+                    typewriterTimerRef.current = setInterval(() => {
+                        displayedLenRef.current += 1;
+                        const text = fullTranscriptRef.current;
+                        if (displayedLenRef.current >= text.length) {
+                            setAiMessage(text);
+                            if (typewriterTimerRef.current) {
+                                clearInterval(typewriterTimerRef.current);
+                                typewriterTimerRef.current = null;
+                            }
+                        } else {
+                            setAiMessage(text.slice(0, displayedLenRef.current));
+                        }
+                    }, 30);
+                }
             }
 
             if (data.serverContent?.turnComplete) {
                 setAiState('listening');
+                // Reset typewriter for next turn
+                fullTranscriptRef.current = '';
+                displayedLenRef.current = 0;
+                if (typewriterTimerRef.current) {
+                    clearInterval(typewriterTimerRef.current);
+                    typewriterTimerRef.current = null;
+                }
             }
           } catch (e) {
               // Ignore parse errors for non-JSON messages if any, or log them
