@@ -49,8 +49,12 @@ export default function DiagnosePage() {
 
   const stopMedia = () => {
     if (videoRef.current && videoRef.current.srcObject) {
-       const tracks = (videoRef.current.srcObject as MediaStream).getTracks();
-       tracks.forEach(track => track.stop());
+       const stream = videoRef.current.srcObject as MediaStream;
+       stream.getTracks().forEach(track => {
+           track.stop();
+           track.enabled = false;
+       });
+       videoRef.current.srcObject = null;
     }
     audioContextRef.current?.close();
     playbackContextRef.current?.close();
@@ -135,12 +139,14 @@ export default function DiagnosePage() {
             }
             
             // Handle Audio Output (skip text from modelTurn — it's thinking, not speech)
+            // Handle Audio Output (skip text from modelTurn — it's thinking, not speech)
             if (data.serverContent?.modelTurn?.parts) {
                 setAiState('speaking');
                 for (const part of data.serverContent.modelTurn.parts) {
                     if (part.inlineData && part.inlineData.mimeType.startsWith('audio/pcm')) {
                         playPcmAudio(part.inlineData.data);
                     }
+                    
                     // Handle tool call from AI
                     if (part.functionCall) {
                         const { name, args } = part.functionCall;
@@ -168,22 +174,16 @@ export default function DiagnosePage() {
                 }
             }
 
-            // Show transcription of AI speech (typewriter effect)
+            // Handle Transcript (Typewriter Effect)
             if (data.serverContent?.outputTranscription?.text) {
-                fullTranscriptRef.current = data.serverContent.outputTranscription.text;
-                // Start typewriter if not already running
+                const newChunk = data.serverContent.outputTranscription.text;
+                fullTranscriptRef.current += newChunk; 
+                
                 if (!typewriterTimerRef.current) {
                     typewriterTimerRef.current = setInterval(() => {
-                        displayedLenRef.current += 1;
-                        const text = fullTranscriptRef.current;
-                        if (displayedLenRef.current >= text.length) {
-                            setAiMessage(text);
-                            if (typewriterTimerRef.current) {
-                                clearInterval(typewriterTimerRef.current);
-                                typewriterTimerRef.current = null;
-                            }
-                        } else {
-                            setAiMessage(text.slice(0, displayedLenRef.current));
+                        if (displayedLenRef.current < fullTranscriptRef.current.length) {
+                             displayedLenRef.current += 1;
+                             setAiMessage(fullTranscriptRef.current.slice(0, displayedLenRef.current));
                         }
                     }, 30);
                 }
@@ -191,7 +191,7 @@ export default function DiagnosePage() {
 
             if (data.serverContent?.turnComplete) {
                 setAiState('listening');
-                // Reset typewriter for next turn
+                // Reset transcript for next turn
                 fullTranscriptRef.current = '';
                 displayedLenRef.current = 0;
                 if (typewriterTimerRef.current) {
@@ -200,7 +200,7 @@ export default function DiagnosePage() {
                 }
             }
           } catch (e) {
-              // Ignore parse errors for non-JSON messages if any, or log them
+              console.error('Parse error', e);
           }
       };
 
