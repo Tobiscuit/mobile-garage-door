@@ -7,7 +7,8 @@ export default function DiagnosePage() {
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [status, setStatus] = useState<'idle' | 'connecting' | 'connected' | 'error'>('idle');
   const [aiState, setAiState] = useState<'listening' | 'thinking' | 'speaking'>('listening');
-  const [aiMessage, setAiMessage] = useState("I'm listening. Please press the wall button.");
+  const [aiMessage, setAiMessage] = useState("I'm listening. Point your camera at the garage door.");
+  const [waveformData, setWaveformData] = useState<number[]>(new Array(20).fill(0));
   
   const videoRef = useRef<HTMLVideoElement>(null);
   const wsRef = useRef<WebSocket | null>(null);
@@ -16,6 +17,8 @@ export default function DiagnosePage() {
   const nextStartTimeRef = useRef(0);
   const videoIntervalRef = useRef<number | null>(null);
   const streamsStartedRef = useRef(false);
+  const analyserRef = useRef<AnalyserNode | null>(null);
+  const animFrameRef = useRef<number | null>(null);
 
   useEffect(() => {
     return () => {
@@ -34,6 +37,10 @@ export default function DiagnosePage() {
     if (videoIntervalRef.current !== null) {
       window.clearInterval(videoIntervalRef.current);
       videoIntervalRef.current = null;
+    }
+    if (animFrameRef.current !== null) {
+      cancelAnimationFrame(animFrameRef.current);
+      animFrameRef.current = null;
     }
     streamsStartedRef.current = false;
   };
@@ -107,13 +114,10 @@ export default function DiagnosePage() {
                 }
             }
             
-            // Handle Audio Output
+            // Handle Audio Output (skip text from modelTurn — it's thinking, not speech)
             if (data.serverContent?.modelTurn?.parts) {
                 setAiState('speaking');
                 for (const part of data.serverContent.modelTurn.parts) {
-                    if (part.text) {
-                        setAiMessage(part.text);
-                    }
                     if (part.inlineData && part.inlineData.mimeType.startsWith('audio/pcm')) {
                         playPcmAudio(part.inlineData.data);
                     }
@@ -151,6 +155,27 @@ export default function DiagnosePage() {
 
           const source = audioCtx.createMediaStreamSource(stream);
           const workletNode = new AudioWorkletNode(audioCtx, 'pcm-processor');
+
+          // AnalyserNode for live waveform visualization
+          const analyser = audioCtx.createAnalyser();
+          analyser.fftSize = 64;
+          source.connect(analyser);
+          analyserRef.current = analyser;
+
+          // Start waveform animation loop
+          const updateWaveform = () => {
+            if (!analyserRef.current) return;
+            const dataArray = new Uint8Array(analyserRef.current.frequencyBinCount);
+            analyserRef.current.getByteFrequencyData(dataArray);
+            // Sample 20 bars from the frequency data
+            const bars = Array.from({ length: 20 }, (_, i) => {
+              const idx = Math.floor((i / 20) * dataArray.length);
+              return dataArray[idx] / 255;
+            });
+            setWaveformData(bars);
+            animFrameRef.current = requestAnimationFrame(updateWaveform);
+          };
+          updateWaveform();
           
           workletNode.port.onmessage = (event) => {
               if (wsRef.current?.readyState !== WebSocket.OPEN) return;
@@ -160,10 +185,10 @@ export default function DiagnosePage() {
 
               wsRef.current.send(JSON.stringify({
                   realtimeInput: {
-                      mediaChunks: [{
+                      audio: {
                           mimeType: "audio/pcm;rate=16000",
                           data: base64Audio
-                      }]
+                      }
                   }
               }));
           };
@@ -204,10 +229,10 @@ export default function DiagnosePage() {
 
           wsRef.current.send(JSON.stringify({
               realtimeInput: {
-                  mediaChunks: [{
+                  video: {
                       mimeType: "image/jpeg",
                       data: base64Image
-                  }]
+                  }
               }
           }));
 
@@ -334,10 +359,10 @@ export default function DiagnosePage() {
                                  </p>
                              </div>
                              
-                             {/* AUDIO WAVEFORM VISUALIZER */}
-                             <div className="flex items-center justify-center gap-1 h-8 opacity-50">
-                                 {[...Array(20)].map((_, i) => (
-                                     <div key={i} className="w-1 bg-white/50 rounded-full animate-bounce" style={{ height: `${Math.random() * 100}%`, animationDelay: `${i * 0.05}s` }}></div>
+                             {/* LIVE AUDIO WAVEFORM */}
+                             <div className="flex items-center justify-center gap-1 h-8">
+                                 {waveformData.map((level, i) => (
+                                     <div key={i} className="w-1 bg-[#f1c40f]/70 rounded-full transition-all duration-75" style={{ height: `${Math.max(8, level * 100)}%` }}></div>
                                  ))}
                              </div>
                          </div>
