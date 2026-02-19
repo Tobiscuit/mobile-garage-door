@@ -99,7 +99,7 @@ export default function DiagnosePage() {
                       clientContent: {
                         turns: [{
                           role: "user",
-                          parts: [{ text: "Hey, I'm having an issue with my garage door." }]
+                          parts: [{ text: "[The customer has connected and pointed their camera at the garage door. Greet them warmly and begin your visual inspection.]" }]
                         }],
                         turnComplete: true
                       }
