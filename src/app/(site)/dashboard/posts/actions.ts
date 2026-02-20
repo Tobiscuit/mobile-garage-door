@@ -11,7 +11,7 @@ export async function createPost(prevState: any, formData: FormData) {
   const title = formData.get('title') as string;
   const slug = formData.get('slug') as string || title.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
   const excerpt = formData.get('excerpt') as string;
-  const content = formData.get('content') as string; // Treated as simple text/JSON for now
+  const content = formData.get('content') as string; // This is now HTML from Tiptap
   const category = formData.get('category') as any;
   const status = formData.get('status') as any;
   const featuredImage = formData.get('featuredImage') as string;
@@ -31,35 +31,8 @@ export async function createPost(prevState: any, formData: FormData) {
         title,
         slug,
         excerpt,
-        content: {
-          root: {
-            children: [
-              {
-                children: [
-                  {
-                    detail: 0,
-                    format: 0,
-                    mode: 'normal',
-                    style: '',
-                    text: content || '',
-                    type: 'text',
-                    version: 1,
-                  }
-                ],
-                direction: 'ltr',
-                format: '',
-                indent: 0,
-                type: 'paragraph',
-                version: 1,
-              }
-            ],
-            direction: 'ltr',
-            format: '',
-            indent: 0,
-            type: 'root',
-            version: 1,
-          }
-        }, // Simple Lexical Structure Mock
+        // Adapter Pattern: Send HTML to htmlContent, hook converts to Lexical 'content'
+        htmlContent: content, 
         category,
         status,
         featuredImage: featuredImage || null,
@@ -78,18 +51,13 @@ export async function createPost(prevState: any, formData: FormData) {
   redirect('/dashboard/posts');
 }
 
-// Note: updatePost needs binding for ID, so signature will be (id, prevState, formData) or similar.
-// For simplicity with bind: updatePost.bind(null, id) -> returns (prevState, formData) => ...
-// But standard useActionState expects (state, payload).
-// Let's keep updatePost validation for another time or wrap it.
-// Actually, let's just fix createPost first to be safe.
 export async function updatePost(id: string, prevState: any, formData: FormData) {
   const payload = await getPayload({ config: configPromise });
 
   const title = formData.get('title') as string;
   const slug = formData.get('slug') as string;
   const excerpt = formData.get('excerpt') as string;
-  const content = formData.get('content') as string;
+  const content = formData.get('content') as string; // This is now HTML from Tiptap
   const category = formData.get('category') as any;
   const status = formData.get('status') as any;
   const featuredImage = formData.get('featuredImage') as string;
@@ -102,11 +70,6 @@ export async function updatePost(id: string, prevState: any, formData: FormData)
     : [];
 
   try {
-    // Check if content is a JSON string (existing lexical) or plain text (edit)
-    // For simplicity in this bespoke form, we are treating input as plain text and wrapping it again
-    // In a real app, we'd parse the existing JSON and update it.
-    // Here we just overwrite with a new simple paragraph.
-    
     await payload.update({
       collection: 'posts',
       id,
@@ -114,35 +77,8 @@ export async function updatePost(id: string, prevState: any, formData: FormData)
         title,
         slug,
         excerpt,
-        content: {
-            root: {
-              children: [
-                {
-                  children: [
-                    {
-                      detail: 0,
-                      format: 0,
-                      mode: 'normal',
-                      style: '',
-                      text: content || '',
-                      type: 'text',
-                      version: 1,
-                    }
-                  ],
-                  direction: 'ltr',
-                  format: '',
-                  indent: 0,
-                  type: 'paragraph',
-                  version: 1,
-                }
-              ],
-              direction: 'ltr',
-              format: '',
-              indent: 0,
-              type: 'root',
-              version: 1,
-            }
-          }, 
+        // Adapter Pattern: Send HTML to htmlContent, hook converts to Lexical 'content'
+        htmlContent: content,
         category,
         status,
         featuredImage: featuredImage || null,

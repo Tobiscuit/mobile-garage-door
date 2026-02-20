@@ -18,10 +18,10 @@ export default function ProjectForm({ initialData, isEdit = false }: ProjectForm
   const [aiPrompt, setAiPrompt] = useState('');
 
   // Rich Text State
-  // Prefer htmlDescription (from Adapter) if available, otherwise fallback to plain text extraction
-  const [description, setDescription] = useState(initialData?.htmlDescription || extractText(initialData?.description));
-  const [challenge, setChallenge] = useState(initialData?.htmlChallenge || extractText(initialData?.challenge));
-  const [solution, setSolution] = useState(initialData?.htmlSolution || extractText(initialData?.solution));
+  // Prefer htmlDescription (from Adapter) if available, otherwise fallback to converting Lexical JSON to HTML
+  const [description, setDescription] = useState(initialData?.htmlDescription || lexicalToHtml(initialData?.description));
+  const [challenge, setChallenge] = useState(initialData?.htmlChallenge || lexicalToHtml(initialData?.challenge));
+  const [solution, setSolution] = useState(initialData?.htmlSolution || lexicalToHtml(initialData?.solution));
   
   // Basic Fields State (for AI population)
   const [title, setTitle] = useState(initialData?.title || '');
@@ -78,26 +78,56 @@ export default function ProjectForm({ initialData, isEdit = false }: ProjectForm
     // If success, server action redirects, so we don't need to unset isLoading (component unmounts)
   }
 
-  // Helper to extract text from Lexical JSON if it exists
-  function extractText(field: any) {
-    if (!field) return '';
-    if (typeof field === 'string') return field;
-    try {
-      if (field.root && field.root.children) {
-        return field.root.children
-          .map((child: any) => {
-             if (child.children) {
-                return child.children.map((c: any) => c.text).join('');
-             }
-             return '';
-          })
-          .join('\n');
-      }
-      return '';
-    } catch (e) {
-      return '';
+  // Helper to convert Lexical JSON to HTML for Tiptap
+  function lexicalToHtml(node: any): string {
+    if (!node) return '';
+    
+    // Handle string input (legacy/simple)
+    if (typeof node === 'string') return node;
+
+    // Handle root object wrapper
+    if (node.root) {
+      return lexicalToHtml(node.root);
     }
-  };
+
+    // Handle text nodes
+    if (node.type === 'text') {
+      let text = node.text || '';
+      // Escape HTML special characters to prevent XSS/rendering issues
+      text = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      
+      if (node.format & 1) text = `<strong>${text}</strong>`;
+      if (node.format & 2) text = `<em>${text}</em>`;
+      if (node.format & 8) text = `<u>${text}</u>`;
+      if (node.format & 16) text = `<code>${text}</code>`;
+      return text;
+    }
+
+    // Process children first
+    const childrenHtml = node.children ? node.children.map((child: any) => lexicalToHtml(child)).join('') : '';
+
+    // Handle block elements
+    switch (node.type) {
+      case 'root':
+        return childrenHtml;
+      case 'paragraph':
+        // Only render paragraph if it has content or children, otherwise Tiptap might treat it as empty
+        return childrenHtml ? `<p>${childrenHtml}</p>` : '<p><br></p>'; 
+      case 'heading':
+        return `<${node.tag}>${childrenHtml}</${node.tag}>`;
+      case 'list':
+        const tag = node.listType === 'number' ? 'ol' : 'ul';
+        return `<${tag}>${childrenHtml}</${tag}>`;
+      case 'listitem':
+        return `<li>${childrenHtml}</li>`;
+      case 'quote':
+        return `<blockquote>${childrenHtml}</blockquote>`;
+      case 'link':
+        return `<a href="${node.fields?.url}" target="${node.fields?.newTab ? '_blank' : '_self'}">${childrenHtml}</a>`;
+      default:
+        return childrenHtml;
+    }
+  }
 
   return (
     <div className="max-w-6xl animate-in fade-in duration-500 space-y-8">

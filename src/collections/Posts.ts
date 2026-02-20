@@ -17,8 +17,8 @@ const htmlToLexicalHook: CollectionBeforeChangeHook = async ({ data, req, operat
 
       // Populate Lexical field for Admin UI
       data.content = lexicalJSON;
-      // Clear htmlContent so it doesn't persist, forcing standard RichText rendering on frontend
-      data.htmlContent = null;
+      // We keep htmlContent to serve as the source of truth for the Custom Dashboard Tiptap Editor
+      // and for the frontend to render perfect HTML.
     } catch (err) {
       req.payload.logger.error({ err }, "Failed to parse HTML to Lexical");
     }
