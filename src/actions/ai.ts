@@ -132,3 +132,37 @@ export async function generateEmailDrafts(threadContext: { id: string, from: str
     const result = await generateContent(systemPrompt, "Draft 3 options based on the transcript.", schema);
     return result.options;
 }
+
+// --- Feature: Project Case Study Generator ---
+export async function generateProjectCaseStudy(prompt: string) {
+    const schema: Schema = {
+        type: Type.OBJECT,
+        properties: {
+            title: { type: Type.STRING, description: 'Catchy, professional title for the case study' },
+            client: { type: Type.STRING, description: 'Type of client (e.g., "Luxury Residence", "Commercial Warehouse")' },
+            location: { type: Type.STRING, description: 'City/Area (inferred or generic)' },
+            description: { type: Type.STRING, description: 'Main narrative HTML' },
+            challenge: { type: Type.STRING, description: 'Problem statement HTML' },
+            solution: { type: Type.STRING, description: 'Solution details HTML' },
+            tags: { type: Type.ARRAY, items: { type: Type.STRING } },
+        },
+        required: ['title', 'client', 'location', 'description', 'challenge', 'solution', 'tags'],
+    };
+
+    const systemPrompt = `
+        You are a Senior Project Manager for a high-end Garage Door Installation company.
+        Create a detailed Case Study based on the user's rough notes.
+        
+        INSTRUCTIONS:
+        1.  **Title:** compelling and descriptive.
+        2.  **Client/Location:** Infer from context or use realistic placeholders (e.g. "Private Residence").
+        3.  **Content (HTML):**
+            -   **Description:** The main story. Use <p>, <b>, <ul>. Professional tone.
+            -   **Challenge:** What was broken, difficult, or unique?
+            -   **Solution:** What products/methods did we use? (e.g. "High-cycle springs", "Insulated steel panels").
+        
+        Ensure the HTML is clean (no <html>/<body> tags), just semantic block elements.
+    `;
+
+    return generateContent(systemPrompt, prompt, schema);
+}

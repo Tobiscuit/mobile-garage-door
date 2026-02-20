@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { sendReply, getThreadDetails } from '@/app/(site)/dashboard/emails/actions';
 import { generateEmailDrafts, EmailDraftOption } from '@/actions/ai'; // Ensure this path is correct
-import { RichTextEditor } from './RichTextEditor';
+import { RichTextEditor } from '@/features/admin/ui/RichTextEditor';
 import { useRouter } from 'next/navigation';
 
 interface Message {

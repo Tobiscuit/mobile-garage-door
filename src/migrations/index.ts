@@ -5,6 +5,8 @@ import * as migration_20260214_140000_add_square_customer_id_to_users from './20
 import * as migration_20260215_051510_add_customer_type_and_company_name_to_users from './20260215_051510_add_customer_type_and_company_name_to_users';
 import * as migration_20260216_011500_add_better_auth_tables from './20260216_011500_add_better_auth_tables';
 import * as migration_20260217_210333_add_projects_warranty_fields from './20260217_210333_add_projects_warranty_fields';
+import * as migration_20260220_010443_add_html_content_to_posts from './20260220_010443_add_html_content_to_posts';
+import * as migration_20260220_194139 from './20260220_194139';
 
 export const migrations = [
   {
@@ -40,6 +42,16 @@ export const migrations = [
   {
     up: migration_20260217_210333_add_projects_warranty_fields.up,
     down: migration_20260217_210333_add_projects_warranty_fields.down,
-    name: '20260217_210333_add_projects_warranty_fields'
+    name: '20260217_210333_add_projects_warranty_fields',
+  },
+  {
+    up: migration_20260220_010443_add_html_content_to_posts.up,
+    down: migration_20260220_010443_add_html_content_to_posts.down,
+    name: '20260220_010443_add_html_content_to_posts',
+  },
+  {
+    up: migration_20260220_194139.up,
+    down: migration_20260220_194139.down,
+    name: '20260220_194139'
   },
 ];

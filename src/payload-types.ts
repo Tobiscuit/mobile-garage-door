@@ -397,6 +397,9 @@ export interface Project {
     };
     [k: string]: unknown;
   };
+  htmlDescription?: string | null;
+  htmlChallenge?: string | null;
+  htmlSolution?: string | null;
   imageStyle: 'garage-pattern-steel' | 'garage-pattern-glass' | 'garage-pattern-carriage' | 'garage-pattern-modern';
   image?: (number | null) | Media;
   tags?:
@@ -450,7 +453,10 @@ export interface Post {
    * Brief description for sharing and previews
    */
   excerpt?: string | null;
-  content: {
+  /**
+   * Used for manual writing.
+   */
+  content?: {
     root: {
       type: string;
       children: {
@@ -464,7 +470,11 @@ export interface Post {
       version: number;
     };
     [k: string]: unknown;
-  };
+  } | null;
+  /**
+   * Autonomously generated semantic HTML content. If present, the frontend uses this instead of the Manual Content.
+   */
+  htmlContent?: string | null;
   featuredImage?: (number | null) | Media;
   category: 'repair-tips' | 'product-spotlight' | 'contractor-insights' | 'maintenance-guide' | 'industry-news';
   keywords?:
@@ -785,6 +795,9 @@ export interface ProjectsSelect<T extends boolean = true> {
   description?: T;
   challenge?: T;
   solution?: T;
+  htmlDescription?: T;
+  htmlChallenge?: T;
+  htmlSolution?: T;
   imageStyle?: T;
   image?: T;
   tags?:
@@ -825,6 +838,7 @@ export interface PostsSelect<T extends boolean = true> {
   slug?: T;
   excerpt?: T;
   content?: T;
+  htmlContent?: T;
   featuredImage?: T;
   category?: T;
   keywords?:

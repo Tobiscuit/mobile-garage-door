@@ -1,7 +1,36 @@
-import type { CollectionConfig } from 'payload';
+import type { CollectionConfig, CollectionBeforeChangeHook } from 'payload';
+import { convertHTMLToLexical, editorConfigFactory } from '@payloadcms/richtext-lexical';
+import { JSDOM } from 'jsdom';
+import configPromise from '@payload-config';
+
+const htmlToLexicalHook: CollectionBeforeChangeHook = async ({ data, req, operation }) => {
+  if (data.htmlContent) {
+    req.payload.logger.info(`Converting AI htmlContent to Lexical AST for post: ${data.slug}`);
+    try {
+      const lexicalJSON = await convertHTMLToLexical({
+        editorConfig: await editorConfigFactory.default({
+          config: await configPromise,
+        }),
+        html: data.htmlContent,
+        JSDOM,
+      });
+
+      // Populate Lexical field for Admin UI
+      data.content = lexicalJSON;
+      // Clear htmlContent so it doesn't persist, forcing standard RichText rendering on frontend
+      data.htmlContent = null;
+    } catch (err) {
+      req.payload.logger.error({ err }, "Failed to parse HTML to Lexical");
+    }
+  }
+  return data;
+};
 
 export const Posts: CollectionConfig = {
   slug: 'posts',
+  hooks: {
+    beforeChange: [htmlToLexicalHook],
+  },
   admin: {
     useAsTitle: 'title',
     defaultColumns: ['title', 'category', 'publishedAt', 'status'],
@@ -43,8 +72,18 @@ export const Posts: CollectionConfig = {
     {
       name: 'content',
       type: 'richText',
-      required: true,
-      label: 'Article Content',
+      label: 'Manual Article Content (Lexical)',
+      admin: {
+        description: 'Used for manual writing.'
+      }
+    },
+    {
+      name: 'htmlContent',
+      type: 'code',
+      admin: {
+        language: 'html',
+        description: 'Autonomously generated semantic HTML content. If present, the frontend uses this instead of the Manual Content.'
+      }
     },
     {
       name: 'featuredImage',
