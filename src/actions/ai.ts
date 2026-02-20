@@ -36,8 +36,8 @@ async function generateContent(systemPrompt: string, userPrompt: string, schema?
 }
 
 // --- Feature: Blog Post Generator ---
-export async function generatePostContent(prompt: string, format: 'json' | 'markdown' = 'json'): Promise<any> {
-    const markdownSchema: Schema = {
+export async function generatePostContent(prompt: string): Promise<any> {
+    const schema: Schema = {
         type: Type.OBJECT,
         properties: {
         title: { type: Type.STRING },
@@ -50,33 +50,23 @@ export async function generatePostContent(prompt: string, format: 'json' | 'mark
             type: Type.ARRAY, 
             items: { type: Type.STRING } 
         },
-        content: { type: Type.STRING },
+        content: { type: Type.STRING, description: 'Main article body in semantic HTML (<p>, <h2>, <ul>, etc)' },
         },
         required: ['title', 'excerpt', 'category', 'keywords', 'content'],
     };
 
-    let systemPrompt = `
+    const systemPrompt = `
         You are an expert blog post writer for a Garage Door Service company.
-        Generate a blog post based on the user's prompt.
+        Generate a detailed, SEO-friendly blog post based on the user's prompt.
+        
+        INSTRUCTIONS:
+        1. Return valid HTML for the 'content' field.
+        2. Use semantic tags: <h2> for section headers, <p> for paragraphs, <ul>/<li> for lists.
+        3. Do NOT include <html>, <head>, or <body> tags.
+        4. Keep the tone professional but accessible.
     `;
 
-    if (format === 'markdown') {
-        systemPrompt += `
-        The 'content' field must be a Markdown formatted string.
-        Structure your response according to the schema.
-        `;
-    } else {
-        systemPrompt += `
-        You must return a JSON object with these fields:
-        - title, excerpt, category, keywords
-        - content: Lexical Editor State JSON Object (use 'heading', 'paragraph', 'list' nodes).
-        
-        Example Lexical Structure:
-        ${JSON.stringify(EXAMPLE_LEXICAL_STRUCTURE, null, 2)}
-        `;
-    }
-
-    return generateContent(systemPrompt, prompt, format === 'markdown' ? markdownSchema : undefined);
+    return generateContent(systemPrompt, prompt, schema);
 }
 
 // --- Feature: Smart Email Drafts (Service Hero) ---

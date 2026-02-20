@@ -4,6 +4,7 @@ import React, { useRef, useState, useActionState } from 'react';
 import { useRouter } from 'next/navigation';
 import MediaUpload from '@/features/admin/ui/MediaUpload';
 import { generatePostContent } from '@/actions/ai';
+import { RichTextEditor } from '@/features/admin/ui/RichTextEditor';
 
 interface PostFormProps {
   action: (prevState: any, formData: FormData) => Promise<any>;
@@ -24,27 +25,46 @@ export default function PostForm({ action, initialData, buttonLabel }: PostFormP
   const [aiPrompt, setAiPrompt] = useState('');
   const [isAiLoading, setIsAiLoading] = useState(false);
 
-  // Form Refs for direct manipulation
+  // Helper to convert Lexical JSON to HTML for Tiptap
+  function lexicalToHtml(node: any): string {
+    if (!node) return '';
+    if (typeof node === 'string') return node;
+    if (node.root) return lexicalToHtml(node.root);
+
+    if (node.type === 'text') {
+      let text = node.text || '';
+      text = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      if (node.format & 1) text = `<strong>${text}</strong>`;
+      if (node.format & 2) text = `<em>${text}</em>`;
+      if (node.format & 8) text = `<u>${text}</u>`;
+      if (node.format & 16) text = `<code>${text}</code>`;
+      return text;
+    }
+
+    const childrenHtml = node.children ? node.children.map((child: any) => lexicalToHtml(child)).join('') : '';
+
+    switch (node.type) {
+      case 'root': return childrenHtml;
+      case 'paragraph': return childrenHtml ? `<p>${childrenHtml}</p>` : '<p><br></p>';
+      case 'heading': return `<${node.tag}>${childrenHtml}</${node.tag}>`;
+      case 'list': return `<${node.listType === 'number' ? 'ol' : 'ul'}>${childrenHtml}</${node.listType === 'number' ? 'ol' : 'ul'}>`;
+      case 'listitem': return `<li>${childrenHtml}</li>`;
+      case 'quote': return `<blockquote>${childrenHtml}</blockquote>`;
+      case 'link': return `<a href="${node.fields?.url}" target="${node.fields?.newTab ? '_blank' : '_self'}">${childrenHtml}</a>`;
+      default: return childrenHtml;
+    }
+  }
+
+  // Content State
+  // Prefer htmlContent (from Adapter) if available, otherwise fallback to converting Lexical JSON to HTML
+  const [content, setContent] = useState(initialData?.htmlContent || lexicalToHtml(initialData?.content));
+
+  // Form Refs for direct manipulation of simple fields
   const titleRef = useRef<HTMLInputElement>(null);
   const slugRef = useRef<HTMLInputElement>(null);
-  const contentRef = useRef<HTMLTextAreaElement>(null);
   const excerptRef = useRef<HTMLTextAreaElement>(null);
   const keywordsRef = useRef<HTMLInputElement>(null);
   const categoryRef = useRef<HTMLSelectElement>(null);
-
-  // Helper to extract text from Lexical JSON if it exists
-  const getInitialContent = () => {
-    if (!initialData?.content) return '';
-    // If string (from our simple create), return it
-    if (typeof initialData.content === 'string') return initialData.content;
-    // If Lexical JSON object
-    try {
-        // Very basic extraction: get the first paragraph text
-        return initialData.content?.root?.children?.[0]?.children?.[0]?.text || '';
-    } catch (e) {
-        return '';
-    }
-  };
 
   const getInitialKeywords = () => {
     if (!initialData?.keywords) return '';
@@ -55,9 +75,7 @@ export default function PostForm({ action, initialData, buttonLabel }: PostFormP
       if (!aiPrompt) return;
       setIsAiLoading(true);
       try {
-          console.log('Generating content for:', aiPrompt);
-          const result = await generatePostContent(aiPrompt, 'markdown');
-          console.log('AI Result:', result);
+          const result = await generatePostContent(aiPrompt); // No format arg needed, returns HTML
           
           if (titleRef.current) titleRef.current.value = result.title || '';
           
@@ -67,7 +85,9 @@ export default function PostForm({ action, initialData, buttonLabel }: PostFormP
           }
           
           if (excerptRef.current) excerptRef.current.value = result.excerpt || '';
-          if (contentRef.current) contentRef.current.value = result.content || '';
+          
+          // Set Content (Tiptap)
+          setContent(result.content || '');
           
           if (keywordsRef.current) {
                const keywords = result.keywords;
@@ -75,12 +95,7 @@ export default function PostForm({ action, initialData, buttonLabel }: PostFormP
           }
           
           if (categoryRef.current && result.category) {
-              const validCategories = ['repair-tips', 'product-spotlight', 'contractor-insights', 'maintenance-guide', 'industry-news'];
-              if (validCategories.includes(result.category)) {
-                  categoryRef.current.value = result.category;
-              } else {
-                  console.warn('AI returned invalid category:', result.category);
-              }
+              categoryRef.current.value = result.category;
           }
 
           setIsAiOpen(false);
@@ -98,16 +113,16 @@ export default function PostForm({ action, initialData, buttonLabel }: PostFormP
         {/* AI POPUP */}
         {isAiOpen && (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-                <div className="bg-[#2c3e50] border border-[#ffffff10] rounded-2xl p-6 shadow-2xl w-full max-w-md animate-in zoom-in-95 duration-200">
-                    <h3 className="text-xl font-black text-white mb-4 flex items-center gap-2">
+                <div className="bg-[var(--staff-surface)] border border-[var(--staff-border)] rounded-2xl p-6 shadow-2xl w-full max-w-md animate-in zoom-in-95 duration-200">
+                    <h3 className="text-xl font-black text-[#f1c40f] mb-4 flex items-center gap-2">
                         <span>✨</span> AI Magic Writer
                     </h3>
                     <div className="mb-4">
-                        <label className="block text-xs font-bold text-[#bdc3c7] uppercase tracking-wider mb-2">What should I write about?</label>
+                        <label className="block text-xs font-bold text-[var(--staff-muted)] uppercase tracking-wider mb-2">What should I write about?</label>
                         <textarea 
                             value={aiPrompt}
                             onChange={(e) => setAiPrompt(e.target.value)}
-                            className="w-full bg-[#1e2b38] border border-[#ffffff10] rounded-xl p-3 text-white focus:border-[#f1c40f] outline-none min-h-[100px]"
+                            className="w-full bg-[var(--staff-bg)] border border-[var(--staff-border)] rounded-xl p-3 text-[var(--staff-text)] focus:border-[#f1c40f] outline-none min-h-[100px]"
                             placeholder="e.g. Write a guide about how to fix a noisy garage door opener..."
                             autoFocus
                         />
@@ -115,18 +130,18 @@ export default function PostForm({ action, initialData, buttonLabel }: PostFormP
                     <div className="flex justify-end gap-3">
                         <button 
                             onClick={() => setIsAiOpen(false)}
-                            className="px-4 py-2 text-[#bdc3c7] hover:text-white font-bold text-sm"
+                            className="px-4 py-2 text-[var(--staff-muted)] hover:text-[var(--staff-text)] font-bold text-sm"
                         >
                             Cancel
                         </button>
                         <button 
                             onClick={handleAiGenerate}
                             disabled={isAiLoading || !aiPrompt}
-                            className="px-6 py-2 bg-gradient-to-r from-[#f1c40f] to-[#f39c12] text-[#2c3e50] font-black rounded-lg shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                            className="px-6 py-2 bg-[#f1c40f] hover:bg-[#f39c12] text-[#2c3e50] font-black rounded-lg shadow-lg hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                         >
                             {isAiLoading ? (
                                 <>
-                                    <div className="w-4 h-4 border-2 border-[#2c3e50] border-t-transparent rounded-full animate-spin"></div>
+                                    <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                                     Thinking...
                                 </>
                             ) : (
@@ -164,76 +179,72 @@ export default function PostForm({ action, initialData, buttonLabel }: PostFormP
         
         {/* MAIN CONTENT COLUMN */}
         <div className="lg:col-span-2 space-y-6">
-            <div className="bg-[#34495e]/50 backdrop-blur-md border border-[#ffffff08] rounded-2xl p-8 shadow-xl">
+            <div className="bg-[var(--staff-surface)] border border-[var(--staff-border)] rounded-2xl p-8 shadow-xl transition-colors duration-200">
                  {/* TITLE */}
                  <div className="mb-6">
-                    <label className="block text-xs font-bold text-[#bdc3c7] uppercase tracking-wider mb-2">Article Title</label>
+                    <label className="block text-xs font-bold text-[var(--staff-muted)] uppercase tracking-wider mb-2">Article Title</label>
                     <input 
                       ref={titleRef}
                       name="title"
                       type="text" 
                       defaultValue={initialData?.title}
                       required
-                      className="w-full bg-[#2c3e50] border border-[#ffffff10] rounded-xl px-4 py-3 text-white text-xl font-bold focus:outline-none focus:border-[#f1c40f] transition-colors"
+                      className="w-full bg-[var(--staff-bg)] border border-[var(--staff-border)] rounded-xl px-4 py-3 text-[var(--staff-text)] text-xl font-bold focus:outline-none focus:border-[#f1c40f] transition-colors"
                       placeholder="Enter a catchy title..."
                     />
                  </div>
 
                  {/* SLUG */}
                  <div className="mb-6">
-                    <label className="block text-xs font-bold text-[#bdc3c7] uppercase tracking-wider mb-2">Slug (URL)</label>
-                    <div className="flex bg-[#2c3e50] border border-[#ffffff10] rounded-xl px-4 py-3 text-gray-400">
+                    <label className="block text-xs font-bold text-[var(--staff-muted)] uppercase tracking-wider mb-2">Slug (URL)</label>
+                    <div className="flex bg-[var(--staff-bg)] border border-[var(--staff-border)] rounded-xl px-4 py-3 text-[var(--staff-muted)]">
                         <span className="select-none">/posts/</span>
                         <input 
                         ref={slugRef}
                         name="slug"
                         type="text" 
                         defaultValue={initialData?.slug}
-                        className="bg-transparent text-white focus:outline-none flex-1 ml-1"
+                        className="bg-transparent text-[var(--staff-text)] focus:outline-none flex-1 ml-1"
                         placeholder="auto-generated-from-title"
                         />
                     </div>
                  </div>
 
-                 {/* CONTENT (Simple Textarea for now, replacing RichText wrapper) */}
+                 {/* CONTENT EDITOR */}
                  <div className="mb-6">
-                    <label className="block text-xs font-bold text-[#bdc3c7] uppercase tracking-wider mb-2">Content (Markdown / Text)</label>
-                    <textarea 
-                      ref={contentRef}
-                      name="content"
-                      defaultValue={getInitialContent()}
-                      required
-                      rows={15}
-                      className="w-full bg-[#2c3e50] border border-[#ffffff10] rounded-xl px-4 py-3 text-white font-mono text-sm focus:outline-none focus:border-[#f1c40f] transition-colors"
-                      placeholder="Write your article content here..."
+                    <label className="block text-xs font-bold text-[var(--staff-muted)] uppercase tracking-wider mb-2">Content</label>
+                    <RichTextEditor 
+                        content={content} 
+                        onChange={setContent} 
                     />
+                    <input type="hidden" name="content" value={content} />
                  </div>
 
                  {/* EXCERPT */}
                  <div>
-                    <label className="block text-xs font-bold text-[#bdc3c7] uppercase tracking-wider mb-2">Short Summary (Excerpt)</label>
+                    <label className="block text-xs font-bold text-[var(--staff-muted)] uppercase tracking-wider mb-2">Short Summary (Excerpt)</label>
                     <textarea 
                       ref={excerptRef}
                       name="excerpt"
                       defaultValue={initialData?.excerpt}
                       rows={3}
-                      className="w-full bg-[#2c3e50] border border-[#ffffff10] rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#f1c40f] transition-colors"
+                      className="w-full bg-[var(--staff-bg)] border border-[var(--staff-border)] rounded-xl px-4 py-3 text-[var(--staff-text)] focus:outline-none focus:border-[#f1c40f] transition-colors"
                       placeholder="Brief overview for SEO and previews..."
                     />
                  </div>
             </div>
             
-             <div className="bg-[#34495e]/50 backdrop-blur-md border border-[#ffffff08] rounded-2xl p-8 shadow-xl">
-                 <h3 className="text-lg font-bold text-white mb-4">Search Optimization</h3>
+             <div className="bg-[var(--staff-surface)] border border-[var(--staff-border)] rounded-2xl p-8 shadow-xl transition-colors duration-200">
+                 <h3 className="text-lg font-bold text-[#f1c40f] mb-4">Search Optimization</h3>
                  {/* KEYWORDS */}
                  <div>
-                    <label className="block text-xs font-bold text-[#bdc3c7] uppercase tracking-wider mb-2">Keywords (Comma Separated)</label>
+                    <label className="block text-xs font-bold text-[var(--staff-muted)] uppercase tracking-wider mb-2">Keywords (Comma Separated)</label>
                     <input 
                       ref={keywordsRef}
                       name="keywords"
                       type="text" 
                       defaultValue={getInitialKeywords()}
-                      className="w-full bg-[#2c3e50] border border-[#ffffff10] rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#f1c40f] transition-colors"
+                      className="w-full bg-[var(--staff-bg)] border border-[var(--staff-border)] rounded-xl px-4 py-3 text-[var(--staff-text)] focus:outline-none focus:border-[#f1c40f] transition-colors"
                       placeholder="e.g. garage door repair, new installation, dallas"
                     />
                  </div>
@@ -242,16 +253,16 @@ export default function PostForm({ action, initialData, buttonLabel }: PostFormP
 
         {/* SIDEBAR COLUMN */}
         <div className="space-y-6">
-            <div className="bg-[#34495e]/50 backdrop-blur-md border border-[#ffffff08] rounded-2xl p-6 shadow-xl">
-                <h3 className="text-xs font-bold text-[#bdc3c7] uppercase tracking-wider mb-4 border-b border-[#ffffff10] pb-2">Publishing</h3>
+            <div className="bg-[var(--staff-surface)] border border-[var(--staff-border)] rounded-2xl p-6 shadow-xl transition-colors duration-200">
+                <h3 className="text-xs font-bold text-[var(--staff-muted)] uppercase tracking-wider mb-4 border-b border-[var(--staff-border)] pb-2">Publishing</h3>
                 
                 {/* STATUS */}
                 <div className="mb-4">
-                    <label className="block text-xs text-[#bdc3c7] mb-1">Status</label>
+                    <label className="block text-xs text-[var(--staff-muted)] mb-1">Status</label>
                     <select 
                         name="status"
                         defaultValue={initialData?.status || 'draft'}
-                        className="w-full bg-[#2c3e50] border border-[#ffffff10] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-[#f1c40f]"
+                        className="w-full bg-[var(--staff-bg)] border border-[var(--staff-border)] rounded-xl px-3 py-2 text-[var(--staff-text)] focus:outline-none focus:border-[#f1c40f]"
                     >
                         <option value="draft">Draft</option>
                         <option value="published">Published</option>
@@ -260,23 +271,23 @@ export default function PostForm({ action, initialData, buttonLabel }: PostFormP
 
                 {/* PUBLISHED AT */}
                 <div className="mb-6">
-                    <label className="block text-xs text-[#bdc3c7] mb-1">Publish Date</label>
+                    <label className="block text-xs text-[var(--staff-muted)] mb-1">Publish Date</label>
                     <input 
                         name="publishedAt"
                         type="date"
                         defaultValue={initialData?.publishedAt ? new Date(initialData.publishedAt).toISOString().split('T')[0] : ''}
-                        className="w-full bg-[#2c3e50] border border-[#ffffff10] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-[#f1c40f]"
+                        className="w-full bg-[var(--staff-bg)] border border-[var(--staff-border)] rounded-xl px-3 py-2 text-[var(--staff-text)] focus:outline-none focus:border-[#f1c40f]"
                     />
                 </div>
 
                 {/* CATEGORY */}
                 <div className="mb-6">
-                    <label className="block text-xs text-[#bdc3c7] mb-1">Category</label>
+                    <label className="block text-xs text-[var(--staff-muted)] mb-1">Category</label>
                      <select 
                         ref={categoryRef}
                         name="category"
                         defaultValue={initialData?.category || 'repair-tips'}
-                        className="w-full bg-[#2c3e50] border border-[#ffffff10] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-[#f1c40f]"
+                        className="w-full bg-[var(--staff-bg)] border border-[var(--staff-border)] rounded-xl px-3 py-2 text-[var(--staff-text)] focus:outline-none focus:border-[#f1c40f]"
                     >
                         <option value="repair-tips">Repair Tips</option>
                         <option value="product-spotlight">Product Spotlight</option>
@@ -297,7 +308,7 @@ export default function PostForm({ action, initialData, buttonLabel }: PostFormP
                     <button 
                         type="button"
                         onClick={() => router.back()}
-                        className="w-full py-2 text-[#bdc3c7] font-bold hover:text-white transition-colors text-sm"
+                        className="w-full py-2 text-[var(--staff-muted)] font-bold hover:text-[var(--staff-text)] transition-colors text-sm"
                     >
                         Cancel
                     </button>
@@ -305,8 +316,8 @@ export default function PostForm({ action, initialData, buttonLabel }: PostFormP
             </div>
 
             {/* FEATURED IMAGE */}
-            <div className="bg-[#34495e]/50 backdrop-blur-md border border-[#ffffff08] rounded-2xl p-6 shadow-xl">
-                 <h3 className="text-xs font-bold text-[#bdc3c7] uppercase tracking-wider mb-4 border-b border-[#ffffff10] pb-2">Featured Image</h3>
+            <div className="bg-[var(--staff-surface)] border border-[var(--staff-border)] rounded-2xl p-6 shadow-xl transition-colors duration-200">
+                 <h3 className="text-xs font-bold text-[var(--staff-muted)] uppercase tracking-wider mb-4 border-b border-[var(--staff-border)] pb-2">Featured Image</h3>
                  
                  <MediaUpload 
                     onUploadComplete={(doc) => setFeaturedImageId(doc.id)}
@@ -315,13 +326,13 @@ export default function PostForm({ action, initialData, buttonLabel }: PostFormP
             </div>
 
             {/* AI NOTES */}
-            <div className="bg-[#34495e]/50 backdrop-blur-md border border-[#ffffff08] rounded-2xl p-6 shadow-xl">
-                 <h3 className="text-xs font-bold text-[#bdc3c7] uppercase tracking-wider mb-4 border-b border-[#ffffff10] pb-2">AI Quick Notes</h3>
+            <div className="bg-[var(--staff-surface)] border border-[var(--staff-border)] rounded-2xl p-6 shadow-xl transition-colors duration-200">
+                 <h3 className="text-xs font-bold text-[var(--staff-muted)] uppercase tracking-wider mb-4 border-b border-[var(--staff-border)] pb-2">AI Quick Notes</h3>
                  <textarea 
                       name="quickNotes"
                       defaultValue={initialData?.quickNotes}
                       rows={4}
-                      className="w-full bg-[#2c3e50] border border-[#ffffff10] rounded-xl px-3 py-2 text-white text-sm focus:outline-none focus:border-[#f1c40f] transition-colors resize-none"
+                      className="w-full bg-[var(--staff-bg)] border border-[var(--staff-border)] rounded-xl px-3 py-2 text-[var(--staff-text)] text-sm focus:outline-none focus:border-[#f1c40f] transition-colors resize-none"
                       placeholder="Ideas for AI expansion..."
                     />
                     <button type="button" className="w-full mt-2 py-2 bg-[#8e44ad] text-white text-xs font-bold rounded-lg hover:bg-[#9b59b6] transition-colors flex items-center justify-center gap-2 opacity-50 cursor-not-allowed" title="Coming Soon">
