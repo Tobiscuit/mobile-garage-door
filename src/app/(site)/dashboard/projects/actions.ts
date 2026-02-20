@@ -29,58 +29,6 @@ export async function getProjectById(id: string) {
   }
 }
 
-const generateRichText = (text: string) => {
-  if (!text) {
-    return {
-      root: {
-        type: 'root',
-        format: '',
-        indent: 0,
-        version: 1,
-        direction: 'ltr',
-        children: [
-          {
-            type: 'paragraph',
-            format: '',
-            indent: 0,
-            version: 1,
-            children: [],
-          },
-        ],
-      },
-    };
-  }
-
-  const paragraphs = text.split('\n');
-
-  return {
-    root: {
-      type: 'root',
-      format: '',
-      indent: 0,
-      version: 1,
-      direction: 'ltr',
-      children: paragraphs.map((pText) => ({
-        type: 'paragraph',
-        format: '',
-        indent: 0,
-        version: 1,
-        children: [
-          {
-            type: 'text',
-            detail: 0,
-            format: 0,
-            mode: 'normal',
-            style: '',
-            text: pText,
-            version: 1,
-          },
-        ],
-      })),
-    },
-  };
-};
-
 export async function createProject(formData: FormData) {
   const payload = await getPayload({ config: configPromise });
 
@@ -98,9 +46,10 @@ export async function createProject(formData: FormData) {
       collection: 'projects',
       data: {
         title,
-        description: generateRichText(description) as any, // Cast to any to bypass complex Lexical types in server action
-        challenge: generateRichText(challenge) as any,
-        solution: generateRichText(solution) as any,
+        // Pass HTML to transient fields - hook will convert to Lexical
+        htmlDescription: description,
+        htmlChallenge: challenge,
+        htmlSolution: solution,
         client,
         location,
         completionDate,
@@ -109,7 +58,7 @@ export async function createProject(formData: FormData) {
         imageStyle: 'garage-pattern-modern', // Default for now
         tags: [{ tag: 'General' }], // Default tag
         stats: [], // Empty stats
-      } as any, // Bypass stale type definition for completionDate
+      } as any, 
     });
   } catch (error) {
     console.error('Create Project Error:', error);
@@ -138,9 +87,10 @@ export async function updateProject(id: string, formData: FormData) {
       id,
       data: {
         title,
-        description: generateRichText(description) as any,
-        challenge: generateRichText(challenge) as any,
-        solution: generateRichText(solution) as any,
+        // Pass HTML to transient fields - hook will convert to Lexical
+        htmlDescription: description,
+        htmlChallenge: challenge,
+        htmlSolution: solution,
         client,
         location,
         completionDate,

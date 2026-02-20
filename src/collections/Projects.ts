@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload';
+import { generateHtmlToLexicalHook } from '../lib/payload/rich-text-adapter';
 
 export const Projects: CollectionConfig = {
   slug: 'projects',
@@ -6,6 +7,15 @@ export const Projects: CollectionConfig = {
     useAsTitle: 'title',
     defaultColumns: ['title', 'client', 'location', 'updatedAt'],
     group: 'Content',
+  },
+  hooks: {
+    beforeChange: [
+      generateHtmlToLexicalHook({
+        htmlDescription: 'description',
+        htmlChallenge: 'challenge',
+        htmlSolution: 'solution',
+      }, { cleanup: false }),
+    ],
   },
   fields: [
     {
@@ -104,6 +114,31 @@ export const Projects: CollectionConfig = {
       label: 'Our Solution',
       admin: {
         description: 'How did we fix it?',
+      },
+    },
+    // Transient HTML fields for API-based updates (Adapter Pattern)
+    {
+      name: 'htmlDescription',
+      type: 'code',
+      admin: {
+        hidden: true,
+        language: 'html',
+      },
+    },
+    {
+      name: 'htmlChallenge',
+      type: 'code',
+      admin: {
+        hidden: true,
+        language: 'html',
+      },
+    },
+    {
+      name: 'htmlSolution',
+      type: 'code',
+      admin: {
+        hidden: true,
+        language: 'html',
       },
     },
     {

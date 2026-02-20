@@ -24,12 +24,13 @@ const MenuBar = ({ editor }: { editor: Editor | null }) => {
     "p-2 rounded text-sm transition-colors",
     isActive 
       ? "bg-[#f1c40f] text-[#2c3e50] font-bold" 
-      : "text-gray-500 dark:text-[#7f8c8d] hover:bg-gray-100 dark:hover:bg-[#ffffff10] hover:text-gray-900 dark:hover:text-white"
+      : "text-[var(--staff-muted)] hover:bg-[var(--staff-border)] hover:text-[var(--staff-text)]"
   );
 
   return (
-    <div className="flex flex-wrap gap-1 p-2 border-b border-gray-200 dark:border-[#ffffff10] bg-gray-50 dark:bg-[#ffffff02]">
+    <div className="flex flex-wrap gap-1 p-2 border-b border-[var(--staff-border)] bg-[var(--staff-surface-alt)]">
       <button
+        type="button"
         onClick={() => editor.chain().focus().toggleBold().run()}
         disabled={!editor.can().chain().focus().toggleBold().run()}
         className={buttonClass(editor.isActive('bold'))}
@@ -38,6 +39,7 @@ const MenuBar = ({ editor }: { editor: Editor | null }) => {
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 4h8a4 4 0 014 4 4 4 0 01-4 4H6z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 12h9a4 4 0 014 4 4 4 0 01-4 4H6z" /></svg>
       </button>
       <button
+        type="button"
         onClick={() => editor.chain().focus().toggleItalic().run()}
         disabled={!editor.can().chain().focus().toggleItalic().run()}
         className={buttonClass(editor.isActive('italic'))}
@@ -46,6 +48,7 @@ const MenuBar = ({ editor }: { editor: Editor | null }) => {
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l8 8M6 16l14 14" /></svg>
       </button>
       <button
+         type="button"
          onClick={() => editor.chain().focus().toggleStrike().run()}
          disabled={!editor.can().chain().focus().toggleStrike().run()}
          className={buttonClass(editor.isActive('strike'))}
@@ -54,9 +57,10 @@ const MenuBar = ({ editor }: { editor: Editor | null }) => {
          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 12h16" /></svg>
       </button>
       
-      <div className="w-[1px] h-6 bg-gray-200 dark:bg-[#ffffff10] mx-1 my-auto"></div>
+      <div className="w-[1px] h-6 bg-[var(--staff-border)] mx-1 my-auto"></div>
 
       <button
+        type="button"
         onClick={() => editor.chain().focus().toggleBulletList().run()}
         className={buttonClass(editor.isActive('bulletList'))}
         title="Bullet List"
@@ -64,6 +68,7 @@ const MenuBar = ({ editor }: { editor: Editor | null }) => {
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
       </button>
       <button
+        type="button"
         onClick={() => editor.chain().focus().toggleOrderedList().run()}
         className={buttonClass(editor.isActive('orderedList'))}
         title="Ordered List"
@@ -71,9 +76,10 @@ const MenuBar = ({ editor }: { editor: Editor | null }) => {
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h12M7 12h12M7 17h12M3 7h.01M3 12h.01M3 17h.01" /></svg>
       </button>
       
-      <div className="w-[1px] h-6 bg-gray-200 dark:bg-[#ffffff10] mx-1 my-auto"></div>
+      <div className="w-[1px] h-6 bg-[var(--staff-border)] mx-1 my-auto"></div>
 
       <button
+        type="button"
         onClick={() => editor.chain().focus().toggleBlockquote().run()}
         className={buttonClass(editor.isActive('blockquote'))}
         title="Quote"
@@ -86,6 +92,7 @@ const MenuBar = ({ editor }: { editor: Editor | null }) => {
 
 export const RichTextEditor = ({ content, onChange, onSend, disabled }: RichTextEditorProps) => {
   const editor = useEditor({
+    immediatelyRender: false,
     extensions: [
       StarterKit,
       Link.configure({
@@ -101,7 +108,7 @@ export const RichTextEditor = ({ content, onChange, onSend, disabled }: RichText
     },
     editorProps: {
         attributes: {
-            class: 'prose prose-sm dark:prose-invert max-w-none focus:outline-none min-h-[150px] p-4 text-sm custom-scrollbar text-gray-800 dark:text-white',
+            class: 'prose prose-sm max-w-none focus:outline-none min-h-[150px] p-4 text-sm custom-scrollbar text-[var(--staff-text)] [&_p]:text-[var(--staff-text)] [&_h1]:text-[var(--staff-text)] [&_h2]:text-[var(--staff-text)] [&_h3]:text-[var(--staff-text)] [&_li]:text-[var(--staff-text)] [&_strong]:text-[var(--staff-text)]',
         },
         handleKeyDown: (view, event) => {
             if (event.key === 'Enter' && (event.ctrlKey || event.metaKey)) {
@@ -116,20 +123,17 @@ export const RichTextEditor = ({ content, onChange, onSend, disabled }: RichText
     editable: !disabled,
   });
 
-  // Sync content if props change externally (e.g. clear after send)
+  // Sync content if props change externally (e.g. clear after send or AI generation)
   React.useEffect(() => {
     if (editor && content !== editor.getHTML()) {
-        // Only update if significantly different to avoid cursor jumps
-        if (content === '' || content === '<p></p>') {
-            editor.commands.setContent(content);
-        }
+        editor.commands.setContent(content);
     }
   }, [content, editor]);
 
   return (
     <div className={clsx(
-        "rounded-xl border border-gray-200 dark:border-[#ffffff10] bg-white dark:bg-[#ffffff05] overflow-hidden transition-all",
-        editor?.isFocused && "border-yellow-400 dark:border-[#f1c40f]/50 ring-1 ring-yellow-400/20 dark:ring-[#f1c40f]/20",
+        "rounded-xl border border-[var(--staff-border)] bg-[var(--staff-surface)] overflow-hidden transition-colors duration-200",
+        editor?.isFocused && "border-[#f1c40f] ring-1 ring-[#f1c40f]/20",
         disabled && "opacity-50 cursor-not-allowed"
     )}>
       <MenuBar editor={editor} />
