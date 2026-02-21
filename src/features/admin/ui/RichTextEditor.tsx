@@ -108,7 +108,7 @@ export const RichTextEditor = ({ content, onChange, onSend, disabled }: RichText
     },
     editorProps: {
         attributes: {
-            class: 'prose prose-sm max-w-none focus:outline-none min-h-[150px] p-4 text-sm custom-scrollbar text-[var(--staff-text)] [&_p]:text-[var(--staff-text)] [&_h1]:text-[var(--staff-text)] [&_h2]:text-[var(--staff-text)] [&_h3]:text-[var(--staff-text)] [&_li]:text-[var(--staff-text)] [&_strong]:text-[var(--staff-text)]',
+            class: 'prose prose-sm max-w-none focus:outline-none min-h-[150px] p-4 text-sm custom-scrollbar text-[var(--staff-text)] prose-headings:text-[var(--staff-text)] prose-p:text-[var(--staff-text)] prose-strong:text-[var(--staff-text)] prose-li:text-[var(--staff-text)] prose-code:text-[var(--staff-text)] prose-blockquote:text-[var(--staff-text)] prose-a:text-[#f1c40f]',
         },
         handleKeyDown: (view, event) => {
             if (event.key === 'Enter' && (event.ctrlKey || event.metaKey)) {

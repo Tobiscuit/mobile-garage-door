@@ -8,15 +8,15 @@ export default function CreatePostPage() {
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="mb-8">
         <div className="flex items-center gap-2 mb-1">
-            <Link href="/dashboard/posts" className="text-[#7f8c8d] hover:text-[#f1c40f] text-sm font-bold uppercase tracking-widest transition-colors">
+            <Link href="/dashboard/posts" className="text-[var(--staff-muted)] hover:text-[#f1c40f] text-sm font-bold uppercase tracking-widest transition-colors">
             Blog Posts
             </Link>
-            <span className="text-[#ffffff20]">/</span>
+            <span className="text-[var(--staff-border)]">/</span>
             <span className="text-[#f1c40f] text-sm font-bold uppercase tracking-widest">
             Create
             </span>
         </div>
-        <h1 className="text-4xl font-black text-white">Write New Article</h1>
+        <h1 className="text-4xl font-black text-[var(--staff-text)]">Write New Article</h1>
       </div>
 
       <PostForm 
