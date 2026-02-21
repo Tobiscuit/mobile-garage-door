@@ -23,25 +23,25 @@ export default async function MediaPage() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
            <div className="flex items-center gap-2 mb-1">
-              <Link href="/dashboard" className="text-[#7f8c8d] hover:text-[#f1c40f] text-sm font-bold uppercase tracking-widest transition-colors">
+              <Link href="/dashboard" className="text-[var(--staff-muted)] hover:text-[#f1c40f] text-sm font-bold uppercase tracking-widest transition-colors">
                 Command Center
               </Link>
-              <span className="text-[#ffffff20]">/</span>
+              <span className="text-[var(--staff-border)]">/</span>
               <span className="text-[#f1c40f] text-sm font-bold uppercase tracking-widest">
                 Content
               </span>
            </div>
-           <h1 className="text-4xl font-black text-white">Media Library</h1>
+           <h1 className="text-4xl font-black text-[var(--staff-text)]">Media Library</h1>
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         {/* UPLOAD CARD */}
         <div className="col-span-1 md:col-span-1">
-            <div className="bg-[#34495e]/50 backdrop-blur-md border border-[#ffffff08] p-6 rounded-2xl shadow-xl space-y-4">
-                <h3 className="text-sm font-bold text-white">Quick Upload</h3>
+            <div className="bg-[var(--staff-surface)] backdrop-blur-md border border-[var(--staff-border)] p-6 rounded-2xl shadow-xl space-y-4">
+                <h3 className="text-sm font-bold text-[var(--staff-text)]">Quick Upload</h3>
                 <QuickUpload />
-                <p className="text-xs text-[#7f8c8d] mt-2 text-center">
+                <p className="text-xs text-[var(--staff-muted)] mt-2 text-center">
                     Note: Refresh page to see new uploads in the gallery.
                 </p>
             </div>
@@ -51,7 +51,7 @@ export default async function MediaPage() {
         <div className="col-span-1 md:col-span-3">
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 {mediaItems.map((item) => (
-                    <div key={item.id} className="relative aspect-square group bg-[#1e2b38] rounded-xl overflow-hidden border border-[#ffffff10] hover:border-[#f1c40f] transition-all">
+                    <div key={item.id} className="relative aspect-square group bg-[var(--staff-surface-alt)] rounded-xl overflow-hidden border border-[var(--staff-border)] hover:border-[#f1c40f] transition-all">
                         {item.url && (
                              <Image 
                                 src={item.url} 

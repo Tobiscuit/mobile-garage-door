@@ -14,15 +14,15 @@ export default async function ServicesPage() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
            <div className="flex items-center gap-2 mb-1">
-              <Link href="/dashboard" className="text-[#7f8c8d] hover:text-[#f1c40f] text-sm font-bold uppercase tracking-widest transition-colors">
+              <Link href="/dashboard" className="text-[var(--staff-muted)] hover:text-[#f1c40f] text-sm font-bold uppercase tracking-widest transition-colors">
                 Command Center
               </Link>
-              <span className="text-[#ffffff20]">/</span>
+              <span className="text-[var(--staff-border)]">/</span>
               <span className="text-[#f1c40f] text-sm font-bold uppercase tracking-widest">
                 Operations
               </span>
            </div>
-           <h1 className="text-4xl font-black text-white">Edit Services</h1>
+           <h1 className="text-4xl font-black text-[var(--staff-text)]">Services</h1>
         </div>
 
         <Link 
@@ -48,17 +48,17 @@ export default async function ServicesPage() {
             header: 'Service Name',
             cell: (item: any) => (
                <div>
-                  <div className="font-bold text-lg text-white group-hover:text-[#f1c40f] transition-colors">
+                  <div className="font-bold text-lg text-[var(--staff-text)] group-hover:text-[#f1c40f] transition-colors">
                     {item.title}
                   </div>
-                  <div className="text-xs text-[#7f8c8d] line-clamp-1">{item.description}</div>
+                  <div className="text-xs text-[var(--staff-muted)] line-clamp-1">{item.description}</div>
                </div>
             )
           },
           {
             header: 'Category',
             cell: (item: any) => (
-                <span className="inline-block px-3 py-1 rounded-md bg-[#ffffff05] border border-[#ffffff05] text-xs font-bold text-[#bdc3c7]">
+                <span className="inline-block px-3 py-1 rounded-md bg-[var(--staff-surface-alt)] border border-[var(--staff-border)] text-xs font-bold text-[var(--staff-muted)]">
                     {item.category}
                 </span>
             )
@@ -74,7 +74,7 @@ export default async function ServicesPage() {
            {
              header: 'Highlight',
              cell: (item: any) => (
-                item.highlight ? <span className="text-[#f1c40f] text-xs font-bold uppercase">Featured</span> : <span className="text-[#7f8c8d] text-xs">-</span>
+                item.highlight ? <span className="text-[#f1c40f] text-xs font-bold uppercase">Featured</span> : <span className="text-[var(--staff-muted)] text-xs">-</span>
              )
            },
           {
@@ -84,7 +84,7 @@ export default async function ServicesPage() {
               <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                  <Link 
                     href={`/dashboard/services/${item.id}`}
-                    className="p-2 bg-[#ffffff05] hover:bg-[#f1c40f] hover:text-[#2c3e50] rounded-lg transition-colors"
+                    className="p-2 bg-[var(--staff-surface-alt)] hover:bg-[#f1c40f] hover:text-[#2c3e50] rounded-lg transition-colors"
                     title="Edit Service"
                  >
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
