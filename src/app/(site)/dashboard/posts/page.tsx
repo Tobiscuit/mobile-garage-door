@@ -14,15 +14,15 @@ export default async function PostsPage() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
            <div className="flex items-center gap-2 mb-1">
-              <Link href="/dashboard" className="text-[#7f8c8d] hover:text-[#f1c40f] text-sm font-bold uppercase tracking-widest transition-colors">
+              <Link href="/dashboard" className="text-[var(--staff-muted)] hover:text-[#f1c40f] text-sm font-bold uppercase tracking-widest transition-colors">
                 Command Center
               </Link>
-              <span className="text-[#ffffff20]">/</span>
+              <span className="text-[var(--staff-border)]">/</span>
               <span className="text-[#f1c40f] text-sm font-bold uppercase tracking-widest">
                 Content
               </span>
            </div>
-           <h1 className="text-4xl font-black text-white">Blog Posts</h1>
+           <h1 className="text-4xl font-black text-[var(--staff-text)]">Blog Posts</h1>
         </div>
 
         <Link 
@@ -48,17 +48,17 @@ export default async function PostsPage() {
             header: 'Title',
             cell: (item: any) => (
                <div>
-                  <div className="font-bold text-lg text-white group-hover:text-[#f1c40f] transition-colors line-clamp-1">
+                  <div className="font-bold text-lg text-[var(--staff-text)] group-hover:text-[#f1c40f] transition-colors line-clamp-1">
                     {item.title}
                   </div>
-                  <div className="text-xs text-[#7f8c8d]">/{item.slug}</div>
+                  <div className="text-xs text-[var(--staff-muted)]">/{item.slug}</div>
                </div>
             )
           },
           {
             header: 'Category',
             cell: (item: any) => (
-                <span className="inline-block px-3 py-1 rounded-md bg-[#ffffff05] border border-[#ffffff05] text-xs font-bold text-[#bdc3c7]">
+                <span className="inline-block px-3 py-1 rounded-md bg-[var(--staff-surface-alt)] border border-[var(--staff-border)] text-xs font-bold text-[var(--staff-muted)]">
                     {item.category || 'Uncategorized'}
                 </span>
             )
@@ -77,7 +77,7 @@ export default async function PostsPage() {
           {
             header: 'Published',
             cell: (item: any) => (
-                <div className="text-sm text-[#bdc3c7]">
+                <div className="text-sm text-[var(--staff-muted)]">
                    {item.publishedAt ? new Date(item.publishedAt).toLocaleDateString() : '-'}
                 </div>
             )
@@ -89,7 +89,7 @@ export default async function PostsPage() {
               <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                  <Link 
                     href={`/dashboard/posts/${item.id}`}
-                    className="p-2 bg-[#ffffff05] hover:bg-[#f1c40f] hover:text-[#2c3e50] rounded-lg transition-colors"
+                    className="p-2 bg-[var(--staff-surface-alt)] hover:bg-[#f1c40f] hover:text-[#2c3e50] rounded-lg transition-colors"
                     title="Edit Post"
                  >
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

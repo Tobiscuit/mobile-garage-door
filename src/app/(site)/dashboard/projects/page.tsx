@@ -15,15 +15,15 @@ export default async function ProjectsPage() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
            <div className="flex items-center gap-2 mb-1">
-              <Link href="/dashboard" className="text-[#7f8c8d] hover:text-[#f1c40f] text-sm font-bold uppercase tracking-widest transition-colors">
+              <Link href="/dashboard" className="text-[var(--staff-muted)] hover:text-[#f1c40f] text-sm font-bold uppercase tracking-widest transition-colors">
                 Command Center
               </Link>
-              <span className="text-[#ffffff20]">/</span>
+              <span className="text-[var(--staff-border)]">/</span>
               <span className="text-[#f1c40f] text-sm font-bold uppercase tracking-widest">
                 Operations
               </span>
            </div>
-           <h1 className="text-4xl font-black text-white">Project Portfolio</h1>
+           <h1 className="text-4xl font-black text-[var(--staff-text)]">Projects</h1>
         </div>
 
         <Link 
@@ -49,7 +49,7 @@ export default async function ProjectsPage() {
             header: 'Project',
             cell: (item: any) => (
                <div className="flex items-center gap-4">
-                  <div className="w-16 h-16 rounded-lg bg-[#ffffff05] relative overflow-hidden shrink-0 border border-[#ffffff10]">
+                  <div className="w-16 h-16 rounded-lg bg-[var(--staff-surface-alt)] relative overflow-hidden shrink-0 border border-[var(--staff-border)]">
                       {item.coverImage?.url ? (
                          <Image src={item.coverImage.url} alt={item.title} fill className="object-cover" />
                       ) : (
@@ -59,8 +59,8 @@ export default async function ProjectsPage() {
                       )}
                   </div>
                   <div>
-                    <div className="font-bold text-lg text-white group-hover:text-[#f1c40f] transition-colors">{item.title}</div>
-                    <div className="text-xs text-[#7f8c8d]">{item.client}</div>
+                    <div className="font-bold text-lg text-[var(--staff-text)] group-hover:text-[#f1c40f] transition-colors">{item.title}</div>
+                    <div className="text-xs text-[var(--staff-muted)]">{item.client}</div>
                   </div>
                </div>
             )
@@ -68,7 +68,7 @@ export default async function ProjectsPage() {
           {
             header: 'Location',
             cell: (item: any) => (
-                <div className="text-sm font-medium text-[#bdc3c7]">
+                <div className="text-sm font-medium text-[var(--staff-muted)]">
                     {item.location || 'N/A'}
                 </div>
             )
@@ -88,7 +88,7 @@ export default async function ProjectsPage() {
               <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                  <Link 
                     href={`/dashboard/projects/${item.id}`}
-                    className="p-2 bg-[#ffffff05] hover:bg-[#f1c40f] hover:text-[#2c3e50] rounded-lg transition-colors"
+                    className="p-2 bg-[var(--staff-surface-alt)] hover:bg-[#f1c40f] hover:text-[#2c3e50] rounded-lg transition-colors"
                  >
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
