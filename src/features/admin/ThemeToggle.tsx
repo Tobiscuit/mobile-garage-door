@@ -24,7 +24,7 @@ export default function ThemeToggle() {
       <button
         type="button"
         onClick={() => switchTheme('light')}
-        className="px-3 py-1.5 rounded text-xs font-bold"
+        className="flex-1 px-3 py-1.5 rounded text-xs font-bold text-center justify-center transition-all"
         style={{
           backgroundColor: theme === 'light' ? 'var(--staff-accent)' : 'transparent',
           color: theme === 'light' ? '#2c3e50' : 'var(--staff-muted)',
@@ -35,13 +35,13 @@ export default function ThemeToggle() {
       <button
         type="button"
         onClick={() => switchTheme('dark')}
-        className="px-3 py-1.5 rounded text-xs font-bold"
+        className="flex-1 px-3 py-1.5 rounded text-xs font-bold text-center justify-center transition-all"
         style={{
           backgroundColor: theme === 'dark' ? 'var(--staff-accent)' : 'transparent',
           color: theme === 'dark' ? '#2c3e50' : 'var(--staff-muted)',
         }}
       >
-        Dark (Current)
+        Dark
       </button>
     </div>
   );
