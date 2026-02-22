@@ -24,7 +24,7 @@ export default async function EditServicePage({ params }: { params: Promise<{ id
             Edit
             </span>
         </div>
-        <h1 className="text-4xl font-black text-white">Edit Service</h1>
+        <h1 className="text-4xl font-black text-slate-900 dark:text-white">Edit Service</h1>
         <div className="text-[#547085] font-mono text-xs mt-2">ID: {service.id}</div>
       </div>
 
