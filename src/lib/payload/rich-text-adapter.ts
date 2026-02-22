@@ -1,6 +1,5 @@
 import type { CollectionBeforeChangeHook } from 'payload';
 import { convertHTMLToLexical, editorConfigFactory } from '@payloadcms/richtext-lexical';
-import { JSDOM } from 'jsdom';
 import configPromise from '@payload-config';
 
 interface FieldMap {
@@ -35,6 +34,8 @@ export const generateHtmlToLexicalHook = (fieldMap: FieldMap, options: AdapterOp
           const editorConfig = await editorConfigFactory.default({
             config: await configPromise,
           });
+
+          const { JSDOM } = await import('jsdom');
 
           const lexicalJSON = await convertHTMLToLexical({
             editorConfig,

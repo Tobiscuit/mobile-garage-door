@@ -20,8 +20,7 @@ export const AIWriter: React.FC<any> = () => {
 
     try {
       console.log('Generating content for Payload Admin...');
-      // Explicitly request JSON format (Lexical)
-      const result = await generatePostContent(prompt, 'json') as AIPostResponse;
+      const result = await generatePostContent(prompt) as AIPostResponse;
       console.log('AI Result:', result);
 
       // Update Form Fields
