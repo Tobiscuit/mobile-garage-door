@@ -104,22 +104,5 @@ export const Users: CollectionConfig = {
       },
     },
   ],
-  hooks: {
-    afterLogin: [
-      async ({ req, user }) => {
-        try {
-          await req.payload.update({
-            collection: 'users',
-            id: user.id,
-            data: {
-              lastLogin: new Date().toISOString(),
-            } as any,
-          })
-        } catch (err) {
-          console.error('Error updating lastLogin for user:', user.id, err)
-        }
-        return user
-      },
-    ],
-  },
+  // Removed afterLogin hook to prevent Postgres transaction timeouts during native login
 }

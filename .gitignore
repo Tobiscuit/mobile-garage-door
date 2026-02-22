@@ -64,3 +64,6 @@ dev_server.log
 *.tfstate.backup
 *.tfvars
 *.tfvars.json
+
+# BetterAuth Secrets
+.secrets/
