@@ -53,6 +53,7 @@
     "drizzle-kit": "^0.31.9",
     "drizzle-orm": "^0.45.1",
     "graphql": "^16.12.0",
+    "html-react-parser": "^5.2.17",
     "jsdom": "^28.1.0",
     "mailparser": "^3.9.3",
     "motion": "^12.34.2",
