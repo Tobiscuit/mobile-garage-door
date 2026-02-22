@@ -100,17 +100,26 @@ export async function generatePostContent(prompt: string): Promise<any> {
     let featuredImageId = null;
     try {
         if (resultJson.imagePrompt) {
-            const imageResponse = await genAI.models.generateImages({
+            const imageResponse = await genAI.models.generateContent({
                 model: 'gemini-3-pro-image-preview',
-                prompt: resultJson.imagePrompt,
+                contents: resultJson.imagePrompt,
                 config: {
-                    numberOfImages: 1,
-                    aspectRatio: '16:9',
-                    outputMimeType: 'image/jpeg'
+                    imageConfig: {
+                        aspectRatio: '16:9',
+                    }
                 }
             });
 
-            const base64Image = imageResponse.generatedImages?.[0]?.image?.imageBytes;
+            let base64Image = null;
+            const firstCandidate = imageResponse.candidates?.[0];
+            if (firstCandidate?.content?.parts) {
+                for (const part of firstCandidate.content.parts) {
+                    if (part.inlineData?.data) {
+                        base64Image = part.inlineData.data;
+                        break;
+                    }
+                }
+            }
             
             if (base64Image) {
                 const imageBuffer = Buffer.from(base64Image, 'base64');
