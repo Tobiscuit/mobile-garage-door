@@ -18,13 +18,38 @@ export default async function PortalDashboard() {
 
   const payload = await getPayload({ config: configPromise });
   const user = session.user;
-  const customer = user as any;
-  const isBuilder = customer.customerType === 'builder';
 
-  // Use Service Layer for data fetching
-  // Ensure we are passing a valid user ID string
-  const activeRequests = await serviceRequestService.getActiveRequests(payload, String(user.id));
-  const pastRequests = await serviceRequestService.getPastRequests(payload, String(user.id));
+  // 1) Find the Payload User by email (since BetterAuth uses UUIDs and Payload Postgres uses Ints)
+  const payloadUsers = await payload.find({
+    collection: 'users',
+    where: { email: { equals: user.email } },
+    depth: 0,
+  });
+
+  let payloadUserId: number | null = null;
+  let customerData = payloadUsers.docs[0];
+
+  if (customerData) {
+    payloadUserId = customerData.id as number;
+  } else {
+    // 2) Auto-sync fresh Google SSO logins into Payload
+    customerData = await payload.create({
+      collection: 'users',
+      data: {
+        email: user.email,
+        name: user.name || '',
+        role: 'customer',
+      }
+    });
+    payloadUserId = customerData.id as number;
+  }
+
+  const isBuilder = customerData.customerType === 'builder';
+  const customer = customerData; // Alias for the UI components
+
+  // Use Service Layer for data fetching using the Integer Payload ID
+  const activeRequests = await serviceRequestService.getActiveRequests(payload, payloadUserId);
+  const pastRequests = await serviceRequestService.getPastRequests(payload, payloadUserId);
 
   const activeMapped = activeRequests.docs.map(doc => ({
     id: String(doc.id),
@@ -43,7 +68,7 @@ export default async function PortalDashboard() {
 
   return (
     <div className="space-y-8">
-      <PortalHeader customerName={customer.companyName || customer.name} isBuilder={isBuilder} />
+      <PortalHeader customerName={customer.companyName || customer.name || ''} isBuilder={isBuilder} />
       
       {isBuilder && (
          <div className="bg-blue-900/10 border border-blue-900/20 rounded-xl p-4 flex items-center justify-between">
@@ -70,9 +95,9 @@ export default async function PortalDashboard() {
         {/* Sidebar */}
         <div className="lg:col-span-1">
           <AccountSidebar customer={{
-            name: customer.name,
-            email: customer.email,
-            phone: customer.phone,
+            name: customer.name || '',
+            email: user.email || '',
+            phone: customer.phone || '',
           }} />
         </div>
       </div>
