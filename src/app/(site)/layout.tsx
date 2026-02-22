@@ -48,6 +48,7 @@ export const metadata: Metadata = {
 }
 
 import { FloatingAiButton } from '@/features/landing/FloatingAiButton';
+import { PwaRegistry } from '@/components/PwaRegistry';
 
 export default function RootLayout({
   children,
@@ -59,6 +60,7 @@ export default function RootLayout({
       <body className={`${inter.className} bg-background text-primary`}>
         {children}
         <FloatingAiButton />
+        <PwaRegistry />
       </body>
     </html>
   )
