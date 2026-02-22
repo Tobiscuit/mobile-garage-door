@@ -59,6 +59,13 @@ self.addEventListener('fetch', (event) => {
   );
 });
 
+// Allow the UI to trigger an immediate update
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+});
+
 // Push Notification Foundation
 self.addEventListener('push', function (event) {
   if (event.data) {
