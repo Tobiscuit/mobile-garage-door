@@ -2,6 +2,9 @@
 
 import { GoogleGenAI, Type, Schema } from '@google/genai';
 import { EXAMPLE_LEXICAL_STRUCTURE } from '@/lib/ai-contract';
+import { getPayload } from 'payload';
+import configPromise from '@payload-config';
+import sharp from 'sharp';
 
 const apiKey = process.env.GEMINI_API_KEY;
 const genAI = new GoogleGenAI({ apiKey: apiKey || '' });
@@ -51,8 +54,9 @@ export async function generatePostContent(prompt: string): Promise<any> {
             items: { type: Type.STRING } 
         },
         content: { type: Type.STRING, description: 'Main article body in semantic HTML (<p>, <h2>, <ul>, etc)' },
+        imagePrompt: { type: Type.STRING, description: 'A highly detailed prompt for generating a photorealistic featured image for this article.' }
         },
-        required: ['title', 'excerpt', 'category', 'keywords', 'content'],
+        required: ['title', 'excerpt', 'category', 'keywords', 'content', 'imagePrompt'],
     };
 
     const systemPrompt = `
@@ -64,9 +68,81 @@ export async function generatePostContent(prompt: string): Promise<any> {
         2. Use semantic tags: <h2> for section headers, <p> for paragraphs, <ul>/<li> for lists.
         3. Do NOT include <html>, <head>, or <body> tags.
         4. Keep the tone professional but accessible.
+        5. Provide a highly detailed 'imagePrompt' that will be used to generate the featured image.
     `;
 
-    return generateContent(systemPrompt, prompt, schema);
+    if (!apiKey) throw new Error('GEMINI_API_KEY is not set');
+
+    let resultJson: any = {};
+    try {
+        const response = await genAI.models.generateContent({
+            model: 'gemini-3.1-pro-preview',
+            contents: [
+                {
+                    role: 'user',
+                    parts: [{ text: `${systemPrompt}\n\nTasks:\n${prompt}` }]
+                }
+            ],
+            config: {
+                responseMimeType: 'application/json',
+                responseSchema: schema,
+            },
+        });
+
+        const text = response.text;
+        if (!text) throw new Error('No content generated');
+        resultJson = JSON.parse(text);
+    } catch (error) {
+        console.error('AI Text Generation Error:', error);
+        throw error;
+    }
+
+    let featuredImageId = null;
+    try {
+        if (resultJson.imagePrompt) {
+            const imageResponse = await genAI.models.generateImages({
+                model: 'gemini-3-pro-image-preview',
+                prompt: resultJson.imagePrompt,
+                config: {
+                    numberOfImages: 1,
+                    aspectRatio: '16:9',
+                    outputMimeType: 'image/jpeg'
+                }
+            });
+
+            const base64Image = imageResponse.generatedImages?.[0]?.image?.imageBytes;
+            
+            if (base64Image) {
+                const imageBuffer = Buffer.from(base64Image, 'base64');
+                const webpBuffer = await sharp(imageBuffer)
+                    .webp({ quality: 80, effort: 6 })
+                    .toBuffer();
+
+                const payload = await getPayload({ config: configPromise });
+                const uploadedMedia = await payload.create({
+                    collection: 'media',
+                    data: {
+                        alt: resultJson.title,
+                    },
+                    file: {
+                        data: webpBuffer,
+                        mimetype: 'image/webp',
+                        name: `${resultJson.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}.webp`,
+                        size: webpBuffer.length
+                    }
+                });
+
+                featuredImageId = uploadedMedia.id;
+            }
+        }
+    } catch (error) {
+        console.error('AI Image Generation Error:', error);
+    }
+
+    return {
+        ...resultJson,
+        featuredImageId
+    };
 }
 
 // --- Feature: Smart Email Drafts (Service Hero) ---

@@ -161,9 +161,9 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
             <div className="container mx-auto px-4 py-16">
                 <div className="flex flex-col lg:flex-row gap-12 max-w-6xl mx-auto">
                     {/* Main Content */}
-                    <article className="flex-1 max-w-3xl prose prose-lg prose-headings:text-charcoal-blue prose-a:text-golden-yellow">
+                    <article className="flex-1 max-w-3xl prose prose-lg prose-p:my-6 prose-ul:my-6 prose-ol:my-6 prose-headings:text-charcoal-blue prose-a:text-golden-yellow">
                         {post.htmlContent ? (
-                            <div dangerouslySetInnerHTML={{ __html: post.htmlContent }} />
+                            <div className="prose max-w-none text-gray-700 prose-p:leading-relaxed" dangerouslySetInnerHTML={{ __html: post.htmlContent }} />
                         ) : (
                             <RichTextRenderer content={post.content} />
                         )}
