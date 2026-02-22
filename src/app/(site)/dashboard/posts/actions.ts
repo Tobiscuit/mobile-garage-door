@@ -14,7 +14,11 @@ export async function createPost(prevState: any, formData: FormData) {
   const content = formData.get('content') as string; // This is now HTML from Tiptap
   const category = formData.get('category') as any;
   const status = formData.get('status') as any;
-  const featuredImage = formData.get('featuredImage') as string;
+  
+  // Payload Postgres expects numeric IDs, but FormData is strictly strings.
+  const featuredImageRaw = formData.get('featuredImage') as string;
+  const featuredImage = featuredImageRaw ? (isNaN(Number(featuredImageRaw)) ? featuredImageRaw : Number(featuredImageRaw)) : null;
+
   const quickNotes = formData.get('quickNotes') as string;
   const publishedAt = formData.get('publishedAt') as string;
 
@@ -35,7 +39,7 @@ export async function createPost(prevState: any, formData: FormData) {
         htmlContent: content, 
         category,
         status,
-        featuredImage: featuredImage || null,
+        featuredImage,
         quickNotes,
         publishedAt: publishedAt ? new Date(publishedAt).toISOString() : new Date().toISOString(),
         keywords,
@@ -60,7 +64,11 @@ export async function updatePost(id: string, prevState: any, formData: FormData)
   const content = formData.get('content') as string; // This is now HTML from Tiptap
   const category = formData.get('category') as any;
   const status = formData.get('status') as any;
-  const featuredImage = formData.get('featuredImage') as string;
+  
+  // Payload Postgres expects numeric IDs, but FormData is strictly strings.
+  const featuredImageRaw = formData.get('featuredImage') as string;
+  const featuredImage = featuredImageRaw ? (isNaN(Number(featuredImageRaw)) ? featuredImageRaw : Number(featuredImageRaw)) : null;
+
   const quickNotes = formData.get('quickNotes') as string;
   const publishedAt = formData.get('publishedAt') as string;
 
@@ -81,7 +89,7 @@ export async function updatePost(id: string, prevState: any, formData: FormData)
         htmlContent: content,
         category,
         status,
-        featuredImage: featuredImage || null,
+        featuredImage,
         quickNotes,
         publishedAt: publishedAt ? new Date(publishedAt).toISOString() : undefined,
         keywords,
