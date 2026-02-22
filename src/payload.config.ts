@@ -2,6 +2,7 @@ import { buildConfig } from 'payload';
 
 import { postgresAdapter } from '@payloadcms/db-postgres';
 import { lexicalEditor } from '@payloadcms/richtext-lexical';
+import { s3Storage } from '@payloadcms/storage-s3';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { nodemailerAdapter } from '@payloadcms/email-nodemailer';
@@ -113,6 +114,24 @@ export default buildConfig({
     },
     push: false,
   }),
+  plugins: [
+    s3Storage({
+      collections: {
+        media: true,
+      },
+      bucket: process.env.R2_BUCKET || '',
+      config: {
+        endpoint: process.env.R2_ENDPOINT,
+        credentials: {
+          accessKeyId: process.env.R2_ACCESS_KEY_ID || '',
+          secretAccessKey: process.env.R2_SECRET_ACCESS_KEY || '',
+        },
+        region: 'auto',
+        // Cloudflare R2 specific settings:
+        forcePathStyle: true,
+      },
+    }),
+  ],
   cors: cors,
   csrf: cors,
   email: nodemailerAdapter({
