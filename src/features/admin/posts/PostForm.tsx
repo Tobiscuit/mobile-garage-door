@@ -89,6 +89,10 @@ export default function PostForm({ action, initialData, buttonLabel }: PostFormP
           // Set Content (Tiptap)
           setContent(result.content || '');
           
+          if (result.featuredImageId) {
+             setFeaturedImageId(result.featuredImageId);
+          }
+          
           if (keywordsRef.current) {
                const keywords = result.keywords;
                keywordsRef.current.value = Array.isArray(keywords) ? keywords.join(', ') : (keywords || '');
