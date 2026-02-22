@@ -17,21 +17,15 @@ export function PwaRegistry() {
     const isAndroid = /Android/.test(ua);
     setPlatform(isIOS ? 'ios' : isAndroid ? 'android' : 'other');
 
-    // 2. Check if already installed
-    const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
-    const hasPrompted = localStorage.getItem('pwa-prompt-shown');
-
-    // 3. Register Service Worker
+    // 2. Register Service Worker
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('/sw.js').then((reg) => {
-          // Add listener for updates
           reg.onupdatefound = () => {
             const installingWorker = reg.installing;
             if (installingWorker) {
               installingWorker.onstatechange = () => {
                 if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                    // New content available, trigger update
                     installingWorker.postMessage({ type: 'SKIP_WAITING' });
                 }
               };
@@ -40,31 +34,46 @@ export function PwaRegistry() {
         });
       });
 
-      // Auto-reload when new worker takes control
       navigator.serviceWorker.addEventListener('controllerchange', () => {
         window.location.reload();
       });
     }
 
+    let timeoutId: NodeJS.Timeout;
+
+    // 3. Logic to check if we should show the modal
+    const checkAndShowModal = () => {
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+      // We check localStorage right at evaluation time to avoid stale React closures
+      const hasPrompted = localStorage.getItem('pwa-prompt-shown') === 'true';
+      
+      if (!isStandalone && !hasPrompted) {
+        timeoutId = setTimeout(() => {
+          // Double check right before showing in case they dismissed it on another tab
+          if (localStorage.getItem('pwa-prompt-shown') !== 'true') {
+            setShowModal(true);
+          }
+        }, 3000);
+      }
+    };
+
     // 4. Handle Install Prompt (Android/Chrome)
     const handleBeforeInstallPrompt = (e: any) => {
       e.preventDefault();
       setInstallPrompt(e);
-      
-      if (!isStandalone && !hasPrompted) {
-        // Show after a short delay for better UX
-        setTimeout(() => setShowModal(true), 3000);
-      }
+      checkAndShowModal();
     };
 
-    // 5. iOS Manual Prompt Strategy
-    if (isIOS && !isStandalone && !hasPrompted) {
-        setTimeout(() => setShowModal(true), 3000);
+    // 5. Trigger
+    if (isIOS) {
+        // iOS doesn't fire beforeinstallprompt, so we trigger manually
+        checkAndShowModal();
+    } else {
+        window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     }
 
-    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-
     return () => {
+      if (timeoutId) clearTimeout(timeoutId);
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     };
   }, []);
@@ -86,7 +95,6 @@ export function PwaRegistry() {
 
   const handleClose = () => {
     setShowModal(false);
-    // Don't show again for 7 days if they dismiss it
     localStorage.setItem('pwa-prompt-shown', 'true');
   };
 
