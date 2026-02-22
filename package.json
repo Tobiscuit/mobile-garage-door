@@ -39,6 +39,7 @@
     "@payloadcms/richtext-lexical": "^3.76.1",
     "@payloadcms/ui": "^3.76.1",
     "@tailwindcss/postcss": "^4.2.0",
+    "@tailwindcss/typography": "^0.5.19",
     "@tiptap/extension-link": "^3.20.0",
     "@tiptap/extension-placeholder": "^3.20.0",
     "@tiptap/react": "^3.20.0",
