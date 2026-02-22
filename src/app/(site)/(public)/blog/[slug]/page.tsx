@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import SmartLink from '@/shared/ui/SmartLink';
+import parse, { Element } from 'html-react-parser';
 
 export const dynamic = 'force-dynamic';
 
@@ -163,7 +164,41 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
                     {/* Main Content */}
                     <article className="flex-1 max-w-3xl prose prose-lg prose-p:my-6 prose-ul:my-6 prose-ol:my-6 prose-headings:text-charcoal-blue prose-a:text-golden-yellow">
                         {post.htmlContent ? (
-                            <div className="prose max-w-none text-gray-700 prose-p:leading-relaxed" dangerouslySetInnerHTML={{ __html: post.htmlContent }} />
+                            <div className="prose max-w-none text-gray-700 prose-p:leading-relaxed">
+                                {parse(post.htmlContent, {
+                                    replace: (domNode) => {
+                                        if (domNode instanceof Element && domNode.tagName === 'img') {
+                                            const { src, alt, width, height } = domNode.attribs;
+                                            
+                                            // Extract styling from inline styles or use defaults
+                                            const w = width ? parseInt(width, 10) : 1200;
+                                            const h = height ? parseInt(height, 10) : 675;
+
+                                            return (
+                                                <figure className="-mx-4 sm:-mx-8 md:-mx-16 lg:-mx-32 my-12 relative group">
+                                                    <div className="relative w-full overflow-hidden rounded-2xl shadow-2xl ring-1 ring-black/5 bg-gray-100">
+                                                        <Image
+                                                            src={src}
+                                                            alt={alt || "Blog Post Image"}
+                                                            width={w}
+                                                            height={h}
+                                                            className="w-full h-auto object-cover transform transition-transform duration-700 group-hover:scale-105"
+                                                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
+                                                            placeholder="blur"
+                                                            blurDataURL={`data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNiA5IiBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjFmMjY1IiAvPjwvc3ZnPg==`}
+                                                        />
+                                                    </div>
+                                                    {alt && (
+                                                        <figcaption className="absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 backdrop-blur-md bg-white/70 rounded-full text-xs font-medium text-charcoal-blue border border-black/5 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none w-max max-w-[90%] text-center truncate">
+                                                            {alt}
+                                                        </figcaption>
+                                                    )}
+                                                </figure>
+                                            );
+                                        }
+                                    }
+                                })}
+                            </div>
                         ) : (
                             <RichTextRenderer content={post.content} />
                         )}
