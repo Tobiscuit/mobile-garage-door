@@ -1,12 +1,12 @@
 import type { CollectionConfig, CollectionBeforeChangeHook } from 'payload';
 import { convertHTMLToLexical, editorConfigFactory } from '@payloadcms/richtext-lexical';
-import { JSDOM } from 'jsdom';
 import configPromise from '@payload-config';
 
 const htmlToLexicalHook: CollectionBeforeChangeHook = async ({ data, req, operation }) => {
   if (data.htmlContent) {
     req.payload.logger.info(`Converting AI htmlContent to Lexical AST for post: ${data.slug}`);
     try {
+      const { JSDOM } = await import('jsdom');
       const lexicalJSON = await convertHTMLToLexical({
         editorConfig: await editorConfigFactory.default({
           config: await configPromise,
