@@ -1,0 +1,47 @@
+---
+title: "Zero-Effort Auto-Translation: How It Works"
+---
+flowchart TB
+    subgraph ADMIN["👩‍💼 You — Admin Panel"]
+        A1["Write content in English<br/>as you normally would"]
+        A2["Click Save"]
+    end
+
+    subgraph HOOK["⚡ Automatic Translation Engine"]
+        H1["Payload detects new<br/>or updated content"]
+        H2["Sends text to<br/>Google Gemini AI"]
+        H3["AI translates to<br/>Mexican Spanish<br/>(Houston-area appropriate)"]
+        H4["Spanish version saved<br/>automatically to database"]
+    end
+
+    subgraph RESULT["✅ Result"]
+        R1["🇺🇸 English version<br/>(what you wrote)"]
+        R2["🇲🇽 Spanish version<br/>(AI-generated, instant)"]
+        R3["Both versions live<br/>on your website<br/>immediately"]
+    end
+
+    subgraph COVERAGE["📋 What Gets Translated"]
+        T1["✅ Service descriptions"]
+        T2["✅ Project case studies"]
+        T3["✅ Blog articles"]
+        T4["✅ Customer testimonials"]
+        T5["✅ All buttons & labels"]
+    end
+
+    A1 --> A2
+    A2 --> H1
+    H1 --> H2
+    H2 --> H3
+    H3 --> H4
+    H4 --> R1
+    H4 --> R2
+    R1 --> R3
+    R2 --> R3
+    R3 --> COVERAGE
+
+    style ADMIN fill:#1a1a2e,color:#f1c40f,stroke:#f1c40f
+    style HOOK fill:#4a148c,color:#fff,stroke:#9c27b0
+    style RESULT fill:#1b5e20,color:#fff,stroke:#4caf50
+    style COVERAGE fill:#0d47a1,color:#fff,stroke:#2196f3
+    style R1 fill:#1565c0,color:#fff,stroke:#42a5f5
+    style R2 fill:#e65100,color:#fff,stroke:#ff9800

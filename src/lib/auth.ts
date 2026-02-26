@@ -63,6 +63,11 @@ export const auth = betterAuth({
     nextCookies(),
     magicLink({
       sendMagicLink: async ({ email, url }) => {
+        // Always log the magic link URL for local development
+        console.log(`\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
+        console.log(`🔑 MAGIC LINK for ${email}:`);
+        console.log(url);
+        console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`);
         try {
           await sendEmail({
              to: email,
@@ -71,9 +76,7 @@ export const auth = betterAuth({
              text: `Click the link below to sign in:\n\n${url}\n\nIf you didn't request this, you can ignore this email.`
           });
         } catch (error) {
-          console.error('Failed to send magic link:', error);
-          // Fallback log for development if credentials fail
-          console.log(`[magic-link] send to ${email}: ${url}`);
+          console.error('Failed to send magic link email:', error);
         }
       },
     }),

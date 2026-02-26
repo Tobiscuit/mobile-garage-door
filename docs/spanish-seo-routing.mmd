@@ -1,0 +1,39 @@
+---
+title: "How Spanish-Speaking Customers Find Your Website"
+---
+flowchart TB
+    subgraph GOOGLE["🔍 Google Search"]
+        G1["Customer searches:<br/>'reparación puerta de garaje Houston'"]
+    end
+
+    subgraph SEO["📈 SEO Advantage"]
+        S1["Google indexes BOTH versions:<br/>✅ mobilegaragedoor.com — English<br/>✅ mobilegaragedoor.com/es — Spanish"]
+    end
+
+    subgraph BROWSER["🌐 Customer's Browser"]
+        B1["Browser sends language<br/>preference automatically<br/>(Accept-Language: es)"]
+    end
+    
+    subgraph SERVER["⚡ Your Website Server"]
+        P1["proxy.ts detects<br/>Spanish preference"]
+        P2["Redirects to /es/..."]
+    end
+
+    subgraph CONTENT["📄 What the Customer Sees"]
+        C1["🇺🇸 English Visitor<br/>mobilegaragedoor.com<br/><br/>'Emergency Repair'<br/>'Book a Service'<br/>'Our Portfolio'"]
+        C2["🇲🇽 Spanish Visitor<br/>mobilegaragedoor.com/es<br/><br/>'Reparación de Emergencia'<br/>'Reservar un Servicio'<br/>'Nuestro Portafolio'"]
+    end
+
+    G1 --> S1
+    S1 --> B1
+    B1 --> P1
+    P1 --> P2
+    P2 --> C2
+    B1 -->|"English browser"| C1
+
+    style GOOGLE fill:#1a1a2e,color:#f1c40f,stroke:#f1c40f
+    style SEO fill:#0d47a1,color:#fff,stroke:#2196f3
+    style BROWSER fill:#263238,color:#fff,stroke:#546e7a
+    style SERVER fill:#1b5e20,color:#fff,stroke:#4caf50
+    style C1 fill:#1565c0,color:#fff,stroke:#42a5f5
+    style C2 fill:#e65100,color:#fff,stroke:#ff9800

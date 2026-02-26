@@ -4,6 +4,8 @@ import { getSessionSafe } from '@/lib/get-session-safe';
 import NativeSignInPrompt from '@/features/auth/NativeSignInPrompt';
 import Sidebar from '@/features/admin/Sidebar';
 import React from 'react';
+import { getPayload } from 'payload';
+import configPromise from '@payload-config';
 
 export default async function DashboardLayout({
   children,
@@ -17,13 +19,21 @@ export default async function DashboardLayout({
     redirect('/login');
   }
 
+  const payload = await getPayload({ config: configPromise });
+  const settings = await payload.findGlobal({ slug: 'settings' });
+  const themePreference = settings.themePreference || 'candlelight';
+
   return (
-    <div className="min-h-screen font-sans selection:bg-[#f1c40f] selection:text-[#2c3e50]" style={{ backgroundColor: 'var(--staff-bg)', color: 'var(--staff-text)' }}>
+    <div 
+      className="min-h-screen font-sans selection:bg-[#f1c40f] selection:text-[#2c3e50]" 
+      style={{ backgroundColor: 'var(--staff-bg)', color: 'var(--staff-text)' }}
+
+    >
       <NativeSignInPrompt />
       <script
         dangerouslySetInnerHTML={{
           __html:
-            "try{var t=localStorage.getItem('app-theme')||'light';document.documentElement.setAttribute('data-app-theme',t);}catch(e){}",
+            `try{var t=localStorage.getItem('app-theme')||'light';document.documentElement.setAttribute('data-app-theme',t);${themePreference === 'original' ? "document.documentElement.setAttribute('data-light-theme','original');" : ''}}catch(e){}`,
         }}
       />
       <Sidebar />

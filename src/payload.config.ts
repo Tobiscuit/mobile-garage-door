@@ -26,8 +26,7 @@ import { EmailThreads } from './collections/EmailThreads';
 import { Emails } from './collections/Emails';
 
 // Globals
-import { SiteSettings } from './globals/SiteSettings';
-import { GlobalSettings } from './globals/GlobalSettings';
+import { Settings } from './globals/Settings';
 
 // Custom Branding Components
 // import Logo from './components/payload/Logo';
@@ -41,6 +40,15 @@ console.log('--- [PAYLOAD CONFIG] DB URI:', process.env.DATABASE_URI ? 'FOUND' :
 console.log('--- [PAYLOAD CONFIG] PAYLOAD_SECRET:', process.env.PAYLOAD_SECRET ? 'FOUND (length: ' + process.env.PAYLOAD_SECRET.length + ')' : 'MISSING');
 
 export default buildConfig({
+  localization: {
+    locales: [
+      { label: 'English', code: 'en' },
+      { label: 'Español', code: 'es' },
+      { label: 'Tiếng Việt', code: 'vi' },
+    ],
+    defaultLocale: 'en',
+    fallback: true,
+  },
   admin: {
     user: 'users',
     meta: {
@@ -100,8 +108,7 @@ export default buildConfig({
     Payments,
   ],
   globals: [
-    SiteSettings,
-    GlobalSettings,
+    Settings,
   ],
   editor: lexicalEditor({}),
   secret: process.env.PAYLOAD_SECRET || 'fallback-secret-do-not-use-in-production',

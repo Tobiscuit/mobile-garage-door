@@ -3,15 +3,17 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 
 const Header: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
+  const t = useTranslations('nav');
 
   // Close menu when route changes (optional optimization)
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
 
-  const isActive = (path: string) => pathname === path;
+  const isActive = (path: string) => pathname === path || pathname.endsWith(path);
 
   return (
     <>
@@ -33,10 +35,10 @@ const Header: React.FC = () => {
           {/* DESKTOP NAV: The "Command Center" */}
           <nav className="hidden md:flex items-center gap-1 bg-white/5 p-1 rounded-full border border-white/10">
             {[
-              { path: '/services', label: 'Services' },
-              { path: '/portfolio', label: 'Portfolio' },
-              { path: '/blog', label: 'Blog' },
-              { path: '/about', label: 'About' }
+              { path: '/services', label: t('services') },
+              { path: '/portfolio', label: t('portfolio') },
+              { path: '/blog', label: t('blog') },
+              { path: '/about', label: t('about') }
             ].map((link) => (
               <Link 
                 key={link.path}
@@ -55,7 +57,7 @@ const Header: React.FC = () => {
           {/* DESKTOP ACTIONS */}
           <div className="hidden md:flex items-center gap-4">
             <Link href="/login" className="text-sm font-bold text-golden-yellow hover:text-yellow-300 transition-colors uppercase tracking-wider text-[10px]">
-              Portal Login
+              {t('login')}
             </Link>
           </div>
 
@@ -82,10 +84,10 @@ const Header: React.FC = () => {
       }`}>
         <div className="flex flex-col gap-6 text-center">
           {[
-            { path: '/services', label: 'Services' },
-            { path: '/portfolio', label: 'Portfolio' },
-            { path: '/blog', label: 'Blog' },
-            { path: '/about', label: 'About Us' }
+            { path: '/services', label: t('services') },
+            { path: '/portfolio', label: t('portfolio') },
+            { path: '/blog', label: t('blog') },
+            { path: '/about', label: t('about') }
           ].map((link) => (
             <Link 
               key={link.path}
@@ -100,7 +102,7 @@ const Header: React.FC = () => {
           ))}
           <div className="h-px w-20 mx-auto bg-white/10 my-4"></div>
           <Link href="/login" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-bold text-golden-yellow uppercase tracking-widest">
-            Portal Login
+            {t('login')}
           </Link>
         </div>
       </div>

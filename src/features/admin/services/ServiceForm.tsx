@@ -41,27 +41,27 @@ export default function ServiceForm({ initialData, isEdit = false }: ServiceForm
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* LEFT COLUMN - MAIN INFO */}
         <div className="space-y-6">
-           <div className="bg-[#34495e]/30 p-6 rounded-2xl border border-[#ffffff08]">
-              <h3 className="text-[#f1c40f] font-bold uppercase tracking-widest text-xs mb-4">Core Details</h3>
+           <div className="bg-[var(--staff-surface-alt)] p-6 rounded-2xl border border-[var(--staff-border)]">
+              <h3 className="text-[var(--staff-accent)] font-bold uppercase tracking-widest text-xs mb-4">Core Details</h3>
               
               <div className="space-y-4">
                 <div>
-                  <label className="block text-xs font-bold text-[#bdc3c7] uppercase mb-2">Service Title</label>
+                  <label className="block text-xs font-bold text-[var(--staff-muted)] uppercase mb-2">Service Title</label>
                   <input 
                     name="title" 
                     defaultValue={initialData?.title} 
                     required 
                     placeholder="e.g. Broken Spring Repair"
-                    className="w-full bg-[#1e2b38]/80 border border-[#ffffff10] rounded-xl p-4 text-white placeholder-[#547085] focus:border-[#f1c40f] focus:ring-1 focus:ring-[#f1c40f] outline-none transition-all"
+                    className="w-full bg-[var(--staff-surface)] border border-[var(--staff-border)] rounded-xl p-4 text-[var(--staff-text)] placeholder-[var(--staff-muted)] focus:border-[var(--staff-accent)] focus:ring-1 focus:ring-[var(--staff-accent)] outline-none transition-all"
                   />
                 </div>
                 
                 <div>
-                   <label className="block text-xs font-bold text-[#bdc3c7] uppercase mb-2">Category</label>
+                   <label className="block text-xs font-bold text-[var(--staff-muted)] uppercase mb-2">Category</label>
                    <select 
                       name="category" 
                       defaultValue={initialData?.category || 'Residential'}
-                      className="w-full bg-[#1e2b38]/80 border border-[#ffffff10] rounded-xl p-4 text-white outline-none focus:border-[#f1c40f] transition-all appearance-none"
+                      className="w-full bg-[var(--staff-surface)] border border-[var(--staff-border)] rounded-xl p-4 text-[var(--staff-text)] outline-none focus:border-[var(--staff-accent)] transition-all appearance-none"
                    >
                       <option value="Residential">Residential</option>
                       <option value="Commercial">Commercial</option>
@@ -72,17 +72,17 @@ export default function ServiceForm({ initialData, isEdit = false }: ServiceForm
               </div>
            </div>
 
-           <div className="bg-[#34495e]/30 p-6 rounded-2xl border border-[#ffffff08]">
-              <h3 className="text-[#f1c40f] font-bold uppercase tracking-widest text-xs mb-4">Pricing</h3>
+           <div className="bg-[var(--staff-surface-alt)] p-6 rounded-2xl border border-[var(--staff-border)]">
+              <h3 className="text-[var(--staff-accent)] font-bold uppercase tracking-widest text-xs mb-4">Pricing</h3>
               <div>
-                  <label className="block text-xs font-bold text-[#bdc3c7] uppercase mb-2">Base Price ($)</label>
+                  <label className="block text-xs font-bold text-[var(--staff-muted)] uppercase mb-2">Base Price ($)</label>
                   <input 
                     name="price" 
                     type="number" 
                     step="0.01"
                     defaultValue={initialData?.price} 
                     placeholder="0.00"
-                    className="w-full bg-[#1e2b38]/80 border border-[#ffffff10] rounded-xl p-4 text-white font-mono placeholder-[#547085] focus:border-[#f1c40f] outline-none transition-all"
+                    className="w-full bg-[var(--staff-surface)] border border-[var(--staff-border)] rounded-xl p-4 text-[var(--staff-text)] font-mono placeholder-[var(--staff-muted)] focus:border-[var(--staff-accent)] outline-none transition-all"
                   />
               </div>
            </div>
@@ -90,12 +90,12 @@ export default function ServiceForm({ initialData, isEdit = false }: ServiceForm
 
         {/* RIGHT COLUMN - DESCRIPTION */}
         <div className="space-y-6">
-           <div className="bg-[#34495e]/30 p-6 rounded-2xl border border-[#ffffff08] h-full flex flex-col">
-              <h3 className="text-[#f1c40f] font-bold uppercase tracking-widest text-xs mb-4">Description</h3>
+           <div className="bg-[var(--staff-surface-alt)] p-6 rounded-2xl border border-[var(--staff-border)] h-full flex flex-col">
+              <h3 className="text-[var(--staff-accent)] font-bold uppercase tracking-widest text-xs mb-4">Description</h3>
               <textarea 
                 name="description" 
                 defaultValue={getInitialDescription()}
-                className="w-full flex-1 bg-[#1e2b38]/80 border border-[#ffffff10] rounded-xl p-4 text-white placeholder-[#547085] focus:border-[#f1c40f] outline-none transition-all min-h-[200px]"
+                className="w-full flex-1 bg-[var(--staff-surface)] border border-[var(--staff-border)] rounded-xl p-4 text-[var(--staff-text)] placeholder-[var(--staff-muted)] focus:border-[var(--staff-accent)] outline-none transition-all min-h-[200px]"
                 placeholder="Detailed description of the service..."
               />
            </div>
@@ -107,7 +107,7 @@ export default function ServiceForm({ initialData, isEdit = false }: ServiceForm
         <button 
           type="button" 
           onClick={() => window.history.back()}
-          className="px-6 py-3 rounded-xl border border-[#ffffff10] text-[#bdc3c7] font-bold hover:bg-[#ffffff05] transition-all"
+          className="px-6 py-3 rounded-xl border border-[var(--staff-border)] text-[var(--staff-muted)] font-bold hover:text-[var(--staff-text)] transition-all"
         >
           Cancel
         </button>
@@ -115,8 +115,8 @@ export default function ServiceForm({ initialData, isEdit = false }: ServiceForm
           type="submit" 
           disabled={isLoading}
           className="
-            px-8 py-3 rounded-xl bg-[#f1c40f] text-[#2c3e50] font-bold uppercase tracking-wider
-            shadow-[0_4px_20px_rgba(241,196,15,0.3)] hover:shadow-[0_6px_25px_rgba(241,196,15,0.5)] 
+            px-8 py-3 rounded-xl bg-[var(--staff-accent)] text-[var(--staff-surface-alt)] font-bold uppercase tracking-wider
+            shadow-[0_4px_20px_var(--staff-accent)] hover:shadow-[0_6px_25px_var(--staff-accent)] 
             hover:-translate-y-1 transition-all disabled:opacity-50 disabled:cursor-not-allowed
           "
         >

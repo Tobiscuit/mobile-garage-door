@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import '../globals.css'
+import { getLocale } from 'next-intl/server'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -45,18 +46,26 @@ export const metadata: Metadata = {
     description: 'Professional garage door services including repair, installation, and maintenance. Reliable and professional solutions for all your garage door needs.',
     images: ['/images/social/og-image.png'],
   },
+  alternates: {
+    languages: {
+      en: '/',
+      es: '/es',
+    },
+  },
 }
 
 import { FloatingAiButton } from '@/features/landing/FloatingAiButton';
 import { PwaRegistry } from '@/components/PwaRegistry';
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  const locale = await getLocale();
+
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang={locale} suppressHydrationWarning>
       <body className={`${inter.className} bg-background text-primary`}>
         {children}
         <FloatingAiButton />
@@ -65,3 +74,4 @@ export default function RootLayout({
     </html>
   )
 }
+

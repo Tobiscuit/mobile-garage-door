@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload';
+import { autoTranslateHook } from '../hooks/auto-translate';
 
 export const Services: CollectionConfig = {
   slug: 'services',
@@ -7,11 +8,15 @@ export const Services: CollectionConfig = {
     defaultColumns: ['title', 'category', 'order', 'highlight'],
     group: 'Content',
   },
+  hooks: {
+    afterChange: [autoTranslateHook],
+  },
   fields: [
     {
       name: 'title',
       type: 'text',
       required: true,
+      localized: true,
       label: 'Service Name',
     },
     {
@@ -27,6 +32,7 @@ export const Services: CollectionConfig = {
       name: 'category',
       type: 'text',
       required: true,
+      localized: true,
       admin: {
         description: 'Category tag (e.g., "Critical Response", "Smart Home")',
       },
@@ -43,12 +49,14 @@ export const Services: CollectionConfig = {
       name: 'description',
       type: 'textarea',
       required: true,
+      localized: true,
       label: 'Short Description',
     },
     {
       name: 'features',
       type: 'array',
       label: 'Key Features',
+      localized: true,
       fields: [
         {
           name: 'feature',

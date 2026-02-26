@@ -39,7 +39,14 @@ export async function createProject(formData: FormData) {
   const client = formData.get('client') as string;
   const location = formData.get('location') as string;
   const completionDate = formData.get('completionDate') as string;
-  const coverImage = formData.get('coverImage') as string;
+  const galleryStr = formData.get('gallery') as string;
+  
+  let gallery = [];
+  try {
+      if (galleryStr) gallery = JSON.parse(galleryStr);
+  } catch (e) {
+      console.error('Failed to parse gallery JSON:', e);
+  }
 
   try {
     await payload.create({
@@ -53,7 +60,7 @@ export async function createProject(formData: FormData) {
         client,
         location,
         completionDate,
-        image: coverImage ? (coverImage as any) : undefined, // Cast to any to bypass strict number check
+        gallery,
         slug: title.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, ''),
         imageStyle: 'garage-pattern-modern', // Default for now
         tags: [{ tag: 'General' }], // Default tag
@@ -79,7 +86,14 @@ export async function updateProject(id: string, formData: FormData) {
   const client = formData.get('client') as string;
   const location = formData.get('location') as string;
   const completionDate = formData.get('completionDate') as string;
-  const coverImage = formData.get('coverImage') as string;
+  const galleryStr = formData.get('gallery') as string;
+
+  let gallery = [];
+  try {
+      if (galleryStr) gallery = JSON.parse(galleryStr);
+  } catch (e) {
+      console.error('Failed to parse gallery JSON:', e);
+  }
 
   try {
     await payload.update({
@@ -94,7 +108,7 @@ export async function updateProject(id: string, formData: FormData) {
         client,
         location,
         completionDate,
-        image: coverImage ? (coverImage as any) : undefined,
+        gallery,
       } as any,
     });
   } catch (error) {

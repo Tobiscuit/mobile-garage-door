@@ -5,26 +5,28 @@ import configPromise from '@payload-config';
 
 export async function uploadMedia(formData: FormData) {
   const payload = await getPayload({ config: configPromise });
-  const file = formData.get('file');
+  const file = formData.get('file') as File;
 
   if (!file) {
     return { error: 'No file provided' };
   }
 
   try {
-    // Payload 3.0 local API handles file uploads via the 'file' property in data
-    // typically by passing the File object directly if using the Node API correctly
-    // However, depending on the adapter, we might need to buffer it. 
-    // For standard multipart forms passed to Server Actions, we can pass the FormData directly if the API supports it
-    // or we use the 'create' method with the file property.
+    // Payload expects a precise structure for files via the Local API (especially with S3 adapter)
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
     
-    // In Payload Local API, we pass the file object in the 'file' property
     const media = await payload.create({
       collection: 'media',
       data: {
-        alt: (formData.get('alt') as string) || 'Dashboard Upload',
+        alt: (formData.get('alt') as string) || file.name || 'Dashboard Upload',
       },
-      file: file as any // Payload expects specific file-like object, standard File from FormData usually works in Node envs now
+      file: {
+        data: buffer,
+        name: file.name,
+        mimetype: file.type,
+        size: file.size,
+      } as any
     });
 
     return { success: true, doc: media };

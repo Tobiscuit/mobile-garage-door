@@ -1,6 +1,10 @@
 import React from 'react';
+import { getTranslations } from 'next-intl/server';
 
-const Footer: React.FC = () => {
+const Footer: React.FC = async () => {
+  const t = await getTranslations('footer');
+  const tCommon = await getTranslations('common');
+
   return (
     <footer className="bg-black text-gray-400 border-t border-white/10 pt-20 pb-10 text-sm font-sans">
       <div className="w-full max-w-[1800px] mx-auto px-6 md:px-12">
@@ -10,7 +14,7 @@ const Footer: React.FC = () => {
           <div className="col-span-1 md:col-span-1">
             <h3 className="text-white text-xl font-bold mb-6 font-display tracking-tight">MOBIL<span className="text-gray-600">GARAGE</span></h3>
             <p className="leading-relaxed mb-6">
-              The premier automated access solution for residential builders and discerning homeowners.
+              {t('brand_description')}
             </p>
             <div className="flex gap-4">
                {/* Social placeholders - minimalist */}
@@ -21,7 +25,7 @@ const Footer: React.FC = () => {
 
           {/* SERVICE AREA */}
           <div>
-            <h4 className="text-white font-bold mb-6 uppercase tracking-wider text-xs">Deployment Zones</h4>
+            <h4 className="text-white font-bold mb-6 uppercase tracking-wider text-xs">{t('deployment_zones')}</h4>
             <ul className="space-y-3">
               <li><a href="#" className="hover:text-white transition-colors">Greater Katy & West Houston</a></li>
               <li><a href="#" className="hover:text-white transition-colors">The Woodlands & North Houston</a></li>
@@ -32,31 +36,31 @@ const Footer: React.FC = () => {
 
           {/* SUPPORT */}
           <div>
-            <h4 className="text-white font-bold mb-6 uppercase tracking-wider text-xs">Client Support</h4>
+            <h4 className="text-white font-bold mb-6 uppercase tracking-wider text-xs">{t('client_support')}</h4>
             <ul className="space-y-3">
-              <li><a href="/contact" className="hover:text-white transition-colors">Submit Warranty Claim</a></li>
-              <li><a href="/login" className="hover:text-white transition-colors">Builder Portal</a></li>
-              <li><a href="/contact?type=repair" className="hover:text-white transition-colors">Emergency Callback Request</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">SLA Documentation</a></li>
+              <li><a href="/contact" className="hover:text-white transition-colors">{t('warranty_claim')}</a></li>
+              <li><a href="/login" className="hover:text-white transition-colors">{t('builder_portal')}</a></li>
+              <li><a href="/contact?type=repair" className="hover:text-white transition-colors">{t('emergency_callback')}</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">{t('sla_docs')}</a></li>
             </ul>
           </div>
 
           {/* OFFICIAL DATA */}
           <div>
-            <h4 className="text-white font-bold mb-6 uppercase tracking-wider text-xs">Official Data</h4>
+            <h4 className="text-white font-bold mb-6 uppercase tracking-wider text-xs">{t('official_data')}</h4>
             <div className="space-y-4">
               <div>
-                <div className="text-xs text-gray-600 uppercase">State License</div>
+                <div className="text-xs text-gray-600 uppercase">{t('state_license')}</div>
                 <div className="text-white font-mono">#9942-B-RES</div>
               </div>
               <div>
-                <div className="text-xs text-gray-600 uppercase">Insurance</div>
+                <div className="text-xs text-gray-600 uppercase">{t('insurance')}</div>
                 <div className="text-white font-mono">Liberty Mutual • $2M Agg</div>
               </div>
               <div>
-                <div className="text-xs text-gray-600 uppercase">HQ Dispatch</div>
+                <div className="text-xs text-gray-600 uppercase">{t('hq_dispatch')}</div>
                 <div className="text-white">
-                  Rapid Response Unit<br />
+                  {t('rapid_response')}<br />
                   Houston & Surrounding Areas
                 </div>
               </div>
@@ -67,15 +71,15 @@ const Footer: React.FC = () => {
 
         {/* BOTTOM BAR */}
         <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p>© 2026 Mobil Garage Door Inc. All rights reserved.</p>
+          <p>{tCommon('copyright', { year: new Date().getFullYear() })}</p>
           <div className="flex gap-6 text-xs">
-            <a href="/privacy" className="hover:text-white">Privacy Policy</a>
-            <a href="#" className="hover:text-white">Terms of Service</a>
-            <a href="#" className="hover:text-white">Sitemap</a>
+            <a href="/privacy" className="hover:text-white">{tCommon('privacy_policy')}</a>
+            <a href="#" className="hover:text-white">{t('terms')}</a>
+            <a href="#" className="hover:text-white">{t('sitemap')}</a>
           </div>
           <div className="flex items-center gap-2 text-xs font-mono text-gray-600">
             <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-            SYSTEMS OPERATIONAL
+            {t('systems_operational')}
           </div>
         </div>
       </div>

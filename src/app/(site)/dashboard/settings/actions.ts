@@ -8,7 +8,7 @@ export async function getSettings() {
   const payload = await getPayload({ config: configPromise });
   
   const settings = await payload.findGlobal({
-    slug: 'site-settings',
+    slug: 'settings',
   });
 
   return settings;
@@ -41,9 +41,21 @@ export async function updateSettings(formData: FormData) {
   const brandTone = formData.get('brandTone') as string;
   const brandAvoid = formData.get('brandAvoid') as string;
 
+  // Extract Theme Preference
+  const themePreference = formData.get('themePreference') as string;
+
+  // Extract Warranty
+  const warrantyEnableNotifications = formData.get('warrantyEnableNotifications') === 'true';
+  const warrantyEmailTemplate = formData.get('warrantyEmailTemplate') as string;
+
+  const warranty = {
+      enableNotifications: warrantyEnableNotifications,
+      notificationEmailTemplate: warrantyEmailTemplate,
+  };
+
   try {
     await payload.updateGlobal({
-      slug: 'site-settings',
+      slug: 'settings',
       data: {
         companyName,
         phone,
@@ -57,6 +69,8 @@ export async function updateSettings(formData: FormData) {
         brandVoice,
         brandTone,
         brandAvoid,
+        themePreference,
+        warranty,
       },
     });
 
