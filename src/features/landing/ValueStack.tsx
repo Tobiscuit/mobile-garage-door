@@ -1,6 +1,17 @@
+'use client';
 import React from 'react';
+import { useTranslations } from 'next-intl';
 
 const ValueStack: React.FC = () => {
+  const t = useTranslations('value_stack');
+  
+  const items = [
+    { title: t('licensed_title'), desc: t('licensed_desc'), icon: 'shield' },
+    { title: t('fees_title'), desc: t('fees_desc'), icon: 'tag' },
+    { title: t('window_title'), desc: t('window_desc'), icon: 'clock' },
+    { title: t('background_title'), desc: t('background_desc'), icon: 'user' }
+  ];
+
   return (
     <section className="py-20 bg-charcoal-blue text-white relative overflow-hidden">
       {/* Background Texture */}
@@ -12,28 +23,23 @@ const ValueStack: React.FC = () => {
           {/* LEFT: The Proposition */}
           <div>
             <div className="inline-block bg-golden-yellow/20 text-golden-yellow font-bold px-4 py-2 rounded-full mb-6 border border-golden-yellow/30">
-              The "No-Headache" Guarantee
+              {t('badge')}
             </div>
             <h2 className="text-4xl md:text-5xl font-black mb-6 leading-tight">
-              We kill the risks<br />
-              <span className="text-gray-400">that others ignore.</span>
+              {t('title_1')}<br />
+              <span className="text-gray-400">{t('title_2')}</span>
             </h2>
             <p className="text-lg text-gray-300 mb-8 leading-relaxed">
-              Most contractors fail on schedule, price, or quality. We engineered a system that makes failure impossible.
+              {t('desc')}
             </p>
             <a href="/contact" className="inline-flex items-center text-white border-b-2 border-golden-yellow pb-1 font-bold hover:text-golden-yellow transition-colors">
-              Read our Service Level Agreement <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+              {t('sla_link')} <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
             </a>
           </div>
 
           {/* RIGHT: The Stack */}
           <div className="space-y-4">
-            {[
-              { title: 'Fully Licensed & Insured', desc: '$2M Liability Coverage per project site.', icon: 'shield' },
-              { title: 'Zero Hidden Fees', desc: 'Flat-rate pricing approved before we start.', icon: 'tag' },
-              { title: '2-Hour Window', desc: 'We track our trucks so you don\'t wait all day.', icon: 'clock' },
-              { title: 'Background Checked', desc: 'Uniformed, drug-tested W2 employees. No random subs.', icon: 'user' }
-            ].map((item, i) => (
+            {items.map((item, i) => (
               <div key={i} className="flex items-start gap-4 bg-white/5 p-4 rounded-xl border border-white/10 hover:bg-white/10 transition-colors">
                 <div className="flex-shrink-0 w-10 h-10 rounded-full bg-golden-yellow/10 flex items-center justify-center text-golden-yellow">
                   {item.icon === 'shield' && <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>}

@@ -33,7 +33,7 @@ export function ActiveJobsList() {
             </span>
             <span className="text-[10px]" style={{ color: 'var(--staff-muted)' }}>{new Date(job.createdAt).toLocaleDateString()}</span>
           </div>
-          <div className="font-bold mb-1 group-hover:text-[#f1c40f] transition-colors" style={{ color: 'var(--staff-text)' }}>{job.issue || 'Service Request'}</div>
+          <div className="font-bold mb-1 group-hover:text-[var(--staff-accent)] transition-colors" style={{ color: 'var(--staff-text)' }}>{job.issue || 'Service Request'}</div>
           {job.customerName && <div className="text-xs" style={{ color: 'var(--staff-muted)' }}>{job.customerName}</div>}
         </div>
       ))}

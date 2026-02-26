@@ -1,0 +1,240 @@
+import React from 'react';
+import { getPayload } from 'payload';
+import configPromise from '@payload-config';
+import { notFound } from 'next/navigation';
+import Image from 'next/image';
+import Link from 'next/link';
+import SmartLink from '@/shared/ui/SmartLink';
+import { getTranslations } from 'next-intl/server';
+import parse, { Element } from 'html-react-parser';
+
+export const dynamic = 'force-dynamic';
+
+// Basic Rich Text Renderer for Lexical
+const RichTextRenderer = ({ content }: { content: any }) => {
+    if (!content || !content.root || !content.root.children) return null;
+
+    const renderNode = (node: any, index: number) => {
+        switch (node.type) {
+            case 'paragraph':
+                return (
+                    <p key={index} className="mb-6 text-gray-600 leading-relaxed text-lg">
+                        {node.children?.map((child: any, i: number) => renderChild(child, i))}
+                    </p>
+                );
+            case 'heading':
+                const headingTag = node.tag as 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
+                const Tag = headingTag;
+                const sizeClasses: Record<string, string> = {
+                    h1: 'text-4xl font-black text-charcoal-blue mt-12 mb-6',
+                    h2: 'text-3xl font-bold text-charcoal-blue mt-10 mb-5 border-l-4 border-golden-yellow pl-4',
+                    h3: 'text-2xl font-bold text-charcoal-blue mt-8 mb-4',
+                    h4: 'text-xl font-bold text-charcoal-blue mt-6 mb-3',
+                    h5: 'text-lg font-bold text-charcoal-blue mt-4 mb-2',
+                    h6: 'text-base font-bold text-charcoal-blue mt-4 mb-2',
+                };
+                return (
+                    <Tag key={index} className={sizeClasses[headingTag] || sizeClasses.h2}>
+                        {node.children?.map((child: any, i: number) => renderChild(child, i))}
+                    </Tag>
+                );
+            case 'list':
+                const ListTag = node.listType === 'number' ? 'ol' : 'ul';
+                return (
+                    <ListTag key={index} className={`mb-6 pl-6 ${node.listType === 'number' ? 'list-decimal' : 'list-disc'} text-gray-600 space-y-2 marker:text-golden-yellow`}>
+                        {node.children?.map((child: any, i: number) => (
+                            <li key={i} className="pl-2">
+                                {child.children?.map((c: any, j: number) => renderChild(c, j))}
+                            </li>
+                        ))}
+                    </ListTag>
+                );
+            case 'quote':
+                return (
+                    <blockquote key={index} className="border-l-4 border-golden-yellow bg-white p-6 rounded-r-lg italic text-xl text-charcoal-blue my-8 shadow-md">
+                        {node.children?.map((child: any, i: number) => renderChild(child, i))}
+                    </blockquote>
+                );
+             case 'link':
+                return (
+                    <a key={index} href={node.fields?.url || '#'} target={node.fields?.newTab ? '_blank' : undefined} className="text-golden-yellow hover:underline font-bold transition-colors">
+                        {node.children?.map((child: any, i: number) => renderChild(child, i))}
+                    </a>
+                );
+            default:
+                // Fallback for unhandled types, just try to render children
+                 if (node.children) {
+                    return <div key={index}>{node.children.map((child: any, i: number) => renderChild(child, i))}</div>;
+                 }
+                return null;
+        }
+    };
+
+    const renderChild = (node: any, index: number) => {
+        if (node.type === 'text') {
+            let text = <span key={index}>{node.text}</span>;
+            if (node.format & 1) text = <strong key={index} className="text-charcoal-blue font-bold">{node.text}</strong>;
+            if (node.format & 2) text = <em key={index} className="italic">{node.text}</em>;
+            if (node.format & 8) text = <u key={index} className="underline decoration-golden-yellow decoration-2 underline-offset-4">{node.text}</u>;
+            if (node.format & 16) text = <code key={index} className="bg-gray-100 px-1 py-0.5 rounded font-mono text-sm text-charcoal-blue border border-gray-200">{node.text}</code>;
+            return text;
+        }
+        if (node.type === 'link') {
+             return (
+                    <a key={index} href={node.fields?.url || '#'} target={node.fields?.newTab ? '_blank' : undefined} className="text-golden-yellow hover:underline font-bold transition-colors">
+                        {node.children?.map((child: any, i: number) => renderChild(child, i))}
+                    </a>
+                );
+        }
+        return renderNode(node, index);
+    };
+
+    return (
+        <div className="rich-text-content">
+            {content.root.children.map((node: any, index: number) => renderNode(node, index))}
+        </div>
+    );
+};
+
+export default async function BlogPost({ params }: { params: Promise<{ slug: string; locale: string }> }) {
+    const { slug, locale } = await params;
+    const payload = await getPayload({ config: configPromise });
+    const t = await getTranslations({ locale, namespace: 'blog_detail' });
+
+    const posts = await payload.find({
+        collection: 'posts',
+        where: {
+            slug: {
+                equals: slug,
+            },
+        },
+        locale: locale as 'en' | 'es',
+    });
+
+    if (!posts.docs.length) {
+        notFound();
+    }
+
+    const post = posts.docs[0];
+
+    return (
+        <div className="bg-cloudy-white min-h-screen pb-24 font-work-sans">
+            {/* Hero Section */}
+            <div className="relative h-[60vh] min-h-[400px] w-full overflow-hidden">
+                {post.featuredImage && typeof post.featuredImage !== 'string' && typeof post.featuredImage !== 'number' && post.featuredImage.url ? (
+                    <Image
+                        src={post.featuredImage.url}
+                        alt={post.featuredImage.alt || post.title}
+                        fill
+                        className="object-cover"
+                        priority
+                    />
+                ) : (
+                     <div className="absolute inset-0 bg-charcoal-blue"></div>
+                )}
+                <div className="absolute inset-0 bg-gradient-to-t from-charcoal-blue via-charcoal-blue/60 to-transparent"></div>
+                
+                <div className="absolute bottom-0 left-0 w-full p-8 md:p-16">
+                    <div className="container mx-auto max-w-5xl">
+                        <SmartLink href="/blog" className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-charcoal-blue font-bold uppercase tracking-widest transition-colors group">
+                        <svg className="w-4 h-4 group-hover:-translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+                        {t('back')}
+                    </SmartLink>
+                        
+                        <div className="flex flex-wrap items-center gap-4 mb-4">
+                            <span className="bg-golden-yellow text-charcoal-blue px-3 py-1 text-xs font-bold uppercase tracking-wider rounded-sm">
+                                {post.category?.replace(/-/g, ' ')}
+                            </span>
+                            <span className="text-gray-300 text-sm font-mono border-l border-white/20 pl-4">
+                                {new Date(post.publishedAt || post.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
+                            </span>
+                        </div>
+                        
+                        <h1 className="text-4xl md:text-6xl font-black text-white leading-tight mb-6 max-w-4xl">
+                            {post.title}
+                        </h1>
+
+                         <p className="text-xl text-gray-200 max-w-3xl leading-relaxed font-light border-l-4 border-golden-yellow/50 pl-6">
+                            {post.excerpt}
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            {/* Content Section */}
+            <div className="container mx-auto px-4 py-16">
+                <div className="flex flex-col lg:flex-row gap-12 max-w-6xl mx-auto">
+                    {/* Main Content */}
+                    <article className="flex-1 max-w-3xl prose prose-lg prose-p:my-6 prose-ul:my-6 prose-ol:my-6 prose-headings:text-charcoal-blue prose-a:text-golden-yellow">
+                        {post.htmlContent ? (
+                            <div className="prose max-w-none text-gray-700 prose-p:leading-relaxed">
+                                {parse(post.htmlContent, {
+                                    replace: (domNode) => {
+                                        if (domNode instanceof Element && domNode.tagName === 'img') {
+                                            const { src, alt, width, height } = domNode.attribs;
+                                            
+                                            // Extract styling from inline styles or use defaults
+                                            const w = width ? parseInt(width, 10) : 1200;
+                                            const h = height ? parseInt(height, 10) : 675;
+
+                                            return (
+                                                <figure className="-mx-4 sm:-mx-8 md:-mx-16 lg:-mx-32 my-12 relative group">
+                                                    <div className="relative w-full overflow-hidden rounded-2xl shadow-2xl ring-1 ring-black/5 bg-gray-100">
+                                                        <Image
+                                                            src={src}
+                                                            alt={alt || "Blog Post Image"}
+                                                            width={w}
+                                                            height={h}
+                                                            className="w-full h-auto object-cover transform transition-transform duration-700 group-hover:scale-105"
+                                                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
+                                                            placeholder="blur"
+                                                            blurDataURL={`data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNiA5IiBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjFmMjY1IiAvPjwvc3ZnPg==`}
+                                                        />
+                                                    </div>
+                                                    {alt && (
+                                                        <figcaption className="absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 backdrop-blur-md bg-white/70 rounded-full text-xs font-medium text-charcoal-blue border border-black/5 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none w-max max-w-[90%] text-center truncate">
+                                                            {alt}
+                                                        </figcaption>
+                                                    )}
+                                                </figure>
+                                            );
+                                        }
+                                    }
+                                })}
+                            </div>
+                        ) : (
+                            <RichTextRenderer content={post.content} />
+                        )}
+                        
+                        {/* Author Bio / Footer */}
+                        <div className="mt-16 pt-8 border-t border-gray-200 flex items-center gap-4">
+                            <div className="w-12 h-12 bg-charcoal-blue rounded-full flex items-center justify-center text-golden-yellow font-bold text-xl">
+                                MG
+                            </div>
+                            <div>
+                                <div className="text-sm font-bold text-charcoal-blue">{t('team_name')}</div>
+                            <div className="text-xs text-gray-400">{t('team_subtitle')}</div>
+                            </div>
+                        </div>
+                    </article>
+
+                    {/* Sidebar */}
+                    <aside className="lg:w-80 space-y-8">
+                        {/* CTA Card */}
+                        <div className="bg-charcoal-blue border border-white/10 rounded-2xl p-8 sticky top-32 shadow-2xl">
+                            <div className="w-16 h-16 bg-golden-yellow/10 rounded-full flex items-center justify-center mb-6 mx-auto">
+                                <svg className="w-8 h-8 text-golden-yellow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                            </div>
+                                <h3 className="font-bold text-white text-lg mb-2">{t('cta_heading')}</h3>
+                                <p className="text-sm text-gray-400 mb-4">{t('cta_desc')}</p>
+                                <SmartLink href="/contact?type=repair" className="inline-block bg-golden-yellow text-charcoal-blue font-bold py-3 px-6 rounded-lg text-sm hover:bg-white transition-all w-full text-center">
+                                    {t('cta_button')}
+                                </SmartLink>
+                                <p className="text-center text-xs text-gray-500 mt-3">{t('cta_phone')}</p>
+                        </div>
+                    </aside>
+                </div>
+            </div>
+        </div>
+    );
+}

@@ -86,7 +86,7 @@ export function KPIGrid({ stats }: KPIGridProps) {
             className="
               backdrop-blur-md 
               p-4 md:p-6 rounded-3xl 
-              hover:border-[#f1c40f]/30
+              hover:border-[var(--staff-accent)]
               transition-all duration-300 ease-out
               group 
               shadow-lg hover:shadow-[0_0_30px_-10px_rgba(241,196,15,0.1)]

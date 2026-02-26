@@ -1,4 +1,6 @@
+'use client';
 import React from 'react';
+import { useTranslations } from 'next-intl';
 
 interface ServiceFeature {
   feature: string;
@@ -42,6 +44,7 @@ const IconMap = {
 };
 
 const Services: React.FC<ServicesProps> = ({ services = [] }) => {
+  const t = useTranslations('services_landing');
   return (
     <section id="services" className="py-24 bg-cloudy-white relative overflow-hidden">
       {/* Background Decor */}
@@ -53,10 +56,10 @@ const Services: React.FC<ServicesProps> = ({ services = [] }) => {
       <div className="w-full max-w-[1800px] mx-auto px-6 md:px-12 relative z-10">
         <div className="text-center mb-16 max-w-2xl mx-auto">
           <h2 className="text-4xl font-black text-charcoal-blue mb-4 tracking-tight">
-            Diagnosis & <span className="text-golden-yellow">Solutions.</span>
+            {t('heading')} <span className="text-golden-yellow">{t('heading_accent')}</span>
           </h2>
           <p className="text-lg text-steel-gray">
-            Identify your issue below. We deploy the right specialist within hours, not days.
+            {t('subheading')}
           </p>
         </div>
 
@@ -76,7 +79,7 @@ const Services: React.FC<ServicesProps> = ({ services = [] }) => {
               >
                 {isHighPriority && (
                   <div className="absolute top-0 right-0 bg-red-100 text-red-600 text-xs font-bold px-3 py-1 rounded-bl-xl uppercase tracking-wider">
-                    High Priority
+                    {t('high_priority')}
                   </div>
                 )}
                 
@@ -117,7 +120,7 @@ const Services: React.FC<ServicesProps> = ({ services = [] }) => {
                       ${service.highlight ? 'text-golden-yellow text-sm tracking-wide uppercase border-b border-golden-yellow/30 pb-1 hover:border-golden-yellow' : 'text-red-600'}
                     `}
                   >
-                    {service.slug === 'contractor-portal' ? 'Access Pro Portal' : (service.slug === 'installations' ? 'Browse Gallery' : 'Request Emergency Tech')}
+                    {service.slug === 'contractor-portal' ? t('cta_portal') : (service.slug === 'installations' ? t('cta_gallery') : t('cta_emergency'))}
                     <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                     </svg>

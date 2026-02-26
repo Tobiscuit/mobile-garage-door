@@ -38,16 +38,16 @@ const Sidebar: React.FC = () => {
         className={`
           flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 group relative overflow-hidden
           ${active 
-            ? 'text-[#2c3e50] font-bold shadow-[0_0_20px_rgba(241,196,15,0.4)]' 
-            : 'hover:bg-[#ffffff08]'
+            ? 'text-[var(--staff-surface)] font-bold shadow-[0_0_20px_var(--staff-accent)]' 
+            : 'hover:bg-[var(--staff-border)]/20'
           }
         `}
         style={{
           backgroundColor: active ? 'var(--staff-accent)' : 'transparent',
-          color: active ? '#2c3e50' : 'var(--staff-muted)',
+          color: active ? 'var(--staff-surface)' : 'var(--staff-muted)',
         }}
       >
-        <span className={`relative z-10 ${active ? 'text-[#2c3e50]' : 'group-hover:text-[#f1c40f] transition-colors'}`}>
+        <span className={`relative z-10 ${active ? 'text-[var(--staff-surface)]' : 'group-hover:text-[var(--staff-accent)] transition-colors'}`}>
           <Icon />
         </span>
         <span className="relative z-10">{label}</span>
@@ -69,19 +69,19 @@ const Sidebar: React.FC = () => {
     <>
       {/* MOBILE BOTTOM NAV - Visible only on small screens */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 backdrop-blur-xl z-50 flex justify-around items-center p-2 pb-safe" style={{ backgroundColor: 'var(--staff-surface)', borderTop: '1px solid var(--staff-border)' }}>
-        <Link href="/dashboard" className={`p-2 rounded-lg flex flex-col items-center gap-1 ${isActive('/dashboard') && !isActive('/dashboard/dispatch') ? 'text-[#f1c40f]' : ''}`} style={{ color: isActive('/dashboard') && !isActive('/dashboard/dispatch') ? 'var(--staff-accent)' : 'var(--staff-muted)' }}>
+        <Link href="/dashboard" className={`p-2 rounded-lg flex flex-col items-center gap-1 ${isActive('/dashboard') && !isActive('/dashboard/dispatch') ? 'text-[var(--staff-accent)]' : ''}`} style={{ color: isActive('/dashboard') && !isActive('/dashboard/dispatch') ? 'var(--staff-accent)' : 'var(--staff-muted)' }}>
             <CommandIcon />
             <span className="text-[10px] font-bold">Home</span>
         </Link>
-        <Link href="/dashboard/dispatch" className={`p-2 rounded-lg flex flex-col items-center gap-1 ${isActive('/dashboard/dispatch') ? 'text-[#f1c40f]' : ''}`} style={{ color: isActive('/dashboard/dispatch') ? 'var(--staff-accent)' : 'var(--staff-muted)' }}>
+        <Link href="/dashboard/dispatch" className={`p-2 rounded-lg flex flex-col items-center gap-1 ${isActive('/dashboard/dispatch') ? 'text-[var(--staff-accent)]' : ''}`} style={{ color: isActive('/dashboard/dispatch') ? 'var(--staff-accent)' : 'var(--staff-muted)' }}>
             <DispatchIcon />
             <span className="text-[10px] font-bold">Dispatch</span>
         </Link>
-        <Link href="/dashboard/services" className={`p-2 rounded-lg flex flex-col items-center gap-1 ${isActive('/dashboard/services') ? 'text-[#f1c40f]' : ''}`} style={{ color: isActive('/dashboard/services') ? 'var(--staff-accent)' : 'var(--staff-muted)' }}>
+        <Link href="/dashboard/services" className={`p-2 rounded-lg flex flex-col items-center gap-1 ${isActive('/dashboard/services') ? 'text-[var(--staff-accent)]' : ''}`} style={{ color: isActive('/dashboard/services') ? 'var(--staff-accent)' : 'var(--staff-muted)' }}>
             <ServiceIcon />
             <span className="text-[10px] font-bold">Services</span>
         </Link>
-        <Link href="/dashboard/settings" className={`p-2 rounded-lg flex flex-col items-center gap-1 ${isActive('/dashboard/settings') ? 'text-[#f1c40f]' : ''}`} style={{ color: isActive('/dashboard/settings') ? 'var(--staff-accent)' : 'var(--staff-muted)' }}>
+        <Link href="/dashboard/settings" className={`p-2 rounded-lg flex flex-col items-center gap-1 ${isActive('/dashboard/settings') ? 'text-[var(--staff-accent)]' : ''}`} style={{ color: isActive('/dashboard/settings') ? 'var(--staff-accent)' : 'var(--staff-muted)' }}>
             <SettingsIcon />
             <span className="text-[10px] font-bold">Settings</span>
         </Link>

@@ -11,12 +11,12 @@ export function UserTable({ initialUsers }: { initialUsers: any[] }) {
       accessorKey: 'name' as const, // Cast to verify key
       cell: (user: any) => (
         <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#f1c40f] to-[#f39c12] flex items-center justify-center text-[#2c3e50] font-bold text-xs">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[var(--staff-accent)] to-[var(--staff-bg)] flex items-center justify-center text-[var(--staff-surface-alt)] font-bold text-xs">
                 {(user.name?.charAt(0) || user.email?.charAt(0) || '?').toUpperCase()}
             </div>
             <div>
-                <div className="font-bold text-white">{user.name || 'Unknown'}</div>
-                <div className="text-xs text-[#7f8c8d]">{user.email}</div>
+                <div className="font-bold" style={{ color: 'var(--staff-text)' }}>{user.name || 'Unknown'}</div>
+                <div className="text-xs" style={{ color: 'var(--staff-muted)' }}>{user.email}</div>
             </div>
         </div>
       )
@@ -35,13 +35,13 @@ export function UserTable({ initialUsers }: { initialUsers: any[] }) {
      {
       header: 'Joined',
       accessorKey: 'createdAt' as const,
-      cell: (user: any) => <span className="text-sm text-[#bdc3c7]">{user.createdAt ? format(new Date(user.createdAt), 'MMM d, yyyy') : '-'}</span>
+      cell: (user: any) => <span className="text-sm" style={{ color: 'var(--staff-muted)' }}>{user.createdAt ? format(new Date(user.createdAt), 'MMM d, yyyy') : '-'}</span>
     },
     {
         header: 'Actions',
         cell: (user: any) => (
             <div className="flex gap-2">
-                <Link href={`/dashboard/users/${user.id}`} className="text-[#f1c40f] hover:text-[#f39c12] text-xs font-bold uppercase tracking-wider">
+                <Link href={`/dashboard/users/${user.id}`} className="text-[var(--staff-accent)] hover:opacity-80 text-xs font-bold uppercase tracking-wider">
                     Edit
                 </Link>
             </div>

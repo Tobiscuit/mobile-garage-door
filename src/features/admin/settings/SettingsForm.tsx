@@ -76,7 +76,7 @@ export default function SettingsForm({ initialData }: SettingsFormProps) {
         name={name}
         defaultValue={defaultValue}
         placeholder={placeholder}
-        className="w-full rounded-xl p-4 focus:outline-none focus:border-[#f1c40f] transition-colors"
+        className="w-full rounded-xl p-4 focus:outline-none focus:border-[var(--staff-accent)] transition-colors"
         style={{ backgroundColor: 'var(--staff-surface)', border: '1px solid var(--staff-border)', color: 'var(--staff-text)' }}
       />
     </div>
@@ -90,7 +90,7 @@ export default function SettingsForm({ initialData }: SettingsFormProps) {
         defaultValue={defaultValue}
         rows={rows}
         placeholder={placeholder}
-        className="w-full rounded-xl p-4 focus:outline-none focus:border-[#f1c40f] transition-colors resize-none"
+        className="w-full rounded-xl p-4 focus:outline-none focus:border-[var(--staff-accent)] transition-colors resize-none"
         style={{ backgroundColor: 'var(--staff-surface)', border: '1px solid var(--staff-border)', color: 'var(--staff-text)' }}
       />
     </div>
@@ -102,7 +102,7 @@ export default function SettingsForm({ initialData }: SettingsFormProps) {
       {/* COMPANY INFO */}
       <section className="backdrop-blur-md rounded-3xl p-8 shadow-xl" style={{ backgroundColor: 'var(--staff-surface)', border: '1px solid var(--staff-border)' }}>
         <h2 className="text-2xl font-black mb-6 flex items-center gap-3" style={{ color: 'var(--staff-text)' }}>
-          <span className="text-[#f1c40f]">01.</span> Company Information
+          <span className="text-[var(--staff-accent)]">01.</span> Company Information
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <InputField label="Business Name" name="companyName" defaultValue={initialData.companyName} />
@@ -117,7 +117,7 @@ export default function SettingsForm({ initialData }: SettingsFormProps) {
       {/* ABOUT PAGE CONTENT */}
       <section className="backdrop-blur-md rounded-3xl p-8 shadow-xl" style={{ backgroundColor: 'var(--staff-surface)', border: '1px solid var(--staff-border)' }}>
         <h2 className="text-2xl font-black mb-6 flex items-center gap-3" style={{ color: 'var(--staff-text)' }}>
-          <span className="text-[#f1c40f]">02.</span> About Page Content
+          <span className="text-[var(--staff-accent)]">02.</span> About Page Content
         </h2>
         
         <div className="space-y-8">
@@ -127,7 +127,7 @@ export default function SettingsForm({ initialData }: SettingsFormProps) {
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <label className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--staff-muted)' }}>Company Stats</label>
-              <button type="button" onClick={addStat} className="text-[#f1c40f] text-xs font-bold hover:underline">+ ADD STAT</button>
+              <button type="button" onClick={addStat} className="text-[var(--staff-accent)] text-xs font-bold hover:underline">+ ADD STAT</button>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {stats.map((stat: any, index: number) => (
@@ -145,7 +145,7 @@ export default function SettingsForm({ initialData }: SettingsFormProps) {
                       value={stat.value} 
                       onChange={(e) => handleStatsChange(index, 'value', e.target.value)}
                       placeholder="Value (e.g. 15+)"
-                      className="w-full bg-transparent border-b pb-1 font-bold focus:outline-none focus:border-[#f1c40f]"
+                      className="w-full bg-transparent border-b pb-1 font-bold focus:outline-none focus:border-[var(--staff-accent)]"
                       style={{ borderColor: 'var(--staff-border)', color: 'var(--staff-text)' }}
                     />
                     <input 
@@ -153,7 +153,7 @@ export default function SettingsForm({ initialData }: SettingsFormProps) {
                       value={stat.label} 
                       onChange={(e) => handleStatsChange(index, 'label', e.target.value)}
                       placeholder="Label (e.g. Years)"
-                      className="w-full bg-transparent border-b pb-1 text-sm focus:outline-none focus:border-[#f1c40f]"
+                      className="w-full bg-transparent border-b pb-1 text-sm focus:outline-none focus:border-[var(--staff-accent)]"
                       style={{ borderColor: 'var(--staff-border)', color: 'var(--staff-muted)' }}
                     />
                   </div>
@@ -166,7 +166,7 @@ export default function SettingsForm({ initialData }: SettingsFormProps) {
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <label className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--staff-muted)' }}>Core Values</label>
-              <button type="button" onClick={addValue} className="text-[#f1c40f] text-xs font-bold hover:underline">+ ADD VALUE</button>
+              <button type="button" onClick={addValue} className="text-[var(--staff-accent)] text-xs font-bold hover:underline">+ ADD VALUE</button>
             </div>
             <div className="space-y-4">
               {values.map((val: any, index: number) => (
@@ -184,7 +184,7 @@ export default function SettingsForm({ initialData }: SettingsFormProps) {
                       value={val.title} 
                       onChange={(e) => handleValuesChange(index, 'title', e.target.value)}
                       placeholder="Value Title"
-                      className="w-full bg-transparent border-b pb-2 text-[#f1c40f] font-bold text-lg focus:outline-none focus:border-[#f1c40f]"
+                      className="w-full bg-transparent border-b pb-2 text-[var(--staff-accent)] font-bold text-lg focus:outline-none focus:border-[var(--staff-accent)]"
                       style={{ borderColor: 'var(--staff-border)' }}
                     />
                      <textarea 
@@ -192,7 +192,7 @@ export default function SettingsForm({ initialData }: SettingsFormProps) {
                       onChange={(e) => handleValuesChange(index, 'description', e.target.value)}
                       placeholder="Description"
                       rows={2}
-                      className="w-full bg-transparent border-b pb-2 focus:outline-none focus:border-[#f1c40f] resize-none"
+                      className="w-full bg-transparent border-b pb-2 focus:outline-none focus:border-[var(--staff-accent)] resize-none"
                       style={{ borderColor: 'var(--staff-border)', color: 'var(--staff-muted)' }}
                     />
                   </div>
@@ -206,12 +206,61 @@ export default function SettingsForm({ initialData }: SettingsFormProps) {
       {/* BRAND VOICE */}
       <section className="backdrop-blur-md rounded-3xl p-8 shadow-xl" style={{ backgroundColor: 'var(--staff-surface)', border: '1px solid var(--staff-border)' }}>
         <h2 className="text-2xl font-black mb-6 flex items-center gap-3" style={{ color: 'var(--staff-text)' }}>
-          <span className="text-[#f1c40f]">03.</span> Brand Voice (AI Persona)
+          <span className="text-[var(--staff-accent)]">03.</span> Brand Voice (AI Persona)
         </h2>
         <div className="space-y-6">
           <TextareaField label="Writing Style" name="brandVoice" defaultValue={initialData.brandVoice} rows={6} />
           <TextareaField label="Tone Notes" name="brandTone" defaultValue={initialData.brandTone} rows={4} />
           <TextareaField label="Words to Avoid" name="brandAvoid" defaultValue={initialData.brandAvoid} rows={4} />
+        </div>
+      </section>
+
+      {/* ADMIN PREFERENCES */}
+      <section className="backdrop-blur-md rounded-3xl p-8 shadow-xl" style={{ backgroundColor: 'var(--staff-surface)', border: '1px solid var(--staff-border)' }}>
+        <h2 className="text-2xl font-black mb-6 flex items-center gap-3" style={{ color: 'var(--staff-text)' }}>
+          <span className="text-[var(--staff-accent)]">04.</span> Admin Preferences
+        </h2>
+        <div className="space-y-6">
+          <div className="space-y-2">
+            <label className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--staff-muted)' }}>Light Mode Theme</label>
+            <select
+              name="themePreference"
+              defaultValue={initialData?.themePreference || 'candlelight'}
+              className="w-full rounded-xl p-4 focus:outline-none focus:border-[var(--staff-accent)] transition-colors appearance-none"
+              style={{ backgroundColor: 'var(--staff-surface-alt)', border: '1px solid var(--staff-border)', color: 'var(--staff-text)' }}
+            >
+              <option value="candlelight">Candlelight (Warm & Ambient)</option>
+              <option value="original">Original (High Contrast White)</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      {/* AUTOMATIONS & WARRANTY */}
+      <section className="backdrop-blur-md rounded-3xl p-8 shadow-xl" style={{ backgroundColor: 'var(--staff-surface)', border: '1px solid var(--staff-border)' }}>
+        <h2 className="text-2xl font-black mb-6 flex items-center gap-3" style={{ color: 'var(--staff-text)' }}>
+          <span className="text-[var(--staff-accent)]">05.</span> Automations & Warranty
+        </h2>
+        <div className="space-y-6">
+          <label className="flex items-center gap-3 p-4 rounded-xl cursor-pointer transition-colors hover:bg-black/5" style={{ border: '1px solid var(--staff-border)' }}>
+             <input 
+               type="checkbox" 
+               name="warrantyEnableNotifications" 
+               defaultChecked={initialData?.warranty?.enableNotifications}
+               className="w-5 h-5 rounded accent-[var(--staff-accent)]" 
+             />
+             <div className="flex flex-col">
+                <span className="font-bold text-sm" style={{ color: 'var(--staff-text)' }}>Enable 11-Month Warranty Checkup Emails</span>
+                <span className="text-xs" style={{ color: 'var(--staff-muted)' }}>Automatically emails customers a month before their 1-year labor warranty expires.</span>
+             </div>
+          </label>
+          <TextareaField 
+             label="Warranty Email Template" 
+             name="warrantyEmailTemplate" 
+             defaultValue={initialData?.warranty?.notificationEmailTemplate} 
+             rows={4} 
+             placeholder="Use {{client}} and {{project}} as placeholders."
+          />
         </div>
       </section>
 
@@ -224,8 +273,8 @@ export default function SettingsForm({ initialData }: SettingsFormProps) {
           type="submit"
           disabled={isSubmitting}
           className={`
-            bg-[#f1c40f] text-[#2c3e50] font-black uppercase tracking-widest py-3 px-8 rounded-xl
-            hover:shadow-[0_0_20px_rgba(241,196,15,0.4)] transition-all duration-300
+            bg-[var(--staff-accent)] text-[var(--staff-surface-alt)] font-black uppercase tracking-widest py-3 px-8 rounded-xl
+            hover:shadow-[0_0_20px_var(--staff-accent)] transition-all duration-300
             disabled:opacity-50 disabled:cursor-not-allowed
           `}
         >

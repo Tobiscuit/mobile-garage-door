@@ -27,6 +27,19 @@ html {
   --golden-yellow: #f1c40f;
   --dark-charcoal: #34495e;
   --light-gray: #bdc3c7;
+
+  /* Candlelight is the DEFAULT light theme */
+  --staff-bg: #FAF6ED;
+  --staff-text: #3E3B32;
+  --staff-surface: #F5EFE2;
+  --staff-surface-alt: #EDE5D5;
+  --staff-border: #E0D4C0;
+  --staff-muted: #8C7B65;
+  --staff-accent: #D4AF37;
+}
+
+/* Legacy white — only if explicitly chosen in Settings */
+html[data-light-theme='original']:not([data-app-theme='dark']) {
   --staff-bg: #f7f9fb;
   --staff-text: #2c3e50;
   --staff-surface: #ffffff;

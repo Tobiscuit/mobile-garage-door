@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload';
+import { autoTranslateHook } from '../hooks/auto-translate';
 
 export const Testimonials: CollectionConfig = {
   slug: 'testimonials',
@@ -7,11 +8,15 @@ export const Testimonials: CollectionConfig = {
     defaultColumns: ['author', 'location', 'rating', 'featured'],
     group: 'Content',
   },
+  hooks: {
+    afterChange: [autoTranslateHook],
+  },
   fields: [
     {
       name: 'quote',
       type: 'textarea',
       required: true,
+      localized: true,
       label: 'Review Text',
     },
     {
@@ -24,6 +29,7 @@ export const Testimonials: CollectionConfig = {
       name: 'location',
       type: 'text',
       required: true,
+      localized: true,
       label: 'City / Area',
     },
     {

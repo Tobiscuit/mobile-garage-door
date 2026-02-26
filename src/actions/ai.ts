@@ -241,3 +241,167 @@ export async function generateProjectCaseStudy(prompt: string) {
 
     return generateContent(systemPrompt, prompt, schema);
 }
+
+// --- Feature: Multimodal Project Case Study Generator ---
+export async function generateMultimodalProjectCaseStudy(
+    imagesContext: { url: string, mimeType: string, caption: string }[],
+    prompt: string,
+    targetField?: 'description' | 'challenge' | 'solution' | 'title',
+    existingContext?: { description?: string, challenge?: string, solution?: string, title?: string }
+) {
+    const fullSchema: Schema = {
+        type: Type.OBJECT,
+        properties: {
+            title: { type: Type.STRING, description: 'Catchy, professional title for the case study' },
+            client: { type: Type.STRING, description: 'Type of client (e.g., "Luxury Residence", "Commercial Warehouse")' },
+            location: { type: Type.STRING, description: 'City/Area (inferred or generic)' },
+            description: { type: Type.STRING, description: 'Main narrative HTML' },
+            challenge: { type: Type.STRING, description: 'Problem statement HTML' },
+            solution: { type: Type.STRING, description: 'Solution details HTML' },
+            tags: { type: Type.ARRAY, items: { type: Type.STRING } },
+        },
+        required: ['title', 'client', 'location', 'description', 'challenge', 'solution', 'tags'],
+    };
+
+    const targetSchema: Schema = targetField ? {
+        type: Type.OBJECT,
+        properties: {
+            [targetField]: fullSchema.properties![targetField]
+        },
+        required: [targetField]
+    } : fullSchema;
+
+    const basePrompt = `
+        You are a Senior Project Manager and Master Garage Door Technician.
+        Write a highly technical, SEO-optimized Project Case Study in semantic HTML based on the provided before/after photos and context notes.
+        
+        INSTRUCTIONS:
+        1. Analyze the provided photos to identify hardware, damage, and solutions.
+        2. Read the attached captions for context.
+        3.  **Title:** compelling and descriptive.
+        4.  **Client/Location:** Infer from context or use realistic placeholders (e.g. "Private Residence").
+        5.  **Content (HTML):**
+            -   **Description:** The main story. Use <p>, <b>, <ul>. Professional tone.
+            -   **Challenge:** What was broken, difficult, or unique?
+            -   **Solution:** What hardware/methods did we use? Be technical (e.g. "High-cycle springs", "16-gauge hinges").
+        
+        Ensure the HTML is clean (no <html>/<body> tags), just semantic block elements.
+    `;
+
+    let systemPrompt = basePrompt;
+    if (targetField) {
+        systemPrompt += `\n\n=== GRANULAR REWRITE MODE ===
+IMPORTANT: The user has requested to rewrite ONLY the '${targetField}' section based on their new instructions below. 
+You must ONLY output the '${targetField}' field in your JSON response. DO NOT output the other fields.
+
+Here is the EXISTING REST OF THE DRAFT for your context (do not regenerate these, just read them so your new '${targetField}' matches the tone and doesn't repeat information):
+- CURRENT TITLE: ${existingContext?.title || '(Empty)'}
+- CURRENT DESCRIPTION: ${existingContext?.description || '(Empty)'}
+- CURRENT CHALLENGE: ${existingContext?.challenge || '(Empty)'}
+- CURRENT SOLUTION: ${existingContext?.solution || '(Empty)'}
+`;
+    }
+
+    if (!apiKey) throw new Error('GEMINI_API_KEY is not set');
+
+    try {
+        const parts: any[] = [];
+        parts.push({ text: `${systemPrompt}\n\nTasks:\n${prompt}\n\nImage Context:` });
+
+        // Download and append each image
+        for (const img of imagesContext) {
+            if (!img.url) continue;
+            
+            // Handle relative URLs if running locally
+            const fullUrl = img.url.startsWith('http') ? img.url : `${process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'}${img.url}`;
+            
+            try {
+                const response = await fetch(fullUrl);
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                const arrayBuffer = await response.arrayBuffer();
+                const buffer = Buffer.from(arrayBuffer);
+                
+                parts.push({
+                    inlineData: {
+                        data: buffer.toString('base64'),
+                        mimeType: img.mimeType || 'image/jpeg'
+                    }
+                });
+                
+                if (img.caption) {
+                    parts.push({ text: `Caption for the above image: ${img.caption}` });
+                }
+            } catch (err) {
+                console.error("Failed to fetch image for AI:", fullUrl, err);
+            }
+        }
+
+        const response = await genAI.models.generateContent({
+            model: 'gemini-3.1-pro-preview', // Vision-capable model
+            contents: [
+                {
+                    role: 'user',
+                    parts: parts
+                }
+            ],
+            config: {
+                responseMimeType: 'application/json',
+                responseSchema: targetSchema,
+            },
+        });
+
+        const text = response.text;
+        if (!text) throw new Error('No content generated');
+        
+        return JSON.parse(text);
+    } catch (error) {
+        console.error('AI Multimodal Generation Error:', error);
+        throw error;
+    }
+}
+
+// --- Feature: Smart Context Extraction (Client / Location) ---
+export async function extractProjectContext(contextString: string) {
+    const schema: Schema = {
+        type: Type.OBJECT,
+        properties: {
+            client: { type: Type.STRING, description: 'The name of the client, homeowner, or business extracted from the prompt. Leave empty if no specific client is mentioned.' },
+            location: { type: Type.STRING, description: 'The city, neighborhood, or general location extracted from the prompt. Leave empty if no location is mentioned.' },
+        },
+    };
+
+    const systemPrompt = `
+        You are a structured data extractor. Your job is to extract the client name and the location from the user's conversational input.
+        If a piece of information is missing, leave the string empty. Do not guess.
+        
+        Examples:
+        - "This was for the Smith job up in Austin" -> client: "The Smith Residence", location: "Austin, TX"
+        - "Commercial warehouse door in South Dallas" -> client: "Commercial Warehouse", location: "South Dallas, TX"
+    `;
+
+    if (!apiKey) throw new Error('GEMINI_API_KEY is not set');
+
+    try {
+        const response = await genAI.models.generateContent({
+            model: 'gemini-3.1-pro-preview', // Pro model for complex extraction logic
+            contents: [
+                {
+                    role: 'user',
+                    parts: [{ text: `${systemPrompt}\n\nUser Input:\n"${contextString}"` }]
+                }
+            ],
+            config: {
+                responseMimeType: 'application/json',
+                responseSchema: schema,
+            },
+        });
+
+        const text = response.text;
+        if (!text) return { client: '', location: '' };
+        
+        return JSON.parse(text);
+    } catch (error) {
+        console.error('AI Smart Context Extraction Error:', error);
+        throw error;
+    }
+}

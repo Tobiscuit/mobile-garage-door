@@ -138,38 +138,40 @@ export default function DiagnosePage() {
                 }
             }
             
-            // Handle Audio Output (skip text from modelTurn — it's thinking, not speech)
-            // Handle Audio Output (skip text from modelTurn — it's thinking, not speech)
+            // 1. Handle Audio Output (Skip text from modelTurn — it's thinking, not speech)
             if (data.serverContent?.modelTurn?.parts) {
                 setAiState('speaking');
                 for (const part of data.serverContent.modelTurn.parts) {
                     if (part.inlineData && part.inlineData.mimeType.startsWith('audio/pcm')) {
                         playPcmAudio(part.inlineData.data);
                     }
-                    
-                    // Handle tool call from AI
-                    if (part.functionCall) {
-                        const { name, args } = part.functionCall;
-                        if (name === 'report_diagnosis') {
-                            const hour = new Date().getHours();
-                            const isAfterHours = hour < 7 || hour >= 19;
-                            const finalUrgency = args.urgency === 'emergency' || isAfterHours
-                                ? 'emergency' : 'standard';
-                            
-                            // Store diagnosis in sessionStorage for the booking form
-                            sessionStorage.setItem('aiDiagnosis', JSON.stringify({
-                                issueDescription: args.issue_summary,
-                                urgency: finalUrgency,
-                                fromDiagnosis: true
-                            }));
+                }
+            }
 
-                            // Clean up and navigate
-                            setTimeout(() => {
-                                wsRef.current?.close();
-                                stopMedia();
-                                router.push('/book-service');
-                            }, 3000); // Give AI 3s to finish speaking
-                        }
+            // 2. Handle Tool Calls from AI (Live API sends this under serverContent.toolCall, not modelTurn)
+            if (data.serverContent?.toolCall?.functionCalls) {
+                for (const call of data.serverContent.toolCall.functionCalls) {
+                    if (call.name === 'report_diagnosis') {
+                        const args = call.args || {};
+                        const hour = new Date().getHours();
+                        const isAfterHours = hour < 7 || hour >= 19;
+                        const finalUrgency = args.urgency === 'emergency' || isAfterHours
+                            ? 'emergency' : 'standard';
+                        
+                        // Store diagnosis in sessionStorage for the booking form
+                        sessionStorage.setItem('aiDiagnosis', JSON.stringify({
+                            issueDescription: args.issue_summary || "Automated diagnostic completed.",
+                            urgency: finalUrgency,
+                            fromDiagnosis: true
+                        }));
+
+                        console.log("TOOL CALL RECEIVED, REDIRECTING:", args);
+
+                        setTimeout(() => {
+                            wsRef.current?.close();
+                            stopMedia();
+                            window.location.href = '/book-service';
+                        }, 1500); // Slight delay then hard redirect
                     }
                 }
             }

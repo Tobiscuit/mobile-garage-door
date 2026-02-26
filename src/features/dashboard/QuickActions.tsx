@@ -34,7 +34,7 @@ export function QuickActions() {
   return (
     <div className="lg:col-span-2">
       <h2 className="text-xl font-bold mb-6 flex items-center gap-3" style={{ color: 'var(--staff-text)' }}>
-          <span className="w-1.5 h-8 bg-[#f1c40f] rounded-full shadow-[0_0_10px_#f1c40f]"></span>
+          <span className="w-1.5 h-8 bg-[var(--staff-accent)] rounded-full shadow-[0_0_10px_var(--staff-accent)]"></span>
           Quick Actions
       </h2>
 
@@ -72,9 +72,9 @@ export function QuickActions() {
               </div>
           </button>
 
-          <Link href="/dashboard/projects/create" className="group p-6 rounded-2xl hover:bg-[#f1c40f] transition-all flex items-center gap-4" style={{ backgroundColor: 'var(--staff-surface)', border: '1px solid var(--staff-border)' }}>
+          <Link href="/dashboard/projects/create" className="group p-6 rounded-2xl hover:bg-[var(--staff-accent)] transition-all flex items-center gap-4" style={{ backgroundColor: 'var(--staff-surface)', border: '1px solid var(--staff-border)' }}>
               <div className="w-12 h-12 rounded-xl flex items-center justify-center group-hover:bg-white/20 transition-colors" style={{ backgroundColor: 'var(--staff-surface-alt)' }}>
-                  <svg className="w-6 h-6 text-[#f1c40f] group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                  <svg className="w-6 h-6 text-[var(--staff-accent)] group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
               </div>
               <div>
                   <div className="font-bold text-lg group-hover:text-[#2c3e50]" style={{ color: 'var(--staff-text)' }}>New Project</div>
@@ -82,9 +82,9 @@ export function QuickActions() {
               </div>
           </Link>
 
-          <Link href="/dashboard/posts/create" className="group p-6 rounded-2xl hover:bg-[#f1c40f] transition-all flex items-center gap-4" style={{ backgroundColor: 'var(--staff-surface)', border: '1px solid var(--staff-border)' }}>
+          <Link href="/dashboard/posts/create" className="group p-6 rounded-2xl hover:bg-[var(--staff-accent)] transition-all flex items-center gap-4" style={{ backgroundColor: 'var(--staff-surface)', border: '1px solid var(--staff-border)' }}>
               <div className="w-12 h-12 rounded-xl flex items-center justify-center group-hover:bg-white/20 transition-colors" style={{ backgroundColor: 'var(--staff-surface-alt)' }}>
-                  <svg className="w-6 h-6 text-[#f1c40f] group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                  <svg className="w-6 h-6 text-[var(--staff-accent)] group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
               </div>
               <div>
                   <div className="font-bold text-lg group-hover:text-[#2c3e50]" style={{ color: 'var(--staff-text)' }}>Write Post</div>

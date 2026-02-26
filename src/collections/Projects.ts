@@ -1,5 +1,6 @@
 import type { CollectionConfig } from 'payload';
 import { generateHtmlToLexicalHook } from '../lib/payload/rich-text-adapter';
+import { autoTranslateHook } from '../hooks/auto-translate';
 
 export const Projects: CollectionConfig = {
   slug: 'projects',
@@ -16,12 +17,14 @@ export const Projects: CollectionConfig = {
         htmlSolution: 'solution',
       }, { cleanup: false }),
     ],
+    afterChange: [autoTranslateHook],
   },
   fields: [
     {
       name: 'title',
       type: 'text',
       required: true,
+      localized: true,
       label: 'Project Title',
     },
     {
@@ -37,6 +40,7 @@ export const Projects: CollectionConfig = {
       name: 'client',
       type: 'text',
       required: true,
+      localized: true,
       label: 'Client / Type',
       admin: {
         description: 'E.g., "Regional Distribution Center" or "Private Residence"',
@@ -93,6 +97,7 @@ export const Projects: CollectionConfig = {
       name: 'description',
       type: 'richText',
       required: true,
+      localized: true,
       label: 'Case Study Details',
       admin: {
         description: 'Main body content (Rich Text)',
@@ -102,6 +107,7 @@ export const Projects: CollectionConfig = {
       name: 'challenge',
       type: 'richText',
       required: true,
+      localized: true,
       label: 'The Challenge',
       admin: {
         description: 'What problem was the client facing?',
@@ -111,6 +117,7 @@ export const Projects: CollectionConfig = {
       name: 'solution',
       type: 'richText',
       required: true,
+      localized: true,
       label: 'Our Solution',
       admin: {
         description: 'How did we fix it?',
@@ -120,6 +127,7 @@ export const Projects: CollectionConfig = {
     {
       name: 'htmlDescription',
       type: 'code',
+      localized: true,
       admin: {
         hidden: true,
         language: 'html',
@@ -128,6 +136,7 @@ export const Projects: CollectionConfig = {
     {
       name: 'htmlChallenge',
       type: 'code',
+      localized: true,
       admin: {
         hidden: true,
         language: 'html',
@@ -136,6 +145,7 @@ export const Projects: CollectionConfig = {
     {
       name: 'htmlSolution',
       type: 'code',
+      localized: true,
       admin: {
         hidden: true,
         language: 'html',
@@ -154,10 +164,29 @@ export const Projects: CollectionConfig = {
       ],
     },
     {
-      name: 'image',
-      type: 'upload',
-      relationTo: 'media',
-      label: 'Project Photo (optional)',
+      name: 'gallery',
+      type: 'array',
+      label: 'Project Gallery (AI Context)',
+      admin: {
+        description: 'Upload project photos and provide optional context for the AI Case Study generator. (We recommend at least a Before and After photo)',
+      },
+      fields: [
+        {
+          name: 'image',
+          type: 'upload',
+          relationTo: 'media',
+          required: true,
+          label: 'Photo',
+        },
+        {
+          name: 'caption',
+          type: 'text',
+          label: 'AI Context / Caption',
+          admin: {
+            description: 'Provide brief context (e.g. "Rusted torsion spring", "New insulated steel door")',
+          },
+        },
+      ],
     },
     {
       name: 'tags',
@@ -175,6 +204,7 @@ export const Projects: CollectionConfig = {
       name: 'stats',
       type: 'array',
       label: 'Key Metrics',
+      localized: true,
       fields: [
         {
           name: 'label',

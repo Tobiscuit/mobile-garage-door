@@ -1,6 +1,7 @@
 import type { CollectionConfig, CollectionBeforeChangeHook } from 'payload';
 import { convertHTMLToLexical, editorConfigFactory } from '@payloadcms/richtext-lexical';
 import configPromise from '@payload-config';
+import { autoTranslateHook } from '../hooks/auto-translate';
 
 const htmlToLexicalHook: CollectionBeforeChangeHook = async ({ data, req, operation }) => {
   if (data.htmlContent) {
@@ -30,6 +31,7 @@ export const Posts: CollectionConfig = {
   slug: 'posts',
   hooks: {
     beforeChange: [htmlToLexicalHook],
+    afterChange: [autoTranslateHook],
   },
   admin: {
     useAsTitle: 'title',
@@ -50,6 +52,7 @@ export const Posts: CollectionConfig = {
       name: 'title',
       type: 'text',
       required: true,
+      localized: true,
       label: 'Article Title',
     },
     {
@@ -65,6 +68,7 @@ export const Posts: CollectionConfig = {
       name: 'excerpt',
       type: 'textarea',
       label: 'Short Summary',
+      localized: true,
       admin: {
         description: 'Brief description for sharing and previews',
       },
@@ -73,6 +77,7 @@ export const Posts: CollectionConfig = {
       name: 'content',
       type: 'richText',
       label: 'Manual Article Content (Lexical)',
+      localized: true,
       admin: {
         description: 'Used for manual writing.'
       }
@@ -80,6 +85,7 @@ export const Posts: CollectionConfig = {
     {
       name: 'htmlContent',
       type: 'code',
+      localized: true,
       admin: {
         language: 'html',
         description: 'Autonomously generated semantic HTML content. If present, the frontend uses this instead of the Manual Content.'

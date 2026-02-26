@@ -23,7 +23,7 @@ const MenuBar = ({ editor }: { editor: Editor | null }) => {
   const buttonClass = (isActive: boolean) => twMerge(
     "p-2 rounded text-sm transition-colors",
     isActive 
-      ? "bg-[#f1c40f] text-[#2c3e50] font-bold" 
+      ? "bg-[var(--staff-accent)] text-[var(--staff-surface-alt)] font-bold" 
       : "text-[var(--staff-muted)] hover:bg-[var(--staff-border)] hover:text-[var(--staff-text)]"
   );
 
@@ -108,7 +108,7 @@ export const RichTextEditor = ({ content, onChange, onSend, disabled }: RichText
     },
     editorProps: {
         attributes: {
-            class: 'prose prose-sm max-w-none focus:outline-none min-h-[150px] p-4 text-sm custom-scrollbar text-[var(--staff-text)] prose-headings:text-[var(--staff-text)] prose-p:text-[var(--staff-text)] prose-strong:text-[var(--staff-text)] prose-li:text-[var(--staff-text)] prose-code:text-[var(--staff-text)] prose-blockquote:text-[var(--staff-text)] prose-a:text-[#f1c40f]',
+            class: 'prose prose-sm max-w-none focus:outline-none min-h-[150px] p-4 text-sm custom-scrollbar text-[var(--staff-text)] prose-headings:text-[var(--staff-text)] prose-p:text-[var(--staff-text)] prose-strong:text-[var(--staff-text)] prose-li:text-[var(--staff-text)] prose-code:text-[var(--staff-text)] prose-blockquote:text-[var(--staff-text)] prose-a:text-[var(--staff-accent)]',
         },
         handleKeyDown: (view, event) => {
             if (event.key === 'Enter' && (event.ctrlKey || event.metaKey)) {
@@ -133,7 +133,7 @@ export const RichTextEditor = ({ content, onChange, onSend, disabled }: RichText
   return (
     <div className={clsx(
         "rounded-xl border border-[var(--staff-border)] bg-[var(--staff-surface)] overflow-hidden transition-colors duration-200",
-        editor?.isFocused && "border-[#f1c40f] ring-1 ring-[#f1c40f]/20",
+        editor?.isFocused && "border-[var(--staff-accent)] ring-1 ring-[var(--staff-accent)]/20",
         disabled && "opacity-50 cursor-not-allowed"
     )}>
       <MenuBar editor={editor} />

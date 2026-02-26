@@ -1,20 +1,22 @@
+'use client';
 import React from 'react';
+import { useTranslations } from 'next-intl';
 
 interface ContactHeroProps {
   type: 'repair' | 'install' | 'contractor' | 'general';
 }
 
 export function ContactHero({ type }: ContactHeroProps) {
+  const t = useTranslations('contact_hero');
   const isEmergency = type === 'repair';
   const isContractor = type === 'contractor';
 
   const accentColor = isEmergency ? 'text-red-500' : 'text-golden-yellow';
   const bgColor = isEmergency ? 'bg-dark-charcoal' : 'bg-charcoal-blue';
-  const patternColor = isEmergency ? '#ef4444' : '#f1c40f'; // Red-500 or Yellow-400
+  const patternColor = isEmergency ? '#ef4444' : '#f1c40f';
 
   return (
     <section className={`relative pt-48 pb-32 px-6 overflow-hidden font-display ${bgColor}`}>
-      {/* Background Pattern */}
       <div className="absolute inset-0 opacity-10" style={{
         backgroundImage: `radial-gradient(${patternColor} 1px, transparent 1px)`,
         backgroundSize: '24px 24px'
@@ -25,46 +27,44 @@ export function ContactHero({ type }: ContactHeroProps) {
           {isEmergency ? (
             <>
               <span className="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
-              24/7 Emergency Dispatch
+              {t('emergency_badge')}
             </>
           ) : isContractor ? (
             <>
               <span className="w-2 h-2 rounded-full bg-golden-yellow"></span>
-              Contractor Portal
+              {t('contractor_badge')}
             </>
           ) : (
             <>
               <span className="w-2 h-2 rounded-full bg-golden-yellow"></span>
-              Project Consultation
+              {t('consultation_badge')}
             </>
           )}
         </div>
 
         <h1 className="text-5xl md:text-7xl font-black text-white leading-tight mb-6 tracking-tight">
           {isEmergency ? (
-            <>System <span className="text-red-500">Critical?</span></>
+            <>{t('emergency_heading')} <span className="text-red-500">{t('emergency_accent')}</span></>
           ) : isContractor ? (
-            <>Partner <span className="text-golden-yellow">Access</span></>
+            <>{t('contractor_heading')} <span className="text-golden-yellow">{t('contractor_accent')}</span></>
           ) : (
             type === 'install' ? (
-              <>Build Your <span className="text-golden-yellow">Vision</span></>
+              <>{t('install_heading')} <span className="text-golden-yellow">{t('install_accent')}</span></>
             ) : (
-              <>Let's <span className="text-golden-yellow">Connect</span></>
+              <>{t('general_heading')} <span className="text-golden-yellow">{t('general_accent')}</span></>
             )
           )}
         </h1>
 
         <p className="text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed">
           {isEmergency
-            ? "Immediate response required. Our rapid dispatch team is standing by to deploy industrial-grade repair solutions."
+            ? t('emergency_desc')
             : isContractor
-            ? "Dedicated support and bulk pricing for residential builders and property managers."
-            : "Whether it's a new installation or a custom upgrade, our engineers are ready to architect the perfect access solution."
+            ? t('contractor_desc')
+            : t('general_desc')
           }
         </p>
       </div>
-
-      {/* Removed Gradient Fade */}
     </section>
   );
 }

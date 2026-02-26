@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export interface BookingFormData {
   guestName: string;
@@ -25,36 +25,32 @@ const INITIAL_DATA: BookingFormData = {
 };
 
 export function useBookingForm() {
-  const [step, setStep] = useState<BookingStep>(() => {
-    if (typeof window !== 'undefined') {
-      const raw = sessionStorage.getItem('aiDiagnosis');
-      if (raw) {
-        try {
-          const diagnosis = JSON.parse(raw);
-          if (diagnosis.fromDiagnosis) return 1; // Skip to Issue step
-        } catch {}
-      }
-    }
-    return 0;
-  });
-  
-  const [formData, setFormData] = useState<BookingFormData>(() => {
-    const data = { ...INITIAL_DATA };
-    if (typeof window !== 'undefined') {
+  const [step, setStep] = useState<BookingStep>(0);
+  const [formData, setFormData] = useState<BookingFormData>(INITIAL_DATA);
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && !isInitialized) {
       const raw = sessionStorage.getItem('aiDiagnosis');
       if (raw) {
         try {
           const diagnosis = JSON.parse(raw);
           if (diagnosis.fromDiagnosis) {
-            data.issueDescription = diagnosis.issueDescription || '';
-            data.urgency = diagnosis.urgency || 'standard';
-            sessionStorage.removeItem('aiDiagnosis'); // Clean up
+            setFormData(prev => ({
+              ...prev,
+              issueDescription: diagnosis.issueDescription || '',
+              urgency: diagnosis.urgency || 'standard'
+            }));
+            setStep(1); // Skip to Issue step
+            sessionStorage.removeItem('aiDiagnosis'); // Clean up so it doesn't happen again on refresh
           }
-        } catch {}
+        } catch (e) {
+          console.error("Failed to parse aiDiagnosis from sessionStorage", e);
+        }
       }
+      setIsInitialized(true);
     }
-    return data;
-  });
+  }, [isInitialized]);
 
   const updateField = <K extends keyof BookingFormData>(key: K, value: BookingFormData[K]) => {
     setFormData((prev) => ({ ...prev, [key]: value }));

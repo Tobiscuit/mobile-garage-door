@@ -106,16 +106,14 @@ export interface Config {
   db: {
     defaultIDType: number;
   };
-  fallbackLocale: null;
+  fallbackLocale: ('false' | 'none' | 'null') | false | null | ('en' | 'es' | 'vi') | ('en' | 'es' | 'vi')[];
   globals: {
-    'site-settings': SiteSetting;
     settings: Setting;
   };
   globalsSelect: {
-    'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
     settings: SettingsSelect<false> | SettingsSelect<true>;
   };
-  locale: null;
+  locale: 'en' | 'es' | 'vi';
   user: User;
   jobs: {
     tasks: unknown;
@@ -401,7 +399,19 @@ export interface Project {
   htmlChallenge?: string | null;
   htmlSolution?: string | null;
   imageStyle: 'garage-pattern-steel' | 'garage-pattern-glass' | 'garage-pattern-carriage' | 'garage-pattern-modern';
-  image?: (number | null) | Media;
+  /**
+   * Upload project photos and provide optional context for the AI Case Study generator. (We recommend at least a Before and After photo)
+   */
+  gallery?:
+    | {
+        image: number | Media;
+        /**
+         * Provide brief context (e.g. "Rusted torsion spring", "New insulated steel door")
+         */
+        caption?: string | null;
+        id?: string | null;
+      }[]
+    | null;
   tags?:
     | {
         tag: string;
@@ -799,7 +809,13 @@ export interface ProjectsSelect<T extends boolean = true> {
   htmlChallenge?: T;
   htmlSolution?: T;
   imageStyle?: T;
-  image?: T;
+  gallery?:
+    | T
+    | {
+        image?: T;
+        caption?: T;
+        id?: T;
+      };
   tags?:
     | T
     | {
@@ -939,9 +955,9 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "site-settings".
+ * via the `definition` "settings".
  */
-export interface SiteSetting {
+export interface Setting {
   id: number;
   companyName: string;
   phone: string;
@@ -982,15 +998,10 @@ export interface SiteSetting {
    * Things the AI should never say
    */
   brandAvoid?: string | null;
-  updatedAt?: string | null;
-  createdAt?: string | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "settings".
- */
-export interface Setting {
-  id: number;
+  /**
+   * Select the color palette used when the dashboard is in Light Mode.
+   */
+  themePreference?: ('candlelight' | 'original') | null;
   warranty?: {
     enableNotifications?: boolean | null;
     /**
@@ -1003,9 +1014,9 @@ export interface Setting {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "site-settings_select".
+ * via the `definition` "settings_select".
  */
-export interface SiteSettingsSelect<T extends boolean = true> {
+export interface SettingsSelect<T extends boolean = true> {
   companyName?: T;
   phone?: T;
   email?: T;
@@ -1030,15 +1041,7 @@ export interface SiteSettingsSelect<T extends boolean = true> {
   brandVoice?: T;
   brandTone?: T;
   brandAvoid?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  globalType?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "settings_select".
- */
-export interface SettingsSelect<T extends boolean = true> {
+  themePreference?: T;
   warranty?:
     | T
     | {

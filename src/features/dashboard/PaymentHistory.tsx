@@ -59,7 +59,7 @@ export function PaymentHistory() {
           <button 
             onClick={handleHardSync}
             disabled={syncing}
-            className="text-xs bg-[#f1c40f]/10 text-[#f1c40f] hover:bg-[#f1c40f]/20 px-3 py-1.5 rounded-md transition-colors disabled:opacity-50 flex items-center gap-2"
+            className="text-xs bg-[var(--staff-accent)]/10 text-[var(--staff-accent)] hover:bg-[var(--staff-accent)]/20 px-3 py-1.5 rounded-md transition-colors disabled:opacity-50 flex items-center gap-2"
           >
              {syncing ? 'Syncing...' : 'Force Sync with Square'}
           </button>

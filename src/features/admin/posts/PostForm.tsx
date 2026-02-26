@@ -118,7 +118,7 @@ export default function PostForm({ action, initialData, buttonLabel }: PostFormP
         {isAiOpen && (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
                 <div className="bg-[var(--staff-surface)] border border-[var(--staff-border)] rounded-2xl p-6 shadow-2xl w-full max-w-md animate-in zoom-in-95 duration-200">
-                    <h3 className="text-xl font-black text-[#f1c40f] mb-4 flex items-center gap-2">
+                    <h3 className="text-xl font-black text-[var(--staff-accent)] mb-4 flex items-center gap-2">
                         <span>✨</span> AI Magic Writer
                     </h3>
                     <div className="mb-4">
@@ -126,7 +126,7 @@ export default function PostForm({ action, initialData, buttonLabel }: PostFormP
                         <textarea 
                             value={aiPrompt}
                             onChange={(e) => setAiPrompt(e.target.value)}
-                            className="w-full bg-[var(--staff-bg)] border border-[var(--staff-border)] rounded-xl p-3 text-[var(--staff-text)] focus:border-[#f1c40f] outline-none min-h-[100px]"
+                            className="w-full bg-[var(--staff-bg)] border border-[var(--staff-border)] rounded-xl p-3 text-[var(--staff-text)] focus:border-[var(--staff-accent)] outline-none min-h-[100px]"
                             placeholder="e.g. Write a guide about how to fix a noisy garage door opener..."
                             autoFocus
                         />
@@ -141,7 +141,7 @@ export default function PostForm({ action, initialData, buttonLabel }: PostFormP
                         <button 
                             onClick={handleAiGenerate}
                             disabled={isAiLoading || !aiPrompt}
-                            className="px-6 py-2 bg-[#f1c40f] hover:bg-[#f39c12] text-[#2c3e50] font-black rounded-lg shadow-lg hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                            className="px-6 py-2 bg-[var(--staff-accent)] hover:opacity-90 text-[var(--staff-surface-alt)] font-black rounded-lg shadow-lg hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                         >
                             {isAiLoading ? (
                                 <>
@@ -193,7 +193,7 @@ export default function PostForm({ action, initialData, buttonLabel }: PostFormP
                       type="text" 
                       defaultValue={initialData?.title}
                       required
-                      className="w-full bg-[var(--staff-bg)] border border-[var(--staff-border)] rounded-xl px-4 py-3 text-[var(--staff-text)] text-xl font-bold focus:outline-none focus:border-[#f1c40f] transition-colors"
+                      className="w-full bg-[var(--staff-bg)] border border-[var(--staff-border)] rounded-xl px-4 py-3 text-[var(--staff-text)] text-xl font-bold focus:outline-none focus:border-[var(--staff-accent)] transition-colors"
                       placeholder="Enter a catchy title..."
                     />
                  </div>
@@ -232,14 +232,14 @@ export default function PostForm({ action, initialData, buttonLabel }: PostFormP
                       name="excerpt"
                       defaultValue={initialData?.excerpt}
                       rows={3}
-                      className="w-full bg-[var(--staff-bg)] border border-[var(--staff-border)] rounded-xl px-4 py-3 text-[var(--staff-text)] focus:outline-none focus:border-[#f1c40f] transition-colors"
+                      className="w-full bg-[var(--staff-bg)] border border-[var(--staff-border)] rounded-xl px-4 py-3 text-[var(--staff-text)] focus:outline-none focus:border-[var(--staff-accent)] transition-colors"
                       placeholder="Brief overview for SEO and previews..."
                     />
                  </div>
             </div>
             
              <div className="bg-[var(--staff-surface)] border border-[var(--staff-border)] rounded-2xl p-8 shadow-xl transition-colors duration-200">
-                 <h3 className="text-lg font-bold text-[#f1c40f] mb-4">Search Optimization</h3>
+                 <h3 className="text-lg font-bold text-[var(--staff-accent)] mb-4">Search Optimization</h3>
                  {/* KEYWORDS */}
                  <div>
                     <label className="block text-xs font-bold text-[var(--staff-muted)] uppercase tracking-wider mb-2">Keywords (Comma Separated)</label>
@@ -248,7 +248,7 @@ export default function PostForm({ action, initialData, buttonLabel }: PostFormP
                       name="keywords"
                       type="text" 
                       defaultValue={getInitialKeywords()}
-                      className="w-full bg-[var(--staff-bg)] border border-[var(--staff-border)] rounded-xl px-4 py-3 text-[var(--staff-text)] focus:outline-none focus:border-[#f1c40f] transition-colors"
+                      className="w-full bg-[var(--staff-bg)] border border-[var(--staff-border)] rounded-xl px-4 py-3 text-[var(--staff-text)] focus:outline-none focus:border-[var(--staff-accent)] transition-colors"
                       placeholder="e.g. garage door repair, new installation, dallas"
                     />
                  </div>
@@ -266,7 +266,7 @@ export default function PostForm({ action, initialData, buttonLabel }: PostFormP
                     <select 
                         name="status"
                         defaultValue={initialData?.status || 'draft'}
-                        className="w-full bg-[var(--staff-bg)] border border-[var(--staff-border)] rounded-xl px-3 py-2 text-[var(--staff-text)] focus:outline-none focus:border-[#f1c40f]"
+                        className="w-full bg-[var(--staff-bg)] border border-[var(--staff-border)] rounded-xl px-3 py-2 text-[var(--staff-text)] focus:outline-none focus:border-[var(--staff-accent)]"
                     >
                         <option value="draft">Draft</option>
                         <option value="published">Published</option>
@@ -280,7 +280,7 @@ export default function PostForm({ action, initialData, buttonLabel }: PostFormP
                         name="publishedAt"
                         type="date"
                         defaultValue={initialData?.publishedAt ? new Date(initialData.publishedAt).toISOString().split('T')[0] : ''}
-                        className="w-full bg-[var(--staff-bg)] border border-[var(--staff-border)] rounded-xl px-3 py-2 text-[var(--staff-text)] focus:outline-none focus:border-[#f1c40f]"
+                        className="w-full bg-[var(--staff-bg)] border border-[var(--staff-border)] rounded-xl px-3 py-2 text-[var(--staff-text)] focus:outline-none focus:border-[var(--staff-accent)]"
                     />
                 </div>
 
@@ -291,7 +291,7 @@ export default function PostForm({ action, initialData, buttonLabel }: PostFormP
                         ref={categoryRef}
                         name="category"
                         defaultValue={initialData?.category || 'repair-tips'}
-                        className="w-full bg-[var(--staff-bg)] border border-[var(--staff-border)] rounded-xl px-3 py-2 text-[var(--staff-text)] focus:outline-none focus:border-[#f1c40f]"
+                        className="w-full bg-[var(--staff-bg)] border border-[var(--staff-border)] rounded-xl px-3 py-2 text-[var(--staff-text)] focus:outline-none focus:border-[var(--staff-accent)]"
                     >
                         <option value="repair-tips">Repair Tips</option>
                         <option value="product-spotlight">Product Spotlight</option>
@@ -305,7 +305,7 @@ export default function PostForm({ action, initialData, buttonLabel }: PostFormP
                 <div className="flex flex-col gap-3">
                      <button 
                         type="submit"
-                        className="w-full py-3 bg-[#f1c40f] text-[#2c3e50] font-bold rounded-xl hover:bg-[#f39c12] hover:scale-105 transition-all shadow-[0_4px_20px_rgba(241,196,15,0.3)]"
+                        className="w-full py-3 bg-[var(--staff-accent)] text-[var(--staff-surface-alt)] font-bold rounded-xl hover:opacity-90 hover:scale-105 transition-all shadow-[0_4px_20px_var(--staff-accent)]"
                     >
                         {isPending ? 'Saving...' : buttonLabel}
                     </button>
@@ -336,7 +336,7 @@ export default function PostForm({ action, initialData, buttonLabel }: PostFormP
                       name="quickNotes"
                       defaultValue={initialData?.quickNotes}
                       rows={4}
-                      className="w-full bg-[var(--staff-bg)] border border-[var(--staff-border)] rounded-xl px-3 py-2 text-[var(--staff-text)] text-sm focus:outline-none focus:border-[#f1c40f] transition-colors resize-none"
+                      className="w-full bg-[var(--staff-bg)] border border-[var(--staff-border)] rounded-xl px-3 py-2 text-[var(--staff-text)] text-sm focus:outline-none focus:border-[var(--staff-accent)] transition-colors resize-none"
                       placeholder="Ideas for AI expansion..."
                     />
                     <button type="button" className="w-full mt-2 py-2 bg-[#8e44ad] text-white text-xs font-bold rounded-lg hover:bg-[#9b59b6] transition-colors flex items-center justify-center gap-2 opacity-50 cursor-not-allowed" title="Coming Soon">

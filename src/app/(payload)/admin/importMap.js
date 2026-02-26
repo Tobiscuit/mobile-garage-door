@@ -24,6 +24,7 @@ import { ItalicFeatureClient as ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0
 import { AIWriter as AIWriter_9c543e75bd084e7f2ee1d78d3bb54b49 } from '../../../../src/features/payload/AIWriter.tsx'
 import { default as default_5ed177eac5969456a82a377ac089b97f } from '../../../../src/features/payload/Icon.tsx'
 import { default as default_8e410a6ac9d02e1e8a5ac2e69f570057 } from '../../../../src/features/payload/Logo.tsx'
+import { S3ClientUploadHandler as S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24 } from '@payloadcms/storage-s3/client'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 
 export const importMap = {
@@ -53,5 +54,6 @@ export const importMap = {
   "/src/features/payload/AIWriter.tsx#AIWriter": AIWriter_9c543e75bd084e7f2ee1d78d3bb54b49,
   "/src/features/payload/Icon.tsx#default": default_5ed177eac5969456a82a377ac089b97f,
   "/src/features/payload/Logo.tsx#default": default_8e410a6ac9d02e1e8a5ac2e69f570057,
+  "@payloadcms/storage-s3/client#S3ClientUploadHandler": S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1
 }

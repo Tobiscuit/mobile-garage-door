@@ -33,7 +33,7 @@ export default function ActiveUsers() {
 
   if (loading) return (
     <div className="backdrop-blur-md rounded-xl p-6 h-full min-h-[200px] flex items-center justify-center" style={{ backgroundColor: 'var(--staff-surface)', border: '1px solid var(--staff-border)' }}>
-        <div className="animate-spin w-8 h-8 border-2 border-[var(--staff-border)] border-t-[#f1c40f] rounded-full"></div>
+        <div className="animate-spin w-8 h-8 border-2 border-[var(--staff-border)] border-t-[var(--staff-accent)] rounded-full"></div>
     </div>
   )
 
@@ -54,7 +54,7 @@ export default function ActiveUsers() {
             return (
                 <div key={user.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-3 rounded-lg transition-colors group gap-2 sm:gap-0" style={{ backgroundColor: 'var(--staff-surface-alt)' }}>
                     <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-gradient-to-br from-[#f1c40f] to-[#f39c12] flex items-center justify-center text-[#2c3e50] font-bold text-sm md:text-lg shadow-lg shrink-0">
+                    <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-gradient-to-br from-[var(--staff-accent)] to-[var(--staff-bg)] flex items-center justify-center text-[var(--staff-surface-alt)] font-bold text-sm md:text-lg shadow-lg shrink-0">
                         {user.email?.charAt(0).toUpperCase() || '?'}
                     </div>
                     <div className="min-w-0">
