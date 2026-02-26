@@ -9,7 +9,7 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
   const payload = await getPayloadClient();
   const t = await getTranslations({ locale, namespace: 'about_page' });
   const settings = await payload.findGlobal({
-    slug: 'site-settings',
+    slug: 'settings',
   });
 
   return (

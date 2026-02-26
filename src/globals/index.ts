@@ -1,1 +1,1 @@
-export { SiteSettings } from './SiteSettings';
+export { Settings } from './Settings';
