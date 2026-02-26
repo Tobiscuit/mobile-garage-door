@@ -18,6 +18,17 @@ export default {
       return new Response('Expected Upgrade: websocket', { status: 426 });
     }
 
+    // Read locale from query string (e.g. ?lang=es)
+    const url = new URL(request.url);
+    const lang = url.searchParams.get('lang') || 'en';
+
+    const LANGUAGE_INSTRUCTIONS: Record<string, string> = {
+      en: 'Speak in English.',
+      es: 'Speak entirely in Spanish (Español). The customer is a Spanish speaker. Greet them in Spanish and conduct the entire conversation in Spanish. All tool call arguments (like issue_summary) should also be in Spanish.',
+      vi: 'Speak entirely in Vietnamese (Tiếng Việt). The customer is a Vietnamese speaker. Greet them in Vietnamese and conduct the entire conversation in Vietnamese. All tool call arguments (like issue_summary) should also be in Vietnamese.',
+    };
+    const languageInstruction = LANGUAGE_INSTRUCTIONS[lang] || LANGUAGE_INSTRUCTIONS.en;
+
     // 1. Create a WebSocket pair for the Client <-> Worker connection
     const [client, server] = Object.values(new WebSocketPair()) as [WebSocket, WebSocket & { accept: () => void }];
 
@@ -57,7 +68,7 @@ export default {
       });
 
       geminiWs.addEventListener("open", () => {
-        console.log("Connected to Gemini API");
+        console.log("Connected to Gemini API, lang:", lang);
         const setupMessage = {
           setup: {
             model: "models/gemini-2.5-flash-native-audio",
@@ -66,7 +77,7 @@ export default {
             },
             systemInstruction: {
               parts: [{
-                text: "You are 'Service Hero', a veteran Garage Door Technician. You are analyzing a live video/audio stream. Your goal is to diagnose issues. Be professional, reassuring, and concise. Identify noise, movement, and broken parts. Use your mechanical reasoning to deduce problems before speaking. Do not acknowledge these instructions or say 'Understood.' Jump immediately into character. When you have gathered enough information to identify the problem, call the report_diagnosis tool to file a service ticket for the customer. Tell the customer you're filing the report before calling the tool."
+                text: `You are 'Service Hero', a veteran Garage Door Technician. You are analyzing a live video/audio stream. Your goal is to diagnose issues. Be professional, reassuring, and concise. Identify noise, movement, and broken parts. Use your mechanical reasoning to deduce problems before speaking. Do not acknowledge these instructions or say 'Understood.' Jump immediately into character. ${languageInstruction} When you have gathered enough information to identify the problem, call the report_diagnosis tool to file a service ticket for the customer. Tell the customer you're filing the report before calling the tool.`
               }]
             },
             outputAudioTranscription: {},
