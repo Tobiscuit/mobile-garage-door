@@ -67,10 +67,10 @@ export async function updateSettings(formData: FormData) {
         stats,
         values,
         brandVoice,
-        brandTone,
-        brandAvoid,
-        themePreference,
-        warranty,
+        brandTone: brandTone as any,
+        brandAvoid: brandAvoid as any,
+        themePreference: themePreference as 'candlelight' | 'original',
+        warranty: warranty as any,
       },
     });
 
