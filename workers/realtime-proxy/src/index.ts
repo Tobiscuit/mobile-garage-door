@@ -71,7 +71,7 @@ export default {
         console.log("Connected to Gemini API, lang:", lang);
         const setupMessage = {
           setup: {
-            model: "models/gemini-live-2.5-flash-native-audio",
+            model: "models/gemini-2.5-flash-native-audio",
             generationConfig: {
               responseModalities: ["AUDIO"],
             },
