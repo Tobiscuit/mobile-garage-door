@@ -2,24 +2,14 @@
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
-
-const UI_STRINGS: Record<string, { initialMessage: string; startButton: string; permissionPrompt: string; heading: string; exitLabel: string }> = {
-  en: { initialMessage: "I'm listening. Point your camera at the garage door.", startButton: 'Start Diagnostic', permissionPrompt: 'I need to <strong>see</strong> and <strong>hear</strong> your garage door.', heading: "Let's see what's wrong.", exitLabel: 'Exit' },
-  es: { initialMessage: 'Estoy escuchando. Apunte la cámara a la puerta del garaje.', startButton: 'Iniciar Diagnóstico', permissionPrompt: 'Necesito <strong>ver</strong> y <strong>escuchar</strong> su puerta de garaje.', heading: 'Veamos qué pasa.', exitLabel: 'Salir' },
-  vi: { initialMessage: 'Tôi đang lắng nghe. Hãy hướng camera vào cửa ga-ra.', startButton: 'Bắt đầu Chẩn đoán', permissionPrompt: 'Tôi cần <strong>nhìn</strong> và <strong>nghe</strong> cửa ga-ra của bạn.', heading: 'Hãy xem có vấn đề gì.', exitLabel: 'Thoát' },
-};
+import { useRouter } from 'next/navigation';
 
 export default function DiagnosePage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const lang = searchParams.get('lang') || 'en';
-  const ui = UI_STRINGS[lang] || UI_STRINGS.en;
-
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [status, setStatus] = useState<'idle' | 'connecting' | 'connected' | 'error'>('idle');
   const [aiState, setAiState] = useState<'listening' | 'thinking' | 'speaking'>('listening');
-  const [aiMessage, setAiMessage] = useState(ui.initialMessage);
+  const [aiMessage, setAiMessage] = useState("I'm listening. Point your camera at the garage door.");
   const [waveformData, setWaveformData] = useState<number[]>(new Array(20).fill(0));
   
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -117,10 +107,9 @@ export default function DiagnosePage() {
   const connectWebSocket = (stream: MediaStream) => {
       setStatus('connecting');
       
-      const baseUrl = window.location.hostname === 'localhost' 
+      const wsUrl = window.location.hostname === 'localhost' 
           ? 'ws://localhost:3001' 
           : 'wss://mobile-garage-door-realtime-proxy.tobiasramzy.workers.dev';
-      const wsUrl = `${baseUrl}?lang=${lang}`;
           
       const ws = new WebSocket(wsUrl);
       wsRef.current = ws;
@@ -133,11 +122,6 @@ export default function DiagnosePage() {
           try {
             const data = JSON.parse(event.data);
 
-            // DEBUG: Log every non-audio message's top-level keys
-            const keys = Object.keys(data);
-            if (!keys.includes('serverContent') || !data.serverContent?.modelTurn?.parts?.some((p: any) => p.inlineData)) {
-              console.log('[WS] Message keys:', keys, JSON.stringify(data).substring(0, 500));
-            }
 
             if (data.setupComplete) {
                 if (!streamsStartedRef.current) {
@@ -384,7 +368,7 @@ export default function DiagnosePage() {
       <div className="absolute top-0 left-0 right-0 p-4 flex justify-between items-center z-20 bg-gradient-to-b from-black/80 to-transparent">
         <Link href="/" className="text-white/80 hover:text-white flex items-center gap-2">
            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-           <span className="text-sm font-bold uppercase tracking-widest">{ui.exitLabel}</span>
+           <span className="text-sm font-bold uppercase tracking-widest">Exit</span>
         </Link>
         <div className={`px-3 py-1 border rounded-full flex items-center gap-2 backdrop-blur-md transition-colors ${
             status === 'connected' ? 'bg-green-600/30 border-green-500/50' : 
@@ -426,13 +410,15 @@ export default function DiagnosePage() {
                      <span className="absolute inset-0 rounded-full animate-ping bg-[#f1c40f]/20"></span>
                      <svg className="w-10 h-10 text-[#f1c40f]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
                 </div>
-                <h1 className="text-3xl font-black mb-4 tracking-tight">{ui.heading}</h1>
-                <p className="text-gray-400 mb-8 text-lg leading-relaxed" dangerouslySetInnerHTML={{ __html: ui.permissionPrompt }} />
+                <h1 className="text-3xl font-black mb-4 tracking-tight">Let's see what's wrong.</h1>
+                <p className="text-gray-400 mb-8 text-lg leading-relaxed">
+                    I need to <strong className="text-white">see</strong> and <strong className="text-white">hear</strong> your garage door.
+                </p>
                 <button 
                     onClick={startCamera}
                     className="w-full py-4 bg-[#f1c40f] hover:bg-yellow-400 text-charcoal-blue font-black text-lg uppercase tracking-widest rounded-xl shadow-[0_0_40px_rgba(241,196,15,0.3)] transition-all transform hover:scale-105"
                 >
-                    {ui.startButton}
+                    Start Diagnostic
                 </button>
             </div>
         ) : (
