@@ -21,18 +21,20 @@ export const FloatingAiButton = () => {
     // Detect locale from pathname (e.g. /es/portfolio → 'es')
     const locale = pathname?.startsWith('/es') ? 'es' : pathname?.startsWith('/vi') ? 'vi' : 'en';
 
+    const diagnoseUrl = `/diagnose?lang=${locale}`;
+
     const handleNavigation = (e: React.MouseEvent) => {
         e.preventDefault();
         setIsNavigating(true);
         // Slight delay to allow animation to play before actual route change
         setTimeout(() => {
-            router.push('/diagnose');
+            router.push(diagnoseUrl);
         }, 300);
     };
 
     return (
         <a 
-            href="/diagnose"
+            href={diagnoseUrl}
             onClick={handleNavigation}
             className={`fixed bottom-6 right-6 z-50 group transition-all duration-500 ease-in-out ${isNavigating ? 'translate-y-24 opacity-0 pointer-events-none' : 'translate-y-0 opacity-100'}`}
         >
