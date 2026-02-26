@@ -121,6 +121,13 @@ export default function DiagnosePage() {
       ws.onmessage = async (event) => {
           try {
             const data = JSON.parse(event.data);
+
+            // DEBUG: Log every non-audio message's top-level keys
+            const keys = Object.keys(data);
+            if (!keys.includes('serverContent') || !data.serverContent?.modelTurn?.parts?.some((p: any) => p.inlineData)) {
+              console.log('[WS] Message keys:', keys, JSON.stringify(data).substring(0, 500));
+            }
+
             if (data.setupComplete) {
                 if (!streamsStartedRef.current) {
                     streamsStartedRef.current = true;
@@ -148,9 +155,11 @@ export default function DiagnosePage() {
                 }
             }
 
-            // 2. Handle Tool Calls from AI (Live API sends this under serverContent.toolCall, not modelTurn)
-            if (data.serverContent?.toolCall?.functionCalls) {
-                for (const call of data.serverContent.toolCall.functionCalls) {
+            // 2. Handle Tool Calls — Gemini Live API sends toolCall at TOP LEVEL of message, not inside serverContent
+            const toolCall = data.toolCall || data.serverContent?.toolCall;
+            if (toolCall?.functionCalls) {
+                console.log('[WS] 🔧 TOOL CALL DETECTED:', JSON.stringify(toolCall));
+                for (const call of toolCall.functionCalls) {
                     if (call.name === 'report_diagnosis') {
                         const args = call.args || {};
                         const hour = new Date().getHours();
@@ -165,13 +174,14 @@ export default function DiagnosePage() {
                             fromDiagnosis: true
                         }));
 
-                        console.log("TOOL CALL RECEIVED, REDIRECTING:", args);
+                        console.log('[WS] ✅ DIAGNOSIS STORED, REDIRECTING in 1.5s:', args);
+                        setAiMessage("Filing your service report... Redirecting you now.");
 
                         setTimeout(() => {
                             wsRef.current?.close();
                             stopMedia();
                             window.location.href = '/book-service';
-                        }, 1500); // Slight delay then hard redirect
+                        }, 1500);
                     }
                 }
             }
