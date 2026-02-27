@@ -77,7 +77,11 @@ export default async function PortalDashboard() {
 
   return (
     <div className="space-y-8">
-      <PortalHeader customerName={customer.companyName || customer.name || ''} isBuilder={isBuilder} />
+      <PortalHeader 
+        customerName={customer.companyName || customer.name || ''} 
+        isBuilder={isBuilder} 
+        isAdmin={['admin', 'technician', 'dispatcher'].includes(customerData.role || '')}
+      />
       
       {isBuilder && (
          <div className="bg-blue-900/10 border border-blue-900/20 rounded-xl p-4 flex items-center justify-between">
