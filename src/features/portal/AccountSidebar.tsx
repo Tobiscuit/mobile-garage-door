@@ -1,3 +1,4 @@
+'use client';
 import React from 'react';
 import { PasskeyManager } from './PasskeyManager';
 
@@ -41,6 +42,17 @@ export function AccountSidebar({ customer }: AccountSidebarProps) {
       </div>
 
       <PasskeyManager />
+
+      <button 
+        onClick={async () => {
+          const { authClient } = await import('@/lib/auth-client');
+          await authClient.signOut();
+          window.location.href = '/';
+        }}
+        className="w-full py-3 rounded-xl border border-red-200 text-red-600 font-bold hover:bg-red-50 hover:text-red-700 transition-colors bg-white shadow-sm"
+      >
+        Sign Out
+      </button>
     </div>
   );
 }
