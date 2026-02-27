@@ -4,14 +4,21 @@ import Link from 'next/link';
 interface PortalHeaderProps {
   customerName: string;
   isBuilder?: boolean;
+  isAdmin?: boolean;
 }
 
-export function PortalHeader({ customerName, isBuilder }: PortalHeaderProps) {
+export function PortalHeader({ customerName, isBuilder, isAdmin }: PortalHeaderProps) {
   return (
     <div className="bg-charcoal-blue text-white rounded-2xl p-8 shadow-xl relative overflow-hidden">
       <div className="relative z-10 flex flex-col md:flex-row justify-between items-center gap-6">
         <div>
-          <h1 className="text-3xl font-black mb-2 flex items-center gap-2">
+          <h1 className="text-3xl font-black mb-2 flex items-center gap-2 flex-wrap">
+            {isAdmin && (
+                 <Link href="/dashboard" className="bg-[#f1c40f]/20 hover:bg-[#f1c40f]/30 text-[#f1c40f] border border-[#f1c40f]/50 text-xs px-3 py-1.5 rounded-full font-bold uppercase tracking-wider mt-1.5 flex items-center gap-1 transition-colors">
+                     <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+                     Admin View
+                 </Link>
+            )}
             {isBuilder && (
                  <span className="bg-golden-yellow text-charcoal-blue text-xs px-2 py-1 rounded font-bold uppercase tracking-wider self-start mt-1.5">Builder</span>
             )}
