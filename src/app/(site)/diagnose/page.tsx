@@ -47,27 +47,35 @@ export default function DiagnosePage() {
     return () => document.removeEventListener('visibilitychange', handler);
   }, []);
 
-  const stopMedia = () => {
-    if (videoRef.current && videoRef.current.srcObject) {
-       const stream = videoRef.current.srcObject as MediaStream;
-       stream.getTracks().forEach(track => {
-           track.stop();
-           track.enabled = false;
-       });
-       videoRef.current.srcObject = null;
+  const stopMedia = useCallback(() => {
+    try {
+        if (videoRef.current && videoRef.current.srcObject) {
+           const stream = videoRef.current.srcObject as MediaStream;
+           stream.getTracks().forEach(track => {
+               track.stop();
+           });
+           videoRef.current.srcObject = null;
+        }
+        if (audioContextRef.current?.state !== 'closed') {
+          audioContextRef.current?.close().catch(e => console.log('Audio close:', e));
+        }
+        if (playbackContextRef.current?.state !== 'closed') {
+          playbackContextRef.current?.close().catch(e => console.log('Playback close:', e));
+        }
+        if (videoIntervalRef.current !== null) {
+          window.clearInterval(videoIntervalRef.current);
+          videoIntervalRef.current = null;
+        }
+        if (animFrameRef.current !== null) {
+          cancelAnimationFrame(animFrameRef.current);
+          animFrameRef.current = null;
+        }
+    } catch (e) {
+        console.error("Error stopping media:", e);
+    } finally {
+        streamsStartedRef.current = false;
     }
-    audioContextRef.current?.close();
-    playbackContextRef.current?.close();
-    if (videoIntervalRef.current !== null) {
-      window.clearInterval(videoIntervalRef.current);
-      videoIntervalRef.current = null;
-    }
-    if (animFrameRef.current !== null) {
-      cancelAnimationFrame(animFrameRef.current);
-      animFrameRef.current = null;
-    }
-    streamsStartedRef.current = false;
-  };
+  }, []);
 
 
 
@@ -121,7 +129,11 @@ export default function DiagnosePage() {
       ws.onmessage = async (event) => {
           try {
             const data = JSON.parse(event.data);
-
+            
+            // DEBUG: Log the full raw message so we can inspect the exact structure Gemini sends
+             if (!data.serverContent?.outputTranscription && !data.serverContent?.modelTurn?.parts?.[0]?.inlineData) {
+                 console.log('[WS RAW PAYLOAD]', JSON.stringify(data, null, 2));
+             }
 
             if (data.setupComplete) {
                 if (!streamsStartedRef.current) {
@@ -132,7 +144,7 @@ export default function DiagnosePage() {
                       clientContent: {
                         turns: [{
                           role: "user",
-                          parts: [{ text: "[The customer has connected and pointed their camera at the garage door. Greet them warmly and begin your visual inspection.]" }]
+                          parts: [{ text: "[The customer has connected and pointed their camera at the garage door. Greet them warmly and begin your visual inspection. When you have enough info to diagnose, call report_diagnosis!]" }]
                         }],
                         turnComplete: true
                       }
@@ -173,9 +185,13 @@ export default function DiagnosePage() {
                         setAiMessage("Filing your service report... Redirecting you now.");
 
                         setTimeout(() => {
-                            wsRef.current?.close();
-                            stopMedia();
-                            window.location.href = '/book-service';
+                            try {
+                                wsRef.current?.close();
+                                stopMedia();
+                            } catch (e) {
+                                console.error("Cleanup error before redirect:", e);
+                            }
+                            router.push('/book-service');
                         }, 1500);
                     }
                 }
