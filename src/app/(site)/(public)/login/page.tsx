@@ -47,7 +47,10 @@ export default function LoginPage() {
               onClick={async () => {
                 setLoading(true);
                 try {
-                  await authClient.signIn.social({ provider: 'google' });
+                  await authClient.signIn.social({ 
+                    provider: 'google',
+                    callbackURL: `${window.location.origin}/app`, 
+                  });
                 } catch {
                   setInfo('Failed to initialize Google login.');
                   setLoading(false);

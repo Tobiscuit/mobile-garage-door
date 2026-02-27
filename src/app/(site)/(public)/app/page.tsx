@@ -15,7 +15,7 @@ export default async function AppEntryPage() {
     redirect('/login');
   }
 
-  const { role, profileComplete } = await provisionUserFromSession(session.user as { email?: string; role?: string } | undefined);
+  const { role, profileComplete } = await provisionUserFromSession(session.user as { email?: string; role?: string; name?: string } | undefined);
 
   if ((role === 'admin' || role === 'technician' || role === 'dispatcher') && !profileComplete) {
     redirect('/profile/complete');
