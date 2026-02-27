@@ -5,6 +5,7 @@ import configPromise from '@payload-config';
 type SessionUser = {
   email?: string;
   role?: string;
+  name?: string;
 };
 
 type AppRole = 'admin' | 'technician' | 'dispatcher' | 'customer';
@@ -71,13 +72,14 @@ export async function provisionUserFromSession(sessionUser?: SessionUser): Promi
 
   if (!existing) {
     const invitedName = composeName(invite?.firstName, invite?.lastName);
+    const defaultName = invitedName || sessionUser?.name;
     const created = await payload.create({
       collection: 'users',
       data: {
         email,
         password: generateBootstrapPassword(),
         role: invite ? invitedRole : 'customer',
-        ...(invitedName ? { name: invitedName } : {}),
+        ...(defaultName ? { name: defaultName } : {}),
       } as any,
     });
 
@@ -102,12 +104,13 @@ export async function provisionUserFromSession(sessionUser?: SessionUser): Promi
 
   if (invite && (existing.role !== 'admin' && existing.role !== 'technician')) {
     const invitedName = composeName(invite.firstName, invite.lastName);
+    const nextName = existing.name || invitedName || sessionUser?.name;
     const updated = await payload.update({
       collection: 'users',
       id: existing.id,
       data: {
         role: invitedRole,
-        ...(!existing.name && invitedName ? { name: invitedName } : {}),
+        ...(nextName && !existing.name ? { name: nextName } : {}),
       } as any,
     });
 
@@ -129,8 +132,19 @@ export async function provisionUserFromSession(sessionUser?: SessionUser): Promi
   }
 
   const role = existing.role || 'customer';
+  let finalName = existing.name;
+
+  if (!existing.name && sessionUser?.name) {
+    await payload.update({
+      collection: 'users',
+      id: existing.id,
+      data: { name: sessionUser.name } as any,
+    });
+    finalName = sessionUser.name;
+  }
+
   return {
     role,
-    profileComplete: isProfileComplete(role, existing.name),
+    profileComplete: isProfileComplete(role, finalName),
   };
 }

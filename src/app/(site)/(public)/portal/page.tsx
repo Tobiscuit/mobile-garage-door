@@ -31,6 +31,15 @@ export default async function PortalDashboard() {
 
   if (customerData) {
     payloadUserId = customerData.id as number;
+    // Auto-update missing name if Google SSO provided one
+    if (!customerData.name && user.name) {
+       await payload.update({
+         collection: 'users',
+         id: payloadUserId,
+         data: { name: user.name }
+       });
+       customerData.name = user.name;
+    }
   } else {
     // 2) Auto-sync fresh Google SSO logins into Payload
     customerData = await payload.create({
