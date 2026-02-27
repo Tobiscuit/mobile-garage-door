@@ -4,11 +4,13 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useTranslations } from 'next-intl';
+import { authClient } from '@/lib/auth-client';
 
 const Header: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
   const t = useTranslations('nav');
+  const { data: session } = authClient.useSession();
 
   // Close menu when route changes (optional optimization)
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -56,8 +58,8 @@ const Header: React.FC = () => {
 
           {/* DESKTOP ACTIONS */}
           <div className="hidden md:flex items-center gap-4">
-            <Link href="/login" className="text-sm font-bold text-golden-yellow hover:text-yellow-300 transition-colors uppercase tracking-wider text-[10px]">
-              {t('login')}
+            <Link href={session ? "/app" : "/login"} className="text-sm font-bold text-golden-yellow hover:text-yellow-300 transition-colors uppercase tracking-wider text-[10px]">
+              {session ? 'DASHBOARD' : t('login')}
             </Link>
           </div>
 
@@ -101,8 +103,8 @@ const Header: React.FC = () => {
             </Link>
           ))}
           <div className="h-px w-20 mx-auto bg-white/10 my-4"></div>
-          <Link href="/login" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-bold text-golden-yellow uppercase tracking-widest">
-            {t('login')}
+          <Link href={session ? "/app" : "/login"} onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-bold text-golden-yellow uppercase tracking-widest">
+            {session ? 'DASHBOARD' : t('login')}
           </Link>
         </div>
       </div>
