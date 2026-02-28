@@ -11,13 +11,22 @@ export const dynamic = 'force-dynamic';
 export default async function TechnicianDashboard() {
   const payload = await getPayload({ config: configPromise });
   const headerList = await headers();
-  const { user } = await payload.auth({ headers: headerList });
-
-  if (!user || (user.role !== 'technician' && user.role !== 'admin')) {
+  const { getSessionSafe } = await import('@/lib/get-session-safe');
+  const { provisionUserFromSession } = await import('@/lib/provision-user-from-session');
+  
+  const session = await getSessionSafe(headerList);
+  if (!session) {
     redirect('/login');
   }
 
-  const assignedJobs = await serviceRequestService.getAssignedRequests(payload, user.id);
+  const user = await provisionUserFromSession(session.user as any);
+
+  if (!user || (user.role !== 'technician' && user.role !== 'admin')) {
+    redirect('/app');
+  }
+
+  const assignedJobs = await serviceRequestService.getAssignedRequests(payload, session.user.id);
+
 
   return (
     <div className="min-h-screen bg-charcoal-blue text-white p-6 md:p-12 font-sans">
