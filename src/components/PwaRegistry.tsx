@@ -35,7 +35,9 @@ export function PwaRegistry() {
       });
 
       navigator.serviceWorker.addEventListener('controllerchange', () => {
-        window.location.reload();
+        // We removed window.location.reload() to stop the infinite loop bug.
+        // The service worker will update gracefully on the next natural navigation.
+        console.log('[PWA] Service worker updated. Changes will apply on next load.');
       });
     }
 
