@@ -42,16 +42,7 @@ const Header: React.FC = () => {
             </span>
           </Link>
 
-          {/* STAFF BACK-NAVIGATION */}
-          {isStaff && isPortal && (
-            <Link 
-              href={getDashboardUrl()} 
-              className="ml-4 hidden sm:flex items-center gap-2 bg-charcoal-blue border border-golden-yellow/50 text-golden-yellow hover:bg-golden-yellow hover:text-charcoal-blue px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest transition-all shadow-[0_0_15px_rgba(241,196,15,0.15)] hover:shadow-[0_0_20px_rgba(241,196,15,0.3)]"
-            >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
-              Return to Dashboard
-            </Link>
-          )}
+
 
           {/* DESKTOP NAV: The "Command Center" */}
           <nav className="hidden md:flex items-center gap-1 bg-white/5 p-1 rounded-full border border-white/10">
@@ -77,7 +68,15 @@ const Header: React.FC = () => {
 
           {/* DESKTOP ACTIONS */}
           <div className="hidden md:flex items-center gap-4">
-            {(!isStaff || !isPortal) && (
+            {isStaff && isPortal ? (
+              <Link 
+                href={getDashboardUrl()} 
+                className="flex items-center gap-1.5 bg-golden-yellow text-charcoal-blue hover:bg-yellow-400 px-5 py-2 rounded-full text-xs font-black uppercase tracking-widest transition-all shadow-[0_0_15px_rgba(241,196,15,0.2)] hover:shadow-[0_0_20px_rgba(241,196,15,0.4)] hover:-translate-x-1"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+                Dashboard
+              </Link>
+            ) : (
               <Link href={session ? getDashboardUrl() : "/login"} className="text-sm font-bold text-golden-yellow hover:text-yellow-300 transition-colors uppercase tracking-wider text-[10px]">
                 {session ? 'DASHBOARD' : t('login')}
               </Link>
