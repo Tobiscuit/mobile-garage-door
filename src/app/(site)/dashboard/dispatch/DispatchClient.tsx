@@ -8,6 +8,7 @@ export function DispatchClient({ jobs, technicians }: { jobs: any[], technicians
     const router = useRouter();
     const [loading, setLoading] = useState<string | null>(null);
     const [selectedTechs, setSelectedTechs] = useState<{[key: string]: string}>({});
+    const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
     const handleAssign = async (jobId: string) => {
         const techId = selectedTechs[jobId];
@@ -109,22 +110,57 @@ export function DispatchClient({ jobs, technicians }: { jobs: any[], technicians
                                             Select Technician
                                         </label>
                                         <div className="relative">
-                                            <select 
-                                                className="w-full rounded-xl px-4 py-4 appearance-none focus:outline-none focus:border-[#f1c40f] focus:ring-1 focus:ring-[#f1c40f] transition-all cursor-pointer"
-                                                style={{ backgroundColor: 'var(--staff-surface)', border: '1px solid var(--staff-border)', color: 'var(--staff-text)' }}
-                                                value={selectedTechs[job.id] || ''}
-                                                onChange={(e) => handleTechSelect(job.id, e.target.value)}
+                                            <button 
+                                                type="button"
+                                                onClick={() => setOpenDropdown(openDropdown === job.id ? null : job.id)}
+                                                className="w-full text-left rounded-xl px-4 py-4 focus:outline-none focus:border-[#f1c40f] focus:ring-1 focus:ring-[#f1c40f] transition-all cursor-pointer flex justify-between items-center"
+                                                style={{ 
+                                                    backgroundColor: 'var(--staff-surface)', 
+                                                    border: `1px solid ${openDropdown === job.id ? '#f1c40f' : 'var(--staff-border)'}`, 
+                                                    color: selectedTechs[job.id] ? 'var(--staff-text)' : 'var(--staff-muted)' 
+                                                }}
                                             >
-                                                <option value="" style={{ color: 'var(--staff-muted)' }}>Choose available tech...</option>
-                                                {technicians.map(tech => (
-                                                    <option key={tech.id} value={tech.id}>
-                                                        {tech.name} {tech.pushSubscription ? '🟢' : '⚪'}
-                                                    </option>
-                                                ))}
-                                            </select>
-                                            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4" style={{ color: 'var(--staff-muted)' }}>
-                                                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
-                                            </div>
+                                                <span>
+                                                    {selectedTechs[job.id] 
+                                                        ? technicians.find(t => t.id === selectedTechs[job.id])?.name 
+                                                        : 'Choose available tech...'}
+                                                </span>
+                                                <svg className={`h-4 w-4 transition-transform duration-200 ${openDropdown === job.id ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+                                            </button>
+
+                                            {openDropdown === job.id && (
+                                                <div 
+                                                    className="absolute z-20 w-full mt-2 rounded-xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2"
+                                                    style={{ backgroundColor: 'var(--staff-surface)', border: '1px solid var(--staff-border)' }}
+                                                >
+                                                    <div className="max-h-60 overflow-y-auto">
+                                                        {technicians.map(tech => (
+                                                            <button
+                                                                key={tech.id}
+                                                                type="button"
+                                                                onClick={() => {
+                                                                    handleTechSelect(job.id, tech.id);
+                                                                    setOpenDropdown(null);
+                                                                }}
+                                                                className="w-full text-left px-4 py-3 flex items-center justify-between transition-colors hover:bg-white/5"
+                                                                style={{ 
+                                                                    color: 'var(--staff-text)',
+                                                                    borderBottom: '1px solid var(--staff-border)'
+                                                                }}
+                                                            >
+                                                                <span className="font-medium">{tech.name}</span>
+                                                                <span className="text-xs flex items-center gap-1.5" style={{ color: 'var(--staff-muted)' }}>
+                                                                    {tech.pushSubscription ? (
+                                                                        <><span className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]"></span> Online</>
+                                                                    ) : (
+                                                                        <><span className="w-2 h-2 rounded-full bg-gray-500"></span> Offline</>
+                                                                    )}
+                                                                </span>
+                                                            </button>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
 
