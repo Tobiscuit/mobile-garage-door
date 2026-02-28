@@ -12,7 +12,7 @@ const Logo: React.FC = () => {
       fontSize: '20px',
       fontWeight: '800',
       letterSpacing: '-0.02em',
-      color: '#f7f9fb'
+      color: 'var(--staff-text)'
     }}>
       <div style={{ width: '32px', height: '32px', flexShrink: 0 }}>
         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: '100%', height: '100%' }}>
