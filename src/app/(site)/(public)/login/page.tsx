@@ -6,26 +6,41 @@ import { authClient } from '@/lib/auth-client';
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
+  const [isSignUp, setIsSignUp] = useState(false);
   const [info, setInfo] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setInfo('');
 
     try {
-      const { error } = await authClient.signIn.email({
-        email,
-        password,
-      });
-      if (error) {
-        setInfo(error.message || 'Login failed. Please check your credentials.');
+      if (isSignUp) {
+        const { error } = await authClient.signUp.email({
+          email,
+          password,
+          name,
+        });
+        if (error) {
+          setInfo(error.message || 'Sign up failed. Please check your details.');
+        } else {
+          window.location.href = '/app';
+        }
       } else {
-        window.location.href = '/app';
+        const { error } = await authClient.signIn.email({
+          email,
+          password,
+        });
+        if (error) {
+          setInfo(error.message || 'Login failed. Please check your credentials.');
+        } else {
+          window.location.href = '/app';
+        }
       }
     } catch {
-      setInfo('An unexpected error occurred during login.');
+      setInfo('An unexpected error occurred.');
     } finally {
       setLoading(false);
     }
@@ -77,11 +92,27 @@ export default function LoginPage() {
                 <div className="w-full border-t border-gray-200"></div>
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-400 font-bold uppercase tracking-widest">Or Use Email</span>
+                <span className="px-2 bg-white text-gray-400 font-bold uppercase tracking-widest">
+                  {isSignUp ? 'Or Create Account' : 'Or Use Email'}
+                </span>
               </div>
             </div>
 
-            <form onSubmit={handleLogin} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {isSignUp && (
+                <div>
+                  <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Full Name</label>
+                  <input 
+                    type="text" 
+                    required={isSignUp}
+                    className="w-full bg-white border border-gray-200 rounded-lg p-4 font-medium text-black focus:ring-2 focus:ring-[#f1c40f] focus:border-transparent outline-none transition-all"
+                    style={{ color: '#000000', backgroundColor: '#ffffff' }}
+                    placeholder="John Doe"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                  />
+                </div>
+              )}
               <div>
                 <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Email Address</label>
                 <input 
@@ -119,14 +150,27 @@ export default function LoginPage() {
                           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                       </svg>
-                  ) : 'SIGN IN WITH PASSWORD'}
+                  ) : (isSignUp ? 'CREATE ACCOUNT' : 'SIGN IN WITH PASSWORD')}
                 </button>
               </div>
             </form>
 
             <div className="mt-8 text-center text-sm text-gray-500" style={{lineHeight: '1.6'}}>
-              By continuing, you verify that you are an authorized user of this portal.<br/> 
-              <strong>New customers:</strong> Please <a href="/" className="text-charcoal-blue hover:underline font-bold">contact us</a> to request an account.
+              {isSignUp ? (
+                <>
+                  Already have an account?{' '}
+                  <button type="button" onClick={() => { setIsSignUp(false); setInfo(''); }} className="text-charcoal-blue hover:underline font-bold">
+                    Sign in here
+                  </button>
+                </>
+              ) : (
+                <>
+                  Don't have an account?{' '}
+                  <button type="button" onClick={() => { setIsSignUp(true); setInfo(''); }} className="text-charcoal-blue hover:underline font-bold">
+                    Create one here
+                  </button>
+                </>
+              )}
             </div>
           </div>
         </div>
