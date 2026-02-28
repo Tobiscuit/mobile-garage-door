@@ -104,5 +104,27 @@ export const Users: CollectionConfig = {
       },
     },
   ],
-  // Removed afterLogin hook to prevent Postgres transaction timeouts during native login
-}
+  hooks: {
+    afterChange: [
+      async ({ doc, previousDoc }) => {
+        // Sync role and name to BetterAuth whenever Payload user is modified
+        if (doc.role !== previousDoc?.role || doc.name !== previousDoc?.name) {
+          try {
+            const { db: authDb } = await import('@/lib/auth');
+            const { user: authUserTable } = await import('@/lib/auth-schema');
+            const { eq } = await import('drizzle-orm');
+            
+            await authDb.update(authUserTable)
+              .set({ 
+                role: doc.role,
+                ...(doc.name && doc.name !== 'Admin' ? { name: doc.name } : {}) 
+              })
+              .where(eq(authUserTable.email, doc.email));
+          } catch (e) {
+            console.error('[Users] Failed to sync Payload user to BetterAuth:', e);
+          }
+        }
+      }
+    ]
+  }
+};
