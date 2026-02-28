@@ -31,14 +31,20 @@ export default async function PortalDashboard() {
 
   if (customerData) {
     payloadUserId = customerData.id as number;
-    // Auto-update missing name if Google SSO provided one
-    if (!customerData.name && user.name) {
+    // Auto-update missing name (or legacy "Admin" placeholder) if Google SSO provided one
+    if ((!customerData.name || customerData.name === 'Admin') && user.name && user.name !== 'Admin') {
        await payload.update({
          collection: 'users',
          id: payloadUserId,
          data: { name: user.name }
        });
        customerData.name = user.name;
+       
+       // Force sync to better-auth DB as well to overwrite the old 'Admin' alias
+       const { db: authDb } = await import('@/lib/auth');
+       const { user: authUserTable } = await import('@/lib/auth-schema');
+       const { eq } = await import('drizzle-orm');
+       await authDb.update(authUserTable).set({ name: user.name }).where(eq(authUserTable.email, user.email));
     }
   } else {
     // 2) Auto-sync fresh Google SSO logins into Payload
