@@ -1,35 +1,39 @@
-import { SESClient, SendEmailCommand } from '@aws-sdk/client-ses';
+// import { SESClient, SendEmailCommand } from '@aws-sdk/client-ses';
 import nodemailer from 'nodemailer';
-import * as aws from '@aws-sdk/client-ses';
+// import * as aws from '@aws-sdk/client-ses';
 
-const region = process.env.AWS_REGION || 'us-east-1';
-const accessKeyId = process.env.AWS_ACCESS_KEY_ID;
-const secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY;
+// const region = process.env.AWS_REGION || 'us-east-1';
+// const accessKeyId = process.env.AWS_ACCESS_KEY_ID;
+// const secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY;
 
-// Check if credentials are configured
-const isConfigured = accessKeyId && secretAccessKey;
+// // Check if credentials are configured
+// const isConfigured = accessKeyId && secretAccessKey;
 
-if (!isConfigured) {
-  console.warn('AWS SES credentials not found. Email sending will be disabled or logged only.');
-}
+// if (!isConfigured) {
+//   console.warn('AWS SES credentials not found. Email sending will be disabled or logged only.');
+// }
 
-// 1. Raw SES Client for BetterAuth (lightweight, no nodemailer overhead needed if just sending simple links)
-export const sesClient = new SESClient({
-  region,
-  credentials: {
-    accessKeyId: accessKeyId || '',
-    secretAccessKey: secretAccessKey || '',
-  },
+// // 1. Raw SES Client for BetterAuth (lightweight, no nodemailer overhead needed if just sending simple links)
+// export const sesClient = new SESClient({
+//   region,
+//   credentials: {
+//     accessKeyId: accessKeyId || '',
+//     secretAccessKey: secretAccessKey || '',
+//   },
+// });
+
+// // 2. Nodemailer Transport for PayloadCMS (Payload expects a nodemailer transport)
+// export const emailTransport = isConfigured
+//   ? nodemailer.createTransport({
+//       SES: { ses: sesClient, aws },
+//     } as any)
+//   : nodemailer.createTransport({
+//       jsonTransport: true,
+//     });
+
+export const emailTransport = nodemailer.createTransport({
+  jsonTransport: true,
 });
-
-// 2. Nodemailer Transport for PayloadCMS (Payload expects a nodemailer transport)
-export const emailTransport = isConfigured
-  ? nodemailer.createTransport({
-      SES: { ses: sesClient, aws },
-    } as any)
-  : nodemailer.createTransport({
-      jsonTransport: true,
-    });
 
 export const sendEmail = async ({
   to,
@@ -44,6 +48,15 @@ export const sendEmail = async ({
   text?: string;
   from?: string;
 }) => {
+  // Production SES is currently disabled. 
+  // All emails will be intercepted and logged to the console here.
+  console.log(`\n📧 [INTERCEPTED EMAIL]`);
+  console.log(`To: ${to}`);
+  console.log(`Subject: ${subject}`);
+  console.log(`Body:\n${text || 'HTML Content'}\n`);
+  return { MessageId: 'mock-id' };
+
+  /* 
   if (!isConfigured) {
     console.log(`[Mock Email] To: ${to}, Subject: ${subject}`);
     return;
@@ -74,4 +87,5 @@ export const sendEmail = async ({
     console.error('Error sending email via SES:', error);
     throw error;
   }
+  */
 };
