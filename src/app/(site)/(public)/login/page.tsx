@@ -18,10 +18,11 @@ export default function LoginPage() {
       const { error } = await authClient.signIn.email({
         email,
         password,
-        callbackURL: `${window.location.origin}/app`,
       });
       if (error) {
         setInfo(error.message || 'Login failed. Please check your credentials.');
+      } else {
+        window.location.href = '/app';
       }
     } catch {
       setInfo('An unexpected error occurred during login.');

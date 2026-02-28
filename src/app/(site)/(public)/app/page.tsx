@@ -22,7 +22,7 @@ export default async function AppEntryPage() {
   }
 
   if (role === 'admin' || role === 'dispatcher') {
-    redirect('/dashboard/dispatch');
+    redirect('/dashboard');
   }
   if (role === 'technician') {
     redirect('/dashboard/technician');
