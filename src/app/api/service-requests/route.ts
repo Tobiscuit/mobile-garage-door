@@ -13,9 +13,15 @@ export async function POST(req: NextRequest) {
   try {
     const payload = await getPayload({ config: configPromise });
     const { getSessionSafe } = await import('@/lib/get-session-safe');
+    const { provisionUserFromSession } = await import('@/lib/provision-user-from-session');
     const session = await getSessionSafe(req.headers);
-    const user = session?.user;
-    let customerId = user?.id;
+    
+    let user = null;
+    let customerId;
+    if (session) {
+      user = await provisionUserFromSession(session.user as any);
+      customerId = user.id;
+    }
 
     // API Key Auth for Server-to-Server (e.g., AWS Lambda)
     const apiKey = req.headers.get('x-api-key');

@@ -10,12 +10,14 @@ export async function savePushSubscription(subscription: any) {
         const headersList = await headers();
         const { getSessionSafe } = await import('@/lib/get-session-safe');
         const session = await getSessionSafe(headersList);
-        const user = session?.user;
-
-        if (!user) {
+        
+        if (!session?.user) {
             console.error('No authenticated user found for subscription');
             return { success: false, error: 'Unauthorized' };
         }
+
+        const { provisionUserFromSession } = await import('@/lib/provision-user-from-session');
+        const user = await provisionUserFromSession(session.user as any);
 
         await payload.update({
             collection: 'users',
@@ -38,11 +40,13 @@ export async function getAvailableJobs() {
         const headersList = await headers();
         const { getSessionSafe } = await import('@/lib/get-session-safe');
         const session = await getSessionSafe(headersList);
-        const user = session?.user;
 
-        if (!user) {
+        if (!session?.user) {
              return [];
         }
+
+        const { provisionUserFromSession } = await import('@/lib/provision-user-from-session');
+        const user = await provisionUserFromSession(session.user as any);
 
         // Fetch jobs assigned to "me" (the logged in technician)
         // OR jobs that are 'confirmed' (waiting for assignment) IF we want a hybrid model
