@@ -70,3 +70,37 @@ export async function getUsers() {
 
   return results.docs;
 }
+
+export async function getUserById(id: string | number) {
+  const payload = await getPayload({ config: configPromise });
+  
+  try {
+    const user = await payload.findByID({
+      collection: 'users',
+      id: typeof id === 'string' ? parseInt(id, 10) : id,
+      depth: 1,
+    });
+    return user;
+  } catch (error) {
+    console.error('Failed to get user by id:', error);
+    return null;
+  }
+}
+export async function updateUser(id: string | number, data: any) {
+  const payload = await getPayload({ config: configPromise });
+  
+  try {
+    const updatedUser = await payload.update({
+      collection: 'users',
+      id: typeof id === 'string' ? parseInt(id, 10) : id,
+      data,
+    });
+    revalidatePath(`/dashboard/users/${id}`);
+    revalidatePath('/dashboard/users');
+    return { success: true, user: updatedUser };
+  } catch (error) {
+    console.error('Failed to update user:', error);
+    return { success: false, error: 'Failed to update user' };
+  }
+}
+
