@@ -127,10 +127,20 @@ const Sidebar: React.FC = () => {
             <div className="mb-3">
                 <ThemeToggle />
             </div>
-            <Link href="/dashboard/logout" className="flex items-center gap-3 px-4 py-3 text-red-400 hover:bg-red-500/10 rounded-lg transition-all group">
+            <button onClick={async (e) => {
+              e.preventDefault();
+              try {
+                const { authClient } = await import('@/lib/auth-client');
+                await authClient.signOut();
+                window.location.href = '/login';
+              } catch (err) {
+                console.error(err);
+                window.location.href = '/login';
+              }
+            }} className="flex w-full items-center gap-3 px-4 py-3 text-red-400 hover:bg-red-500/10 rounded-lg transition-all group text-left">
                 <LogoutIcon />
                 <span className="font-bold group-hover:text-red-300">Log Out</span>
-            </Link>
+            </button>
              <div className="mt-4 px-4 text-[10px] font-mono text-center" style={{ color: 'var(--staff-muted)' }}>
                 Mobil Garage v2.0
             </div>
