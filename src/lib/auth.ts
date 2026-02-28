@@ -46,6 +46,14 @@ export const auth = betterAuth({
         provider: 'pg',
         schema: authSchema,
       }),
+  user: {
+    additionalFields: {
+      role: {
+        type: "string",
+        required: false,
+      },
+    },
+  },
   emailAndPassword: {
     enabled: true,
   },
