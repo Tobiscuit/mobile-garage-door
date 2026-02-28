@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload';
 import { autoTranslateHook } from '../hooks/auto-translate';
 
+
 export const Services: CollectionConfig = {
   slug: 'services',
   admin: {

@@ -11,8 +11,10 @@ type SessionUser = {
 type AppRole = 'admin' | 'technician' | 'dispatcher' | 'customer';
 
 export type ProvisionedUser = {
+  id?: string | number;
   role: AppRole;
   profileComplete: boolean;
+  name?: string | null;
 };
 
 function generateBootstrapPassword() {
@@ -33,7 +35,7 @@ function isProfileComplete(role: AppRole, name?: string | null) {
 export async function provisionUserFromSession(sessionUser?: SessionUser): Promise<ProvisionedUser> {
   const email = String(sessionUser?.email || '').toLowerCase().trim();
   if (!email) {
-    return { role: 'customer', profileComplete: true };
+    return { role: 'customer', profileComplete: true, name: sessionUser?.name };
   }
 
   const payload = await getPayload({ config: configPromise });
@@ -97,8 +99,10 @@ export async function provisionUserFromSession(sessionUser?: SessionUser): Promi
     const createdRole = (created as { role?: AppRole }).role || (invite ? invitedRole : 'customer');
     const createdName = (created as { name?: string | null }).name || invitedName;
     return {
+      id: (created as any).id,
       role: createdRole,
       profileComplete: isProfileComplete(createdRole, createdName),
+      name: createdName,
     };
   }
 
@@ -126,8 +130,10 @@ export async function provisionUserFromSession(sessionUser?: SessionUser): Promi
     const updatedRole = (updated as { role?: AppRole }).role || invitedRole;
     const updatedName = (updated as { name?: string | null }).name || existing.name || invitedName;
     return {
+      id: existing.id,
       role: updatedRole,
       profileComplete: isProfileComplete(updatedRole, updatedName),
+      name: updatedName,
     };
   }
 
@@ -144,7 +150,9 @@ export async function provisionUserFromSession(sessionUser?: SessionUser): Promi
   }
 
   return {
+    id: existing.id,
     role,
     profileComplete: isProfileComplete(role, finalName),
+    name: finalName,
   };
 }

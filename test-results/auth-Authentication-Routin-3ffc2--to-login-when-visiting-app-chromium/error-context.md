@@ -1,0 +1,120 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - link "MOBILGARAGE" [ref=e5] [cursor=pointer]:
+          - /url: /
+          - img [ref=e7]
+          - generic [ref=e9]: MOBILGARAGE
+        - navigation [ref=e10]:
+          - link "Services" [ref=e11] [cursor=pointer]:
+            - /url: /services
+          - link "Portfolio" [ref=e12] [cursor=pointer]:
+            - /url: /portfolio
+          - link "Blog" [ref=e13] [cursor=pointer]:
+            - /url: /blog
+          - link "About" [ref=e14] [cursor=pointer]:
+            - /url: /about
+        - link "Portal Login" [ref=e16] [cursor=pointer]:
+          - /url: /login
+        - button "Toggle menu" [ref=e17]:
+          - img
+    - generic [ref=e20]:
+      - link "Services" [ref=e21] [cursor=pointer]:
+        - /url: /services
+      - link "Portfolio" [ref=e22] [cursor=pointer]:
+        - /url: /portfolio
+      - link "Blog" [ref=e23] [cursor=pointer]:
+        - /url: /blog
+      - link "About" [ref=e24] [cursor=pointer]:
+        - /url: /about
+      - link "Portal Login" [ref=e25] [cursor=pointer]:
+        - /url: /login
+    - main [ref=e26]:
+      - main [ref=e29]:
+        - generic [ref=e30]:
+          - generic [ref=e31]:
+            - heading "My Garage Portal" [level=1] [ref=e32]
+            - paragraph [ref=e33]: Customers, builders, and staff all sign in here.
+          - generic [ref=e34]:
+            - button "CONTINUE WITH GOOGLE" [ref=e35]:
+              - img [ref=e36]
+              - text: CONTINUE WITH GOOGLE
+            - generic [ref=e42]: Or Use Email
+            - generic [ref=e43]:
+              - generic [ref=e44]:
+                - text: Email Address
+                - textbox "name@example.com" [ref=e45]
+              - button "CONTINUE WITH MAGIC LINK" [ref=e46]
+            - generic [ref=e47]: No password required. We will email a secure one-time sign-in link.
+    - contentinfo [ref=e48]:
+      - generic [ref=e49]:
+        - generic [ref=e50]:
+          - generic [ref=e51]:
+            - heading "MOBILGARAGE" [level=3] [ref=e52]
+            - paragraph [ref=e53]: The premier automated access solution for residential builders and discerning homeowners.
+            - generic [ref=e54]:
+              - generic [ref=e55]: IG
+              - generic [ref=e56]: LN
+          - generic [ref=e57]:
+            - heading "Deployment Zones" [level=4] [ref=e58]
+            - list [ref=e59]:
+              - listitem [ref=e60]:
+                - link "Greater Katy & West Houston" [ref=e61] [cursor=pointer]:
+                  - /url: "#"
+              - listitem [ref=e62]:
+                - link "The Woodlands & North Houston" [ref=e63] [cursor=pointer]:
+                  - /url: "#"
+              - listitem [ref=e64]:
+                - link "Sugar Land & Richmond" [ref=e65] [cursor=pointer]:
+                  - /url: "#"
+              - listitem [ref=e66]:
+                - link "Houston Interior & Heights" [ref=e67] [cursor=pointer]:
+                  - /url: "#"
+          - generic [ref=e68]:
+            - heading "Client Support" [level=4] [ref=e69]
+            - list [ref=e70]:
+              - listitem [ref=e71]:
+                - link "Submit Warranty Claim" [ref=e72] [cursor=pointer]:
+                  - /url: /contact
+              - listitem [ref=e73]:
+                - link "Builder Portal" [ref=e74] [cursor=pointer]:
+                  - /url: /login
+              - listitem [ref=e75]:
+                - link "Emergency Callback Request" [ref=e76] [cursor=pointer]:
+                  - /url: /contact?type=repair
+              - listitem [ref=e77]:
+                - link "SLA Documentation" [ref=e78] [cursor=pointer]:
+                  - /url: "#"
+          - generic [ref=e79]:
+            - heading "Official Data" [level=4] [ref=e80]
+            - generic [ref=e81]:
+              - generic [ref=e82]:
+                - generic [ref=e83]: State License
+                - generic [ref=e84]: "#9942-B-RES"
+              - generic [ref=e85]:
+                - generic [ref=e86]: Insurance
+                - generic [ref=e87]: Liberty Mutual • $2M Agg
+              - generic [ref=e88]:
+                - generic [ref=e89]: HQ Dispatch
+                - generic [ref=e90]:
+                  - text: Rapid Response Unit
+                  - text: Houston & Surrounding Areas
+        - generic [ref=e91]:
+          - paragraph [ref=e92]: © 2026 Mobil Garage Door. All rights reserved.
+          - generic [ref=e93]:
+            - link "Privacy Policy" [ref=e94] [cursor=pointer]:
+              - /url: /privacy
+            - link "Terms of Service" [ref=e95] [cursor=pointer]:
+              - /url: "#"
+            - link "Sitemap" [ref=e96] [cursor=pointer]:
+              - /url: "#"
+          - generic [ref=e97]: SYSTEMS OPERATIONAL
+  - link "Service Hero" [ref=e98] [cursor=pointer]:
+    - /url: /diagnose
+    - img [ref=e100]
+    - generic [ref=e102]: Service Hero
+```
