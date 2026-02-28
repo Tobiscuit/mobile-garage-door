@@ -21,7 +21,7 @@ export async function savePushSubscription(subscription: any) {
 
         await payload.update({
             collection: 'users',
-            id: user.id,
+            id: user.id!,
             data: {
                 pushSubscription: subscription
             } as any
@@ -58,7 +58,7 @@ export async function getAvailableJobs() {
                 and: [
                     {
                         assignedTech: {
-                            equals: user.id
+                            equals: user.id!
                         }
                     },
                     {
