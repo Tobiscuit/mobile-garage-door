@@ -12,10 +12,18 @@ const Header: React.FC = () => {
   const t = useTranslations('nav');
   const { data: session } = authClient.useSession();
 
-  // Close menu when route changes (optional optimization)
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
 
   const isActive = (path: string) => pathname === path || pathname.endsWith(path);
+  
+  const role = (session?.user as any)?.role;
+  const isStaff = role === 'admin' || role === 'dispatcher' || role === 'technician';
+  const isPortal = pathname.startsWith('/portal');
+
+  const getDashboardUrl = () => {
+    if (role === 'technician') return '/dashboard/technician';
+    return '/dashboard'; // Admin & Dispatcher
+  };
 
   return (
     <>
@@ -33,6 +41,17 @@ const Header: React.FC = () => {
               MOBIL<span className="text-gray-300 font-light">GARAGE</span>
             </span>
           </Link>
+
+          {/* STAFF BACK-NAVIGATION */}
+          {isStaff && isPortal && (
+            <Link 
+              href={getDashboardUrl()} 
+              className="ml-4 hidden sm:flex items-center gap-2 bg-charcoal-blue border border-golden-yellow/50 text-golden-yellow hover:bg-golden-yellow hover:text-charcoal-blue px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest transition-all shadow-[0_0_15px_rgba(241,196,15,0.15)] hover:shadow-[0_0_20px_rgba(241,196,15,0.3)]"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+              Return to Dashboard
+            </Link>
+          )}
 
           {/* DESKTOP NAV: The "Command Center" */}
           <nav className="hidden md:flex items-center gap-1 bg-white/5 p-1 rounded-full border border-white/10">
@@ -58,9 +77,11 @@ const Header: React.FC = () => {
 
           {/* DESKTOP ACTIONS */}
           <div className="hidden md:flex items-center gap-4">
-            <Link href={session ? "/app" : "/login"} className="text-sm font-bold text-golden-yellow hover:text-yellow-300 transition-colors uppercase tracking-wider text-[10px]">
-              {session ? 'DASHBOARD' : t('login')}
-            </Link>
+            {(!isStaff || !isPortal) && (
+              <Link href={session ? getDashboardUrl() : "/login"} className="text-sm font-bold text-golden-yellow hover:text-yellow-300 transition-colors uppercase tracking-wider text-[10px]">
+                {session ? 'DASHBOARD' : t('login')}
+              </Link>
+            )}
           </div>
 
           {/* MOBILE TOGGLE */}
@@ -103,9 +124,11 @@ const Header: React.FC = () => {
             </Link>
           ))}
           <div className="h-px w-20 mx-auto bg-white/10 my-4"></div>
-          <Link href={session ? "/app" : "/login"} onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-bold text-golden-yellow uppercase tracking-widest">
-            {session ? 'DASHBOARD' : t('login')}
-          </Link>
+          {(!isStaff || !isPortal) && (
+            <Link href={session ? getDashboardUrl() : "/login"} onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-bold text-golden-yellow uppercase tracking-widest">
+              {session ? 'DASHBOARD' : t('login')}
+            </Link>
+          )}
         </div>
       </div>
     </>
