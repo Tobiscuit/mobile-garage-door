@@ -8,7 +8,9 @@ export async function savePushSubscription(subscription: any) {
     try {
         const payload = await getPayload({ config: configPromise });
         const headersList = await headers();
-        const { user } = await payload.auth({ headers: headersList });
+        const { getSessionSafe } = await import('@/lib/get-session-safe');
+        const session = await getSessionSafe(headersList);
+        const user = session?.user;
 
         if (!user) {
             console.error('No authenticated user found for subscription');
@@ -34,7 +36,9 @@ export async function getAvailableJobs() {
     try {
         const payload = await getPayload({ config: configPromise });
         const headersList = await headers();
-        const { user } = await payload.auth({ headers: headersList });
+        const { getSessionSafe } = await import('@/lib/get-session-safe');
+        const session = await getSessionSafe(headersList);
+        const user = session?.user;
 
         if (!user) {
              return [];

@@ -67,3 +67,4 @@ dev_server.log
 
 # BetterAuth Secrets
 .secrets/
+admin-credentials.txt

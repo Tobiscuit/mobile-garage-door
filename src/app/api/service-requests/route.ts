@@ -12,7 +12,9 @@ const squareClient = new Client({
 export async function POST(req: NextRequest) {
   try {
     const payload = await getPayload({ config: configPromise });
-    const { user } = await payload.auth({ headers: req.headers });
+    const { getSessionSafe } = await import('@/lib/get-session-safe');
+    const session = await getSessionSafe(req.headers);
+    const user = session?.user;
     let customerId = user?.id;
 
     // API Key Auth for Server-to-Server (e.g., AWS Lambda)

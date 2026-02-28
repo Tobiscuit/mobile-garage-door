@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload';
-import { generateHtmlToLexicalHook } from '../lib/payload/rich-text-adapter';
 import { autoTranslateHook } from '../hooks/auto-translate';
+import { generateHtmlToLexicalHook } from '../lib/payload/rich-text-adapter';
+
 
 export const Projects: CollectionConfig = {
   slug: 'projects',
