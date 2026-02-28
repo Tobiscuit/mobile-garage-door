@@ -8,6 +8,8 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [step, setStep] = useState<'email' | 'methods' | 'password' | 'signup'>('email');
+  const [info, setInfo] = useState('');
+  const [loading, setLoading] = useState(false);
   
   const handleEmailNext = (e: React.FormEvent) => {
     e.preventDefault();
