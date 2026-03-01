@@ -11,6 +11,7 @@ import * as migration_20260223_161338 from './20260223_161338';
 import * as migration_20260224_202811_enable_i18n_localization from './20260224_202811_enable_i18n_localization';
 import * as migration_20260225_212643_add_vi_locale from './20260225_212643_add_vi_locale';
 import * as migration_20260301_062600_drop_legacy_ba_tables from './20260301_062600_drop_legacy_ba_tables';
+import * as migration_20260301_064500_fix_payload_auth_schema from './20260301_064500_fix_payload_auth_schema';
 
 export const migrations = [
   {
@@ -77,5 +78,10 @@ export const migrations = [
     up: migration_20260301_062600_drop_legacy_ba_tables.up,
     down: migration_20260301_062600_drop_legacy_ba_tables.down,
     name: '20260301_062600_drop_legacy_ba_tables',
+  },
+  {
+    up: migration_20260301_064500_fix_payload_auth_schema.up,
+    down: migration_20260301_064500_fix_payload_auth_schema.down,
+    name: '20260301_064500_fix_payload_auth_schema',
   },
 ];
