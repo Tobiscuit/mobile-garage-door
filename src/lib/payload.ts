@@ -1,21 +1,14 @@
-import { getPayload } from 'payload'
-import config from '../payload.config'
-import type { Payload } from 'payload'
+import configPromise from '@payload-config';
+import { getPayloadAuth } from 'payload-auth/better-auth';
 
-let cachedPayload: Payload | null = null
+// This safely caches and returns Payload wrapped with the BetterAuth instance seamlessly.
+let cachedPayload: any = null;
 
-export const getPayloadClient = async (): Promise<Payload> => {
-  if (!process.env.PAYLOAD_SECRET) {
-    throw new Error('PAYLOAD_SECRET is missing')
-  }
+export const getPayload = async () => {
+    if (cachedPayload) return cachedPayload;
+    cachedPayload = await getPayloadAuth(configPromise);
+    return cachedPayload;
+};
 
-  if (cachedPayload) {
-    return cachedPayload
-  }
-
-  cachedPayload = await getPayload({
-    config,
-  })
-
-  return cachedPayload
-}
+// Aliasing the getPayload function as getPayloadClient so we don't break existing layout modules
+export const getPayloadClient = getPayload;

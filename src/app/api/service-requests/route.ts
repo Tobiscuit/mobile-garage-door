@@ -13,13 +13,12 @@ export async function POST(req: NextRequest) {
   try {
     const payload = await getPayload({ config: configPromise });
     const { getSessionSafe } = await import('@/lib/get-session-safe');
-    const { provisionUserFromSession } = await import('@/lib/provision-user-from-session');
     const session = await getSessionSafe(req.headers);
     
     let user = null;
     let customerId;
     if (session) {
-      user = await provisionUserFromSession(session.user as any);
+      user = session.user;
       customerId = user.id;
     }
 

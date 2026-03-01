@@ -100,9 +100,9 @@ export async function POST(req: NextRequest) {
                                     email: customer.emailAddress,
                                     name: `${customer.givenName || ''} ${customer.familyName || ''}`.trim() || 'Square Customer',
                                     phone: customer.phoneNumber || '',
-                                    password: randomUUID(), // Random password
-                                    role: 'customer',
+                                    role: ['customer'],
                                     squareCustomerId: customerId,
+                                    emailVerified: false,
                                     // address: ... // Parse address if needed
                                 }
                             });

@@ -12,14 +12,12 @@ export default async function TechnicianDashboard() {
   const payload = await getPayload({ config: configPromise });
   const headerList = await headers();
   const { getSessionSafe } = await import('@/lib/get-session-safe');
-  const { provisionUserFromSession } = await import('@/lib/provision-user-from-session');
-  
   const session = await getSessionSafe(headerList);
   if (!session) {
     redirect('/login');
   }
 
-  const user = await provisionUserFromSession(session.user as any);
+  const user = session.user as any;
 
   if (!user || (user.role !== 'technician' && user.role !== 'admin')) {
     redirect('/app');

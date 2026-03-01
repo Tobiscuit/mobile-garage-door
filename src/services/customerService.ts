@@ -30,11 +30,11 @@ export const customerService = {
       collection: 'users',
       data: {
         email: data.guestEmail,
-        password: passwordToUse,
         name: data.guestName,
         phone: data.guestPhone,
         address: data.guestAddress,
-        role: 'customer',
+        role: ['customer'],
+        emailVerified: false,
       },
     });
 

@@ -136,12 +136,12 @@ export async function processPayment({ sourceId, amount = 9900, customerDetails 
             collection: 'users',
             data: {
                 email: customerDetails.email,
-                password: randomUUID(), // Temporary password
                 name: customerDetails.name,
                 phone: customerDetails.phone,
                 address: customerDetails.address,
-                role: 'customer',
+                role: ['customer'],
                 squareCustomerId: squareCustomerId, // Save the link
+                emailVerified: false,
             }
         });
         payloadUserId = newUser.id;

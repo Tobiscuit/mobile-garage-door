@@ -1,7 +1,6 @@
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { getSessionSafe } from '@/lib/get-session-safe';
-import { provisionUserFromSession } from '@/lib/provision-user-from-session';
 
 export default async function AuthCompletePage() {
   if (process.env.AUTH_BYPASS === 'true') {
@@ -15,7 +14,8 @@ export default async function AuthCompletePage() {
     redirect('/login');
   }
 
-  const { role, profileComplete } = await provisionUserFromSession(session.user as { email?: string; role?: string } | undefined);
+  const role = (session.user as any)?.role;
+  const profileComplete = true; // Temporary mock
 
   if ((role === 'admin' || role === 'technician' || role === 'dispatcher') && !profileComplete) {
     redirect('/profile/complete');

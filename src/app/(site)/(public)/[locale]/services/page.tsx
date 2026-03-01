@@ -97,7 +97,7 @@ export default async function ServicesPage({ params }: { params: Promise<{ local
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    {services.map((service, index) => (
+                    {services.map((service: any, index: number) => (
                         <div key={index} className={`group relative p-8 rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl ${service.highlight ? 'bg-charcoal-blue text-white ring-4 ring-charcoal-blue/10' : 'bg-white text-charcoal-blue shadow-lg border border-gray-100'}`}>
                             
                             <div className="flex justify-between items-start mb-8">

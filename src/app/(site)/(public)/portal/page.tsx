@@ -47,7 +47,8 @@ export default async function PortalDashboard() {
       data: {
         email: user.email,
         name: user.name || '',
-        role: 'customer',
+        role: ['customer'],
+        emailVerified: false,
       }
     });
     payloadUserId = customerData.id as number;
@@ -80,7 +81,7 @@ export default async function PortalDashboard() {
       <PortalHeader 
         customerName={customer.companyName || customer.name || ''} 
         isBuilder={isBuilder} 
-        isAdmin={['admin', 'technician', 'dispatcher'].includes(customerData.role || '')}
+        isAdmin={customerData.role?.some(r => ['admin', 'technician', 'dispatcher'].includes(r)) ?? false}
       />
       
       {isBuilder && (
