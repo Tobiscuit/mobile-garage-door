@@ -7,6 +7,8 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { nodemailerAdapter } from '@payloadcms/email-nodemailer';
 import { emailTransport } from './lib/email';
+import { betterAuthPlugin } from 'payload-auth/better-auth';
+import { betterAuthOptions } from './lib/auth/options';
 
 // Allow broad CORS for PWA/Manifest fetch
 const cors = ['https://garage-door.jrcodex.dev', 'http://localhost:3000']; 
@@ -122,6 +124,16 @@ export default buildConfig({
     push: false,
   }),
   plugins: [
+    betterAuthPlugin({
+      disableDefaultPayloadAuth: true,
+      users: {
+        slug: 'users',
+        adminRoles: ['admin'],
+        defaultRole: 'customer',
+        roles: ['admin', 'technician', 'dispatcher', 'customer'],
+      },
+      betterAuthOptions: betterAuthOptions,
+    }),
     s3Storage({
       collections: {
         media: true,

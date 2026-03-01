@@ -8,9 +8,9 @@ export const Invoices: CollectionConfig = {
   },
   access: {
     read: ({ req: { user } }) => {
-        if (user?.role === 'admin') return true;
+        if (user?.role?.includes('admin')) return true;
         // If linked to a customer, allow them to read
-        if (user?.role === 'customer') return { 'customer.email': { equals: user.email } }; 
+        if (user?.role?.includes('customer')) return { 'customer.email': { equals: user.email } }; 
         return false;
     },
     create: () => false, // Created via Webhook only

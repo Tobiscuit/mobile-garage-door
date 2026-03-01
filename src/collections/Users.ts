@@ -7,7 +7,6 @@ type AccessUser = {
 
 export const Users: CollectionConfig = {
   slug: 'users',
-  auth: true,
   admin: {
     useAsTitle: 'email',
     group: 'System',
@@ -31,24 +30,7 @@ export const Users: CollectionConfig = {
     },
   },
   fields: [
-    {
-      name: 'role',
-      type: 'select',
-      defaultValue: 'customer',
-      options: [
-        { label: 'Admin', value: 'admin' },
-        { label: 'Technician', value: 'technician' },
-        { label: 'Dispatcher', value: 'dispatcher' },
-        { label: 'Customer', value: 'customer' },
-      ],
-      required: true,
-      access: {
-        // Only admins can change roles
-        update: ({ req: { user } }) => user?.role === 'admin',
-        // Only admins can set roles on create (others get default)
-        create: ({ req: { user } }) => user?.role === 'admin',
-      },
-    },
+
     {
       name: 'customerType',
       type: 'select',
@@ -68,10 +50,7 @@ export const Users: CollectionConfig = {
         condition: (data) => data.customerType === 'builder',
       },
     },
-    {
-      name: 'name',
-      type: 'text',
-    },
+
     {
       name: 'phone',
       type: 'text',
@@ -104,27 +83,4 @@ export const Users: CollectionConfig = {
       },
     },
   ],
-  hooks: {
-    afterChange: [
-      async ({ doc, previousDoc }) => {
-        // Sync role and name to BetterAuth whenever Payload user is modified
-        if (doc.role !== previousDoc?.role || doc.name !== previousDoc?.name) {
-          try {
-            const { db: authDb } = await import('@/lib/auth');
-            const { user: authUserTable } = await import('@/lib/auth-schema');
-            const { eq } = await import('drizzle-orm');
-            
-            await authDb.update(authUserTable)
-              .set({ 
-                role: doc.role,
-                ...(doc.name && doc.name !== 'Admin' ? { name: doc.name } : {}) 
-              })
-              .where(eq(authUserTable.email, doc.email));
-          } catch (e) {
-            console.error('[Users] Failed to sync Payload user to BetterAuth:', e);
-          }
-        }
-      }
-    ]
-  }
 };

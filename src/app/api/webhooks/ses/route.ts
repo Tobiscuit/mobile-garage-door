@@ -1,4 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
+export async function POST(req: NextRequest) {
+  return NextResponse.json({ message: 'SES Webhook temporarily disabled by client request' });
+}
+
+/* 
+=================================================================================================
+LEGACY AWS SES IMPLEMENTATION (RETAINED FOR FUTURE REACTIVATION)
+=================================================================================================
 import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
 // @ts-ignore -- sns-validator lacks simple types
 import Validator from 'sns-validator';
@@ -40,7 +48,7 @@ const streamToString = (stream: Readable): Promise<string> => {
   });
 };
 
-export async function POST(req: NextRequest) {
+export async function POST_LEGACY(req: NextRequest) {
   try {
     const rawBody = await req.text();
     const payload = JSON.parse(rawBody);
@@ -195,3 +203,4 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
+*/

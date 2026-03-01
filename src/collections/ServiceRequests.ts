@@ -11,14 +11,14 @@ export const ServiceRequests: CollectionConfig = {
     // Admins and Technicians can read all
     // Customers can read their own
     read: ({ req: { user } }) => {
-      if (user?.role === 'admin' || user?.role === 'technician' || user?.role === 'dispatcher') return true;
-      if (user?.role === 'customer') return { customer: { equals: user.id } };
+      if (user?.role?.includes('admin') || user?.role?.includes('technician') || user?.role?.includes('dispatcher')) return true;
+      if (user?.role?.includes('customer')) return { customer: { equals: user.id } };
       return false;
     },
     // Anyone logged in can create (customers create requests)
     create: ({ req: { user } }) => !!user, 
     // Only admins/techs can update status (customers can cancel maybe? but for now strict)
-    update: ({ req: { user } }) => user?.role === 'admin' || user?.role === 'technician', 
+    update: ({ req: { user } }) => (user?.role?.includes('admin') || user?.role?.includes('technician')) ?? false,
   },
   fields: [
     {
@@ -90,7 +90,7 @@ export const ServiceRequests: CollectionConfig = {
       type: 'relationship',
       relationTo: 'users',
       filterOptions: {
-        role: { equals: 'technician' },
+        role: { contains: 'technician' },
       },
       admin: {
         position: 'sidebar',

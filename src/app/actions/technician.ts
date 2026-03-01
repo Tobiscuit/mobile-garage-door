@@ -16,12 +16,11 @@ export async function savePushSubscription(subscription: any) {
             return { success: false, error: 'Unauthorized' };
         }
 
-        const { provisionUserFromSession } = await import('@/lib/provision-user-from-session');
-        const user = await provisionUserFromSession(session.user as any);
+        const user = session.user;
 
         await payload.update({
             collection: 'users',
-            id: user.id!,
+            id: user.id,
             data: {
                 pushSubscription: subscription
             } as any
@@ -45,8 +44,7 @@ export async function getAvailableJobs() {
              return [];
         }
 
-        const { provisionUserFromSession } = await import('@/lib/provision-user-from-session');
-        const user = await provisionUserFromSession(session.user as any);
+        const user = session.user;
 
         // Fetch jobs assigned to "me" (the logged in technician)
         // OR jobs that are 'confirmed' (waiting for assignment) IF we want a hybrid model
@@ -58,7 +56,7 @@ export async function getAvailableJobs() {
                 and: [
                     {
                         assignedTech: {
-                            equals: user.id!
+                            equals: user.id
                         }
                     },
                     {

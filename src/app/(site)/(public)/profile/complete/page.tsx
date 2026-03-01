@@ -3,7 +3,6 @@ import { redirect } from 'next/navigation';
 import { getPayload } from 'payload';
 import configPromise from '@payload-config';
 import { getSessionSafe } from '@/lib/get-session-safe';
-import { provisionUserFromSession } from '@/lib/provision-user-from-session';
 
 async function completeStaffProfile(formData: FormData) {
   'use server';
@@ -68,9 +67,8 @@ export default async function CompleteProfilePage({
     redirect('/login');
   }
 
-  const { role, profileComplete } = await provisionUserFromSession(
-    session.user as { email?: string; role?: string } | undefined,
-  );
+  const role = (session.user as any)?.role;
+  const profileComplete = (session.user as any)?.name ? true : false;
 
   if (!(role === 'admin' || role === 'technician' || role === 'dispatcher')) {
     redirect('/app');

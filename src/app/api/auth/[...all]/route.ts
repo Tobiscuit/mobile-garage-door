@@ -1,15 +1,14 @@
 import { toNextJsHandler } from 'better-auth/next-js';
-import { auth } from '@/lib/auth';
-import { ensureAuthTablesReady } from '@/lib/ensure-auth-tables';
-
-const handlers = toNextJsHandler(auth);
+import { getPayload } from '@/lib/payload';
 
 export async function GET(request: Request) {
-  await ensureAuthTablesReady;
+  const payload = await getPayload();
+  const handlers = toNextJsHandler(payload.betterAuth);
   return handlers.GET(request);
 }
 
 export async function POST(request: Request) {
-  await ensureAuthTablesReady;
+  const payload = await getPayload();
+  const handlers = toNextJsHandler(payload.betterAuth);
   return handlers.POST(request);
 }
