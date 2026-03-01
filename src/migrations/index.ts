@@ -10,6 +10,7 @@ import * as migration_20260220_194139 from './20260220_194139';
 import * as migration_20260223_161338 from './20260223_161338';
 import * as migration_20260224_202811_enable_i18n_localization from './20260224_202811_enable_i18n_localization';
 import * as migration_20260225_212643_add_vi_locale from './20260225_212643_add_vi_locale';
+import * as migration_20260301_062600_drop_legacy_ba_tables from './20260301_062600_drop_legacy_ba_tables';
 
 export const migrations = [
   {
@@ -70,6 +71,11 @@ export const migrations = [
   {
     up: migration_20260225_212643_add_vi_locale.up,
     down: migration_20260225_212643_add_vi_locale.down,
-    name: '20260225_212643_add_vi_locale'
+    name: '20260225_212643_add_vi_locale',
+  },
+  {
+    up: migration_20260301_062600_drop_legacy_ba_tables.up,
+    down: migration_20260301_062600_drop_legacy_ba_tables.down,
+    name: '20260301_062600_drop_legacy_ba_tables',
   },
 ];
