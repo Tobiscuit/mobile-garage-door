@@ -1,8 +1,10 @@
 import { headers } from 'next/headers';
-import { redirect } from 'next/navigation';
-import { getPayload } from 'payload';
-import configPromise from '@payload-config';
+import { redirect } from 'vinext/navigation';
+import { getDB } from "@/db";
+import { users } from "@/db/schema";
+import { eq } from "drizzle-orm";
 import { getSessionSafe } from '@/lib/get-session-safe';
+import { getCloudflareContext } from "vinext/cloudflare";
 
 async function completeStaffProfile(formData: FormData) {
   'use server';
@@ -12,7 +14,7 @@ async function completeStaffProfile(formData: FormData) {
     redirect('/login');
   }
 
-  const email = String((session.user as { email?: string } | undefined)?.email || '').toLowerCase().trim();
+  const email = String(session.user.email || '').toLowerCase().trim();
   if (!email) {
     redirect('/login');
   }
@@ -25,30 +27,17 @@ async function completeStaffProfile(formData: FormData) {
     redirect('/profile/complete?error=missing_name');
   }
 
-  const payload = await getPayload({ config: configPromise });
-  const found = await payload.find({
-    collection: 'users',
-    where: {
-      email: {
-        equals: email,
-      },
-    },
-    limit: 1,
-    depth: 0,
-  });
+  const { env } = await getCloudflareContext();
+  const db = getDB(env.DB);
 
-  const user = found.docs[0] as { id: string | number } | undefined;
+  const found = await db.select().from(users).where(eq(users.email, email)).limit(1);
+  const user = found[0];
+
   if (!user) {
     redirect('/login');
   }
 
-  await payload.update({
-    collection: 'users',
-    id: user.id,
-    data: {
-      name: fullName,
-    } as any,
-  });
+  await db.update(users).set({ name: fullName }).where(eq(users.id, user.id));
 
   redirect('/app');
 }
@@ -68,7 +57,7 @@ export default async function CompleteProfilePage({
   }
 
   const role = (session.user as any)?.role;
-  const profileComplete = (session.user as any)?.name ? true : false;
+  const profileComplete = session.user.name ? true : false;
 
   if (!(role === 'admin' || role === 'technician' || role === 'dispatcher')) {
     redirect('/app');

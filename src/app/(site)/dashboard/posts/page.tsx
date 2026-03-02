@@ -1,6 +1,6 @@
 
 import React from 'react';
-import Link from 'next/link';
+import Link from '@/shared/ui/Link';
 import { getPosts } from './actions';
 import { DataTable } from '@/features/admin/ui/DataTable';
 import { Post } from '@/payload-types';

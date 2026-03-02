@@ -1,5 +1,5 @@
 import React from 'react';
-import Link from 'next/link';
+import Link from '@/shared/ui/Link';
 import PostForm from '@/features/admin/posts/PostForm';
 import { createPost } from '../actions';
 

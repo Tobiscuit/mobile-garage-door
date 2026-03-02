@@ -1,6 +1,6 @@
 'use client';
 import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter } from 'vinext/navigation';
 import { format } from 'date-fns';
 import { updateUser } from '@/app/(site)/dashboard/users/actions';
 

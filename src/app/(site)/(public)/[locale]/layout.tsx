@@ -1,9 +1,7 @@
 import React from 'react'
-import { NextIntlClientProvider } from 'next-intl'
-import { getMessages, setRequestLocale } from 'next-intl/server'
+import I18nProvider from '@/components/I18nProvider'
 import { routing } from '@/i18n/routing'
-import { notFound } from 'next/navigation'
-import { hasLocale } from 'next-intl'
+import { notFound } from 'vinext/navigation'
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }))
@@ -18,16 +16,13 @@ export default async function LocaleLayout({
 }) {
   const { locale } = await params;
 
-  if (!hasLocale(routing.locales, locale)) {
+  if (!routing.locales.includes(locale as any)) {
     notFound();
   }
 
-  setRequestLocale(locale);
-  const messages = await getMessages();
-
   return (
-    <NextIntlClientProvider locale={locale} messages={messages}>
+    <I18nProvider locale={locale}>
       {children}
-    </NextIntlClientProvider>
+    </I18nProvider>
   )
 }

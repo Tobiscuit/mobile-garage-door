@@ -1,5 +1,5 @@
 import React from 'react';
-import { getTranslations } from 'next-intl/server';
+import { getTranslations } from '@/hooks/useTranslations';
 
 export default async function PrivacyPolicy({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;

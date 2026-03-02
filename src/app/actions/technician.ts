@@ -1,12 +1,15 @@
 'use server';
 
-import { getPayload } from 'payload';
-import configPromise from '@payload-config';
+import { getDB } from "@/db";
+import { users, serviceRequests } from "@/db/schema";
+import { eq, and, ne } from "drizzle-orm";
 import { headers } from 'next/headers';
+import { getCloudflareContext } from "vinext/cloudflare";
 
 export async function savePushSubscription(subscription: any) {
     try {
-        const payload = await getPayload({ config: configPromise });
+        const { env } = await getCloudflareContext();
+        const db = getDB(env.DB);
         const headersList = await headers();
         const { getSessionSafe } = await import('@/lib/get-session-safe');
         const session = await getSessionSafe(headersList);
@@ -18,13 +21,11 @@ export async function savePushSubscription(subscription: any) {
 
         const user = session.user;
 
-        await payload.update({
-            collection: 'users',
-            id: user.id,
-            data: {
-                pushSubscription: subscription
-            } as any
-        });
+        await db.update(users)
+            .set({
+                pushSubscription: JSON.stringify(subscription)
+            })
+            .where(eq(users.id, user.id));
         return { success: true };
 
     } catch (error) {
@@ -35,7 +36,8 @@ export async function savePushSubscription(subscription: any) {
 
 export async function getAvailableJobs() {
     try {
-        const payload = await getPayload({ config: configPromise });
+        const { env } = await getCloudflareContext();
+        const db = getDB(env.DB);
         const headersList = await headers();
         const { getSessionSafe } = await import('@/lib/get-session-safe');
         const session = await getSessionSafe(headersList);
@@ -46,39 +48,29 @@ export async function getAvailableJobs() {
 
         const user = session.user;
 
-        // Fetch jobs assigned to "me" (the logged in technician)
-        // OR jobs that are 'confirmed' (waiting for assignment) IF we want a hybrid model
-        // But strict assignment means only showing jobs where assignedTechId = user.id
+        const results = await db.select({
+            id: serviceRequests.id,
+            ticketId: serviceRequests.ticketId,
+            customerName: users.name,
+            customerAddress: users.address,
+            issue: serviceRequests.issueDescription,
+            urgency: serviceRequests.urgency,
+            timestamp: serviceRequests.createdAt,
+            status: serviceRequests.status
+        })
+        .from(serviceRequests)
+        .leftJoin(users, eq(serviceRequests.customerId, users.id))
+        .where(
+            and(
+                eq(serviceRequests.assignedTechId, user.id),
+                ne(serviceRequests.status, 'completed')
+            )
+        );
 
-        const result = await payload.find({
-            collection: 'service-requests',
-            where: {
-                and: [
-                    {
-                        assignedTech: {
-                            equals: user.id
-                        }
-                    },
-                    {
-                        status: {
-                            not_equals: 'completed'
-                        }
-                    }
-                ]
-            },
-            depth: 1, 
-        });
-
-        // Serialize data for client
-        return result.docs.map(doc => ({
-            id: doc.id,
-            ticketId: doc.ticketId,
-            customerName: (doc.customer as any).name || 'Unknown',
-            customerAddress: (doc.customer as any).address || 'No address',
-            issue: doc.issueDescription,
-            urgency: doc.urgency,
-            timestamp: doc.createdAt,
-            status: doc.status
+        return results.map(row => ({
+            ...row,
+            customerName: row.customerName || 'Unknown',
+            customerAddress: row.customerAddress || 'No address',
         }));
 
     } catch (error) {
@@ -87,19 +79,17 @@ export async function getAvailableJobs() {
     }
 }
 
-export async function acceptJob(jobId: string) {
-    // In a real app, we'd check the current user's ID
-    // For now, we'll just update the status to 'dispatched'
+export async function acceptJob(jobId: number) {
     try {
-        const payload = await getPayload({ config: configPromise });
+        const { env } = await getCloudflareContext();
+        const db = getDB(env.DB);
 
-        await payload.update({
-            collection: 'service-requests',
-            id: jobId,
-            data: {
-                status: 'dispatched'
-            }
-        });
+        await db.update(serviceRequests)
+            .set({
+                status: 'dispatched',
+                updatedAt: new Date().toISOString()
+            })
+            .where(eq(serviceRequests.id, jobId));
 
         return { success: true };
     } catch (error) {

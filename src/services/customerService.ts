@@ -1,4 +1,6 @@
-import { Payload } from 'payload';
+import { getDB } from "@/db";
+import { users } from "@/db/schema";
+import { eq } from "drizzle-orm";
 import { randomUUID } from 'crypto';
 
 interface CustomerData {
@@ -10,34 +12,28 @@ interface CustomerData {
 }
 
 export const customerService = {
-  findOrCreate: async (payload: Payload, data: CustomerData) => {
-    // 1. Check for existing user
-    const existingCustomers = await payload.find({
-      collection: 'users',
-      where: {
-        email: { equals: data.guestEmail },
-      },
-    });
+  findOrCreate: async (d1: D1Database, data: CustomerData) => {
+    const db = getDB(d1);
 
-    if (existingCustomers.totalDocs > 0) {
-      return existingCustomers.docs[0].id;
+    // 1. Check for existing user
+    const existing = await db.select().from(users).where(eq(users.email, data.guestEmail)).limit(1);
+
+    if (existing.length > 0) {
+      return existing[0].id;
     }
 
     // 2. Create new Customer
-    const passwordToUse = data.guestPassword || randomUUID();
+    const id = randomUUID();
+    const newCustomer = await db.insert(users).values({
+      id,
+      email: data.guestEmail,
+      name: data.guestName,
+      phone: data.guestPhone,
+      address: data.guestAddress,
+      role: 'customer',
+      emailVerified: false,
+    }).returning();
 
-    const newCustomer = await payload.create({
-      collection: 'users',
-      data: {
-        email: data.guestEmail,
-        name: data.guestName,
-        phone: data.guestPhone,
-        address: data.guestAddress,
-        role: ['customer'],
-        emailVerified: false,
-      },
-    });
-
-    return newCustomer.id;
+    return newCustomer[0].id;
   }
 };

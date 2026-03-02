@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import Link from '@/shared/ui/Link';
+import { useRouter } from 'vinext/navigation';
 
 export default function DiagnosePage() {
   const router = useRouter();

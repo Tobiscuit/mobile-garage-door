@@ -1,9 +1,11 @@
 'use server';
 
-import { getPayload } from 'payload';
-import configPromise from '@payload-config';
+import { getDB } from "@/db";
+import { users, serviceRequests, payments as paymentsTable } from "@/db/schema";
+import { eq, and, or, not, inArray, like, notLike, desc } from "drizzle-orm";
 import { revalidatePath } from 'next/cache';
 import { SquareClient, SquareEnvironment } from 'square';
+import { getCloudflareContext } from "vinext/cloudflare";
 
 const squareClient = new SquareClient({
   token: process.env.SQUARE_ACCESS_TOKEN,
@@ -11,69 +13,44 @@ const squareClient = new SquareClient({
 });
 
 export async function getDashboardStats() {
-  const payload = await getPayload({ config: configPromise });
+  const { env } = await getCloudflareContext();
+  const db = getDB(env.DB);
 
-  // 1. Fetch Service Requests (for Revenue & Job Stats)
-  const { docs: requests } = await payload.find({
-    collection: 'service-requests',
-    limit: 1000,
-    depth: 0,
-  });
+  const requests = await db.select().from(serviceRequests).limit(1000);
+  const payments = await db.select().from(paymentsTable).limit(1000);
+  const techs = await db.select().from(users).where(eq(users.role, 'technician'));
 
-  // 1b. Fetch ALL Payments (Square + Manual)
-  // This is the Financial Source of Truth
-  const { docs: payments } = await payload.find({
-    collection: 'payments',
-    limit: 1000,
-  });
-
-  // 2. Fetch Technicians
-  const { totalDocs: techCount } = await payload.find({
-    collection: 'users',
-    where: {
-      role: { equals: 'technician' },
-    },
-    limit: 0, 
-  });
-
-  // 3. Calculate Metrics
   const now = new Date();
-  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-  const startOfWeek = new Date(now);
-  startOfWeek.setDate(now.getDate() - now.getDay()); // Sunday
-  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+  const startOfWeekDate = new Date(now);
+  startOfWeekDate.setDate(now.getDate() - now.getDay());
+  const startOfWeek = startOfWeekDate.toISOString();
+  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
 
   let lifetimeRevenue = 0;
   let monthlyRevenue = 0;
   let weeklyRevenue = 0;
   let todayRevenue = 0;
   
-  let activeRequests = 0;
+  let activeRequestsCount = 0;
   let pendingQuotes = 0;
 
-  // Process Service Requests (Job Stats Only)
   requests.forEach((req) => {
-    // Job Status Counts
     if (['pending', 'confirmed', 'dispatched', 'on_site'].includes(req.status || '')) {
-      activeRequests++;
+      activeRequestsCount++;
     }
-    
     if (req.status === 'pending') {
       pendingQuotes++;
     }
   });
 
-  // Process ALL Payments for Revenue
   payments.forEach((p) => {
-      // Only count COMPLETED or APPROVED payments
       if (p.status !== 'COMPLETED' && p.status !== 'APPROVED') return;
 
-      const amountCents = Number(p.amount || 0);
-      const amountDollars = amountCents / 100; // Assuming stored in cents
-      
+      const amountDollars = (p.amount || 0) / 100;
       lifetimeRevenue += amountDollars;
 
-      const pDate = new Date(p.createdAt);
+      const pDate = p.createdAt;
       if (pDate >= startOfMonth) monthlyRevenue += amountDollars;
       if (pDate >= startOfWeek) weeklyRevenue += amountDollars;
       if (pDate >= startOfToday) todayRevenue += amountDollars;
@@ -87,38 +64,33 @@ export async function getDashboardStats() {
       today: todayRevenue,
     },
     jobs: {
-      active: activeRequests,
+      active: activeRequestsCount,
       pending: pendingQuotes,
       total: requests.length,
     },
     technicians: {
-      total: techCount,
-      online: techCount, 
+      total: techs.length,
+      online: techs.length,
     },
   };
 }
 
 export async function createManualPayment(amount: number, sourceType: 'CASH' | 'EXTERNAL', note: string) {
     try {
-        const payload = await getPayload({ config: configPromise });
+        const { env } = await getCloudflareContext();
+        const db = getDB(env.DB);
         
-        // Ensure amount is valid (positive)
         if (amount <= 0) throw new Error('Invalid amount');
 
-        // Create Payment Record
-        // We'll generate a pseudo-ID for manual payments: MANUAL-{TIMESTAMP}
         const manualId = `MANUAL-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
 
-        await payload.create({
-            collection: 'payments',
-            data: {
-                squarePaymentId: manualId, // Using this unique field for our ID
-                amount: Math.round(amount * 100), // Convert to cents
-                currency: 'USD',
-                status: 'COMPLETED',
-                sourceType,
-                note,
-            } as any // Type casting until types are regenerated
+        await db.insert(paymentsTable).values({
+            squarePaymentId: manualId,
+            amount: Math.round(amount * 100),
+            currency: 'USD',
+            status: 'COMPLETED',
+            sourceType,
+            note,
         });
 
         revalidatePath('/dashboard');
@@ -132,9 +104,9 @@ export async function createManualPayment(amount: number, sourceType: 'CASH' | '
 
 export async function syncSquarePayments() {
   try {
-    const payload = await getPayload({ config: configPromise });
+    const { env } = await getCloudflareContext();
+    const db = getDB(env.DB);
     
-    // List payments from Square (last 100)
     const response = await squareClient.payments.list({
         limit: 100,
         sortOrder: 'DESC',
@@ -143,9 +115,8 @@ export async function syncSquarePayments() {
     
     let count = 0;
     
-    // Iterate over the Page object (AsyncIterable)
     for await (const payment of response) {
-        if (count >= 100) break; // Limit to 100
+        if (count >= 100) break;
         
         const squarePaymentId = payment.id;
         if (!squarePaymentId) continue;
@@ -156,35 +127,23 @@ export async function syncSquarePayments() {
         const sourceType = payment.sourceType;
         const note = payment.note || '';
 
-        // Check if exists
-        const existingPayments = await payload.find({
-          collection: 'payments',
-          where: {
-            squarePaymentId: { equals: squarePaymentId },
-          },
-        });
+        const existing = await db.select().from(paymentsTable).where(eq(paymentsTable.squarePaymentId, squarePaymentId)).limit(1);
 
-        if (existingPayments.totalDocs === 0) {
-           await payload.create({
-            collection: 'payments',
-            data: {
-              squarePaymentId,
-              amount,
-              currency,
-              status,
-              sourceType,
-              note,
-            } as any
+        if (existing.length === 0) {
+           await db.insert(paymentsTable).values({
+            squarePaymentId,
+            amount,
+            currency,
+            status,
+            sourceType,
+            note,
           });
           count++;
         } else {
-             // Optional: Update status if changed
-             if (existingPayments.docs[0].status !== status) {
-                 await payload.update({
-                     collection: 'payments',
-                     id: existingPayments.docs[0].id,
-                     data: { status } as any
-                 });
+             if (existing[0].status !== status) {
+                 await db.update(paymentsTable)
+                    .set({ status, updatedAt: new Date().toISOString() })
+                    .where(eq(paymentsTable.id, existing[0].id));
              }
         }
     }
@@ -193,36 +152,17 @@ export async function syncSquarePayments() {
     return { success: true, count };
   } catch (error: any) {
     console.error('Sync Square Error:', error);
-    
-    // Check if it's a JSON serialization error from the Square SDK response
-    if (error.message?.includes('JSON') || error.type === 'invalid_json') {
-         return { success: false, error: 'Square API returned invalid JSON. Check API version or network.' };
-    }
-
     return { success: false, error: error.message || 'Failed to sync payments' };
   }
 }
 
-// NEW: Force Reset & Sync to ensure 100% accuracy with Square
 export async function resetAndSyncSquarePayments() {
     try {
-        const payload = await getPayload({ config: configPromise });
+        const { env } = await getCloudflareContext();
+        const db = getDB(env.DB);
 
-        // 1. Delete ALL payments that are NOT manual (assuming manual start with MANUAL-)
-        // Actually, to be safe and "Mirror Square", we should probably keep Manual ones but delete Square ones.
-        // But the user wants "accurate as to what Square has".
-        // Let's delete all payments where squarePaymentId does NOT start with MANUAL
-        
-        await payload.delete({
-            collection: 'payments',
-            where: {
-                squarePaymentId: {
-                    not_like: 'MANUAL-%'
-                }
-            }
-        });
+        await db.delete(paymentsTable).where(notLike(paymentsTable.squarePaymentId, 'MANUAL-%'));
 
-        // 2. Fetch fresh from Square using the async iterator pattern
         const response = await squareClient.payments.list({
             limit: 100,
             sortOrder: 'DESC',
@@ -241,17 +181,13 @@ export async function resetAndSyncSquarePayments() {
             const sourceType = payment.sourceType;
             const note = payment.note || '';
 
-            // We know we deleted them, so just create
-            await payload.create({
-               collection: 'payments',
-               data: {
-                 squarePaymentId,
-                 amount,
-                 currency,
-                 status,
-                 sourceType,
-                 note,
-               } as any
+            await db.insert(paymentsTable).values({
+               squarePaymentId,
+               amount,
+               currency,
+               status,
+               sourceType,
+               note,
              });
              totalSynced++;
         }
@@ -266,39 +202,35 @@ export async function resetAndSyncSquarePayments() {
 }
 
 export async function getRecentPayments(limit = 20) {
-  const payload = await getPayload({ config: configPromise });
-  const { docs } = await payload.find({
-    collection: 'payments',
-    sort: '-createdAt',
-    limit,
-  });
-  return docs;
+  const { env } = await getCloudflareContext();
+  const db = getDB(env.DB);
+  return db.select().from(paymentsTable).orderBy(desc(paymentsTable.createdAt)).limit(limit);
 }
-
-// === NEW ACTIONS FOR KPI SHEETS ===
 
 export async function getActiveJobsList() {
     try {
-        const payload = await getPayload({ config: configPromise });
-        const result = await payload.find({
-            collection: 'service-requests',
-            where: {
-                status: {
-                    in: ['pending', 'confirmed', 'dispatched', 'on_site']
-                }
-            },
-            sort: '-createdAt',
-            limit: 20,
-            depth: 0,
-        });
+        const { env } = await getCloudflareContext();
+        const db = getDB(env.DB);
 
-        return result.docs.map(doc => ({
-            id: doc.id,
-            status: doc.status,
-            customerName: (doc.customer as any)?.name || 'Unknown Customer', // If customer is populated or not
-            urgency: doc.urgency,
-            createdAt: doc.createdAt,
-            issue: doc.issueDescription
+        const results = await db.select({
+            id: serviceRequests.id,
+            status: serviceRequests.status,
+            customerName: users.name,
+            urgency: serviceRequests.urgency,
+            createdAt: serviceRequests.createdAt,
+            issue: serviceRequests.issueDescription
+        })
+        .from(serviceRequests)
+        .leftJoin(users, eq(serviceRequests.customerId, users.id))
+        .where(
+            inArray(serviceRequests.status, ['pending', 'confirmed', 'dispatched', 'on_site'])
+        )
+        .orderBy(desc(serviceRequests.createdAt))
+        .limit(20);
+
+        return results.map(row => ({
+            ...row,
+            customerName: row.customerName || 'Unknown Customer'
         }));
     } catch (error) {
         console.error('Error fetching active jobs:', error);
@@ -308,22 +240,17 @@ export async function getActiveJobsList() {
 
 export async function getTechnicianStatusList() {
     try {
-        const payload = await getPayload({ config: configPromise });
-        const result = await payload.find({
-            collection: 'users',
-            where: {
-                role: { equals: 'technician' }
-            }
-        });
+        const { env } = await getCloudflareContext();
+        const db = getDB(env.DB);
 
-        // In a real app, we'd check a "lastSeen" or "status" field.
-        // For now, we'll assume they are "Online" if they exist.
-        return result.docs.map(tech => ({
+        const techs = await db.select().from(users).where(eq(users.role, 'technician'));
+
+        return techs.map(tech => ({
             id: tech.id,
             name: tech.name,
             email: tech.email,
-            status: 'online', // Mock status
-            lastActive: new Date().toISOString() // Mock time
+            status: 'online',
+            lastActive: new Date().toISOString()
         }));
     } catch (error) {
         console.error('Error fetching technicians:', error);
@@ -333,18 +260,16 @@ export async function getTechnicianStatusList() {
 
 export async function getRecentTechnicians(limit = 5) {
   try {
-    const payload = await getPayload({ config: configPromise });
-    const result = await payload.find({
-      collection: 'users',
-      where: {
-        role: { equals: 'technician' },
-      },
-      sort: '-lastLogin',
-      limit,
-      depth: 0,
-    });
+    const { env } = await getCloudflareContext();
+    const db = getDB(env.DB);
 
-    return result.docs.map((tech) => ({
+    const result = await db.select()
+        .from(users)
+        .where(eq(users.role, 'technician'))
+        .orderBy(desc(users.lastLogin))
+        .limit(limit);
+
+    return result.map((tech) => ({
       id: tech.id,
       email: tech.email,
       lastLogin: tech.lastLogin,

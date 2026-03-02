@@ -1,5 +1,5 @@
 import React from 'react';
-import { getTranslations } from 'next-intl/server';
+import { getTranslations } from '@/hooks/useTranslations';
 
 const Footer: React.FC = async () => {
   const t = await getTranslations('footer');

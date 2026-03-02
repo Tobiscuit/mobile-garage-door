@@ -1,10 +1,12 @@
 'use server';
 
-import { getPayload } from 'payload';
-import configPromise from '@payload-config';
+import { getDB } from "@/db";
+import { media } from "@/db/schema";
+import { getCloudflareContext } from "vinext/cloudflare";
 
 export async function uploadMedia(formData: FormData) {
-  const payload = await getPayload({ config: configPromise });
+  const { env } = await getCloudflareContext();
+  const db = getDB(env.DB);
   const file = formData.get('file') as File;
 
   if (!file) {
@@ -12,24 +14,26 @@ export async function uploadMedia(formData: FormData) {
   }
 
   try {
-    // Payload expects a precise structure for files via the Local API (especially with S3 adapter)
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
     
-    const media = await payload.create({
-      collection: 'media',
-      data: {
-        alt: (formData.get('alt') as string) || file.name || 'Dashboard Upload',
-      },
-      file: {
-        data: buffer,
-        name: file.name,
-        mimetype: file.type,
-        size: file.size,
-      } as any
+    // Upload to R2
+    const key = `media/${Date.now()}-${file.name}`;
+    await env.MEDIA_BUCKET.put(key, buffer, {
+        httpMetadata: { contentType: file.type }
     });
 
-    return { success: true, doc: media };
+    const url = `/media/${key}`; // Local proxy or direct R2 if configured
+
+    const newMedia = await db.insert(media).values({
+        filename: file.name,
+        mimeType: file.type,
+        filesize: file.size,
+        alt: (formData.get('alt') as string) || file.name || 'Dashboard Upload',
+        url,
+    }).returning();
+
+    return { success: true, doc: newMedia[0] };
   } catch (error) {
     console.error('Upload Error:', error);
     return { error: 'Failed to upload image' };

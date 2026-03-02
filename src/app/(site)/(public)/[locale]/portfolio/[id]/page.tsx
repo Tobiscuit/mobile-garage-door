@@ -1,29 +1,41 @@
 import React, { Fragment } from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
-import { notFound } from 'next/navigation';
-import { getPayload } from 'payload';
-import configPromise from '@payload-config';
+import Link from '@/shared/ui/Link';
+import { notFound } from 'vinext/navigation';
+import { getDB } from "@/db";
+import { projects as projectsTable } from "@/db/schema";
+import { eq } from "drizzle-orm";
 import SmartLink from '@/shared/ui/SmartLink';
 import ProjectHeroImage from '@/features/landing/ProjectHeroImage';
-import { getTranslations } from 'next-intl/server';
+import { getTranslations } from '@/hooks/useTranslations';
+import { getCloudflareContext } from "vinext/cloudflare";
 
 export const dynamic = 'force-dynamic';
 
 // --- Lexical Serializer ---
-// Basic renderer for Lexical RichText nodes
-// UPDATED: Removed hardcoded colors to allow parent containers (like prose-invert) to control contrast
-const SerializeLexical = ({ nodes }: { nodes: any[] }) => {
-  if (!nodes || !Array.isArray(nodes)) return null;
+const SerializeLexical = ({ nodes }: { nodes: any[] | string }) => {
+  if (!nodes) return null;
+
+  let parsedNodes: any[];
+  if (typeof nodes === 'string') {
+    try {
+      const data = JSON.parse(nodes);
+      parsedNodes = data.root?.children || [];
+    } catch (e) {
+      return <span>{nodes}</span>;
+    }
+  } else {
+    parsedNodes = nodes;
+  }
+
+  if (!Array.isArray(parsedNodes)) return null;
 
   return (
     <>
-      {nodes.map((node, i) => {
+      {parsedNodes.map((node, i) => {
         if (!node) return null;
 
         if (node.type === 'text') {
           let text = <span key={i}>{node.text}</span>;
-          // Bitwise checks for Lexical formats: 1=Bold, 2=Italic, 8=Underline, etc.
           if (node.format & 1) text = <strong key={i} className="font-bold">{text}</strong>;
           if (node.format & 2) text = <em key={i} className="italic">{text}</em>;
           if (node.format & 8) text = <u key={i} className="underline">{text}</u>;
@@ -89,53 +101,31 @@ interface ProjectDetailPageProps {
   params: Promise<{ id: string; locale: string }>;
 }
 
-export async function generateStaticParams() {
-  const payload = await getPayload({ config: configPromise });
-  const projects = await payload.find({
-    collection: 'projects',
-    limit: 100,
-    depth: 0,
-  });
-
-  return projects.docs.map((project) => ({
-    id: project.slug,
-  }));
-}
-
 export default async function ProjectDetailPage({ params }: ProjectDetailPageProps) {
   const { id: slug, locale } = await params;
-  const payload = await getPayload({ config: configPromise });
+  const { env } = await getCloudflareContext();
+  const db = getDB(env.DB);
   const t = await getTranslations({ locale, namespace: 'portfolio_detail' });
 
-  const result = await payload.find({
-    collection: 'projects',
-    where: {
-      slug: {
-        equals: slug,
+  const project = await db.query.projects.findFirst({
+    where: eq(projectsTable.slug, slug),
+    with: {
+      gallery: {
+        with: {
+          media: true
+        }
       },
-    },
-    limit: 1,
-    depth: 1, // Fetch relationships/media if needed
-    locale: locale as 'en' | 'es',
+      tags: true,
+      stats: true
+    }
   });
-
-  const project = result.docs[0];
 
   if (!project) {
     return notFound();
   }
 
-  // Robust Image Handling (now from gallery array)
-  const firstGalleryItem = Array.isArray(project.gallery) && project.gallery.length > 0 ? project.gallery[0].image : null;
-  const imageUrl = typeof firstGalleryItem === 'object' && firstGalleryItem !== null && 'url' in firstGalleryItem
-      ? (firstGalleryItem.url || null)
-      : null;
+  const imageUrl = project.gallery?.[0]?.media?.url || null;
   
-  // Safe extraction of RichText content
-  const challengeContent = (project.challenge as any)?.root?.children;
-  const solutionContent = (project.solution as any)?.root?.children;
-  const descriptionContent = (project.description as any)?.root?.children;
-
   return (
     <div className="flex flex-col min-h-screen bg-cloudy-white text-charcoal-blue font-work-sans overflow-x-hidden">
       
@@ -228,8 +218,8 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
                     {t('challenge_heading')} <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-orange-400">{t('challenge_accent')}</span>
                 </h2>
                 <div className="prose prose-invert prose-lg text-gray-300">
-                   {challengeContent ? (
-                      <SerializeLexical nodes={challengeContent} />
+                   {project.challenge ? (
+                      <SerializeLexical nodes={project.challenge} />
                    ) : (
                       <p className="text-gray-500 italic">{t('no_challenge')}</p>
                    )}
@@ -251,8 +241,8 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
                     {t('solution_heading')} <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-600 to-golden-yellow">{t('solution_accent')}</span>
                 </h2>
                 <div className="prose prose-lg text-gray-600">
-                   {solutionContent ? (
-                      <SerializeLexical nodes={solutionContent} />
+                   {project.solution ? (
+                      <SerializeLexical nodes={project.solution} />
                    ) : (
                       <p className="text-gray-400 italic">{t('no_solution')}</p>
                    )}
@@ -274,7 +264,7 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
         )}
 
         {/* FULL CASE STUDY (Description) */}
-        {descriptionContent && (
+        {project.description && (
            <div className="max-w-5xl mx-auto mb-24">
               <div className="bg-white p-8 md:p-12 rounded-3xl shadow-xl border border-gray-100 relative overflow-hidden">
                 <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-charcoal-blue via-golden-yellow to-charcoal-blue"></div>
@@ -285,7 +275,7 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
                 </h3>
                 
                 <div className="prose prose-lg max-w-none text-gray-600 prose-headings:font-black prose-headings:text-charcoal-blue prose-strong:text-charcoal-blue prose-li:marker:text-golden-yellow">
-                   <SerializeLexical nodes={descriptionContent} />
+                   <SerializeLexical nodes={project.description} />
                 </div>
               </div>
            </div>

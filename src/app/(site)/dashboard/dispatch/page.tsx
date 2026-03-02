@@ -1,54 +1,56 @@
-import { getPayload } from 'payload';
-import configPromise from '@/payload.config';
 import { DispatchClient } from './DispatchClient';
 import { headers } from 'next/headers';
-import { redirect } from 'next/navigation';
+import { redirect } from 'vinext/navigation';
 import { getSessionSafe } from '@/lib/get-session-safe';
+import { getDB } from "@/db";
+import { users, serviceRequests } from "@/db/schema";
+import { eq, desc } from "drizzle-orm";
+import { getCloudflareContext } from "vinext/cloudflare";
 
 export default async function DispatchPage() {
     const headersList = await headers();
     const session = await getSessionSafe(headersList);
-    const payload = await getPayload({ config: configPromise });
 
     if (!session) {
         redirect('/login');
     }
 
-    // 1. Fetch unassigned (confirmed) jobs
-    const jobs = await payload.find({
-        collection: 'service-requests',
-        where: {
-            status: { equals: 'confirmed' }
-        },
-        depth: 1, // Populate customer details
-        sort: '-createdAt'
-    });
+    const { env } = await getCloudflareContext();
+    const db = getDB(env.DB);
 
-    // 2. Fetch technicians
-    const technicians = await payload.find({
-        collection: 'users',
-        where: {
-            role: { equals: 'technician' }
-        }
-    });
+    const jobs = await db.select({
+        id: serviceRequests.id,
+        ticketId: serviceRequests.ticketId,
+        urgency: serviceRequests.urgency,
+        issueDescription: serviceRequests.issueDescription,
+        createdAt: serviceRequests.createdAt,
+        customerName: users.name,
+        customerEmail: users.email,
+        customerAddress: users.address,
+    })
+    .from(serviceRequests)
+    .leftJoin(users, eq(serviceRequests.customerId, users.id))
+    .where(eq(serviceRequests.status, 'confirmed'))
+    .orderBy(desc(serviceRequests.createdAt));
 
-    // Transform data for client component
-    const serializedJobs = jobs.docs.map(job => ({
+    const technicians = await db.select().from(users).where(eq(users.role, 'technician'));
+
+    const serializedJobs = jobs.map(job => ({
         id: job.id,
         ticketId: job.ticketId,
         urgency: job.urgency,
         issueDescription: job.issueDescription,
         customer: {
-            name: (job.customer as any).name || (job.customer as any).email || 'Unknown Customer',
-            address: (job.customer as any).address || 'No Address Provided',
+            name: job.customerName || job.customerEmail || 'Unknown Customer',
+            address: job.customerAddress || 'No Address Provided',
         },
         createdAt: job.createdAt
     }));
 
-    const serializedTechs = technicians.docs.map(tech => ({
+    const serializedTechs = technicians.map(tech => ({
         id: tech.id,
         name: tech.name || tech.email,
-        pushSubscription: !!(tech as any).pushSubscription
+        pushSubscription: !!tech.pushSubscription
     }));
 
     return (

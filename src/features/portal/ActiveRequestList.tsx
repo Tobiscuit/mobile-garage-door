@@ -1,5 +1,5 @@
 import React from 'react';
-import Link from 'next/link';
+import Link from '@/shared/ui/Link';
 
 interface Request {
   id: string;

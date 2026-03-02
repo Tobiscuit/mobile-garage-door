@@ -1,6 +1,6 @@
 import React from 'react';
-import { notFound } from 'next/navigation';
-import Link from 'next/link';
+import { notFound } from 'vinext/navigation';
+import Link from '@/shared/ui/Link';
 import { getUserById } from '../actions';
 import { UserProfileCard } from '@/features/admin/ui/UserProfileCard';
 
