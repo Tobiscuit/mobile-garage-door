@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import Link from 'next/link';
+import Link from '@/shared/ui/Link';
 import { ManualPaymentModal } from './ManualPaymentModal';
 import { syncSquarePayments } from '@/app/(site)/dashboard/actions';
 

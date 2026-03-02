@@ -1,36 +1,46 @@
 'use server';
 
-import { getPayload } from 'payload';
-import configPromise from '@payload-config';
+import { getDB } from "@/db";
+import { projects, projectGallery, projectTags, projectStats } from "@/db/schema";
+import { eq, desc } from "drizzle-orm";
 import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
+import { redirect } from 'vinext/navigation';
+import { getCloudflareContext } from "vinext/cloudflare";
 
 export async function getProjects() {
-  const payload = await getPayload({ config: configPromise });
-  const results = await payload.find({
-    collection: 'projects',
-    depth: 1,
-    limit: 100,
-    sort: '-createdAt',
+  const { env } = await getCloudflareContext();
+  const db = getDB(env.DB);
+  return db.query.projects.findMany({
+    orderBy: [desc(projects.createdAt)],
+    with: {
+        gallery: { with: { media: true } },
+        tags: true,
+        stats: true
+    }
   });
-  return results.docs;
 }
 
 export async function getProjectById(id: string) {
-  const payload = await getPayload({ config: configPromise });
+  const { env } = await getCloudflareContext();
+  const db = getDB(env.DB);
   try {
-    const project = await payload.findByID({
-      collection: 'projects',
-      id,
+    const projectId = parseInt(id);
+    return db.query.projects.findFirst({
+        where: eq(projects.id, projectId),
+        with: {
+            gallery: { with: { media: true } },
+            tags: true,
+            stats: true
+        }
     });
-    return project;
   } catch (error) {
     return null;
   }
 }
 
 export async function createProject(formData: FormData) {
-  const payload = await getPayload({ config: configPromise });
+  const { env } = await getCloudflareContext();
+  const db = getDB(env.DB);
 
   const title = formData.get('title') as string;
   const description = formData.get('description') as string;
@@ -41,32 +51,42 @@ export async function createProject(formData: FormData) {
   const completionDate = formData.get('completionDate') as string;
   const galleryStr = formData.get('gallery') as string;
   
-  let gallery = [];
+  let galleryItems: any[] = [];
   try {
-      if (galleryStr) gallery = JSON.parse(galleryStr);
-  } catch (e) {
-      console.error('Failed to parse gallery JSON:', e);
-  }
+      if (galleryStr) galleryItems = JSON.parse(galleryStr);
+  } catch (e) {}
 
   try {
-    await payload.create({
-      collection: 'projects',
-      data: {
+    const newProjects = await db.insert(projects).values({
         title,
-        // Pass HTML to transient fields - hook will convert to Lexical
         htmlDescription: description,
         htmlChallenge: challenge,
         htmlSolution: solution,
         client,
         location,
         completionDate,
-        gallery,
         slug: title.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, ''),
-        imageStyle: 'garage-pattern-modern', // Default for now
-        tags: [{ tag: 'General' }], // Default tag
-        stats: [], // Empty stats
-      } as any, 
+        imageStyle: 'garage-pattern-modern',
+    }).returning();
+
+    const newProject = newProjects[0];
+
+    if (galleryItems.length > 0) {
+        await db.insert(projectGallery).values(
+            galleryItems.map((item, idx) => ({
+                projectId: newProject.id,
+                mediaId: item.image,
+                caption: item.caption,
+                order: idx
+            }))
+        );
+    }
+
+    await db.insert(projectTags).values({
+        projectId: newProject.id,
+        tag: 'General'
     });
+
   } catch (error) {
     console.error('Create Project Error:', error);
     return { error: 'Failed to create project' };
@@ -77,7 +97,8 @@ export async function createProject(formData: FormData) {
 }
 
 export async function updateProject(id: string, formData: FormData) {
-  const payload = await getPayload({ config: configPromise });
+  const { env } = await getCloudflareContext();
+  const db = getDB(env.DB);
 
   const title = formData.get('title') as string;
   const description = formData.get('description') as string;
@@ -88,29 +109,35 @@ export async function updateProject(id: string, formData: FormData) {
   const completionDate = formData.get('completionDate') as string;
   const galleryStr = formData.get('gallery') as string;
 
-  let gallery = [];
+  let galleryItems: any[] = [];
   try {
-      if (galleryStr) gallery = JSON.parse(galleryStr);
-  } catch (e) {
-      console.error('Failed to parse gallery JSON:', e);
-  }
+      if (galleryStr) galleryItems = JSON.parse(galleryStr);
+  } catch (e) {}
 
   try {
-    await payload.update({
-      collection: 'projects',
-      id,
-      data: {
+    const projectId = parseInt(id);
+    await db.update(projects).set({
         title,
-        // Pass HTML to transient fields - hook will convert to Lexical
         htmlDescription: description,
         htmlChallenge: challenge,
         htmlSolution: solution,
         client,
         location,
         completionDate,
-        gallery,
-      } as any,
-    });
+        updatedAt: new Date().toISOString()
+    }).where(eq(projects.id, projectId));
+
+    await db.delete(projectGallery).where(eq(projectGallery.projectId, projectId));
+    if (galleryItems.length > 0) {
+        await db.insert(projectGallery).values(
+            galleryItems.map((item, idx) => ({
+                projectId,
+                mediaId: item.image,
+                caption: item.caption,
+                order: idx
+            }))
+        );
+    }
   } catch (error) {
     console.error('Update Project Error:', error);
     return { error: 'Failed to update project' };

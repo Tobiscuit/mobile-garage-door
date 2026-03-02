@@ -3,7 +3,7 @@
 import { getPayload } from 'payload';
 import configPromise from '@payload-config';
 import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
+import { redirect } from 'vinext/navigation';
 
 export async function createTestimonial(formData: FormData) {
   const payload = await getPayload({ config: configPromise });

@@ -2,7 +2,7 @@
 import React from 'react';
 import { DataTable } from './DataTable';
 import { format } from 'date-fns';
-import Link from 'next/link';
+import Link from '@/shared/ui/Link';
 
 export function UserTable({ initialUsers }: { initialUsers: any[] }) {
   const columns = [

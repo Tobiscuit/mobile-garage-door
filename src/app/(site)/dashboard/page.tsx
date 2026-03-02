@@ -1,5 +1,5 @@
 import React from 'react';
-import Link from 'next/link';
+import Link from '@/shared/ui/Link';
 import ActiveUsers from '@/features/admin/ActiveUsers';
 import { KPIGrid } from '@/features/dashboard/KPIGrid';
 import { QuickActions } from '@/features/dashboard/QuickActions';

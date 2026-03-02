@@ -1,5 +1,5 @@
 import React from 'react';
-import Link from 'next/link';
+import Link from '@/shared/ui/Link';
 import { inviteStaff } from '../actions';
 
 export default function CreateUserPage() {

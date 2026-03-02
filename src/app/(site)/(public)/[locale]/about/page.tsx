@@ -1,16 +1,32 @@
 import React from 'react';
-import { getPayloadClient } from '@/lib/payload';
-import { getTranslations } from 'next-intl/server';
+import { getDB } from "@/db";
+import { settings as settingsTable, settingStats, settingValues } from "@/db/schema";
+import { eq } from "drizzle-orm";
+import { getTranslations } from '@/hooks/useTranslations';
+import { getCloudflareContext } from "vinext/cloudflare";
 
 export const dynamic = 'force-dynamic';
 
 export default async function AboutPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
-  const payload = await getPayloadClient();
+  const { env } = await getCloudflareContext();
+  const db = getDB(env.DB);
   const t = await getTranslations({ locale, namespace: 'about_page' });
-  const settings = await payload.findGlobal({
-    slug: 'settings',
+
+  const settingsData = await db.query.settings.findFirst({
+    with: {
+      stats: true,
+      values: true
+    }
   });
+
+  const settings = settingsData || {
+    missionStatement: "To provide fast, honest, and expert garage door service to every homeowner and contractor in our community—ensuring no one is ever left stranded with a broken door.",
+    stats: [],
+    values: [],
+    licenseNumber: "TX Registered & Bonded",
+    insuranceAmount: "$2M Policy"
+  };
 
   return (
     <div className="min-h-screen bg-cloudy-white font-work-sans">
@@ -34,7 +50,7 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
                         </span>
                     </h1>
                     <p className="text-xl text-gray-300 max-w-2xl leading-relaxed">
-                        {settings.missionStatement || "Founded on the principle that a garage door is the primary moving part of your home's security envelope. We engineer reliability into every install."}
+                        {settings.missionStatement}
                     </p>
                 </div>
             </div>
@@ -91,11 +107,11 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
                     <div className="bg-white p-6 rounded-xl shadow-sm flex flex-col justify-center items-center h-48">
                         <div className="font-black text-gray-300 text-xl mb-2">LICENSE</div>
-                        <div className="font-bold text-charcoal-blue text-lg">{settings.licenseNumber || "TX Registered & Bonded"}</div>
+                        <div className="font-bold text-charcoal-blue text-lg">{settings.licenseNumber}</div>
                     </div>
                     <div className="bg-white p-6 rounded-xl shadow-sm flex flex-col justify-center items-center h-48">
                         <div className="font-black text-gray-300 text-xl mb-2">INSURANCE</div>
-                        <div className="font-bold text-charcoal-blue text-lg">{settings.insuranceAmount || "$2M General Liability"}</div>
+                        <div className="font-bold text-charcoal-blue text-lg">{settings.insuranceAmount}</div>
                     </div>
                     <div className="bg-white p-6 rounded-xl shadow-sm flex flex-col justify-center items-center h-48">
                         <div className="font-black text-gray-300 text-xl mb-2">IDA MEMBER</div>

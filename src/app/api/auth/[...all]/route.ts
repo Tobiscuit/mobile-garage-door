@@ -1,14 +1,15 @@
-import { toNextJsHandler } from 'better-auth/next-js';
-import { getPayload } from '@/lib/payload';
+import { toNextJsHandler } from "better-auth/next-js";
+import { createAuth } from "@/lib/auth";
+import { getCloudflareContext } from "vinext/cloudflare";
 
 export async function GET(request: Request) {
-  const payload = await getPayload();
-  const handlers = toNextJsHandler(payload.betterAuth);
-  return handlers.GET(request);
+  const { env } = await getCloudflareContext();
+  const auth = createAuth(env.DB);
+  return toNextJsHandler(auth).GET(request);
 }
 
 export async function POST(request: Request) {
-  const payload = await getPayload();
-  const handlers = toNextJsHandler(payload.betterAuth);
-  return handlers.POST(request);
+  const { env } = await getCloudflareContext();
+  const auth = createAuth(env.DB);
+  return toNextJsHandler(auth).POST(request);
 }

@@ -1,5 +1,5 @@
 import React from 'react';
-import Link from 'next/link';
+import Link from '@/shared/ui/Link';
 import TestimonialForm from '@/features/admin/testimonials/TestimonialForm';
 import { createTestimonial } from '../actions';
 

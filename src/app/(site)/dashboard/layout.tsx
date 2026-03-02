@@ -1,11 +1,12 @@
 import { headers } from 'next/headers';
-import { redirect } from 'next/navigation';
+import { redirect } from 'vinext/navigation';
 import { getSessionSafe } from '@/lib/get-session-safe';
 import NativeSignInPrompt from '@/features/auth/NativeSignInPrompt';
 import Sidebar from '@/features/admin/Sidebar';
 import React from 'react';
-import { getPayload } from 'payload';
-import configPromise from '@payload-config';
+import { getDB } from "@/db";
+import { settings as settingsTable } from "@/db/schema";
+import { getCloudflareContext } from "vinext/cloudflare";
 
 export default async function DashboardLayout({
   children,
@@ -19,9 +20,10 @@ export default async function DashboardLayout({
     redirect('/login');
   }
 
-  const payload = await getPayload({ config: configPromise });
-  const settings = await payload.findGlobal({ slug: 'settings' });
-  const themePreference = settings.themePreference || 'candlelight';
+  const { env } = await getCloudflareContext();
+  const db = getDB(env.DB);
+  const settingsData = await db.query.settings.findFirst();
+  const themePreference = settingsData?.themePreference || 'candlelight';
 
   return (
     <div 

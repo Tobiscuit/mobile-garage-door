@@ -1,6 +1,6 @@
 import React from 'react';
-import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import Link from '@/shared/ui/Link';
+import { notFound } from 'vinext/navigation';
 import { getTestimonialById, updateTestimonial } from '../actions';
 import TestimonialForm from '@/features/admin/testimonials/TestimonialForm';
 

@@ -1,25 +1,18 @@
 'use server';
 
-import { getPayload } from 'payload';
-import configPromise from '@/payload.config';
+import { getDB } from "@/db";
+import { emails, emailThreads } from "@/db/schema";
+import { eq, desc, and } from "drizzle-orm";
 import { revalidatePath } from 'next/cache';
+import { getCloudflareContext } from "vinext/cloudflare";
 
-/**
- * Fetches all email threads with their latest status and metadata.
- */
 export async function getEmailThreads() {
-  const payload = await getPayload({ config: configPromise });
+  const { env } = await getCloudflareContext();
+  const db = getDB(env.DB);
 
   try {
-    const { docs } = await payload.find({
-      collection: 'email-threads',
-      sort: '-lastMessageAt',
-      depth: 1,
-      limit: 50, // Pagination can be added later
-    });
-
-    // Enhance threads with participant info if needed
-    return docs.map((thread) => ({
+    const results = await db.select().from(emailThreads).orderBy(desc(emailThreads.lastMessageAt)).limit(50);
+    return results.map((thread) => ({
       id: thread.id,
       subject: thread.subject,
       status: thread.status,
@@ -31,35 +24,20 @@ export async function getEmailThreads() {
   }
 }
 
-/**
- * Fetches a single thread and all its messages.
- */
 export async function getThreadDetails(threadId: string) {
-  const payload = await getPayload({ config: configPromise });
+  const { env } = await getCloudflareContext();
+  const db = getDB(env.DB);
 
   try {
-    // 1. Get the Thread
-    const thread = await payload.findByID({
-      collection: 'email-threads',
-      id: threadId,
-    });
+    const id = parseInt(threadId);
+    const thread = await db.select().from(emailThreads).where(eq(emailThreads.id, id)).limit(1);
 
-    if (!thread) return null;
+    if (!thread[0]) return null;
 
-    // 2. Get Messages for this thread
-    const { docs: messages } = await payload.find({
-      collection: 'emails',
-      where: {
-        thread: {
-          equals: threadId,
-        },
-      },
-      sort: 'createdAt', // Chronological order
-      depth: 0,
-    });
+    const messages = await db.select().from(emails).where(eq(emails.threadId, id)).orderBy(emails.createdAt);
 
     return {
-      thread,
+      thread: thread[0],
       messages: messages.map(msg => ({
         id: msg.id,
         from: msg.from,
@@ -71,38 +49,25 @@ export async function getThreadDetails(threadId: string) {
     };
 
   } catch (error) {
-    console.error(`Error fetching thread ${threadId}:`, error);
+    console.error(`Error fetching thread \${threadId}:`, error);
     return null;
   }
 }
 
-/**
- * Sends a reply to a thread and saves it to the database.
- */
 export async function sendReply(threadId: string, content: string) {
-  const payload = await getPayload({ config: configPromise });
+  const { env } = await getCloudflareContext();
+  const db = getDB(env.DB);
   
-  // 1. Fetch thread to get context (User email, subject)
-  const thread = await payload.findByID({
-      collection: 'email-threads',
-      id: threadId,
-      depth: 1, 
-  });
+  const id = parseInt(threadId);
+  const threadResult = await db.select().from(emailThreads).where(eq(emailThreads.id, id)).limit(1);
+  const thread = threadResult[0];
 
   if (!thread) throw new Error('Thread not found');
 
-  // Naive logic: Find the first 'inbound' email to get the customer's address
-  const { docs: inboundMessages } = await payload.find({
-      collection: 'emails',
-      where: {
-          and: [
-              { thread: { equals: threadId } },
-              { direction: { equals: 'inbound' } }
-          ]
-      },
-      limit: 1,
-      sort: '-createdAt',
-  });
+  const inboundMessages = await db.select().from(emails)
+      .where(and(eq(emails.threadId, id), eq(emails.direction, 'inbound')))
+      .orderBy(desc(emails.createdAt))
+      .limit(1);
 
   const recipientEmail = inboundMessages[0]?.from;
 
@@ -111,63 +76,35 @@ export async function sendReply(threadId: string, content: string) {
   }
 
   try {
-      // 2. Send via Nodemailer (AWS SES)
       const { emailTransport } = await import('@/lib/email');
       
       const info = await emailTransport.sendMail({
           from: process.env.SES_FROM_ADDRESS || 'dispatch@mobilegaragedoor.com',
           to: recipientEmail,
-          subject: `Re: ${thread.subject}`, 
+          subject: `Re: \${thread.subject}`,
           text: content,
       });
 
-      console.log('Email sent:', info.messageId);
+      const emailRecord = await db.insert(emails).values({
+          threadId: id,
+          from: process.env.SES_FROM_ADDRESS || 'dispatch@mobilegaragedoor.com',
+          to: recipientEmail,
+          subject: `Re: \${thread.subject}`,
+          bodyRaw: content,
+          direction: 'outbound',
+          messageId: info.messageId,
+      }).returning();
 
-      // 3. Save Outbound Message to DB
-      const emailRecord = await payload.create({
-          collection: 'emails',
-          data: {
-              thread: parseInt(threadId),
-              from: process.env.SES_FROM_ADDRESS || 'dispatch@mobilegaragedoor.com',
-              to: recipientEmail,
-              subject: `Re: ${thread.subject}`,
-              bodyRaw: content,
-              direction: 'outbound',
-              messageId: info.messageId, 
-              body: {
-                root: {
-                  type: 'root',
-                  children: [
-                    {
-                      type: 'paragraph',
-                      children: [{ type: 'text', text: content, version: 1 }],
-                      version: 1,
-                    }
-                  ],
-                  direction: 'ltr',
-                  format: '',
-                  indent: 0,
-                  version: 1,
-                }
-              },
-          },
-      });
+      await db.update(emailThreads).set({
+          lastMessageAt: new Date().toISOString(),
+          status: 'open',
+          updatedAt: new Date().toISOString()
+      }).where(eq(emailThreads.id, id));
 
-      // 4. Update Thread
-      await payload.update({
-          collection: 'email-threads',
-          id: threadId,
-          data: {
-              lastMessageAt: new Date().toISOString(),
-              status: 'open',
-          },
-      });
-
-      // 5. Revalidate cache
-      revalidatePath(`/dashboard/emails/${threadId}`);
+      revalidatePath(`/dashboard/emails/\${threadId}`);
       revalidatePath(`/dashboard/emails`);
 
-      return { success: true, messageId: emailRecord.id };
+      return { success: true, messageId: emailRecord[0].id };
 
   } catch (error: any) {
       console.error('Failed to send reply:', error);

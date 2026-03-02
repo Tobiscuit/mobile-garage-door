@@ -1,5 +1,5 @@
 import { headers } from 'next/headers';
-import { redirect } from 'next/navigation';
+import { redirect } from 'vinext/navigation';
 import { getSessionSafe } from '@/lib/get-session-safe';
 
 export default async function AppEntryPage() {

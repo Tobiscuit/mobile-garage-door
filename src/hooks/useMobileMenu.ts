@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { usePathname } from 'next/navigation';
+import { usePathname } from 'vinext/navigation';
 
 export function useMobileMenu() {
   const [isOpen, setIsOpen] = useState(false);

@@ -1,19 +1,18 @@
 import React from 'react';
-import { getPayloadClient } from '@/lib/payload';
-import { getTranslations } from 'next-intl/server';
+import { getDB } from "@/db";
+import { services as servicesTable } from "@/db/schema";
+import { getTranslations } from '@/hooks/useTranslations';
+import { getCloudflareContext } from "vinext/cloudflare";
 
-// Icon mapping helper
 const getIcon = (iconName: string, highlight: boolean) => {
-  const className = `w-8 h-8 ${highlight ? 'text-red-400' : 'text-golden-yellow'}`; // Default colors, adjusted below per icon
-  
   switch (iconName) {
-    case 'lightning': // Repair
+    case 'lightning':
       return <svg className="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>;
-    case 'building': // Install
+    case 'building':
       return <svg className="w-8 h-8 text-golden-yellow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>;
-    case 'clipboard': // Maintenance
+    case 'clipboard':
       return <svg className="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2-2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>;
-    case 'phone': // Automation
+    case 'phone':
       return <svg className="w-8 h-8 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>;
     default:
       return <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>;
@@ -24,12 +23,15 @@ export const dynamic = 'force-dynamic';
 
 export default async function ServicesPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
-  const payload = await getPayloadClient();
+  const { env } = await getCloudflareContext();
+  const db = getDB(env.DB);
   const t = await getTranslations({ locale, namespace: 'services_page' });
-  const { docs: services } = await payload.find({
-    collection: 'services',
-    sort: 'order',
-    locale: locale as 'en' | 'es',
+
+  const services = await db.query.services.findMany({
+    orderBy: [servicesTable.order],
+    with: {
+        features: true
+    }
   });
 
   return (

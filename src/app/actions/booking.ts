@@ -1,13 +1,15 @@
 'use server';
 
-import { getPayload } from 'payload';
-import configPromise from '@/payload.config';
-import { redirect } from 'next/navigation';
+import { getDB } from "@/db";
+import { users, serviceRequests, payments } from "@/db/schema";
+import { eq, or } from "drizzle-orm";
+import { redirect } from 'vinext/navigation';
 import { squareService } from '@/services/squareService';
 import { randomUUID } from 'crypto';
 import webpush from 'web-push';
+import { getCloudflareContext } from "vinext/cloudflare";
 
-// Configure Web Push (Move to global config if used elsewhere)
+// Configure Web Push
 try {
     if (process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
         webpush.setVapidDetails(
@@ -25,145 +27,119 @@ interface CustomerData {
   guestEmail: string;
   guestPhone: string;
   guestAddress: string;
-  guestPassword?: string;
 }
 
-// 1. Private Helper: Find or Create Customer
-async function findOrCreateCustomer(payload: any, data: CustomerData): Promise<number> {
-  const existingCustomers = await payload.find({
-    collection: 'users',
-    where: {
-      email: { equals: data.guestEmail },
-    },
-  });
+async function findOrCreateCustomer(db: any, data: CustomerData): Promise<string> {
+  const existing = await db.select().from(users).where(eq(users.email, data.guestEmail)).limit(1);
 
-  if (existingCustomers.totalDocs > 0) {
-    return existingCustomers.docs[0].id as number;
+  if (existing.length > 0) {
+    return existing[0].id;
   }
 
-  const passwordToUse = data.guestPassword || randomUUID();
-  const newCustomer = await payload.create({
-    collection: 'users',
-    data: {
-      email: data.guestEmail,
-      password: passwordToUse,
-      name: data.guestName,
-      phone: data.guestPhone,
-      address: data.guestAddress,
-      role: 'customer',
-    },
-  });
+  const id = randomUUID();
+  const newCustomer = await db.insert(users).values({
+    id,
+    email: data.guestEmail,
+    name: data.guestName,
+    phone: data.guestPhone,
+    address: data.guestAddress,
+    role: 'customer',
+  }).returning();
 
-  return newCustomer.id as number;
+  return newCustomer[0].id;
 }
 
-// 2. Main Server Action
 export async function createBooking(prevState: any, formData: FormData) {
-  const payload = await getPayload({ config: configPromise });
+  const { env } = await getCloudflareContext();
+  const db = getDB(env.DB);
 
   const guestName = formData.get('guestName') as string;
   const guestEmail = formData.get('guestEmail') as string;
   const guestPhone = formData.get('guestPhone') as string;
   const guestAddress = formData.get('guestAddress') as string;
-  const guestPassword = formData.get('guestPassword') as string;
   const issueDescription = formData.get('issueDescription') as string;
   const urgency = formData.get('urgency') as string;
   const scheduledTime = formData.get('scheduledTime') as string;
-  const sourceId = formData.get('sourceId') as string; // Square Token
+  const sourceId = formData.get('sourceId') as string;
 
-  let customerId: number | undefined;
+  let customerId: string;
 
   try {
-    // A. Customer Logic
-    customerId = await findOrCreateCustomer(payload, {
+    customerId = await findOrCreateCustomer(db, {
       guestName,
       guestEmail,
       guestPhone,
       guestAddress,
-      guestPassword
     });
 
-    // B. Payment Logic (Service Layer)
-    const tripFee = 9900; // 99.00
-    const payment = await squareService.processPayment(
+    const tripFee = 9900;
+    const paymentResult = await squareService.processPayment(
       sourceId,
       tripFee,
       `Trip Fee for ${guestName} (${guestEmail})`
     );
 
-    // C. Service Request Logic
-    const newServiceRequest = await payload.create({
-      collection: 'service-requests',
-      data: {
-        customer: customerId as number, // Cast to number or correct ID type
-        issueDescription: issueDescription,
-        urgency: urgency as 'standard' | 'emergency',
-        scheduledTime: scheduledTime,
-        status: 'pending',
-        tripFeePayment: {
-            paymentId: payment.id,
-            amount: Number(payment.amountMoney?.amount),
-            status: payment.status,
-        },
-      },
+    const ticketId = `SR-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+    await db.insert(serviceRequests).values({
+      ticketId,
+      customerId,
+      issueDescription,
+      urgency: urgency as 'standard' | 'emergency',
+      scheduledTime,
+      status: 'pending',
+      tripFeePayment: JSON.stringify({
+        paymentId: paymentResult.id,
+        amount: Number(paymentResult.amountMoney?.amount),
+        status: paymentResult.status,
+      }),
     });
 
-    // Notify Admins & Dispatchers
+    // Notify Admins
     try {
-        const admins = await payload.find({
-            collection: 'users',
-            where: {
-                or: [
-                    { role: { equals: 'admin' } },
-                    { role: { equals: 'dispatcher' } }
-                ]
-            }
-        });
+        const admins = await db.select().from(users).where(
+            or(
+                eq(users.role, 'admin'),
+                eq(users.role, 'dispatcher')
+            )
+        );
 
-        const notifications = admins.docs
+        const notifications = admins
             .filter((user: any) => user.pushSubscription)
-            .map((user: any) => 
-                webpush.sendNotification(
-                    user.pushSubscription,
-                    JSON.stringify({
-                        title: 'New Service Request!',
-                        body: `${guestName}: ${issueDescription}`,
-                        url: '/admin/mission-control'
-                    })
-                ).catch(err => console.error(`Failed to notify admin ${user.email}:`, err))
-            );
+            .map((user: any) => {
+                try {
+                    const sub = JSON.parse(user.pushSubscription);
+                    return webpush.sendNotification(
+                        sub,
+                        JSON.stringify({
+                            title: 'New Service Request!',
+                            body: `${guestName}: ${issueDescription}`,
+                            url: '/admin/mission-control'
+                        })
+                    );
+                } catch (e) {
+                    return Promise.resolve();
+                }
+            });
         
         await Promise.all(notifications);
     } catch (notifyError) {
         console.error('Error sending admin notifications:', notifyError);
     }
 
-    // D. Payment Logging Logic
-    if (payment.id) {
-        await payload.create({
-           collection: 'payments',
-           data: {
-               squarePaymentId: payment.id,
-               amount: Number(payment.amountMoney?.amount),
-               currency: payment.amountMoney?.currency,
-               status: payment.status,
-               sourceType: payment.sourceType,
-           }
-       });
-   }
+    if (paymentResult.id) {
+        await db.insert(payments).values({
+            squarePaymentId: paymentResult.id,
+            amount: Number(paymentResult.amountMoney?.amount),
+            currency: paymentResult.amountMoney?.currency,
+            status: paymentResult.status,
+            sourceType: paymentResult.sourceType,
+        });
+    }
 
   } catch (error: any) {
     console.error('Booking Error:', error);
-    let errorMessage = 'Failed to process booking.';
-    
-    // Check if it's a known error object
-    if (error.message) {
-      errorMessage = error.message;
-    }
-
-    return { error: errorMessage };
+    return { error: error.message || 'Failed to process booking.' };
   }
 
-  // Success Redirect
   redirect('/portal?success=booked');
 }

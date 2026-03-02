@@ -1,18 +1,30 @@
 import React from 'react';
-import { getPayload } from 'payload';
-import configPromise from '@payload-config';
-import { notFound } from 'next/navigation';
+import { getDB } from "@/db";
+import { posts as postsTable } from "@/db/schema";
+import { eq } from "drizzle-orm";
+import { notFound } from 'vinext/navigation';
 import Image from 'next/image';
-import Link from 'next/link';
 import SmartLink from '@/shared/ui/SmartLink';
-import { getTranslations } from 'next-intl/server';
+import { getTranslations } from '@/hooks/useTranslations';
 import parse, { Element } from 'html-react-parser';
+import { getCloudflareContext } from "vinext/cloudflare";
 
 export const dynamic = 'force-dynamic';
 
 // Basic Rich Text Renderer for Lexical
-const RichTextRenderer = ({ content }: { content: any }) => {
-    if (!content || !content.root || !content.root.children) return null;
+const RichTextRenderer = ({ content }: { content: any | string }) => {
+    let parsedContent: any;
+    if (typeof content === 'string') {
+        try {
+            parsedContent = JSON.parse(content);
+        } catch (e) {
+            return <div>{content}</div>;
+        }
+    } else {
+        parsedContent = content;
+    }
+
+    if (!parsedContent || !parsedContent.root || !parsedContent.root.children) return null;
 
     const renderNode = (node: any, index: number) => {
         switch (node.type) {
@@ -62,7 +74,6 @@ const RichTextRenderer = ({ content }: { content: any }) => {
                     </a>
                 );
             default:
-                // Fallback for unhandled types, just try to render children
                  if (node.children) {
                     return <div key={index}>{node.children.map((child: any, i: number) => renderChild(child, i))}</div>;
                  }
@@ -91,37 +102,33 @@ const RichTextRenderer = ({ content }: { content: any }) => {
 
     return (
         <div className="rich-text-content">
-            {content.root.children.map((node: any, index: number) => renderNode(node, index))}
+            {parsedContent.root.children.map((node: any, index: number) => renderNode(node, index))}
         </div>
     );
 };
 
 export default async function BlogPost({ params }: { params: Promise<{ slug: string; locale: string }> }) {
     const { slug, locale } = await params;
-    const payload = await getPayload({ config: configPromise });
+    const { env } = await getCloudflareContext();
+    const db = getDB(env.DB);
     const t = await getTranslations({ locale, namespace: 'blog_detail' });
 
-    const posts = await payload.find({
-        collection: 'posts',
-        where: {
-            slug: {
-                equals: slug,
-            },
-        },
-        locale: locale as 'en' | 'es',
+    const post = await db.query.posts.findFirst({
+        where: eq(postsTable.slug, slug),
+        with: {
+            featuredImage: true
+        }
     });
 
-    if (!posts.docs.length) {
+    if (!post) {
         notFound();
     }
-
-    const post = posts.docs[0];
 
     return (
         <div className="bg-cloudy-white min-h-screen pb-24 font-work-sans">
             {/* Hero Section */}
             <div className="relative h-[60vh] min-h-[400px] w-full overflow-hidden">
-                {post.featuredImage && typeof post.featuredImage !== 'string' && typeof post.featuredImage !== 'number' && post.featuredImage.url ? (
+                {post.featuredImage?.url ? (
                     <Image
                         src={post.featuredImage.url}
                         alt={post.featuredImage.alt || post.title}
@@ -173,7 +180,6 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
                                         if (domNode instanceof Element && domNode.tagName === 'img') {
                                             const { src, alt, width, height } = domNode.attribs;
                                             
-                                            // Extract styling from inline styles or use defaults
                                             const w = width ? parseInt(width, 10) : 1200;
                                             const h = height ? parseInt(height, 10) : 675;
 
@@ -187,8 +193,6 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
                                                             height={h}
                                                             className="w-full h-auto object-cover transform transition-transform duration-700 group-hover:scale-105"
                                                             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
-                                                            placeholder="blur"
-                                                            blurDataURL={`data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNiA5IiBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjFmMjY1IiAvPjwvc3ZnPg==`}
                                                         />
                                                     </div>
                                                     {alt && (

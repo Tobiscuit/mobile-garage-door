@@ -1,52 +1,40 @@
 'use server';
 
-import { getPayload } from 'payload';
-import configPromise from '@payload-config';
+import { getDB } from "@/db";
+import { users, staffInvites } from "@/db/schema";
+import { eq, desc } from "drizzle-orm";
 import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
+import { redirect } from 'vinext/navigation';
+import { getCloudflareContext } from "vinext/cloudflare";
 
 export async function inviteStaff(formData: FormData) {
-  const payload = await getPayload({ config: configPromise });
+  const { env } = await getCloudflareContext();
+  const db = getDB(env.DB);
   
   const email = String(formData.get('email') || '').toLowerCase().trim();
-  const role = String(formData.get('role') || 'technician');
+  const role = String(formData.get('role') || 'technician') as "technician" | "admin";
   const firstName = String(formData.get('firstName') || '').trim();
   const lastName = String(formData.get('lastName') || '').trim();
 
   try {
-    const existing = await payload.find({
-      collection: 'staff-invites' as any,
-      where: {
-        email: {
-          equals: email,
-        },
-      },
-      limit: 1,
-      depth: 0,
-    });
+    const existing = await db.select().from(staffInvites).where(eq(staffInvites.email, email)).limit(1);
 
-    if (existing.docs.length > 0) {
-      await payload.update({
-        collection: 'staff-invites' as any,
-        id: existing.docs[0].id,
-        data: {
+    if (existing.length > 0) {
+      await db.update(staffInvites).set({
           role,
           firstName: firstName || null,
           lastName: lastName || null,
           status: 'pending',
           acceptedAt: null,
-        } as any,
-      });
+          updatedAt: new Date().toISOString()
+      }).where(eq(staffInvites.id, existing[0].id));
     } else {
-      await payload.create({
-        collection: 'staff-invites' as any,
-        data: {
+      await db.insert(staffInvites).values({
           email,
           role,
           firstName: firstName || null,
           lastName: lastName || null,
           status: 'pending',
-        } as any,
       });
     }
   } catch (error) {
@@ -59,48 +47,40 @@ export async function inviteStaff(formData: FormData) {
 }
 
 export async function getUsers() {
-  const payload = await getPayload({ config: configPromise });
+  const { env } = await getCloudflareContext();
+  const db = getDB(env.DB);
   
-  const results = await payload.find({
-    collection: 'users',
-    depth: 1,
-    limit: 100,
-    sort: '-createdAt',
-  });
-
-  return results.docs;
+  return db.select().from(users).orderBy(desc(users.createdAt)).limit(100);
 }
 
-export async function getUserById(id: string | number) {
-  const payload = await getPayload({ config: configPromise });
+export async function getUserById(id: string) {
+  const { env } = await getCloudflareContext();
+  const db = getDB(env.DB);
   
   try {
-    const user = await payload.findByID({
-      collection: 'users',
-      id: typeof id === 'string' ? parseInt(id, 10) : id,
-      depth: 1,
-    });
-    return user;
+    const result = await db.select().from(users).where(eq(users.id, id)).limit(1);
+    return result[0];
   } catch (error) {
     console.error('Failed to get user by id:', error);
     return null;
   }
 }
-export async function updateUser(id: string | number, data: any) {
-  const payload = await getPayload({ config: configPromise });
+
+export async function updateUser(id: string, data: Partial<typeof users.\$inferInsert>) {
+  const { env } = await getCloudflareContext();
+  const db = getDB(env.DB);
   
   try {
-    const updatedUser = await payload.update({
-      collection: 'users',
-      id: typeof id === 'string' ? parseInt(id, 10) : id,
-      data,
-    });
-    revalidatePath(`/dashboard/users/${id}`);
+    const updatedUsers = await db.update(users)
+        .set({ ...data, updatedAt: new Date().toISOString() })
+        .where(eq(users.id, id))
+        .returning();
+
+    revalidatePath(`/dashboard/users/\${id}`);
     revalidatePath('/dashboard/users');
-    return { success: true, user: updatedUser };
+    return { success: true, user: updatedUsers[0] };
   } catch (error) {
     console.error('Failed to update user:', error);
     return { success: false, error: 'Failed to update user' };
   }
 }
-
