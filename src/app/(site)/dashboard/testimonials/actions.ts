@@ -1,13 +1,16 @@
 'use server';
 
-import { getPayload } from 'payload';
-import configPromise from '@payload-config';
+import { getDB } from '@/db';
+import { testimonials } from '@/db/schema';
+import { eq } from 'drizzle-orm';
+import { getCloudflareContext } from 'vinext/cloudflare';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'vinext/navigation';
 
 export async function createTestimonial(formData: FormData) {
-  const payload = await getPayload({ config: configPromise });
-  
+  const { env } = await getCloudflareContext();
+  const db = getDB(env.DB);
+
   const author = formData.get('author') as string;
   const location = formData.get('location') as string;
   const quote = formData.get('quote') as string;
@@ -15,15 +18,12 @@ export async function createTestimonial(formData: FormData) {
   const featured = formData.get('featured') === 'on';
 
   try {
-    await payload.create({
-      collection: 'testimonials',
-      data: {
-        author,
-        location,
-        quote,
-        rating: parseFloat(rating) || 5,
-        featured,
-      } as any,
+    await db.insert(testimonials).values({
+      author,
+      location,
+      quote,
+      rating: parseInt(rating, 10) || 5,
+      featured,
     });
   } catch (error) {
     console.error('Create Error:', error);
@@ -35,7 +35,8 @@ export async function createTestimonial(formData: FormData) {
 }
 
 export async function updateTestimonial(id: string, formData: FormData) {
-  const payload = await getPayload({ config: configPromise });
+  const { env } = await getCloudflareContext();
+  const db = getDB(env.DB);
 
   const author = formData.get('author') as string;
   const location = formData.get('location') as string;
@@ -44,17 +45,14 @@ export async function updateTestimonial(id: string, formData: FormData) {
   const featured = formData.get('featured') === 'on';
 
   try {
-    await payload.update({
-      collection: 'testimonials',
-      id,
-      data: {
-        author,
-        location,
-        quote,
-        rating: parseFloat(rating) || 5,
-        featured,
-      } as any,
-    });
+    await db.update(testimonials).set({
+      author,
+      location,
+      quote,
+      rating: parseInt(rating, 10) || 5,
+      featured,
+      updatedAt: new Date().toISOString(),
+    }).where(eq(testimonials.id, parseInt(id, 10)));
   } catch (error) {
     console.error('Update Error:', error);
     return { error: 'Failed to update testimonial' };
@@ -65,27 +63,18 @@ export async function updateTestimonial(id: string, formData: FormData) {
 }
 
 export async function getTestimonialById(id: string) {
-  const payload = await getPayload({ config: configPromise });
+  const { env } = await getCloudflareContext();
+  const db = getDB(env.DB);
   try {
-    const testimonial = await payload.findByID({
-      collection: 'testimonials',
-      id,
-    });
-    return testimonial;
+    const result = await db.select().from(testimonials).where(eq(testimonials.id, parseInt(id, 10))).limit(1);
+    return result[0] || null;
   } catch (error) {
     return null;
   }
 }
 
 export async function getTestimonials() {
-  const payload = await getPayload({ config: configPromise });
-  
-  const results = await payload.find({
-    collection: 'testimonials',
-    depth: 1,
-    limit: 100,
-    sort: '-createdAt',
-  });
-
-  return results.docs;
+  const { env } = await getCloudflareContext();
+  const db = getDB(env.DB);
+  return db.select().from(testimonials);
 }

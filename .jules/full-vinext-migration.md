@@ -1,6 +1,8 @@
 ## Full Migration: Next.js + Payload CMS → Vinext + Drizzle + Cloudflare
 
 **IMPORTANT — BEFORE YOU START:**
+Use context7 to fetch the latest documentation for: vinext, better-auth, and drizzle-orm. Verify all API usage against the latest docs before writing code.
+
 Install the Vinext Agent Skill for up-to-date migration instructions:
 ```
 npx skills add cloudflare/vinext

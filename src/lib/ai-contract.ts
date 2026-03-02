@@ -1,17 +1,15 @@
 
-import { type SerializedEditorState } from '@payloadcms/richtext-lexical/lexical';
-
 /**
  * ------------------------------------------------------------------
- * STANDARD DATA CONTRACT: AI-Generated Blog Posts (Lexical JSON)
+ * STANDARD DATA CONTRACT: AI-Generated Blog Posts
  * ------------------------------------------------------------------
  * 
- * This contract defines the strict JSON structure required by Payload CMS's 
- * Lexical RichText editor. AI models must output content adhering to this 
- * schema to ensure it renders correctly in the Admin UI and Frontend.
+ * This contract defines the structure for AI-generated blog content.
+ * Content is now stored as HTML strings (not Lexical JSON) since we
+ * migrated from Payload CMS to Drizzle ORM.
  * 
- * @version 1.0.0
- * @date 2026-02-14
+ * @version 2.0.0 — Vinext Migration
+ * @date 2026-03-01
  */
 
 // 1. Root Structure
@@ -19,9 +17,10 @@ export interface AIPostResponse {
   title: string;
   excerpt: string;
   category: 'repair-tips' | 'product-spotlight' | 'contractor-insights' | 'maintenance-guide' | 'industry-news';
-  keywords: string[]; // Array of strings, e.g. ["Garage Door Spring", "DIY Repair"]
-  content: SerializedEditorState; // The Lexical JSON payload
+  keywords: string[];
+  content: string; // HTML content
 }
+
 
 // 2. Lexical Node Types (Simplified for AI Instruction)
 // AI should construct the 'content' field using this structure:
@@ -103,15 +102,15 @@ export const EXAMPLE_LEXICAL_STRUCTURE = {
             indent: 0,
             version: 1,
             children: [
-               {
-                 type: "text",
-                 text: "Check the green light on the receiving sensor.",
-                 format: 0,
-                 detail: 0,
-                 mode: "normal",
-                 style: "",
-                 version: 1
-               }
+              {
+                type: "text",
+                text: "Check the green light on the receiving sensor.",
+                format: 0,
+                detail: 0,
+                mode: "normal",
+                style: "",
+                version: 1
+              }
             ],
             direction: "ltr"
           }

@@ -2,40 +2,40 @@
 
 import { GoogleGenAI, Type, Schema } from '@google/genai';
 import { EXAMPLE_LEXICAL_STRUCTURE } from '@/lib/ai-contract';
-import { getPayload } from 'payload';
-import configPromise from '@payload-config';
-import sharp from 'sharp';
+import { getCloudflareContext } from 'vinext/cloudflare';
+import { getDB } from '@/db';
+import { media } from '@/db/schema';
 
 const apiKey = process.env.GEMINI_API_KEY;
 const genAI = new GoogleGenAI({ apiKey: apiKey || '' });
 
 // --- Helper: Generic Generator ---
 async function generateContent(systemPrompt: string, userPrompt: string, schema?: Schema, responseMimeType: string = 'application/json') {
-  if (!apiKey) throw new Error('GEMINI_API_KEY is not set');
+    if (!apiKey) throw new Error('GEMINI_API_KEY is not set');
 
-  try {
-    const response = await genAI.models.generateContent({
-      model: 'gemini-2.0-flash', // Upgraded to faster/cheaper model for 2026
-      contents: [
-        {
-          role: 'user',
-          parts: [{ text: `${systemPrompt}\n\nTasks:\n${userPrompt}` }]
-        }
-      ],
-      config: {
-        responseMimeType,
-        responseSchema: schema,
-      },
-    });
+    try {
+        const response = await genAI.models.generateContent({
+            model: 'gemini-2.0-flash', // Upgraded to faster/cheaper model for 2026
+            contents: [
+                {
+                    role: 'user',
+                    parts: [{ text: `${systemPrompt}\n\nTasks:\n${userPrompt}` }]
+                }
+            ],
+            config: {
+                responseMimeType,
+                responseSchema: schema,
+            },
+        });
 
-    const text = response.text;
-    if (!text) throw new Error('No content generated');
-    
-    return JSON.parse(text);
-  } catch (error) {
-    console.error('AI Generation Error:', error);
-    throw error;
-  }
+        const text = response.text;
+        if (!text) throw new Error('No content generated');
+
+        return JSON.parse(text);
+    } catch (error) {
+        console.error('AI Generation Error:', error);
+        throw error;
+    }
 }
 
 // --- Feature: Blog Post Generator ---
@@ -43,18 +43,18 @@ export async function generatePostContent(prompt: string): Promise<any> {
     const schema: Schema = {
         type: Type.OBJECT,
         properties: {
-        title: { type: Type.STRING },
-        excerpt: { type: Type.STRING },
-        category: { 
-            type: Type.STRING, 
-            enum: ['repair-tips', 'product-spotlight', 'contractor-insights', 'maintenance-guide', 'industry-news'] 
-        },
-        keywords: { 
-            type: Type.ARRAY, 
-            items: { type: Type.STRING } 
-        },
-        content: { type: Type.STRING, description: 'Main article body in semantic HTML (<p>, <h2>, <ul>, etc)' },
-        imagePrompt: { type: Type.STRING, description: 'A highly detailed prompt for generating a photorealistic featured image for this article.' }
+            title: { type: Type.STRING },
+            excerpt: { type: Type.STRING },
+            category: {
+                type: Type.STRING,
+                enum: ['repair-tips', 'product-spotlight', 'contractor-insights', 'maintenance-guide', 'industry-news']
+            },
+            keywords: {
+                type: Type.ARRAY,
+                items: { type: Type.STRING }
+            },
+            content: { type: Type.STRING, description: 'Main article body in semantic HTML (<p>, <h2>, <ul>, etc)' },
+            imagePrompt: { type: Type.STRING, description: 'A highly detailed prompt for generating a photorealistic featured image for this article.' }
         },
         required: ['title', 'excerpt', 'category', 'keywords', 'content', 'imagePrompt'],
     };
@@ -120,28 +120,28 @@ export async function generatePostContent(prompt: string): Promise<any> {
                     }
                 }
             }
-            
-            if (base64Image) {
-                const imageBuffer = Buffer.from(base64Image, 'base64');
-                const webpBuffer = await sharp(imageBuffer)
-                    .webp({ quality: 80, effort: 6 })
-                    .toBuffer();
 
-                const payload = await getPayload({ config: configPromise });
-                const uploadedMedia = await payload.create({
-                    collection: 'media',
-                    data: {
-                        alt: resultJson.title,
-                    },
-                    file: {
-                        data: webpBuffer,
-                        mimetype: 'image/webp',
-                        name: `${resultJson.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}.webp`,
-                        size: webpBuffer.length
-                    }
+            if (base64Image) {
+                const imageBuffer = Uint8Array.from(atob(base64Image), c => c.charCodeAt(0));
+                const filename = `${resultJson.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}.png`;
+
+                // Upload to R2
+                const { env } = await getCloudflareContext();
+                await env.MEDIA_BUCKET.put(`blog/${filename}`, imageBuffer, {
+                    httpMetadata: { contentType: 'image/png' },
                 });
 
-                featuredImageId = uploadedMedia.id;
+                // Create media record in D1
+                const db = getDB(env.DB);
+                const [uploaded] = await db.insert(media).values({
+                    filename,
+                    mimeType: 'image/png',
+                    filesize: imageBuffer.length,
+                    alt: resultJson.title,
+                    url: `/api/media/blog/${filename}`,
+                }).returning();
+
+                featuredImageId = uploaded.id;
             }
         }
     } catch (error) {
@@ -311,23 +311,23 @@ Here is the EXISTING REST OF THE DRAFT for your context (do not regenerate these
         // Download and append each image
         for (const img of imagesContext) {
             if (!img.url) continue;
-            
+
             // Handle relative URLs if running locally
             const fullUrl = img.url.startsWith('http') ? img.url : `${process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'}${img.url}`;
-            
+
             try {
                 const response = await fetch(fullUrl);
                 if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                 const arrayBuffer = await response.arrayBuffer();
                 const buffer = Buffer.from(arrayBuffer);
-                
+
                 parts.push({
                     inlineData: {
                         data: buffer.toString('base64'),
                         mimeType: img.mimeType || 'image/jpeg'
                     }
                 });
-                
+
                 if (img.caption) {
                     parts.push({ text: `Caption for the above image: ${img.caption}` });
                 }
@@ -352,7 +352,7 @@ Here is the EXISTING REST OF THE DRAFT for your context (do not regenerate these
 
         const text = response.text;
         if (!text) throw new Error('No content generated');
-        
+
         return JSON.parse(text);
     } catch (error) {
         console.error('AI Multimodal Generation Error:', error);
@@ -398,7 +398,7 @@ export async function extractProjectContext(contextString: string) {
 
         const text = response.text;
         if (!text) return { client: '', location: '' };
-        
+
         return JSON.parse(text);
     } catch (error) {
         console.error('AI Smart Context Extraction Error:', error);

@@ -1,155 +1,114 @@
 /**
- * Payload afterChange Hook: Auto-translate content to Spanish
+ * Auto-translate hook: writes translations to the translations table.
  *
- * When English content is saved (created or updated), this hook:
- * 1. Detects which collection was modified
- * 2. Translates all localized fields (text, Lexical JSON, HTML, arrays)
- * 3. Saves the translated version via payload.update({ locale: targetLocale })
+ * When English content is saved (created or updated), this function:
+ * 1. Detects which entity type was modified
+ * 2. Translates specified fields using Google GenAI
+ * 3. Inserts/updates rows in the translations table for 'es' and 'vi' locales
  *
- * Runs async in background — does not block the admin save.
+ * Designed to run async — does not block the save operation.
  */
-import type { CollectionAfterChangeHook } from 'payload';
-import { translate, translateLexicalTree, translateArray } from '@/lib/translate-utils';
+import { eq, and } from 'drizzle-orm';
+import { getDB } from '@/db';
+import { translations } from '@/db/schema';
+import { translate } from '@/lib/translate-utils';
 
-// Field definitions per collection
-const COLLECTION_FIELDS: Record<string, {
-  textFields?: Array<{ name: string; context: string }>;
-  richTextFields?: string[];
-  htmlFields?: Array<{ name: string; context: string }>;
-  arrayFields?: Array<{ name: string; fieldMap: Record<string, string> }>;
-}> = {
-  projects: {
-    textFields: [
-      { name: 'title', context: 'project title' },
-      { name: 'client', context: 'client type description' },
-    ],
-    richTextFields: ['description', 'challenge', 'solution'],
-    htmlFields: [
-      { name: 'htmlDescription', context: 'project case study HTML content' },
-      { name: 'htmlChallenge', context: 'project challenge HTML content' },
-      { name: 'htmlSolution', context: 'project solution HTML content' },
-    ],
-    arrayFields: [
-      { name: 'stats', fieldMap: { label: 'metric label', value: 'metric value' } },
-    ],
-  },
-  posts: {
-    textFields: [
-      { name: 'title', context: 'blog post title' },
-      { name: 'excerpt', context: 'blog post excerpt / summary' },
-    ],
-    richTextFields: ['content'],
-    htmlFields: [
-      { name: 'htmlContent', context: 'blog article HTML content' },
-    ],
-  },
-  services: {
-    textFields: [
-      { name: 'title', context: 'service name' },
-      { name: 'category', context: 'service category' },
-      { name: 'description', context: 'service description' },
-    ],
-    arrayFields: [
-      { name: 'features', fieldMap: { feature: 'service feature bullet point' } },
-    ],
-  },
-  testimonials: {
-    textFields: [
-      { name: 'quote', context: 'customer testimonial / review' },
-      { name: 'location', context: 'location name' },
-    ],
-  },
+// Field definitions per entity type
+const ENTITY_FIELDS: Record<string, Array<{ name: string; context: string }>> = {
+  services: [
+    { name: 'title', context: 'service name for a garage door company' },
+    { name: 'description', context: 'service description for a garage door company' },
+    { name: 'category', context: 'service category' },
+  ],
+  projects: [
+    { name: 'title', context: 'project title for a garage door company' },
+    { name: 'description', context: 'project case study description' },
+    { name: 'challenge', context: 'project challenge description' },
+    { name: 'solution', context: 'project solution description' },
+  ],
+  posts: [
+    { name: 'title', context: 'blog post title' },
+    { name: 'excerpt', context: 'blog post excerpt / summary' },
+    { name: 'content', context: 'blog article content' },
+  ],
+  testimonials: [
+    { name: 'quote', context: 'customer testimonial / review' },
+    { name: 'location', context: 'location name' },
+  ],
 };
 
-export const autoTranslateHook: CollectionAfterChangeHook = async ({
-  doc,
-  req,
-  operation,
-  collection,
-}) => {
-  // Only translate on create/update of English content
-  if (operation !== 'create' && operation !== 'update') return doc;
+const TARGET_LOCALES = ['es', 'vi'] as const;
 
-  // Check if this is a Spanish save (avoid infinite loop)
-  const locale = req.locale || 'en';
-  if (locale !== 'en') return doc;
-
-  // Don't block the main request — translate in background
-  const collectionSlug = collection.slug;
-  const fieldConfig = COLLECTION_FIELDS[collectionSlug];
-  if (!fieldConfig) return doc;
-
-  // Fire and forget — don't await, don't block the admin UI
-  const targetLocales = ['es', 'vi'];
-  for (const targetLocale of targetLocales) {
-    translateInBackground(doc, collectionSlug, fieldConfig, req.payload, targetLocale).catch((err) => {
-      req.payload.logger.error({ err }, `Auto-translation failed for ${collectionSlug}/${doc.id} (${targetLocale})`);
-    });
-  }
-
-  return doc;
-};
-
-async function translateInBackground(
-  doc: any,
-  collectionSlug: string,
-  fieldConfig: typeof COLLECTION_FIELDS[string],
-  payload: any,
-  targetLocale: string
-) {
-  payload.logger.info(`🌎 Auto-translating ${collectionSlug}/${doc.id} to ${targetLocale}...`);
-
-  const updateData: Record<string, any> = {};
-
-  // 1. Translate plain text fields
-  if (fieldConfig.textFields) {
-    for (const { name, context } of fieldConfig.textFields) {
-      if (doc[name] && typeof doc[name] === 'string' && doc[name].trim()) {
-        updateData[name] = await translate(doc[name], context, targetLocale);
-      }
-    }
-  }
-
-  // 2. Translate Lexical richText fields (deep tree walk)
-  if (fieldConfig.richTextFields) {
-    for (const fieldName of fieldConfig.richTextFields) {
-      if (doc[fieldName] && typeof doc[fieldName] === 'object') {
-        updateData[fieldName] = await translateLexicalTree(doc[fieldName], targetLocale);
-      }
-    }
-  }
-
-  // 3. Translate HTML code fields
-  if (fieldConfig.htmlFields) {
-    for (const { name, context } of fieldConfig.htmlFields) {
-      if (doc[name] && typeof doc[name] === 'string' && doc[name].trim()) {
-        updateData[name] = await translate(doc[name], context, targetLocale);
-      }
-    }
-  }
-
-  // 4. Translate array fields
-  if (fieldConfig.arrayFields) {
-    for (const { name, fieldMap } of fieldConfig.arrayFields) {
-      if (doc[name] && Array.isArray(doc[name]) && doc[name].length > 0) {
-        updateData[name] = await translateArray(doc[name], fieldMap, targetLocale);
-      }
-    }
-  }
-
-  // Only update if we have fields to translate
-  if (Object.keys(updateData).length === 0) {
-    payload.logger.info(`  ⏭ No translatable fields found, skipping.`);
+/**
+ * Auto-translate an entity's fields and save to the translations table.
+ *
+ * @param d1 - The D1 database binding
+ * @param entityType - The table name (e.g. 'services', 'projects')
+ * @param entityId - The integer ID of the entity
+ * @param entityData - The entity data object with field values
+ */
+export async function autoTranslateEntity(
+  d1: D1Database,
+  entityType: string,
+  entityId: number,
+  entityData: Record<string, any>
+): Promise<void> {
+  const fieldConfig = ENTITY_FIELDS[entityType];
+  if (!fieldConfig) {
+    console.log(`⏭ No translation config for entity type: ${entityType}`);
     return;
   }
 
-  // Save the translated version
-  await payload.update({
-    collection: collectionSlug,
-    id: doc.id,
-    locale: targetLocale as any,
-    data: updateData,
-  });
+  const db = getDB(d1);
 
-  payload.logger.info(`  ✅ ${targetLocale} translation saved for ${collectionSlug}/${doc.id} (${Object.keys(updateData).length} fields)`);
+  for (const targetLocale of TARGET_LOCALES) {
+    console.log(`🌎 Auto-translating ${entityType}/${entityId} to ${targetLocale}...`);
+
+    for (const { name, context } of fieldConfig) {
+      const value = entityData[name];
+      if (!value || typeof value !== 'string' || !value.trim()) continue;
+
+      try {
+        const translatedValue = await translate(value, context, targetLocale);
+
+        // Upsert: check if translation exists, then insert or update
+        const existing = await db
+          .select()
+          .from(translations)
+          .where(
+            and(
+              eq(translations.entityType, entityType),
+              eq(translations.entityId, entityId),
+              eq(translations.fieldName, name),
+              eq(translations.locale, targetLocale)
+            )
+          )
+          .limit(1);
+
+        if (existing.length > 0) {
+          await db
+            .update(translations)
+            .set({
+              value: translatedValue,
+              autoTranslated: true,
+              updatedAt: new Date().toISOString(),
+            })
+            .where(eq(translations.id, existing[0].id));
+        } else {
+          await db.insert(translations).values({
+            entityType,
+            entityId,
+            fieldName: name,
+            locale: targetLocale,
+            value: translatedValue,
+            autoTranslated: true,
+          });
+        }
+      } catch (err) {
+        console.error(`❌ Translation failed for ${entityType}/${entityId}.${name} (${targetLocale}):`, err);
+      }
+    }
+
+    console.log(`✅ ${targetLocale} translation saved for ${entityType}/${entityId}`);
+  }
 }

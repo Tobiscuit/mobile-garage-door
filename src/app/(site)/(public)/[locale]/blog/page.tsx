@@ -5,7 +5,7 @@ import { eq, desc } from "drizzle-orm";
 import Link from '@/shared/ui/Link';
 import Image from 'next/image';
 import SmartLink from '@/shared/ui/SmartLink';
-import { getTranslations } from '@/hooks/useTranslations';
+import { getTranslations } from '@/lib/server-translations';
 import { getCloudflareContext } from "vinext/cloudflare";
 
 export const dynamic = 'force-dynamic';

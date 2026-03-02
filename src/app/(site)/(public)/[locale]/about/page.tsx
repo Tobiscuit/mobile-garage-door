@@ -2,7 +2,7 @@ import React from 'react';
 import { getDB } from "@/db";
 import { settings as settingsTable, settingStats, settingValues } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import { getTranslations } from '@/hooks/useTranslations';
+import { getTranslations } from '@/lib/server-translations';
 import { getCloudflareContext } from "vinext/cloudflare";
 
 export const dynamic = 'force-dynamic';

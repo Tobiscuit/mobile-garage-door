@@ -1,5 +1,5 @@
 import React from 'react';
-import { getTranslations } from '@/hooks/useTranslations';
+import { getTranslations } from '@/lib/server-translations';
 
 export default async function PrivacyPolicy({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;

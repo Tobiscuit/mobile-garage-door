@@ -5,7 +5,7 @@ import { eq } from "drizzle-orm";
 import { notFound } from 'vinext/navigation';
 import Image from 'next/image';
 import SmartLink from '@/shared/ui/SmartLink';
-import { getTranslations } from '@/hooks/useTranslations';
+import { getTranslations } from '@/lib/server-translations';
 import parse, { Element } from 'html-react-parser';
 import { getCloudflareContext } from "vinext/cloudflare";
 

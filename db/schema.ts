@@ -17,7 +17,7 @@ export const users = sqliteTable("users", {
   pushSubscription: text("push_subscription"),
   squareCustomerId: text("square_customer_id"),
   createdAt: text("created_at").notNull().\$defaultFn(() => new Date().toISOString()),
-  updatedAt: text("updated_at").notNull().\$defaultFn(() => new Date().toISOString()),
+updatedAt: text("updated_at").notNull().\$defaultFn(() => new Date().toISOString()),
 });
 
 // Business tables
@@ -32,7 +32,7 @@ export const services = sqliteTable("services", {
   highlight: integer("highlight", { mode: "boolean" }).default(false),
   order: integer("order").default(0),
   createdAt: text("created_at").notNull().\$defaultFn(() => new Date().toISOString()),
-  updatedAt: text("updated_at").notNull().\$defaultFn(() => new Date().toISOString()),
+updatedAt: text("updated_at").notNull().\$defaultFn(() => new Date().toISOString()),
 });
 
 export const serviceFeatures = sqliteTable("service_features", {
@@ -59,7 +59,7 @@ export const projects = sqliteTable("projects", {
   htmlSolution: text("html_solution"),
   imageStyle: text("image_style"),
   createdAt: text("created_at").notNull().\$defaultFn(() => new Date().toISOString()),
-  updatedAt: text("updated_at").notNull().\$defaultFn(() => new Date().toISOString()),
+updatedAt: text("updated_at").notNull().\$defaultFn(() => new Date().toISOString()),
 });
 
 export const media = sqliteTable("media", {
@@ -72,7 +72,7 @@ export const media = sqliteTable("media", {
   alt: text("alt"),
   url: text("url"),
   createdAt: text("created_at").notNull().\$defaultFn(() => new Date().toISOString()),
-  updatedAt: text("updated_at").notNull().\$defaultFn(() => new Date().toISOString()),
+updatedAt: text("updated_at").notNull().\$defaultFn(() => new Date().toISOString()),
 });
 
 export const projectGallery = sqliteTable("project_gallery", {
@@ -107,7 +107,7 @@ export const serviceRequests = sqliteTable("service_requests", {
   assignedTechId: text("assigned_tech_id").references(() => users.id),
   tripFeePayment: text("trip_fee_payment"),
   createdAt: text("created_at").notNull().\$defaultFn(() => new Date().toISOString()),
-  updatedAt: text("updated_at").notNull().\$defaultFn(() => new Date().toISOString()),
+updatedAt: text("updated_at").notNull().\$defaultFn(() => new Date().toISOString()),
 });
 
 export const testimonials = sqliteTable("testimonials", {
@@ -118,7 +118,7 @@ export const testimonials = sqliteTable("testimonials", {
   rating: integer("rating").default(5),
   featured: integer("featured", { mode: "boolean" }).default(false),
   createdAt: text("created_at").notNull().\$defaultFn(() => new Date().toISOString()),
-  updatedAt: text("updated_at").notNull().\$defaultFn(() => new Date().toISOString()),
+updatedAt: text("updated_at").notNull().\$defaultFn(() => new Date().toISOString()),
 });
 
 export const posts = sqliteTable("posts", {
@@ -134,7 +134,7 @@ export const posts = sqliteTable("posts", {
   status: text("status", { enum: ["draft", "published"] }).default("draft"),
   quickNotes: text("quick_notes"),
   createdAt: text("created_at").notNull().\$defaultFn(() => new Date().toISOString()),
-  updatedAt: text("updated_at").notNull().\$defaultFn(() => new Date().toISOString()),
+updatedAt: text("updated_at").notNull().\$defaultFn(() => new Date().toISOString()),
 });
 
 export const postKeywords = sqliteTable("post_keywords", {
@@ -152,7 +152,7 @@ export const invoices = sqliteTable("invoices", {
   customerId: text("customer_id").references(() => users.id),
   publicUrl: text("public_url"),
   createdAt: text("created_at").notNull().\$defaultFn(() => new Date().toISOString()),
-  updatedAt: text("updated_at").notNull().\$defaultFn(() => new Date().toISOString()),
+updatedAt: text("updated_at").notNull().\$defaultFn(() => new Date().toISOString()),
 });
 
 export const payments = sqliteTable("payments", {
@@ -164,7 +164,7 @@ export const payments = sqliteTable("payments", {
   sourceType: text("source_type"),
   note: text("note"),
   createdAt: text("created_at").notNull().\$defaultFn(() => new Date().toISOString()),
-  updatedAt: text("updated_at").notNull().\$defaultFn(() => new Date().toISOString()),
+updatedAt: text("updated_at").notNull().\$defaultFn(() => new Date().toISOString()),
 });
 
 export const staffInvites = sqliteTable("staff_invites", {
@@ -177,7 +177,7 @@ export const staffInvites = sqliteTable("staff_invites", {
   acceptedAt: text("accepted_at"),
   invitedById: text("invited_by_id").references(() => users.id),
   createdAt: text("created_at").notNull().\$defaultFn(() => new Date().toISOString()),
-  updatedAt: text("updated_at").notNull().\$defaultFn(() => new Date().toISOString()),
+updatedAt: text("updated_at").notNull().\$defaultFn(() => new Date().toISOString()),
 });
 
 export const emailThreads = sqliteTable("email_threads", {
@@ -186,7 +186,7 @@ export const emailThreads = sqliteTable("email_threads", {
   status: text("status", { enum: ["open", "closed", "archived"] }).default("open"),
   lastMessageAt: text("last_message_at"),
   createdAt: text("created_at").notNull().\$defaultFn(() => new Date().toISOString()),
-  updatedAt: text("updated_at").notNull().\$defaultFn(() => new Date().toISOString()),
+updatedAt: text("updated_at").notNull().\$defaultFn(() => new Date().toISOString()),
 });
 
 export const emailThreadParticipants = sqliteTable("email_thread_participants", {
@@ -207,7 +207,7 @@ export const emails = sqliteTable("emails", {
   messageId: text("message_id").unique(),
   rawMetadata: text("raw_metadata"),
   createdAt: text("created_at").notNull().\$defaultFn(() => new Date().toISOString()),
-  updatedAt: text("updated_at").notNull().\$defaultFn(() => new Date().toISOString()),
+updatedAt: text("updated_at").notNull().\$defaultFn(() => new Date().toISOString()),
 });
 
 export const emailAttachments = sqliteTable("email_attachments", {
@@ -282,3 +282,17 @@ export const emailRelations = relations(emails, ({ one, many }) => ({
   thread: one(emailThreads, { fields: [emails.threadId], references: [emailThreads.id] }),
   attachments: many(emailAttachments),
 }));
+
+// Translations table for CMS content in es/vi locales
+// English content stays in the main table columns; translations table holds other locales
+export const translations = sqliteTable("translations", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  entityType: text("entity_type").notNull(), // e.g. 'services', 'projects', 'posts', 'testimonials'
+  entityId: integer("entity_id").notNull(), // ID of the row in the entity table
+  fieldName: text("field_name").notNull(), // e.g. 'title', 'description', 'content'
+  locale: text("locale", { enum: ["es", "vi"] }).notNull(),
+  value: text("value").notNull(),
+  autoTranslated: integer("auto_translated", { mode: "boolean" }).default(true),
+  createdAt: text("created_at").notNull().$defaultFn(() => new Date().toISOString()),
+  updatedAt: text("updated_at").notNull().$defaultFn(() => new Date().toISOString()),
+});

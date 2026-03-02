@@ -5,7 +5,7 @@ import { projects as projectsTable, projectGallery, media as mediaTable, project
 import { eq, desc } from "drizzle-orm";
 import SmartLink from '@/shared/ui/SmartLink';
 import ProjectCardImage from '@/features/landing/ProjectCardImage';
-import { getTranslations } from '@/hooks/useTranslations';
+import { getTranslations } from '@/lib/server-translations';
 import { getCloudflareContext } from "vinext/cloudflare";
 
 export const dynamic = 'force-dynamic';

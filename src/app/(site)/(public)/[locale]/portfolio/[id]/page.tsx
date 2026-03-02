@@ -6,7 +6,7 @@ import { projects as projectsTable } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import SmartLink from '@/shared/ui/SmartLink';
 import ProjectHeroImage from '@/features/landing/ProjectHeroImage';
-import { getTranslations } from '@/hooks/useTranslations';
+import { getTranslations } from '@/lib/server-translations';
 import { getCloudflareContext } from "vinext/cloudflare";
 
 export const dynamic = 'force-dynamic';

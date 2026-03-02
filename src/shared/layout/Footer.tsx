@@ -1,5 +1,5 @@
 import React from 'react';
-import { getTranslations } from '@/hooks/useTranslations';
+import { getTranslations } from '@/lib/server-translations';
 
 const Footer: React.FC = async () => {
   const t = await getTranslations('footer');
