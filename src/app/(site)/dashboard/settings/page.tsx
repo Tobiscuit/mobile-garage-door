@@ -1,5 +1,5 @@
 import React from 'react';
-import Link from 'next/link';
+import Link from '@/shared/ui/Link';
 import { getSettings } from './actions';
 import SettingsForm from '@/features/admin/settings/SettingsForm';
 import { Metadata } from 'next';

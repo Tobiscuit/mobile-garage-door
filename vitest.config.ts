@@ -10,7 +10,6 @@ export default defineConfig({
     globals: true,
     alias: {
       '@': path.resolve(__dirname, './src'),
-      '@payload-config': path.resolve(__dirname, './src/payload.config.ts'),
     },
   },
 });

@@ -1,12 +1,14 @@
-import { getPayload } from 'payload';
-import configPromise from '@/payload.config';
 import { headers } from 'next/headers';
+import { getDB } from "@/db";
+import { users } from "@/db/schema";
+import { eq } from "drizzle-orm";
 import { serviceRequestService } from '@/services/serviceRequestService';
 import { PortalHeader } from '@/features/portal/PortalHeader';
 import { ActiveRequestList } from '@/features/portal/ActiveRequestList';
 import { ServiceHistory } from '@/features/portal/ServiceHistory';
 import { AccountSidebar } from '@/features/portal/AccountSidebar';
 import { getSessionSafe } from '@/lib/get-session-safe';
+import { getCloudflareContext } from "vinext/cloudflare";
 
 export const dynamic = 'force-dynamic';
 
@@ -14,65 +16,51 @@ export default async function PortalDashboard() {
   const headerList = await headers();
   const session = await getSessionSafe(headerList);
 
-  if (!session) return null; // Handled by layout/middleware
+  if (!session) return null;
 
-  const payload = await getPayload({ config: configPromise });
+  const { env } = await getCloudflareContext();
+  const db = getDB(env.DB);
   const user = session.user;
 
-  // 1) Find the Payload User by email (since BetterAuth uses UUIDs and Payload Postgres uses Ints)
-  const payloadUsers = await payload.find({
-    collection: 'users',
-    where: { email: { equals: user.email } },
-    depth: 0,
-  });
+  const payloadUsers = await db.select().from(users).where(eq(users.email, user.email)).limit(1);
 
-  let payloadUserId: number | null = null;
-  let customerData = payloadUsers.docs[0];
+  let customerData = payloadUsers[0];
 
   if (customerData) {
-    payloadUserId = customerData.id as number;
-    // Keep Payload DB name in sync with BetterAuth session name
     if (user.name && customerData.name !== user.name) {
-       await payload.update({
-         collection: 'users',
-         id: payloadUserId,
-         data: { name: user.name }
-       });
+       await db.update(users).set({ name: user.name }).where(eq(users.id, customerData.id));
        customerData.name = user.name;
     }
   } else {
-    // 2) Auto-sync fresh Google SSO logins into Payload
-    customerData = await payload.create({
-      collection: 'users',
-      data: {
+    const id = user.id;
+    const newUsers = await db.insert(users).values({
+        id,
         email: user.email,
         name: user.name || '',
-        role: ['customer'],
+        role: 'customer',
         emailVerified: false,
-      }
-    });
-    payloadUserId = customerData.id as number;
+    }).returning();
+    customerData = newUsers[0];
   }
 
   const isBuilder = customerData.customerType === 'builder';
-  const customer = customerData; // Alias for the UI components
+  const customer = customerData;
 
-  // Use Service Layer for data fetching using the Integer Payload ID
-  const activeRequests = await serviceRequestService.getActiveRequests(payload, payloadUserId);
-  const pastRequests = await serviceRequestService.getPastRequests(payload, payloadUserId);
+  const activeRequests = await serviceRequestService.getActiveRequests(env.DB, customer.id);
+  const pastRequests = await serviceRequestService.getPastRequests(env.DB, customer.id);
 
-  const activeMapped = activeRequests.docs.map(doc => ({
+  const activeMapped = activeRequests.map(doc => ({
     id: String(doc.id),
-    ticketId: (doc as any).ticketId,
-    status: (doc as any).status,
-    issueDescription: (doc as any).issueDescription,
-    scheduledTime: (doc as any).scheduledTime,
+    ticketId: doc.ticketId,
+    status: doc.status,
+    issueDescription: doc.issueDescription,
+    scheduledTime: doc.scheduledTime,
   }));
 
-  const pastMapped = pastRequests.docs.map(doc => ({
+  const pastMapped = pastRequests.map(doc => ({
     id: String(doc.id),
-    ticketId: (doc as any).ticketId,
-    issueDescription: (doc as any).issueDescription,
+    ticketId: doc.ticketId,
+    issueDescription: doc.issueDescription,
     createdAt: doc.createdAt,
   }));
 
@@ -81,7 +69,7 @@ export default async function PortalDashboard() {
       <PortalHeader 
         customerName={customer.companyName || customer.name || ''} 
         isBuilder={isBuilder} 
-        isAdmin={customerData.role?.some(r => ['admin', 'technician', 'dispatcher'].includes(r)) ?? false}
+        isAdmin={['admin', 'technician', 'dispatcher'].includes(customerData.role || '')}
       />
       
       {isBuilder && (
@@ -95,7 +83,6 @@ export default async function PortalDashboard() {
                     <p className="text-sm text-gray-600">You have access to multi-site management features.</p>
                 </div>
             </div>
-            {/* Future: Add "Add Job Site" button */}
          </div>
       )}
 

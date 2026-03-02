@@ -1,15 +1,17 @@
 import React from 'react';
-import { getPayload } from 'payload';
-import configPromise from '@/payload.config';
 import { headers } from 'next/headers';
-import { redirect } from 'next/navigation';
+import { redirect } from 'vinext/navigation';
 import { serviceRequestService } from '@/services/serviceRequestService';
-import Link from 'next/link';
+import { getDB } from "@/db";
+import { users } from "@/db/schema";
+import { eq } from "drizzle-orm";
+import { getCloudflareContext } from "vinext/cloudflare";
 
 export const dynamic = 'force-dynamic';
 
 export default async function TechnicianDashboard() {
-  const payload = await getPayload({ config: configPromise });
+  const { env } = await getCloudflareContext();
+  const db = getDB(env.DB);
   const headerList = await headers();
   const { getSessionSafe } = await import('@/lib/get-session-safe');
   const session = await getSessionSafe(headerList);
@@ -23,8 +25,13 @@ export default async function TechnicianDashboard() {
     redirect('/app');
   }
 
-  const assignedJobs = await serviceRequestService.getAssignedRequests(payload, user.id!);
+  const assignedJobs = await serviceRequestService.getAssignedRequests(env.DB, user.id!);
 
+  // Fetch customer details for each job
+  const jobsWithCustomers = await Promise.all(assignedJobs.map(async (job) => {
+      const customer = job.customerId ? await db.select().from(users).where(eq(users.id, job.customerId)).limit(1) : [];
+      return { ...job, customer: customer[0] };
+  }));
 
   return (
     <div className="min-h-screen bg-charcoal-blue text-white p-6 md:p-12 font-sans">
@@ -44,19 +51,19 @@ export default async function TechnicianDashboard() {
 
         {/* Jobs Grid */}
         <div className="grid gap-6">
-          {assignedJobs.docs.length === 0 ? (
+          {jobsWithCustomers.length === 0 ? (
             <div className="bg-white/5 rounded-2xl p-12 text-center border border-white/10">
               <div className="text-2xl font-bold text-gray-400 mb-2">No Active Assignments</div>
               <p className="text-gray-500">You're currently clear. Stand by for dispatch.</p>
             </div>
           ) : (
-            assignedJobs.docs.map((job: any) => (
+            jobsWithCustomers.map((job: any) => (
               <div key={job.id} className="bg-white/5 rounded-2xl p-6 border border-white/10 hover:border-[#f1c40f]/50 transition-colors group">
                 <div className="flex flex-col md:flex-row gap-6 justify-between">
                   
                   {/* Status Column */}
                   <div className="md:w-48 flex-shrink-0">
-                    <div className={`inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-3 ${
+                    <div className={`inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-3 \${
                       job.urgency === 'emergency' ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
                     }`}>
                       {job.urgency}
@@ -69,8 +76,8 @@ export default async function TechnicianDashboard() {
                   <div className="flex-grow">
                     <div className="mb-4">
                         <div className="text-sm text-gray-400 font-mono mb-1">Customer</div>
-                        <div className="text-lg font-bold">{typeof job.customer === 'object' ? job.customer.name : 'Unknown'}</div>
-                        <div className="text-gray-400">{typeof job.customer === 'object' ? job.customer.phone : ''}</div>
+                        <div className="text-lg font-bold">{job.customer?.name || 'Unknown'}</div>
+                        <div className="text-gray-400">{job.customer?.phone || ''}</div>
                     </div>
                     <div>
                         <div className="text-sm text-gray-400 font-mono mb-1">Issue</div>
@@ -88,10 +95,10 @@ export default async function TechnicianDashboard() {
                     </div>
                     
                     <a 
-                        href={`/admin/collections/service-requests/${job.id}`} 
+                        href={`/dashboard/dispatch`}
                         className="w-full bg-white text-black font-bold py-3 px-4 rounded-lg text-center hover:bg-[#f1c40f] transition-colors"
                     >
-                        Update Status
+                        View Dispatch
                     </a>
                   </div>
 

@@ -1,9 +1,9 @@
 'use client'
 
 import React, { useState } from 'react';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { useTranslations } from 'next-intl';
+import Link from '@/shared/ui/Link';
+import { usePathname } from 'vinext/navigation';
+import { useTranslations } from '@/hooks/useTranslations';
 import { authClient } from '@/lib/auth-client';
 
 const Header: React.FC = () => {

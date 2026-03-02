@@ -1,81 +1,89 @@
 'use server';
 
-import { getPayload } from 'payload';
-import configPromise from '@payload-config';
+import { getDB } from "@/db";
+import { settings, settingStats, settingValues } from "@/db/schema";
+import { eq } from "drizzle-orm";
 import { revalidatePath } from 'next/cache';
+import { getCloudflareContext } from "vinext/cloudflare";
 
 export async function getSettings() {
-  const payload = await getPayload({ config: configPromise });
+  const { env } = await getCloudflareContext();
+  const db = getDB(env.DB);
   
-  const settings = await payload.findGlobal({
-    slug: 'settings',
+  return db.query.settings.findFirst({
+    with: {
+        stats: true,
+        values: true
+    }
   });
-
-  return settings;
 }
 
 export async function updateSettings(formData: FormData) {
-  const payload = await getPayload({ config: configPromise });
+  const { env } = await getCloudflareContext();
+  const db = getDB(env.DB);
   
-  // Extract Company Info
   const companyName = formData.get('companyName') as string;
   const phone = formData.get('phone') as string;
   const email = formData.get('email') as string;
   const licenseNumber = formData.get('licenseNumber') as string;
   const insuranceAmount = formData.get('insuranceAmount') as string;
   const bbbRating = formData.get('bbbRating') as string;
-
-  // Extract About Page Content
   const missionStatement = formData.get('missionStatement') as string;
   
-  // Parse Stats Array
   const statsJson = formData.get('stats') as string;
-  const stats = statsJson ? JSON.parse(statsJson) : [];
+  const statsList = statsJson ? JSON.parse(statsJson) : [];
 
-  // Parse Values Array
   const valuesJson = formData.get('values') as string;
-  const values = valuesJson ? JSON.parse(valuesJson) : [];
+  const valuesList = valuesJson ? JSON.parse(valuesJson) : [];
 
-  // Extract Brand Voice
   const brandVoice = formData.get('brandVoice') as string;
   const brandTone = formData.get('brandTone') as string;
   const brandAvoid = formData.get('brandAvoid') as string;
-
-  // Extract Theme Preference
   const themePreference = formData.get('themePreference') as string;
-
-  // Extract Warranty
   const warrantyEnableNotifications = formData.get('warrantyEnableNotifications') === 'true';
   const warrantyEmailTemplate = formData.get('warrantyEmailTemplate') as string;
 
-  const warranty = {
-      enableNotifications: warrantyEnableNotifications,
-      notificationEmailTemplate: warrantyEmailTemplate,
-  };
-
   try {
-    await payload.updateGlobal({
-      slug: 'settings',
-      data: {
-        companyName,
-        phone,
-        email,
-        licenseNumber,
-        insuranceAmount,
-        bbbRating,
-        missionStatement,
-        stats,
-        values,
-        brandVoice,
-        brandTone: brandTone as any,
-        brandAvoid: brandAvoid as any,
-        themePreference: themePreference as 'candlelight' | 'original',
-        warranty: warranty as any,
-      },
-    });
+    const existing = await db.query.settings.findFirst();
+
+    let settingId: number;
+    if (existing) {
+        settingId = existing.id;
+        await db.update(settings).set({
+            companyName, phone, email, licenseNumber, insuranceAmount, bbbRating,
+            missionStatement, brandVoice, brandTone, brandAvoid,
+            themePreference: themePreference as "candlelight" | "original",
+            warrantyEnableNotifications,
+            warrantyNotificationEmailTemplate: warrantyEmailTemplate,
+            updatedAt: new Date().toISOString()
+        }).where(eq(settings.id, settingId));
+    } else {
+        const newSettings = await db.insert(settings).values({
+            companyName, phone, email, licenseNumber, insuranceAmount, bbbRating,
+            missionStatement, brandVoice, brandTone, brandAvoid,
+            themePreference: themePreference as "candlelight" | "original",
+            warrantyEnableNotifications,
+            warrantyNotificationEmailTemplate: warrantyEmailTemplate,
+        }).returning();
+        settingId = newSettings[0].id;
+    }
+
+    await db.delete(settingStats).where(eq(settingStats.settingId, settingId));
+    if (statsList.length > 0) {
+        await db.insert(settingStats).values(
+            statsList.map((s: any) => ({ settingId, label: s.label, value: s.value }))
+        );
+    }
+
+    await db.delete(settingValues).where(eq(settingValues.settingId, settingId));
+    if (valuesList.length > 0) {
+        await db.insert(settingValues).values(
+            valuesList.map((v: any) => ({ settingId, title: v.title, description: v.description }))
+        );
+    }
 
     revalidatePath('/dashboard/settings');
-    revalidatePath('/', 'layout'); // Revalidate entire site as settings might affect header/footer
+    revalidatePath('/', 'layout');
     return { success: true };
   } catch (error) {
     console.error('Update Settings Error:', error);

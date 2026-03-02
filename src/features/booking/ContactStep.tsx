@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
 import { BookingFormData } from '@/hooks/useBookingForm';
-import { useTranslations } from 'next-intl';
+import { useTranslations } from '@/hooks/useTranslations';
 
 interface ContactStepProps {
   formData: BookingFormData;

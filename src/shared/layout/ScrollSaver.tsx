@@ -1,6 +1,6 @@
 'use client'
 
-import { usePathname } from 'next/navigation'
+import { usePathname } from 'vinext/navigation'
 import { useEffect } from 'react'
 import { saveScrollPosition } from '@/shared/store/scrollStore'
 

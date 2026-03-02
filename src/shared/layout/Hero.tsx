@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
-import Link from 'next/link';
-import { useTranslations } from 'next-intl';
+import Link from '@/shared/ui/Link';
+import { useTranslations } from '@/hooks/useTranslations';
 
 const Hero: React.FC = () => {
   const t = useTranslations('hero');

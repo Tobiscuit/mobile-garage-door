@@ -1,6 +1,6 @@
 import React from 'react';
-import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import Link from '@/shared/ui/Link';
+import { notFound } from 'vinext/navigation';
 import { getProjectById } from '../actions';
 import ProjectForm from '@/features/admin/projects/ProjectForm';
 

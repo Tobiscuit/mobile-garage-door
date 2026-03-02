@@ -1,5 +1,5 @@
 import React from 'react';
-import Link from 'next/link';
+import Link from '@/shared/ui/Link';
 import ServiceForm from '@/features/admin/services/ServiceForm';
 
 export default function CreateServicePage() {

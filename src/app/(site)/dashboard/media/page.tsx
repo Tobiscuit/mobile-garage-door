@@ -1,18 +1,16 @@
 import React from 'react';
-import Link from 'next/link';
-import { getPayload } from 'payload';
-import configPromise from '@payload-config';
+import Link from '@/shared/ui/Link';
+import { getDB } from "@/db";
+import { media as mediaTable } from "@/db/schema";
+import { desc } from "drizzle-orm";
 import Image from 'next/image';
 import QuickUpload from '@/features/admin/media/QuickUpload';
+import { getCloudflareContext } from "vinext/cloudflare";
 
 async function getMedia() {
-  const payload = await getPayload({ config: configPromise });
-  const results = await payload.find({
-    collection: 'media',
-    limit: 100,
-    sort: '-createdAt',
-  });
-  return results.docs;
+  const { env } = await getCloudflareContext();
+  const db = getDB(env.DB);
+  return db.select().from(mediaTable).orderBy(desc(mediaTable.createdAt)).limit(100);
 }
 
 export default async function MediaPage() {

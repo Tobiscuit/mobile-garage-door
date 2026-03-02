@@ -1,23 +1,31 @@
 import React from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
-import { getPayload } from 'payload';
-import configPromise from '@/payload.config';
+import Link from '@/shared/ui/Link';
+import { getDB } from "@/db";
+import { projects as projectsTable, projectGallery, media as mediaTable, projectTags } from "@/db/schema";
+import { eq, desc } from "drizzle-orm";
 import SmartLink from '@/shared/ui/SmartLink';
 import ProjectCardImage from '@/features/landing/ProjectCardImage';
-import { getTranslations } from 'next-intl/server';
+import { getTranslations } from '@/hooks/useTranslations';
+import { getCloudflareContext } from "vinext/cloudflare";
 
 export const dynamic = 'force-dynamic';
 
 export default async function PortfolioPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
-  const payload = await getPayload({ config: configPromise });
+  const { env } = await getCloudflareContext();
+  const db = getDB(env.DB);
   const t = await getTranslations({ locale, namespace: 'portfolio_page' });
-  const { docs: projects } = await payload.find({
-    collection: 'projects',
-    sort: '-completionDate', // Newest completions first
-    depth: 2,
-    locale: locale as 'en' | 'es',
+
+  const projects = await db.query.projects.findMany({
+    orderBy: [desc(projectsTable.completionDate)],
+    with: {
+      gallery: {
+        with: {
+          media: true
+        }
+      },
+      tags: true
+    }
   });
 
   return (
@@ -86,12 +94,9 @@ export default async function PortfolioPage({ params }: { params: Promise<{ loca
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
-                        {projects.map((project, index) => {
-                            // Robust Image Handling (now from gallery array)
-                            const firstGalleryItem = Array.isArray(project.gallery) && project.gallery.length > 0 ? project.gallery[0].image : null;
-                            const imageUrl = typeof firstGalleryItem === 'object' && firstGalleryItem !== null && 'url' in firstGalleryItem
-                                ? (firstGalleryItem.url || null)
-                                : null;
+                        {projects.map((project) => {
+                            const firstGalleryItem = project.gallery?.[0]?.media;
+                            const imageUrl = firstGalleryItem?.url || null;
                             
                             return (
                                 <SmartLink 
