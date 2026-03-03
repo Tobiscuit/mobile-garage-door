@@ -1,13 +1,13 @@
 import React, { Fragment } from 'react';
 import Link from '@/shared/ui/Link';
-import { notFound } from 'vinext/navigation';
+import { notFound } from 'next/navigation';
 import { getDB } from "@/db";
 import { projects as projectsTable } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import SmartLink from '@/shared/ui/SmartLink';
 import ProjectHeroImage from '@/features/landing/ProjectHeroImage';
 import { getTranslations } from '@/lib/server-translations';
-import { getCloudflareContext } from "vinext/cloudflare";
+import { getCloudflareContext } from "@/lib/cloudflare";
 
 export const dynamic = 'force-dynamic';
 

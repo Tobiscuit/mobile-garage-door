@@ -4,7 +4,7 @@ import { getDB } from "@/db";
 import { emails, emailThreads } from "@/db/schema";
 import { eq, desc, and } from "drizzle-orm";
 import { revalidatePath } from 'next/cache';
-import { getCloudflareContext } from "vinext/cloudflare";
+import { getCloudflareContext } from "@/lib/cloudflare";
 
 export async function getEmailThreads() {
   const { env } = await getCloudflareContext();

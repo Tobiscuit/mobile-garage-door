@@ -1,12 +1,12 @@
 import { headers } from 'next/headers';
-import { redirect } from 'vinext/navigation';
+import { redirect } from 'next/navigation';
 import { getSessionSafe } from '@/lib/get-session-safe';
 import NativeSignInPrompt from '@/features/auth/NativeSignInPrompt';
 import Sidebar from '@/features/admin/Sidebar';
 import React from 'react';
 import { getDB } from "@/db";
 import { settings as settingsTable } from "@/db/schema";
-import { getCloudflareContext } from "vinext/cloudflare";
+import { getCloudflareContext } from "@/lib/cloudflare";
 
 export default async function DashboardLayout({
   children,

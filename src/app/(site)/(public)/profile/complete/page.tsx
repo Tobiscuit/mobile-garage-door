@@ -1,10 +1,10 @@
 import { headers } from 'next/headers';
-import { redirect } from 'vinext/navigation';
+import { redirect } from 'next/navigation';
 import { getDB } from "@/db";
 import { users } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { getSessionSafe } from '@/lib/get-session-safe';
-import { getCloudflareContext } from "vinext/cloudflare";
+import { getCloudflareContext } from "@/lib/cloudflare";
 
 async function completeStaffProfile(formData: FormData) {
   'use server';

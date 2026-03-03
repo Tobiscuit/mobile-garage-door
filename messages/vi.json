@@ -153,7 +153,8 @@
     "projects_completed": "Dự án đã hoàn thành",
     "this_year": "Năm nay",
     "satisfaction": "Mức độ hài lòng của khách hàng",
-    "five_star": "Xác minh 5 sao"
+    "five_star": "Xác minh 5 sao",
+    "no_reviews": "Không có đánh giá đã xác minh vào lúc này."
   },
   "services_landing": {
     "heading": "Chẩn đoán &",

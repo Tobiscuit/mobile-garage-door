@@ -1,0 +1,65 @@
+{
+  "_framework-CCR8GI3v.js": {
+    "file": "assets/framework-CCR8GI3v.js",
+    "name": "framework"
+  },
+  "virtual:vinext-app-browser-entry": {
+    "file": "assets/index-Bz4DoO5O.js",
+    "name": "index",
+    "src": "virtual:vinext-app-browser-entry",
+    "isEntry": true,
+    "imports": [
+      "_framework-CCR8GI3v.js"
+    ],
+    "dynamicImports": [
+      "virtual:vite-rsc/client-references/group/shared:node_modules/vinext/dist/shims/error-boundary.js",
+      "virtual:vite-rsc/client-references/group/shared:node_modules/vinext/dist/shims/error-boundary.js",
+      "virtual:vite-rsc/client-references/group/shared:node_modules/vinext/dist/shims/error-boundary.js",
+      "virtual:vite-rsc/client-references/group/shared:node_modules/vinext/dist/shims/error-boundary.js",
+      "virtual:vite-rsc/client-references/group/shared:node_modules/vinext/dist/shims/error-boundary.js",
+      "virtual:vite-rsc/client-references/group/shared:node_modules/vinext/dist/shims/error-boundary.js",
+      "virtual:vite-rsc/client-references/group/shared:node_modules/vinext/dist/shims/error-boundary.js",
+      "virtual:vite-rsc/client-references/group/shared:node_modules/vinext/dist/shims/error-boundary.js",
+      "virtual:vite-rsc/client-references/group/shared:node_modules/vinext/dist/shims/error-boundary.js",
+      "virtual:vite-rsc/client-references/group/shared:node_modules/vinext/dist/shims/error-boundary.js",
+      "virtual:vite-rsc/client-references/group/shared:node_modules/vinext/dist/shims/error-boundary.js",
+      "virtual:vite-rsc/client-references/group/shared:node_modules/vinext/dist/shims/error-boundary.js",
+      "virtual:vite-rsc/client-references/group/shared:node_modules/vinext/dist/shims/error-boundary.js",
+      "virtual:vite-rsc/client-references/group/shared:node_modules/vinext/dist/shims/error-boundary.js",
+      "virtual:vite-rsc/client-references/group/shared:node_modules/vinext/dist/shims/error-boundary.js",
+      "virtual:vite-rsc/client-references/group/shared:node_modules/vinext/dist/shims/error-boundary.js",
+      "virtual:vite-rsc/client-references/group/shared:node_modules/vinext/dist/shims/error-boundary.js",
+      "virtual:vite-rsc/client-references/group/shared:node_modules/vinext/dist/shims/error-boundary.js",
+      "virtual:vite-rsc/client-references/group/shared:node_modules/vinext/dist/shims/error-boundary.js",
+      "virtual:vite-rsc/client-references/group/shared:node_modules/vinext/dist/shims/error-boundary.js",
+      "virtual:vite-rsc/client-references/group/shared:node_modules/vinext/dist/shims/error-boundary.js",
+      "virtual:vite-rsc/client-references/group/shared:node_modules/vinext/dist/shims/error-boundary.js",
+      "virtual:vite-rsc/client-references/group/shared:node_modules/vinext/dist/shims/error-boundary.js",
+      "virtual:vite-rsc/client-references/group/shared:node_modules/vinext/dist/shims/error-boundary.js",
+      "virtual:vite-rsc/client-references/group/shared:node_modules/vinext/dist/shims/error-boundary.js",
+      "virtual:vite-rsc/client-references/group/shared:node_modules/vinext/dist/shims/error-boundary.js",
+      "virtual:vite-rsc/client-references/group/shared:node_modules/vinext/dist/shims/error-boundary.js",
+      "virtual:vite-rsc/client-references/group/shared:node_modules/vinext/dist/shims/error-boundary.js",
+      "virtual:vite-rsc/client-references/group/shared:node_modules/vinext/dist/shims/error-boundary.js",
+      "virtual:vite-rsc/client-references/group/shared:node_modules/vinext/dist/shims/error-boundary.js",
+      "virtual:vite-rsc/client-references/group/shared:node_modules/vinext/dist/shims/error-boundary.js",
+      "virtual:vite-rsc/client-references/group/shared:node_modules/vinext/dist/shims/error-boundary.js",
+      "virtual:vite-rsc/client-references/group/shared:node_modules/vinext/dist/shims/error-boundary.js",
+      "virtual:vite-rsc/client-references/group/shared:node_modules/vinext/dist/shims/error-boundary.js",
+      "virtual:vite-rsc/client-references/group/shared:node_modules/vinext/dist/shims/error-boundary.js",
+      "virtual:vite-rsc/client-references/group/shared:node_modules/vinext/dist/shims/error-boundary.js",
+      "virtual:vite-rsc/client-references/group/shared:node_modules/vinext/dist/shims/error-boundary.js",
+      "virtual:vite-rsc/client-references/group/shared:node_modules/vinext/dist/shims/error-boundary.js"
+    ]
+  },
+  "virtual:vite-rsc/client-references/group/shared:node_modules/vinext/dist/shims/error-boundary.js": {
+    "file": "assets/error-boundary-DwmqizYB.js",
+    "name": "error-boundary",
+    "src": "virtual:vite-rsc/client-references/group/shared:node_modules/vinext/dist/shims/error-boundary.js",
+    "isDynamicEntry": true,
+    "imports": [
+      "_framework-CCR8GI3v.js",
+      "virtual:vinext-app-browser-entry"
+    ]
+  }
+}

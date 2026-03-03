@@ -5,7 +5,7 @@ import { randomUUID } from 'crypto';
 import { getDB } from "@/db";
 import { users, serviceRequests, payments } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import { getCloudflareContext } from "vinext/cloudflare";
+import { getCloudflareContext } from "@/lib/cloudflare";
 
 const isProduction = process.env.SQUARE_ENVIRONMENT === 'production';
 

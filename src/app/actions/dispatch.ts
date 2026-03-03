@@ -4,7 +4,7 @@ import { getDB } from "@/db";
 import { users, serviceRequests } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import webpush from 'web-push';
-import { getCloudflareContext } from "vinext/cloudflare";
+import { getCloudflareContext } from "@/lib/cloudflare";
 
 // Configure Web Push
 try {

@@ -1,7 +1,7 @@
 'use client';
 
 import Link from '@/shared/ui/Link';
-import { usePathname, useRouter } from 'vinext/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 const tooltipText: Record<string, string> = {

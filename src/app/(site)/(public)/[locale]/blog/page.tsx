@@ -6,7 +6,7 @@ import Link from '@/shared/ui/Link';
 import Image from 'next/image';
 import SmartLink from '@/shared/ui/SmartLink';
 import { getTranslations } from '@/lib/server-translations';
-import { getCloudflareContext } from "vinext/cloudflare";
+import { getCloudflareContext } from "@/lib/cloudflare";
 
 export const dynamic = 'force-dynamic';
 

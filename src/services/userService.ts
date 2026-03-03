@@ -9,7 +9,7 @@ export const userService = {
     return result[0];
   },
 
-  updateProfile: async (d1: D1Database, userId: string, data: Partial<typeof users.\$inferInsert>) => {
+  updateProfile: async (d1: D1Database, userId: string, data: Partial<typeof users.$inferInsert>) => {
     const db = getDB(d1);
     const result = await db.update(users).set(data).where(eq(users.id, userId)).returning();
     return result[0];

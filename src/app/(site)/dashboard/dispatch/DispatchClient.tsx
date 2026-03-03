@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { assignJobToTechnician } from '@/app/actions/dispatch';
-import { useRouter } from 'vinext/navigation';
+import { useRouter } from 'next/navigation';
 
 export function DispatchClient({ jobs, technicians }: { jobs: any[], technicians: any[] }) {
     const router = useRouter();

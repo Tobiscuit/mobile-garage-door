@@ -68,7 +68,6 @@
     "hours": "Business Hours",
     "emergency": "Emergency Service Available 24/7"
   },
-
   "common": {
     "loading": "Loading...",
     "error": "Something went wrong",
@@ -154,7 +153,8 @@
     "projects_completed": "Projects Completed",
     "this_year": "This Year",
     "satisfaction": "Customer Satisfaction",
-    "five_star": "5-Star Verified"
+    "five_star": "5-Star Verified",
+    "no_reviews": "No verified reviews available at this time."
   },
   "services_landing": {
     "heading": "Diagnosis &",

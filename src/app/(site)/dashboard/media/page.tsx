@@ -5,7 +5,7 @@ import { media as mediaTable } from "@/db/schema";
 import { desc } from "drizzle-orm";
 import Image from 'next/image';
 import QuickUpload from '@/features/admin/media/QuickUpload';
-import { getCloudflareContext } from "vinext/cloudflare";
+import { getCloudflareContext } from "@/lib/cloudflare";
 
 async function getMedia() {
   const { env } = await getCloudflareContext();

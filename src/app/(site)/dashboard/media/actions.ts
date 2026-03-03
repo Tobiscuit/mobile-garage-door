@@ -2,7 +2,7 @@
 
 import { getDB } from "@/db";
 import { media } from "@/db/schema";
-import { getCloudflareContext } from "vinext/cloudflare";
+import { getCloudflareContext } from "@/lib/cloudflare";
 
 export async function uploadMedia(formData: FormData) {
   const { env } = await getCloudflareContext();

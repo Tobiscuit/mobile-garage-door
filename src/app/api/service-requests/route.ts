@@ -4,7 +4,7 @@ import { users, serviceRequests, payments } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { SquareClient as Client, SquareEnvironment as Environment } from 'square';
 import { randomUUID } from 'crypto';
-import { getCloudflareContext } from "vinext/cloudflare";
+import { getCloudflareContext } from "@/lib/cloudflare";
 
 const squareClient = new Client({
   token: process.env.SQUARE_ACCESS_TOKEN,

@@ -1,5 +1,5 @@
 import { headers } from 'next/headers';
-import { redirect } from 'vinext/navigation';
+import { redirect } from 'next/navigation';
 import React from 'react';
 import { getSessionSafe } from '@/lib/get-session-safe';
 import NativeSignInPrompt from '@/features/auth/NativeSignInPrompt';

@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 test.describe('Authentication Routing E2E', () => {
   test('Unauthenticated user is redirected to login when visiting /app', async ({ page }) => {
     await page.goto('/app');
-    await expect(page).toHaveURL(/.*\/login/);
+    await expect(page).toHaveURL(/.*\?login=true/);
 
     const headerLoginBtn = page.locator('header').getByText('PORTAL LOGIN');
     await expect(headerLoginBtn).toBeVisible();
@@ -18,7 +18,7 @@ test.describe('Authentication Routing E2E', () => {
         name: 'E2E Customer',
       },
     });
-    
+
     if (!res.ok()) {
       console.log('Signup Failed:', await res.text());
     }
@@ -33,9 +33,9 @@ test.describe('Authentication Routing E2E', () => {
 
     // It should route a customer directly to /portal
     await expect(page).toHaveURL(/.*\/portal/);
-    
+
     await page.screenshot({ path: 'customer-portal-debug.png' });
-    
+
     await expect(page.getByText('E2E Customer').first()).toBeVisible();
     await expect(page.getByText('Admin View')).not.toBeVisible();
   });
@@ -51,7 +51,7 @@ test.describe('Authentication Routing E2E', () => {
     });
 
     if (!res.ok()) {
-       console.log('Admin Signup Failed:', await res.text());
+      console.log('Admin Signup Failed:', await res.text());
     }
     expect(res.ok()).toBeTruthy();
 

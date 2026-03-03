@@ -49,19 +49,22 @@ export const metadata: Metadata = {
     languages: {
       en: '/',
       es: '/es',
+      vi: '/vi',
     },
   },
 }
 
 import { FloatingAiButton } from '@/features/landing/FloatingAiButton';
 import { PwaRegistry } from '@/components/PwaRegistry';
+import { headers } from 'next/headers';
 
 export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  const locale = await getLocale();
+  const reqHeaders = await headers();
+  const locale = reqHeaders.get('x-next-intl-locale') || 'en';
 
   return (
     <html lang={locale} suppressHydrationWarning>

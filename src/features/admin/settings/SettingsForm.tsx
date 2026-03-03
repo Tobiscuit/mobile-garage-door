@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useRouter } from 'vinext/navigation';
+import { useRouter } from 'next/navigation';
 import { updateSettings } from '@/app/(site)/dashboard/settings/actions';
 
 interface SettingsFormProps {

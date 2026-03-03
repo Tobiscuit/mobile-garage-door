@@ -1,7 +1,8 @@
 import React from 'react'
-import I18nProvider from '@/components/I18nProvider'
+import { NextIntlClientProvider, hasLocale } from 'next-intl'
+import { getMessages, setRequestLocale } from 'next-intl/server'
 import { routing } from '@/i18n/routing'
-import { notFound } from 'vinext/navigation'
+import { notFound } from 'next/navigation'
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }))
@@ -20,9 +21,8 @@ export default async function LocaleLayout({
     notFound();
   }
 
-  return (
-    <I18nProvider locale={locale}>
-      {children}
-    </I18nProvider>
-  )
+  // Enable static rendering
+  setRequestLocale(locale);
+
+  return children;
 }

@@ -4,8 +4,8 @@ import { getDB } from "@/db";
 import { users, staffInvites } from "@/db/schema";
 import { eq, desc } from "drizzle-orm";
 import { revalidatePath } from 'next/cache';
-import { redirect } from 'vinext/navigation';
-import { getCloudflareContext } from "vinext/cloudflare";
+import { redirect } from 'next/navigation';
+import { getCloudflareContext } from "@/lib/cloudflare";
 
 export async function inviteStaff(formData: FormData) {
   const { env } = await getCloudflareContext();
@@ -66,7 +66,7 @@ export async function getUserById(id: string) {
   }
 }
 
-export async function updateUser(id: string, data: Partial<typeof users.\$inferInsert>) {
+export async function updateUser(id: string, data: Partial<typeof users.$inferInsert>) {
   const { env } = await getCloudflareContext();
   const db = getDB(env.DB);
   

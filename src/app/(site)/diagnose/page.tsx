@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import Link from '@/shared/ui/Link';
-import { useRouter } from 'vinext/navigation';
+import { useRouter } from 'next/navigation';
 
 export default function DiagnosePage() {
   const router = useRouter();

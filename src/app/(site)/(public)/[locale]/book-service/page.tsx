@@ -4,7 +4,7 @@ export const dynamic = 'force-dynamic';
 
 import React, { useState } from 'react';
 import Script from 'next/script';
-import { useRouter } from 'vinext/navigation';
+import { useRouter } from 'next/navigation';
 import { createBooking } from '@/app/actions/booking';
 import { useTranslations } from '@/hooks/useTranslations';
 import { useBookingForm } from '@/hooks/useBookingForm';

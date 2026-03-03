@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef, useEffect, useState } from 'react';
-import { v4 as uuidv4 } from 'uuid';
+// Edge-native: use crypto.randomUUID() instead of uuid package
 
 interface AddressAutocompleteProps {
   onAddressSelect: (place: any) => void;
@@ -27,14 +27,14 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
 
   // Initialize Session Token
   useEffect(() => {
-    setSessionToken(uuidv4());
+    setSessionToken(crypto.randomUUID());
   }, []);
 
   // Handle Input Change
   const handleInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setInputValue(value);
-    
+
     if (!value || value.length < 3) {
       setPredictions([]);
       setIsOpen(false);
@@ -48,15 +48,15 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ input: value, sessionToken }),
       });
-      
+
       const data = await response.json();
-      
+
       if (data.suggestions) {
         setPredictions(data.suggestions.map((item: any) => ({
-            place_id: item.placePrediction.placeId,
-            main_text: item.placePrediction.structuredFormat?.mainText?.text || '',
-            secondary_text: item.placePrediction.structuredFormat?.secondaryText?.text || '',
-            description: item.placePrediction.text.text
+          place_id: item.placePrediction.placeId,
+          main_text: item.placePrediction.structuredFormat?.mainText?.text || '',
+          secondary_text: item.placePrediction.structuredFormat?.secondaryText?.text || '',
+          description: item.placePrediction.text.text
         })));
         setIsOpen(true);
       } else {
@@ -76,30 +76,30 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
     setPredictions([]);
 
     try {
-        const response = await fetch(`/api/places/details/${prediction.place_id}?sessionToken=${sessionToken}`);
-        const placeDetails = await response.json();
-        
-        if (placeDetails.id) {
-            // Map to a format consistent with your app
-             const placeResult = {
-                place_id: placeDetails.id,
-                name: placeDetails.displayName?.text || '',
-                formatted_address: placeDetails.formattedAddress,
-                geometry: {
-                    location: {
-                        lat: () => placeDetails.location.latitude,
-                        lng: () => placeDetails.location.longitude
-                    }
-                },
-                address_components: placeDetails.addressComponents
-            };
-            
-            onAddressSelect(placeResult);
-            // Reset Session Token after selection (End of Session)
-            setSessionToken(uuidv4());
-        }
+      const response = await fetch(`/api/places/details/${prediction.place_id}?sessionToken=${sessionToken}`);
+      const placeDetails = await response.json();
+
+      if (placeDetails.id) {
+        // Map to a format consistent with your app
+        const placeResult = {
+          place_id: placeDetails.id,
+          name: placeDetails.displayName?.text || '',
+          formatted_address: placeDetails.formattedAddress,
+          geometry: {
+            location: {
+              lat: () => placeDetails.location.latitude,
+              lng: () => placeDetails.location.longitude
+            }
+          },
+          address_components: placeDetails.addressComponents
+        };
+
+        onAddressSelect(placeResult);
+        // Reset Session Token after selection (End of Session)
+        setSessionToken(crypto.randomUUID());
+      }
     } catch (error) {
-        console.error("Details Error:", error);
+      console.error("Details Error:", error);
     }
   };
 
@@ -125,7 +125,7 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
         placeholder={placeholder}
         autoComplete="off"
       />
-      
+
       {/* Custom Dropdown */}
       {isOpen && predictions.length > 0 && (
         <div className="absolute z-50 w-full mt-2 bg-charcoal-blue border border-white/10 rounded-xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2">
@@ -136,8 +136,8 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
               className="w-full text-left px-4 py-3 text-sm text-gray-300 hover:text-white hover:bg-white/5 transition-colors border-b border-white/5 last:border-0 flex items-start gap-3 group"
             >
               <div className="mt-0.5 text-gray-500 group-hover:text-golden-yellow transition-colors">
-                 {/* Map Pin Icon */}
-                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+                {/* Map Pin Icon */}
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
                   <path fillRule="evenodd" d="M11.54 22.351l.07.04.028.016a.76.76 0 00.723 0l.028-.015.071-.041a16.975 16.975 0 001.144-.742 19.58 19.58 0 002.683-2.282c1.944-1.99 3.963-4.98 3.963-8.827a8.25 8.25 0 00-16.5 0c0 3.846 2.02 6.837 3.963 8.827a19.58 19.58 0 002.682 2.282 16.975 16.975 0 001.145.742zM12 13.5a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" />
                 </svg>
               </div>
@@ -151,7 +151,7 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
               </div>
             </button>
           ))}
-          
+
           <div className="px-4 py-2 bg-black/20 text-[10px] text-gray-500 flex justify-end">
             <span className="opacity-50">Powered by Google</span>
           </div>

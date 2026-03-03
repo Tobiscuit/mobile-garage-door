@@ -5,7 +5,7 @@ import { users, serviceRequests, payments as paymentsTable } from "@/db/schema";
 import { eq, and, or, not, inArray, like, notLike, desc } from "drizzle-orm";
 import { revalidatePath } from 'next/cache';
 import { SquareClient, SquareEnvironment } from 'square';
-import { getCloudflareContext } from "vinext/cloudflare";
+import { getCloudflareContext } from "@/lib/cloudflare";
 
 const squareClient = new SquareClient({
   token: process.env.SQUARE_ACCESS_TOKEN,

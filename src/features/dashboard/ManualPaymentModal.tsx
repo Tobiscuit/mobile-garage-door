@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { createManualPayment } from '@/app/(site)/dashboard/actions';
-import { useRouter } from 'vinext/navigation';
+import { useRouter } from 'next/navigation';
 
 interface ManualPaymentModalProps {
     isOpen: boolean;

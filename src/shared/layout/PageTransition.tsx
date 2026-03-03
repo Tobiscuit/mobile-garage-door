@@ -2,7 +2,7 @@
 'use client'
 
 import { motion, AnimatePresence } from 'motion/react'
-import { usePathname } from 'vinext/navigation'
+import { usePathname } from 'next/navigation'
 import { ReactNode, useEffect, useLayoutEffect, useState } from 'react'
 import { getScrollPosition } from '@/shared/store/scrollStore'
 

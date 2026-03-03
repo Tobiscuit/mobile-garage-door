@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, Suspense, useEffect } from 'react';
-import { useSearchParams } from 'vinext/navigation';
+import { useSearchParams } from 'next/navigation';
 import { useTranslations } from '@/hooks/useTranslations';
 import { ContactHero } from '@/features/contact/ContactHero';
 import { AddressAutocomplete } from '@/shared/ui/AddressAutocomplete';

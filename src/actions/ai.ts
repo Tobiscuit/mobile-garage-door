@@ -2,7 +2,7 @@
 
 import { GoogleGenAI, Type, Schema } from '@google/genai';
 import { EXAMPLE_LEXICAL_STRUCTURE } from '@/lib/ai-contract';
-import { getCloudflareContext } from 'vinext/cloudflare';
+import { getCloudflareContext } from '@/lib/cloudflare';
 import { getDB } from '@/db';
 import { media } from '@/db/schema';
 

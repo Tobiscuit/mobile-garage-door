@@ -1,8 +1,3 @@
-import { withPayload } from '@payloadcms/next/withPayload'
-import createNextIntlPlugin from 'next-intl/plugin'
-
-const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts')
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: false,
@@ -20,14 +15,14 @@ const nextConfig = {
     return [
       {
         source: '/db',
-        destination: '/admin',
+        destination: '/dashboard',
       },
       {
         source: '/db/:path*',
-        destination: '/admin/:path*',
+        destination: '/dashboard/:path*',
       },
     ];
   },
 }
 
-export default withPayload(withNextIntl(nextConfig))
+export default nextConfig;

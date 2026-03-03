@@ -4,7 +4,7 @@ import { getDB } from "@/db";
 import { settings, settingStats, settingValues } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from 'next/cache';
-import { getCloudflareContext } from "vinext/cloudflare";
+import { getCloudflareContext } from "@/lib/cloudflare";
 
 export async function getSettings() {
   const { env } = await getCloudflareContext();

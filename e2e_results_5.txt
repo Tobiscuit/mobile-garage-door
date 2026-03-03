@@ -1,0 +1,246 @@
+
+> mobile-garage-door@1.0.0 test:e2e
+> playwright test
+
+[1A[2K[2m[WebServer] [22m[getCloudflareContext] Running in local dev mode. Loading bindings via Wrangler Platform Proxy.
+
+[1A[2K[2m[WebServer] [22m[getCloudflareContext] Running in local dev mode. Loading bindings via Wrangler Platform Proxy.
+
+[dotenv@17.3.1] injecting env (21) from .env -- tip: 🔐 prevent building .env in docker: https://dotenvx.com/prebuild
+--- Playwright Global Setup: Synchronizing Test Users ---
+✅ Injected pending staff invite for Playwright Admin!
+
+Running 3 tests using 3 workers
+
+[1A[2K[1/3] [chromium] › e2e/auth.spec.ts:12:3 › Authentication Routing E2E › Logged in Customer sees the Portal and NOT the Command Center
+[1A[2K[2/3] [chromium] › e2e/auth.spec.ts:4:3 › Authentication Routing E2E › Unauthenticated user is redirected to login when visiting /app
+[1A[2K[3/3] [chromium] › e2e/auth.spec.ts:43:3 › Authentication Routing E2E › Logged in Admin sees the Portal AND the Admin View toggle button
+[1A[2K[2m[WebServer] [22m[getCloudflareContext] Running in local dev mode. Loading bindings via Wrangler Platform Proxy.
+
+[1A[2K[2m[WebServer] [22m[getCloudflareContext] Running in local dev mode. Loading bindings via Wrangler Platform Proxy.
+
+[1A[2K[2m[WebServer] [22m[2m2026-03-03T17:43:28.416Z[0m [31mERROR[0m [1m[Better Auth]:[0m Failed to create user DrizzleQueryError: Failed query: insert into "users" ("id", "name", "email", "email_verified", "image", "role", "customer_type", "company_name", "phone", "address", "last_login", "push_subscription", "square_customer_id", "created_at", "updated_at") values (?, ?, ?, ?, null, ?, ?, null, null, null, null, null, null, ?, ?) returning "id", "name", "email", "email_verified", "image", "role", "customer_type", "company_name", "phone", "address", "last_login", "push_subscription", "square_customer_id", "created_at", "updated_at"
+[2m[WebServer] [22mparams: Aww5bO404ZlouKHZHZlHuRRa25hfKm3b,E2E Customer,playwright-customer@test.com,0,customer,residential,Tue Mar 03 2026 11:43:28 GMT-0600 (Central Standard Time),Tue Mar 03 2026 11:43:28 GMT-0600 (Central Standard Time)
+[2m[WebServer] [22m    at D1PreparedQuery.queryWithCache [90m(/home/juan/development/mobile-garage-door/[39mnode_modules/[4msrc[24m/sqlite-core/session.ts:80:11[90m)[39m
+[2m[WebServer] [22m[90m    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)[39m
+[2m[WebServer] [22m    at async D1PreparedQuery.values [90m(/home/juan/development/mobile-garage-door/[39mnode_modules/[4msrc[24m/d1/session.ts:280:10[90m)[39m
+[2m[WebServer] [22m    at async D1PreparedQuery.all [90m(/home/juan/development/mobile-garage-door/[39mnode_modules/[4msrc[24m/d1/session.ts:217:16[90m)[39m {
+[2m[WebServer] [22m  query: [32m'insert into "users" ("id", "name", "email", "email_verified", "image", "role", "customer_type", "company_name", "phone", "address", "last_login", "push_subscription", "square_customer_id", "created_at", "updated_at") values (?, ?, ?, ?, null, ?, ?, null, null, null, null, null, null, ?, ?) returning "id", "name", "email", "email_verified", "image", "role", "customer_type", "company_name", "phone", "address", "last_login", "push_subscription", "square_customer_id", "created_at", "updated_at"'[39m,
+[2m[WebServer] [22m  params: [
+[2m[WebServer] [22m    [32m'Aww5bO404ZlouKHZHZlHuRRa25hfKm3b'[39m,
+[2m[WebServer] [22m    [32m'E2E Customer'[39m,
+[2m[WebServer] [22m    [32m'playwright-customer@test.com'[39m,
+[2m[WebServer] [22m    [33m0[39m,
+[2m[WebServer] [22m    [32m'customer'[39m,
+[2m[WebServer] [22m    [32m'residential'[39m,
+[2m[WebServer] [22m    [35m2026-03-03T17:43:28.401Z[39m,
+[2m[WebServer] [22m    [35m2026-03-03T17:43:28.401Z[39m
+[2m[WebServer] [22m  ],
+[2m[WebServer] [22m  cause: Error: D1_TYPE_ERROR: Type 'object' not supported for value 'Tue Mar 03 2026 11:43:28 GMT-0600 (Central Standard Time)'
+[2m[WebServer] [22m      at <anonymous> [90m(/home/juan/development/mobile-garage-door/[39mnode_modules/[4msrc[24m/d1/session.ts:281:21[90m)[39m
+[2m[WebServer] [22m      at D1PreparedQuery.queryWithCache [90m(/home/juan/development/mobile-garage-door/[39mnode_modules/[4msrc[24m/sqlite-core/session.ts:78:18[90m)[39m
+[2m[WebServer] [22m      at D1PreparedQuery.values [90m(/home/juan/development/mobile-garage-door/[39mnode_modules/[4msrc[24m/d1/session.ts:280:21[90m)[39m
+[2m[WebServer] [22m      at D1PreparedQuery.all [90m(/home/juan/development/mobile-garage-door/[39mnode_modules/[4msrc[24m/d1/session.ts:217:27[90m)[39m
+[2m[WebServer] [22m      at QueryPromise.all [90m(/home/juan/development/mobile-garage-door/[39mnode_modules/[4msrc[24m/sqlite-core/query-builders/insert.ts:402:26[90m)[39m
+[2m[WebServer] [22m      at QueryPromise.execute [90m(/home/juan/development/mobile-garage-door/[39mnode_modules/[4msrc[24m/sqlite-core/query-builders/insert.ts:414:40[90m)[39m
+[2m[WebServer] [22m      at QueryPromise.then [90m(/home/juan/development/mobile-garage-door/[39mnode_modules/[4msrc[24m/query-promise.ts:31:15[90m)[39m
+[2m[WebServer] [22m  [90m    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)[39m
+[2m[WebServer] [22m      at async withReturning [90m(/home/juan/development/mobile-garage-door/[39mnode_modules/[4mbetter-auth[24m/src/adapters/drizzle-adapter/drizzle-adapter.ts:100:16[90m)[39m
+[2m[WebServer] [22m      at async Object.create [90m(/home/juan/development/mobile-garage-door/[39mnode_modules/[4mbetter-auth[24m/src/adapters/drizzle-adapter/drizzle-adapter.ts:359:23[90m)[39m {
+[2m[WebServer] [22m    [cause]: Error: Type 'object' not supported for value 'Tue Mar 03 2026 11:43:28 GMT-0600 (Central Standard Time)'
+[2m[WebServer] [22m        at cloudflare-internal:d1-api:311:24
+[2m[WebServer] [22m        at Array.map (<anonymous>)
+[2m[WebServer] [22m        at D1PreparedStatement.bind (cloudflare-internal:d1-api:282:42)
+[2m[WebServer] [22m        at #fetch [90m(file:///home/juan/development/mobile-garage-door/[39mnode_modules/[4mminiflare[24m/dist/src/workers/core/entry.worker.js:4261:141[90m)[39m
+[2m[WebServer] [22m        at async ProxyServer.fetch [90m(file:///home/juan/development/mobile-garage-door/[39mnode_modules/[4mminiflare[24m/dist/src/workers/core/entry.worker.js:4175:14[90m)[39m {
+[2m[WebServer] [22m      [cause]: [90mundefined[39m
+[2m[WebServer] [22m    }
+[2m[WebServer] [22m  }
+[2m[WebServer] [22m}
+
+[1A[2K[2m[WebServer] [22m[2m2026-03-03T17:43:28.419Z[0m [31mERROR[0m [1m[Better Auth]:[0m Failed to create user DrizzleQueryError: Failed query: insert into "users" ("id", "name", "email", "email_verified", "image", "role", "customer_type", "company_name", "phone", "address", "last_login", "push_subscription", "square_customer_id", "created_at", "updated_at") values (?, ?, ?, ?, null, ?, ?, null, null, null, null, null, null, ?, ?) returning "id", "name", "email", "email_verified", "image", "role", "customer_type", "company_name", "phone", "address", "last_login", "push_subscription", "square_customer_id", "created_at", "updated_at"
+[2m[WebServer] [22mparams: Aww5bO404ZlouKHZHZlHuRRa25hfKm3b,E2E Customer,playwright-customer@test.com,0,customer,residential,Tue Mar 03 2026 11:43:28 GMT-0600 (Central Standard Time),Tue Mar 03 2026 11:43:28 GMT-0600 (Central Standard Time)
+[2m[WebServer] [22m    at D1PreparedQuery.queryWithCache [90m(/home/juan/development/mobile-garage-door/[39mnode_modules/[4msrc[24m/sqlite-core/session.ts:80:11[90m)[39m
+[2m[WebServer] [22m[90m    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)[39m
+[2m[WebServer] [22m    at async D1PreparedQuery.values [90m(/home/juan/development/mobile-garage-door/[39mnode_modules/[4msrc[24m/d1/session.ts:280:10[90m)[39m
+[2m[WebServer] [22m    at async D1PreparedQuery.all [90m(/home/juan/development/mobile-garage-door/[39mnode_modules/[4msrc[24m/d1/session.ts:217:16[90m)[39m {
+[2m[WebServer] [22m  query: [32m'insert into "users" ("id", "name", "email", "email_verified", "image", "role", "customer_type", "company_name", "phone", "address", "last_login", "push_subscription", "square_customer_id", "created_at", "updated_at") values (?, ?, ?, ?, null, ?, ?, null, null, null, null, null, null, ?, ?) returning "id", "name", "email", "email_verified", "image", "role", "customer_type", "company_name", "phone", "address", "last_login", "push_subscription", "square_customer_id", "created_at", "updated_at"'[39m,
+[2m[WebServer] [22m  params: [
+[2m[WebServer] [22m    [32m'Aww5bO404ZlouKHZHZlHuRRa25hfKm3b'[39m,
+[2m[WebServer] [22m    [32m'E2E Customer'[39m,
+[2m[WebServer] [22m    [32m'playwright-customer@test.com'[39m,
+[2m[WebServer] [22m    [33m0[39m,
+[2m[WebServer] [22m    [32m'customer'[39m,
+[2m[WebServer] [22m    [32m'residential'[39m,
+[2m[WebServer] [22m    [35m2026-03-03T17:43:28.401Z[39m,
+[2m[WebServer] [22m    [35m2026-03-03T17:43:28.401Z[39m
+[2m[WebServer] [22m  ],
+[2m[WebServer] [22m  cause: Error: D1_TYPE_ERROR: Type 'object' not supported for value 'Tue Mar 03 2026 11:43:28 GMT-0600 (Central Standard Time)'
+[2m[WebServer] [22m      at <anonymous> [90m(/home/juan/development/mobile-garage-door/[39mnode_modules/[4msrc[24m/d1/session.ts:281:21[90m)[39m
+[2m[WebServer] [22m      at D1PreparedQuery.queryWithCache [90m(/home/juan/development/mobile-garage-door/[39mnode_modules/[4msrc[24m/sqlite-core/session.ts:78:18[90m)[39m
+[2m[WebServer] [22m      at D1PreparedQuery.values [90m(/home/juan/development/mobile-garage-door/[39mnode_modules/[4msrc[24m/d1/session.ts:280:21[90m)[39m
+[2m[WebServer] [22m      at D1PreparedQuery.all [90m(/home/juan/development/mobile-garage-door/[39mnode_modules/[4msrc[24m/d1/session.ts:217:27[90m)[39m
+[2m[WebServer] [22m      at QueryPromise.all [90m(/home/juan/development/mobile-garage-door/[39mnode_modules/[4msrc[24m/sqlite-core/query-builders/insert.ts:402:26[90m)[39m
+[2m[WebServer] [22m      at QueryPromise.execute [90m(/home/juan/development/mobile-garage-door/[39mnode_modules/[4msrc[24m/sqlite-core/query-builders/insert.ts:414:40[90m)[39m
+[2m[WebServer] [22m      at QueryPromise.then [90m(/home/juan/development/mobile-garage-door/[39mnode_modules/[4msrc[24m/query-promise.ts:31:15[90m)[39m
+[2m[WebServer] [22m  [90m    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)[39m
+[2m[WebServer] [22m      at async withReturning [90m(/home/juan/development/mobile-garage-door/[39mnode_modules/[4mbetter-auth[24m/src/adapters/drizzle-adapter/drizzle-adapter.ts:100:16[90m)[39m
+[2m[WebServer] [22m      at async Object.create [90m(/home/juan/development/mobile-garage-door/[39mnode_modules/[4mbetter-auth[24m/src/adapters/drizzle-adapter/drizzle-adapter.ts:359:23[90m)[39m {
+[2m[WebServer] [22m    [cause]: Error: Type 'object' not supported for value 'Tue Mar 03 2026 11:43:28 GMT-0600 (Central Standard Time)'
+[2m[WebServer] [22m        at cloudflare-internal:d1-api:311:24
+[2m[WebServer] [22m        at Array.map (<anonymous>)
+[2m[WebServer] [22m        at D1PreparedStatement.bind (cloudflare-internal:d1-api:282:42)
+[2m[WebServer] [22m        at #fetch [90m(file:///home/juan/development/mobile-garage-door/[39mnode_modules/[4mminiflare[24m/dist/src/workers/core/entry.worker.js:4261:141[90m)[39m
+[2m[WebServer] [22m        at async ProxyServer.fetch [90m(file:///home/juan/development/mobile-garage-door/[39mnode_modules/[4mminiflare[24m/dist/src/workers/core/entry.worker.js:4175:14[90m)[39m {
+[2m[WebServer] [22m      [cause]: [90mundefined[39m
+[2m[WebServer] [22m    }
+[2m[WebServer] [22m  }
+[2m[WebServer] [22m}
+
+[1A[2K[chromium] › e2e/auth.spec.ts:12:3 › Authentication Routing E2E › Logged in Customer sees the Portal and NOT the Command Center
+Signup Failed: {"code":"FAILED_TO_CREATE_USER","message":"Failed to create user"}
+
+[1A[2K  1) [chromium] › e2e/auth.spec.ts:12:3 › Authentication Routing E2E › Logged in Customer sees the Portal and NOT the Command Center 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBeTruthy[2m()[22m
+
+    Received: [31mfalse[39m
+
+      23 |       console.log('Signup Failed:', await res.text());
+      24 |     }
+    > 25 |     expect(res.ok()).toBeTruthy();
+         |                      ^
+      26 |
+      27 |     // Extract the securely hashed BetterAuth session cookie returned by the server
+      28 |     const state = await request.storageState();
+        at /home/juan/development/mobile-garage-door/e2e/auth.spec.ts:25:22
+
+
+[1A[2K[2m[WebServer] [22m[2m2026-03-03T17:43:28.614Z[0m [31mERROR[0m [1m[Better Auth]:[0m Failed to create user DrizzleQueryError: Failed query: insert into "users" ("id", "name", "email", "email_verified", "image", "role", "customer_type", "company_name", "phone", "address", "last_login", "push_subscription", "square_customer_id", "created_at", "updated_at") values (?, ?, ?, ?, null, ?, ?, null, null, null, null, null, null, ?, ?) returning "id", "name", "email", "email_verified", "image", "role", "customer_type", "company_name", "phone", "address", "last_login", "push_subscription", "square_customer_id", "created_at", "updated_at"
+[2m[WebServer] [22mparams: R3X3Gg1W6VAk1KW7BD0ce55Rc7cMWUkc,E2E Admin,playwright-admin@test.com,0,customer,residential,Tue Mar 03 2026 11:43:28 GMT-0600 (Central Standard Time),Tue Mar 03 2026 11:43:28 GMT-0600 (Central Standard Time)
+[2m[WebServer] [22m    at D1PreparedQuery.queryWithCache [90m(/home/juan/development/mobile-garage-door/[39mnode_modules/[4msrc[24m/sqlite-core/session.ts:80:11[90m)[39m
+[2m[WebServer] [22m[90m    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)[39m
+[2m[WebServer] [22m    at async D1PreparedQuery.values [90m(/home/juan/development/mobile-garage-door/[39mnode_modules/[4msrc[24m/d1/session.ts:280:10[90m)[39m
+[2m[WebServer] [22m    at async D1PreparedQuery.all [90m(/home/juan/development/mobile-garage-door/[39mnode_modules/[4msrc[24m/d1/session.ts:217:16[90m)[39m {
+[2m[WebServer] [22m  query: [32m'insert into "users" ("id", "name", "email", "email_verified", "image", "role", "customer_type", "company_name", "phone", "address", "last_login", "push_subscription", "square_customer_id", "created_at", "updated_at") values (?, ?, ?, ?, null, ?, ?, null, null, null, null, null, null, ?, ?) returning "id", "name", "email", "email_verified", "image", "role", "customer_type", "company_name", "phone", "address", "last_login", "push_subscription", "square_customer_id", "created_at", "updated_at"'[39m,
+[2m[WebServer] [22m  params: [
+[2m[WebServer] [22m    [32m'R3X3Gg1W6VAk1KW7BD0ce55Rc7cMWUkc'[39m,
+[2m[WebServer] [22m    [32m'E2E Admin'[39m,
+[2m[WebServer] [22m    [32m'playwright-admin@test.com'[39m,
+[2m[WebServer] [22m    [33m0[39m,
+[2m[WebServer] [22m    [32m'customer'[39m,
+[2m[WebServer] [22m    [32m'residential'[39m,
+[2m[WebServer] [22m    [35m2026-03-03T17:43:28.599Z[39m,
+[2m[WebServer] [22m    [35m2026-03-03T17:43:28.599Z[39m
+[2m[WebServer] [22m  ],
+[2m[WebServer] [22m  cause: Error: D1_TYPE_ERROR: Type 'object' not supported for value 'Tue Mar 03 2026 11:43:28 GMT-0600 (Central Standard Time)'
+[2m[WebServer] [22m      at <anonymous> [90m(/home/juan/development/mobile-garage-door/[39mnode_modules/[4msrc[24m/d1/session.ts:281:21[90m)[39m
+[2m[WebServer] [22m      at D1PreparedQuery.queryWithCache [90m(/home/juan/development/mobile-garage-door/[39mnode_modules/[4msrc[24m/sqlite-core/session.ts:78:18[90m)[39m
+[2m[WebServer] [22m      at D1PreparedQuery.values [90m(/home/juan/development/mobile-garage-door/[39mnode_modules/[4msrc[24m/d1/session.ts:280:21[90m)[39m
+[2m[WebServer] [22m      at D1PreparedQuery.all [90m(/home/juan/development/mobile-garage-door/[39mnode_modules/[4msrc[24m/d1/session.ts:217:27[90m)[39m
+[2m[WebServer] [22m      at QueryPromise.all [90m(/home/juan/development/mobile-garage-door/[39mnode_modules/[4msrc[24m/sqlite-core/query-builders/insert.ts:402:26[90m)[39m
+[2m[WebServer] [22m      at QueryPromise.execute [90m(/home/juan/development/mobile-garage-door/[39mnode_modules/[4msrc[24m/sqlite-core/query-builders/insert.ts:414:40[90m)[39m
+[2m[WebServer] [22m      at QueryPromise.then [90m(/home/juan/development/mobile-garage-door/[39mnode_modules/[4msrc[24m/query-promise.ts:31:15[90m)[39m
+[2m[WebServer] [22m  [90m    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)[39m
+[2m[WebServer] [22m      at async withReturning [90m(/home/juan/development/mobile-garage-door/[39mnode_modules/[4mbetter-auth[24m/src/adapters/drizzle-adapter/drizzle-adapter.ts:100:16[90m)[39m
+[2m[WebServer] [22m      at async Object.create [90m(/home/juan/development/mobile-garage-door/[39mnode_modules/[4mbetter-auth[24m/src/adapters/drizzle-adapter/drizzle-adapter.ts:359:23[90m)[39m {
+[2m[WebServer] [22m    [cause]: Error: Type 'object' not supported for value 'Tue Mar 03 2026 11:43:28 GMT-0600 (Central Standard Time)'
+[2m[WebServer] [22m        at cloudflare-internal:d1-api:311:24
+[2m[WebServer] [22m        at Array.map (<anonymous>)
+[2m[WebServer] [22m        at D1PreparedStatement.bind (cloudflare-internal:d1-api:282:42)
+[2m[WebServer] [22m        at #fetch [90m(file:///home/juan/development/mobile-garage-door/[39mnode_modules/[4mminiflare[24m/dist/src/workers/core/entry.worker.js:4261:141[90m)[39m
+[2m[WebServer] [22m        at async ProxyServer.fetch [90m(file:///home/juan/development/mobile-garage-door/[39mnode_modules/[4mminiflare[24m/dist/src/workers/core/entry.worker.js:4175:14[90m)[39m {
+[2m[WebServer] [22m      [cause]: [90mundefined[39m
+[2m[WebServer] [22m    }
+[2m[WebServer] [22m  }
+[2m[WebServer] [22m}
+
+[1A[2K[2m[WebServer] [22m[2m2026-03-03T17:43:28.615Z[0m [31mERROR[0m [1m[Better Auth]:[0m Failed to create user DrizzleQueryError: Failed query: insert into "users" ("id", "name", "email", "email_verified", "image", "role", "customer_type", "company_name", "phone", "address", "last_login", "push_subscription", "square_customer_id", "created_at", "updated_at") values (?, ?, ?, ?, null, ?, ?, null, null, null, null, null, null, ?, ?) returning "id", "name", "email", "email_verified", "image", "role", "customer_type", "company_name", "phone", "address", "last_login", "push_subscription", "square_customer_id", "created_at", "updated_at"
+[2m[WebServer] [22mparams: R3X3Gg1W6VAk1KW7BD0ce55Rc7cMWUkc,E2E Admin,playwright-admin@test.com,0,customer,residential,Tue Mar 03 2026 11:43:28 GMT-0600 (Central Standard Time),Tue Mar 03 2026 11:43:28 GMT-0600 (Central Standard Time)
+[2m[WebServer] [22m    at D1PreparedQuery.queryWithCache [90m(/home/juan/development/mobile-garage-door/[39mnode_modules/[4msrc[24m/sqlite-core/session.ts:80:11[90m)[39m
+[2m[WebServer] [22m[90m    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)[39m
+[2m[WebServer] [22m    at async D1PreparedQuery.values [90m(/home/juan/development/mobile-garage-door/[39mnode_modules/[4msrc[24m/d1/session.ts:280:10[90m)[39m
+[2m[WebServer] [22m    at async D1PreparedQuery.all [90m(/home/juan/development/mobile-garage-door/[39mnode_modules/[4msrc[24m/d1/session.ts:217:16[90m)[39m {
+[2m[WebServer] [22m  query: [32m'insert into "users" ("id", "name", "email", "email_verified", "image", "role", "customer_type", "company_name", "phone", "address", "last_login", "push_subscription", "square_customer_id", "created_at", "updated_at") values (?, ?, ?, ?, null, ?, ?, null, null, null, null, null, null, ?, ?) returning "id", "name", "email", "email_verified", "image", "role", "customer_type", "company_name", "phone", "address", "last_login", "push_subscription", "square_customer_id", "created_at", "updated_at"'[39m,
+[2m[WebServer] [22m  params: [
+[2m[WebServer] [22m    [32m'R3X3Gg1W6VAk1KW7BD0ce55Rc7cMWUkc'[39m,
+[2m[WebServer] [22m    [32m'E2E Admin'[39m,
+[2m[WebServer] [22m    [32m'playwright-admin@test.com'[39m,
+[2m[WebServer] [22m    [33m0[39m,
+[2m[WebServer] [22m    [32m'customer'[39m,
+[2m[WebServer] [22m    [32m'residential'[39m,
+[2m[WebServer] [22m    [35m2026-03-03T17:43:28.599Z[39m,
+[2m[WebServer] [22m    [35m2026-03-03T17:43:28.599Z[39m
+[2m[WebServer] [22m  ],
+[2m[WebServer] [22m  cause: Error: D1_TYPE_ERROR: Type 'object' not supported for value 'Tue Mar 03 2026 11:43:28 GMT-0600 (Central Standard Time)'
+[2m[WebServer] [22m      at <anonymous> [90m(/home/juan/development/mobile-garage-door/[39mnode_modules/[4msrc[24m/d1/session.ts:281:21[90m)[39m
+[2m[WebServer] [22m      at D1PreparedQuery.queryWithCache [90m(/home/juan/development/mobile-garage-door/[39mnode_modules/[4msrc[24m/sqlite-core/session.ts:78:18[90m)[39m
+[2m[WebServer] [22m      at D1PreparedQuery.values [90m(/home/juan/development/mobile-garage-door/[39mnode_modules/[4msrc[24m/d1/session.ts:280:21[90m)[39m
+[2m[WebServer] [22m      at D1PreparedQuery.all [90m(/home/juan/development/mobile-garage-door/[39mnode_modules/[4msrc[24m/d1/session.ts:217:27[90m)[39m
+[2m[WebServer] [22m      at QueryPromise.all [90m(/home/juan/development/mobile-garage-door/[39mnode_modules/[4msrc[24m/sqlite-core/query-builders/insert.ts:402:26[90m)[39m
+[2m[WebServer] [22m      at QueryPromise.execute [90m(/home/juan/development/mobile-garage-door/[39mnode_modules/[4msrc[24m/sqlite-core/query-builders/insert.ts:414:40[90m)[39m
+[2m[WebServer] [22m      at QueryPromise.then [90m(/home/juan/development/mobile-garage-door/[39mnode_modules/[4msrc[24m/query-promise.ts:31:15[90m)[39m
+[2m[WebServer] [22m  [90m    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)[39m
+[2m[WebServer] [22m      at async withReturning [90m(/home/juan/development/mobile-garage-door/[39mnode_modules/[4mbetter-auth[24m/src/adapters/drizzle-adapter/drizzle-adapter.ts:100:16[90m)[39m
+[2m[WebServer] [22m      at async Object.create [90m(/home/juan/development/mobile-garage-door/[39mnode_modules/[4mbetter-auth[24m/src/adapters/drizzle-adapter/drizzle-adapter.ts:359:23[90m)[39m {
+[2m[WebServer] [22m    [cause]: Error: Type 'object' not supported for value 'Tue Mar 03 2026 11:43:28 GMT-0600 (Central Standard Time)'
+[2m[WebServer] [22m        at cloudflare-internal:d1-api:311:24
+[2m[WebServer] [22m        at Array.map (<anonymous>)
+[2m[WebServer] [22m        at D1PreparedStatement.bind (cloudflare-internal:d1-api:282:42)
+[2m[WebServer] [22m        at #fetch [90m(file:///home/juan/development/mobile-garage-door/[39mnode_modules/[4mminiflare[24m/dist/src/workers/core/entry.worker.js:4261:141[90m)[39m
+[2m[WebServer] [22m        at async ProxyServer.fetch [90m(file:///home/juan/development/mobile-garage-door/[39mnode_modules/[4mminiflare[24m/dist/src/workers/core/entry.worker.js:4175:14[90m)[39m {
+[2m[WebServer] [22m      [cause]: [90mundefined[39m
+[2m[WebServer] [22m    }
+[2m[WebServer] [22m  }
+[2m[WebServer] [22m}
+
+[1A[2K[chromium] › e2e/auth.spec.ts:43:3 › Authentication Routing E2E › Logged in Admin sees the Portal AND the Admin View toggle button
+Admin Signup Failed: {"code":"FAILED_TO_CREATE_USER","message":"Failed to create user"}
+
+[1A[2K  2) [chromium] › e2e/auth.spec.ts:43:3 › Authentication Routing E2E › Logged in Admin sees the Portal AND the Admin View toggle button 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBeTruthy[2m()[22m
+
+    Received: [31mfalse[39m
+
+      54 |        console.log('Admin Signup Failed:', await res.text());
+      55 |     }
+    > 56 |     expect(res.ok()).toBeTruthy();
+         |                      ^
+      57 |
+      58 |     // Extract the securely hashed BetterAuth session cookie returned by the server
+      59 |     const state = await request.storageState();
+        at /home/juan/development/mobile-garage-door/e2e/auth.spec.ts:56:22
+
+
+[1A[2K  3) [chromium] › e2e/auth.spec.ts:4:3 › Authentication Routing E2E › Unauthenticated user is redirected to login when visiting /app 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/.*\/login/[39m
+    Received string:  [31m"http://localhost:3000/app"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://localhost:3000/app"[22m
+
+
+      4 |   test('Unauthenticated user is redirected to login when visiting /app', async ({ page }) => {
+      5 |     await page.goto('/app');
+    > 6 |     await expect(page).toHaveURL(/.*\/login/);
+        |                        ^
+      7 |
+      8 |     const headerLoginBtn = page.locator('header').getByText('PORTAL LOGIN');
+      9 |     await expect(headerLoginBtn).toBeVisible();
+        at /home/juan/development/mobile-garage-door/e2e/auth.spec.ts:6:24
+
+    Error Context: test-results/auth-Authentication-Routin-3ffc2--to-login-when-visiting-app-chromium/error-context.md
+
+
+[1A[2K  3 failed
+    [chromium] › e2e/auth.spec.ts:4:3 › Authentication Routing E2E › Unauthenticated user is redirected to login when visiting /app 
+    [chromium] › e2e/auth.spec.ts:12:3 › Authentication Routing E2E › Logged in Customer sees the Portal and NOT the Command Center 
+    [chromium] › e2e/auth.spec.ts:43:3 › Authentication Routing E2E › Logged in Admin sees the Portal AND the Admin View toggle button 
+
+[36m  Serving HTML report at http://localhost:9323. Press Ctrl+C to quit.[39m

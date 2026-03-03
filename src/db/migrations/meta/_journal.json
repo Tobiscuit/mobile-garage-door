@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1772490163266,
+      "tag": "0000_public_next_avengers",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1772559262824,
+      "tag": "0001_broad_galactus",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1772559373825,
+      "tag": "0002_groovy_medusa",
+      "breakpoints": true
+    }
+  ]
+}

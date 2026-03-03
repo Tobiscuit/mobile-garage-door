@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>D1 Schema — mobile-garage-door-db</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #0f172a; color: #e2e8f0; font-family: 'Inter', system-ui, sans-serif; }
+  h1 { text-align: center; padding: 20px; font-size: 1.4rem; color: #94a3b8; }
+  h1 span { color: #f59e0b; }
+  #controls { text-align: center; padding: 0 0 16px; }
+  #controls button { background: #1e293b; color: #94a3b8; border: 1px solid #334155; padding: 8px 16px; margin: 0 4px; border-radius: 6px; cursor: pointer; font-size: 0.9rem; }
+  #controls button:hover { background: #334155; color: #f1f5f9; }
+  #diagram-container { width: 100%; overflow: auto; padding: 20px; display: flex; justify-content: center; }
+  .mermaid { min-width: 1200px; }
+  .mermaid svg { max-width: none !important; }
+</style>
+</head>
+<body>
+<h1>D1 Database — <span>mobile-garage-door-db</span> · Production (DFW)</h1>
+<div id="controls">
+  <button onclick="zoom(1.2)">Zoom In (+)</button>
+  <button onclick="zoom(0.8)">Zoom Out (−)</button>
+  <button onclick="resetZoom()">Reset</button>
+</div>
+<div id="diagram-container">
+<pre class="mermaid">
+erDiagram
+    users {
+        text id PK
+        text name
+        text email
+        int email_verified
+        text image
+        text role
+        text customer_type
+        text company_name
+        text phone
+        text address
+        text last_login
+        text push_subscription
+        text square_customer_id
+        text created_at
+        text updated_at
+    }
+
+    settings {
+        int id PK
+        text company_name
+        text phone
+        text email
+        text license_number
+        text insurance_amount
+        text bbb_rating
+        text mission_statement
+        text brand_voice
+        text brand_tone
+        text brand_avoid
+        text theme_preference
+        int warranty_enable_notifications
+        text warranty_notification_email_template
+        text updated_at
+    }
+
+    setting_stats {
+        int id PK
+        int setting_id FK
+        text label
+        text value
+    }
+
+    setting_values {
+        int id PK
+        int setting_id FK
+        text title
+        text description
+    }
+
+    services {
+        int id PK
+        text title
+        text slug
+        text category
+        real price
+        text description
+        text icon
+        int highlight
+        int order
+        text created_at
+        text updated_at
+    }
+
+    service_features {
+        int id PK
+        int service_id FK
+        text feature
+        int order
+    }
+
+    service_requests {
+        int id PK
+        text ticket_id
+        text customer_id FK
+        text issue_description
+        text urgency
+        text scheduled_time
+        text status
+        text assigned_tech_id FK
+        text trip_fee_payment
+        text created_at
+        text updated_at
+    }
+
+    projects {
+        int id PK
+        text title
+        text slug
+        text client
+        text location
+        text completion_date
+        text install_date
+        text warranty_expiration
+        text description
+        text challenge
+        text solution
+        text html_description
+        text html_challenge
+        text html_solution
+        text image_style
+        text created_at
+        text updated_at
+    }
+
+    project_gallery {
+        int id PK
+        int project_id FK
+        int media_id FK
+        text caption
+        int order
+    }
+
+    project_stats {
+        int id PK
+        int project_id FK
+        text label
+        text value
+    }
+
+    project_tags {
+        int id PK
+        int project_id FK
+        text tag
+    }
+
+    posts {
+        int id PK
+        text title
+        text slug
+        text excerpt
+        text content
+        text html_content
+        int featured_image_id FK
+        text category
+        text published_at
+        text status
+        text quick_notes
+        text created_at
+        text updated_at
+    }
+
+    post_keywords {
+        int id PK
+        int post_id FK
+        text keyword
+    }
+
+    media {
+        int id PK
+        text filename
+        text mime_type
+        int filesize
+        int width
+        int height
+        text alt
+        text url
+        text created_at
+        text updated_at
+    }
+
+    testimonials {
+        int id PK
+        text quote
+        text author
+        text location
+        int rating
+        int featured
+        text created_at
+        text updated_at
+    }
+
+    invoices {
+        int id PK
+        text square_invoice_id
+        text order_id
+        int amount
+        text status
+        text customer_id FK
+        text public_url
+        text created_at
+        text updated_at
+    }
+
+    payments {
+        int id PK
+        text square_payment_id
+        int amount
+        text currency
+        text status
+        text source_type
+        text note
+        text created_at
+        text updated_at
+    }
+
+    email_threads {
+        int id PK
+        text subject
+        text status
+        text last_message_at
+        text created_at
+        text updated_at
+    }
+
+    emails {
+        int id PK
+        text from_addr
+        text to_addr
+        text subject
+        text body
+        text body_raw
+        int thread_id FK
+        text direction
+        text message_id
+        text raw_metadata
+        text created_at
+        text updated_at
+    }
+
+    email_attachments {
+        int id PK
+        int email_id FK
+        int media_id FK
+    }
+
+    email_thread_participants {
+        int id PK
+        int thread_id FK
+        text user_id FK
+    }
+
+    staff_invites {
+        int id PK
+        text email
+        text role
+        text first_name
+        text last_name
+        text status
+        text accepted_at
+        text invited_by_id FK
+        text created_at
+        text updated_at
+    }
+
+    translations {
+        int id PK
+        text entity_type
+        int entity_id
+        text field_name
+        text locale
+        text value
+        int auto_translated
+        text created_at
+        text updated_at
+    }
+
+    settings ||--o{ setting_stats : "stats"
+    settings ||--o{ setting_values : "values"
+    services ||--o{ service_features : "features"
+    users ||--o{ service_requests : "customer"
+    users ||--o{ service_requests : "tech"
+    projects ||--o{ project_gallery : "gallery"
+    projects ||--o{ project_stats : "stats"
+    projects ||--o{ project_tags : "tags"
+    media ||--o{ project_gallery : "image"
+    media ||--o| posts : "featured"
+    posts ||--o{ post_keywords : "keywords"
+    users ||--o{ invoices : "customer"
+    email_threads ||--o{ emails : "messages"
+    email_threads ||--o{ email_thread_participants : "participants"
+    users ||--o{ email_thread_participants : "user"
+    emails ||--o{ email_attachments : "attachments"
+    media ||--o{ email_attachments : "file"
+    users ||--o{ staff_invites : "invited_by"
+</pre>
+</div>
+
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+  mermaid.initialize({ 
+    startOnLoad: true, 
+    theme: 'dark',
+    er: { layoutDirection: 'TB', minEntityWidth: 120 }
+  });
+</script>
+<script>
+  let scale = 1;
+  function zoom(factor) {
+    scale *= factor;
+    document.querySelector('.mermaid').style.transform = `scale(${scale})`;
+    document.querySelector('.mermaid').style.transformOrigin = 'top center';
+  }
+  function resetZoom() {
+    scale = 1;
+    document.querySelector('.mermaid').style.transform = 'scale(1)';
+  }
+</script>
+</body>
+</html>

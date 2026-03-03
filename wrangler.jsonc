@@ -1,14 +1,28 @@
 {
   "name": "mobile-garage-door",
   "compatibility_date": "2026-02-01",
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
   "main": "worker/index.ts",
   "d1_databases": [
-    { "binding": "DB", "database_name": "mobile-garage-door-db", "database_id": "placeholder" }
+    {
+      "binding": "DB",
+      "database_name": "mobile-garage-door-db",
+      "database_id": "c3a12bb6-5693-43b6-b333-c8b693e9d91b",
+      "migrations_dir": "src/db/migrations"
+    }
   ],
   "r2_buckets": [
-    { "binding": "MEDIA_BUCKET", "bucket_name": "mobile-garage-door-media" }
+    {
+      "binding": "MEDIA_BUCKET",
+      "bucket_name": "mobile-garage-door-media"
+    }
   ],
   "kv_namespaces": [
-    { "binding": "VINEXT_CACHE", "id": "placeholder" }
+    {
+      "binding": "VINEXT_CACHE",
+      "id": "14e1c4a34c4f4246b4455b28d72b6231"
+    }
   ]
 }

@@ -68,7 +68,6 @@
     "hours": "Horario de Atención",
     "emergency": "Servicio de Emergencia Disponible 24/7"
   },
-
   "common": {
     "loading": "Cargando...",
     "error": "Algo salió mal",
@@ -154,7 +153,8 @@
     "projects_completed": "Proyectos Completados",
     "this_year": "Este Año",
     "satisfaction": "Satisfacción del Cliente",
-    "five_star": "Verificado 5 Estrellas"
+    "five_star": "Verificado 5 Estrellas",
+    "no_reviews": "No hay reseñas verificadas disponibles en este momento."
   },
   "services_landing": {
     "heading": "Diagnóstico y",

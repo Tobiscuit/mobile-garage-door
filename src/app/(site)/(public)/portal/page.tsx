@@ -8,7 +8,7 @@ import { ActiveRequestList } from '@/features/portal/ActiveRequestList';
 import { ServiceHistory } from '@/features/portal/ServiceHistory';
 import { AccountSidebar } from '@/features/portal/AccountSidebar';
 import { getSessionSafe } from '@/lib/get-session-safe';
-import { getCloudflareContext } from "vinext/cloudflare";
+import { getCloudflareContext } from "@/lib/cloudflare";
 
 export const dynamic = 'force-dynamic';
 

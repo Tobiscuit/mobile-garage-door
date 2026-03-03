@@ -4,8 +4,8 @@ import { getDB } from "@/db";
 import { projects, projectGallery, projectTags, projectStats } from "@/db/schema";
 import { eq, desc } from "drizzle-orm";
 import { revalidatePath } from 'next/cache';
-import { redirect } from 'vinext/navigation';
-import { getCloudflareContext } from "vinext/cloudflare";
+import { redirect } from 'next/navigation';
+import { getCloudflareContext } from "@/lib/cloudflare";
 
 export async function getProjects() {
   const { env } = await getCloudflareContext();

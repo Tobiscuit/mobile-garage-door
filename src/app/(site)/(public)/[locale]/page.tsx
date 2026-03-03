@@ -6,19 +6,23 @@ import ValueStack from '@/features/landing/ValueStack';
 import { getDB } from "@/db";
 import { services as servicesTable, testimonials as testimonialsTable } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import { getCloudflareContext } from "vinext/cloudflare";
+import { getCloudflareContext } from "@/lib/cloudflare";
 import { withTranslations } from "@/db/helpers";
 
 export default async function Home({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   const { env } = await getCloudflareContext();
   const db = getDB(env.DB);
-  
-  const rawServices = await db.select().from(servicesTable).orderBy(servicesTable.order);
-  const rawTestimonials = await db.select().from(testimonialsTable).where(eq(testimonialsTable.featured, true));
 
-  const services = await withTranslations(env.DB, rawServices, 'services', locale);
-  const testimonials = await withTranslations(env.DB, rawTestimonials, 'testimonials', locale);
+  let services: any[] = [];
+  let testimonials: any[] = [];
+
+  if (db) {
+    const rawServices = await db.select().from(servicesTable).orderBy(servicesTable.order);
+    const rawTestimonials = await db.select().from(testimonialsTable).where(eq(testimonialsTable.featured, true));
+    services = await withTranslations(env.DB, rawServices, 'services', locale);
+    testimonials = await withTranslations(env.DB, rawTestimonials, 'testimonials', locale);
+  }
 
   return (
     <>

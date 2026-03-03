@@ -4,7 +4,7 @@ import { getDB } from "@/db";
 import { users, serviceRequests } from "@/db/schema";
 import { eq, and, ne } from "drizzle-orm";
 import { headers } from 'next/headers';
-import { getCloudflareContext } from "vinext/cloudflare";
+import { getCloudflareContext } from "@/lib/cloudflare";
 
 export async function savePushSubscription(subscription: any) {
     try {

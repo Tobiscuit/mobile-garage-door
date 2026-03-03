@@ -3,7 +3,7 @@
 import { getDB } from "@/db";
 import { users, serviceRequests } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
-import { getCloudflareContext } from "vinext/cloudflare";
+import { getCloudflareContext } from "@/lib/cloudflare";
 
 export async function getUnassignedJobs() {
     try {

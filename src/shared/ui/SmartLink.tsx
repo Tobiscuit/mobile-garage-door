@@ -1,19 +1,20 @@
 'use client'
 
-import Link, { LinkProps } from '@/shared/ui/Link'
-import { useRouter } from 'vinext/navigation'
-import { ReactNode, useEffect } from 'react'
+import Link from '@/shared/ui/Link'
+import { useRouter } from 'next/navigation'
+import { ReactNode, ComponentProps } from 'react'
 
-interface SmartLinkProps extends LinkProps {
+interface SmartLinkProps extends ComponentProps<typeof Link> {
   children: ReactNode
   className?: string
   prefetchPriority?: 'high' | 'low'
+  href: any
 }
 
-export default function SmartLink({ 
-  children, 
-  prefetchPriority = 'high', 
-  ...props 
+export default function SmartLink({
+  children,
+  prefetchPriority = 'high',
+  ...props
 }: SmartLinkProps) {
   const router = useRouter()
 
@@ -30,8 +31,8 @@ export default function SmartLink({
   }
 
   return (
-    <Link 
-      {...props} 
+    <Link
+      {...props}
       onMouseEnter={handleMouseEnter}
       onTouchStart={handleTouchStart}
     >

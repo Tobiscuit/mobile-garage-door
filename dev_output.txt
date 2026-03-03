@@ -1,0 +1,10 @@
+
+> mobile-garage-door@1.0.0 dev:vinext
+> vite dev --port 3001
+
+
+  VITE v7.3.1  ready in 420 ms
+
+  ➜  Local:   http://localhost:3001/
+  ➜  Network: use --host to expose
+  ➜  press h + enter to show help

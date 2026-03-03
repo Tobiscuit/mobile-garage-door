@@ -2,7 +2,7 @@ import React from 'react';
 import { getDB } from "@/db";
 import { services as servicesTable } from "@/db/schema";
 import { getTranslations } from '@/lib/server-translations';
-import { getCloudflareContext } from "vinext/cloudflare";
+import { getCloudflareContext } from "@/lib/cloudflare";
 
 const getIcon = (iconName: string, highlight: boolean) => {
   switch (iconName) {

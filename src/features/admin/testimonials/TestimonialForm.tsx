@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { useRouter } from 'vinext/navigation';
+import { useRouter } from 'next/navigation';
 
 interface TestimonialFormProps {
   action: (formData: FormData) => Promise<any>;

@@ -2,12 +2,12 @@ import React from 'react';
 import { getDB } from "@/db";
 import { posts as postsTable } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import { notFound } from 'vinext/navigation';
+import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import SmartLink from '@/shared/ui/SmartLink';
 import { getTranslations } from '@/lib/server-translations';
 import parse, { Element } from 'html-react-parser';
-import { getCloudflareContext } from "vinext/cloudflare";
+import { getCloudflareContext } from "@/lib/cloudflare";
 
 export const dynamic = 'force-dynamic';
 

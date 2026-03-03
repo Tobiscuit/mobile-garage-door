@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from '@/shared/ui/Link';
-import { notFound } from 'vinext/navigation';
+import { notFound } from 'next/navigation';
 import { getServiceById } from '../actions';
 import ServiceForm from '@/features/admin/services/ServiceForm';
 

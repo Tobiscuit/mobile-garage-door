@@ -1,16 +1,16 @@
 'use client';
 
-import { useTranslation as useI18nTranslation } from 'react-i18next';
+import { useTranslations as useNextIntlTranslations } from 'next-intl';
 
 /**
  * Client-side translation hook for use in Client Components.
- * Wraps react-i18next's useTranslation hook.
+ * Wraps next-intl's useTranslations hook to maintain the same API signature
+ * previously used across the codebase.
  */
 export function useTranslations(namespace?: string) {
-  const { t } = useI18nTranslation();
+  const t = useNextIntlTranslations(namespace);
 
   return (key: string, values?: any) => {
-    const fullKey = namespace ? `${namespace}.${key}` : key;
-    return t(fullKey, values);
+    return t(key, values);
   };
 }

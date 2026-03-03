@@ -2,9 +2,16 @@
 
 import React, { useState } from 'react';
 import Link from '@/shared/ui/Link';
-import { usePathname } from 'vinext/navigation';
-import Logo from '@/features/payload/Logo';
+import { usePathname } from 'next/navigation';
 import ThemeToggle from './ThemeToggle';
+
+// Simple text logo since we removed the Payload CMS Logo component
+const Logo = () => (
+  <div className="text-xl font-black tracking-tight" style={{ color: 'var(--staff-accent)' }}>
+    Mobil Garage<span className="text-sm font-medium ml-1 opacity-60">Pro</span>
+  </div>
+);
+
 
 // Icons (Same as CustomNav but inline for simplicity or imported if shared)
 const CommandIcon = () => <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>;
@@ -33,12 +40,12 @@ const Sidebar: React.FC = () => {
   const NavItem = ({ href, icon: Icon, label }: { href: string; icon: any; label: string }) => {
     const active = isActive(href);
     return (
-      <Link 
-        href={href} 
+      <Link
+        href={href}
         className={`
           flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 group relative overflow-hidden
-          ${active 
-            ? 'text-[var(--staff-surface)] font-bold shadow-[0_0_20px_var(--staff-accent)]' 
+          ${active
+            ? 'text-[var(--staff-surface)] font-bold shadow-[0_0_20px_var(--staff-accent)]'
             : 'hover:bg-[var(--staff-border)]/20'
           }
         `}
@@ -70,20 +77,20 @@ const Sidebar: React.FC = () => {
       {/* MOBILE BOTTOM NAV - Visible only on small screens */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 backdrop-blur-xl z-50 flex justify-around items-center p-2 pb-safe" style={{ backgroundColor: 'var(--staff-surface)', borderTop: '1px solid var(--staff-border)' }}>
         <Link href="/dashboard" className={`p-2 rounded-lg flex flex-col items-center gap-1 ${isActive('/dashboard') && !isActive('/dashboard/dispatch') ? 'text-[var(--staff-accent)]' : ''}`} style={{ color: isActive('/dashboard') && !isActive('/dashboard/dispatch') ? 'var(--staff-accent)' : 'var(--staff-muted)' }}>
-            <CommandIcon />
-            <span className="text-[10px] font-bold">Home</span>
+          <CommandIcon />
+          <span className="text-[10px] font-bold">Home</span>
         </Link>
         <Link href="/dashboard/dispatch" className={`p-2 rounded-lg flex flex-col items-center gap-1 ${isActive('/dashboard/dispatch') ? 'text-[var(--staff-accent)]' : ''}`} style={{ color: isActive('/dashboard/dispatch') ? 'var(--staff-accent)' : 'var(--staff-muted)' }}>
-            <DispatchIcon />
-            <span className="text-[10px] font-bold">Dispatch</span>
+          <DispatchIcon />
+          <span className="text-[10px] font-bold">Dispatch</span>
         </Link>
         <Link href="/dashboard/services" className={`p-2 rounded-lg flex flex-col items-center gap-1 ${isActive('/dashboard/services') ? 'text-[var(--staff-accent)]' : ''}`} style={{ color: isActive('/dashboard/services') ? 'var(--staff-accent)' : 'var(--staff-muted)' }}>
-            <ServiceIcon />
-            <span className="text-[10px] font-bold">Services</span>
+          <ServiceIcon />
+          <span className="text-[10px] font-bold">Services</span>
         </Link>
         <Link href="/dashboard/settings" className={`p-2 rounded-lg flex flex-col items-center gap-1 ${isActive('/dashboard/settings') ? 'text-[var(--staff-accent)]' : ''}`} style={{ color: isActive('/dashboard/settings') ? 'var(--staff-accent)' : 'var(--staff-muted)' }}>
-            <SettingsIcon />
-            <span className="text-[10px] font-bold">Settings</span>
+          <SettingsIcon />
+          <span className="text-[10px] font-bold">Settings</span>
         </Link>
       </nav>
 
@@ -91,59 +98,59 @@ const Sidebar: React.FC = () => {
       <aside className="hidden md:flex fixed left-0 top-0 h-screen w-[280px] backdrop-blur-xl flex-col z-50" style={{ backgroundColor: 'var(--staff-surface)', borderRight: '1px solid var(--staff-border)' }}>
         {/* LOGO AREA */}
         <div className="p-6 mb-2 shrink-0">
-            <Link href="/dashboard" className="block w-40 hover:opacity-90 transition-opacity">
-               <Logo />
-            </Link>
+          <Link href="/dashboard" className="block w-40 hover:opacity-90 transition-opacity">
+            <Logo />
+          </Link>
         </div>
 
         {/* SCROLLABLE NAV */}
         <nav className="flex-1 px-4 overflow-y-auto custom-scrollbar">
-            <NavGroup title="Core">
-                <NavItem href="/dashboard" icon={CommandIcon} label="Command Center" />
-                <NavItem href="/portal" icon={() => <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>} label="Customer Portal" />
-                <NavItem href="/dashboard/dispatch" icon={DispatchIcon} label="Dispatch Board" />
-                <NavItem href="/dashboard/emails" icon={EmailIcon} label="Inbox" />
-            </NavGroup>
+          <NavGroup title="Core">
+            <NavItem href="/dashboard" icon={CommandIcon} label="Command Center" />
+            <NavItem href="/portal" icon={() => <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>} label="Customer Portal" />
+            <NavItem href="/dashboard/dispatch" icon={DispatchIcon} label="Dispatch Board" />
+            <NavItem href="/dashboard/emails" icon={EmailIcon} label="Inbox" />
+          </NavGroup>
 
-            <NavGroup title="Operations">
-                <NavItem href="/dashboard/services" icon={ServiceIcon} label="Services" />
-                <NavItem href="/dashboard/projects" icon={ProjectIcon} label="Projects" />
-                <NavItem href="/dashboard/testimonials" icon={UsersIcon} label="Testimonials" />
-            </NavGroup>
+          <NavGroup title="Operations">
+            <NavItem href="/dashboard/services" icon={ServiceIcon} label="Services" />
+            <NavItem href="/dashboard/projects" icon={ProjectIcon} label="Projects" />
+            <NavItem href="/dashboard/testimonials" icon={UsersIcon} label="Testimonials" />
+          </NavGroup>
 
-            <NavGroup title="Content">
-                <NavItem href="/dashboard/posts" icon={PostIcon} label="Blog Posts" />
-                <NavItem href="/dashboard/media" icon={MediaIcon} label="Media Library" />
-            </NavGroup>
+          <NavGroup title="Content">
+            <NavItem href="/dashboard/posts" icon={PostIcon} label="Blog Posts" />
+            <NavItem href="/dashboard/media" icon={MediaIcon} label="Media Library" />
+          </NavGroup>
 
-            <NavGroup title="Configuration">
-                <NavItem href="/dashboard/users" icon={UsersIcon} label="Users" />
-                <NavItem href="/dashboard/settings" icon={SettingsIcon} label="Site Settings" />
-            </NavGroup>
+          <NavGroup title="Configuration">
+            <NavItem href="/dashboard/users" icon={UsersIcon} label="Users" />
+            <NavItem href="/dashboard/settings" icon={SettingsIcon} label="Site Settings" />
+          </NavGroup>
         </nav>
 
         {/* FOOTER */}
         <div className="p-4" style={{ borderTop: '1px solid var(--staff-border)' }}>
-            <div className="mb-3">
-                <ThemeToggle />
-            </div>
-            <button onClick={async (e) => {
-              e.preventDefault();
-              try {
-                const { authClient } = await import('@/lib/auth-client');
-                await authClient.signOut();
-                window.location.href = '/login';
-              } catch (err) {
-                console.error(err);
-                window.location.href = '/login';
-              }
-            }} className="flex w-full items-center gap-3 px-4 py-3 text-red-400 hover:bg-red-500/10 rounded-lg transition-all group text-left">
-                <LogoutIcon />
-                <span className="font-bold group-hover:text-red-300">Log Out</span>
-            </button>
-             <div className="mt-4 px-4 text-[10px] font-mono text-center" style={{ color: 'var(--staff-muted)' }}>
-                Mobil Garage v2.0
-            </div>
+          <div className="mb-3">
+            <ThemeToggle />
+          </div>
+          <button onClick={async (e) => {
+            e.preventDefault();
+            try {
+              const { authClient } = await import('@/lib/auth-client');
+              await authClient.signOut();
+              window.location.href = '/login';
+            } catch (err) {
+              console.error(err);
+              window.location.href = '/login';
+            }
+          }} className="flex w-full items-center gap-3 px-4 py-3 text-red-400 hover:bg-red-500/10 rounded-lg transition-all group text-left">
+            <LogoutIcon />
+            <span className="font-bold group-hover:text-red-300">Log Out</span>
+          </button>
+          <div className="mt-4 px-4 text-[10px] font-mono text-center" style={{ color: 'var(--staff-muted)' }}>
+            Mobil Garage v2.0
+          </div>
         </div>
       </aside>
     </>

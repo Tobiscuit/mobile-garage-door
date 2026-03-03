@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from '@/shared/ui/Link';
-import { useRouter } from 'vinext/navigation';
+import { useRouter } from 'next/navigation';
 
 export default function SignupPage() {
   const router = useRouter();

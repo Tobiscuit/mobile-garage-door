@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from '@/shared/ui/Link';
 import { getThreadDetails } from '../actions'; // We'll update actions.ts to export this
-import { notFound } from 'vinext/navigation';
+import { notFound } from 'next/navigation';
 import { ChatInterface } from '@/features/admin/emails/ChatInterface'; // We will create this
 
 export const dynamic = 'force-dynamic';

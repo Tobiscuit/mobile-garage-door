@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef, useState, useActionState } from 'react';
-import { useRouter } from 'vinext/navigation';
+import { useRouter } from 'next/navigation';
 import MediaUpload from '@/features/admin/ui/MediaUpload';
 import { generatePostContent } from '@/actions/ai';
 import { RichTextEditor } from '@/features/admin/ui/RichTextEditor';
