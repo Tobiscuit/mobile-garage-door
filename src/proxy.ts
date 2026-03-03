@@ -3,7 +3,7 @@ import { routing } from './i18n/routing';
 
 const intlMiddleware = createMiddleware(routing);
 
-export default function middleware(request: any) {
+export function middleware(request: any) {
     if (request.nextUrl && typeof request.nextUrl.clone === 'function') {
         const originalClone = request.nextUrl.clone.bind(request.nextUrl);
         request.nextUrl.clone = () => {
@@ -27,7 +27,17 @@ export default function middleware(request: any) {
     return intlMiddleware(request);
 }
 
+// Vinext expects named export 'proxy' and default export for middleware
+export { middleware as proxy };
+export default middleware;
+
 export const config = {
-    // Match all pathnames except static files and API routes
-    matcher: ['/', '/(en|es|vi)/:path*', '/((?!api|_next|_vercel|.*\\..*).*)']
+    // Match only locale-prefixed routes and the root.
+    // Exclude non-localized static routes so they bypass i18n middleware
+    // and hit Vinext's router directly (where they match their static patterns).
+    matcher: [
+        '/',
+        '/(en|es|vi)/:path*',
+        '/((?!api|_next|_vercel|login|portal|signup|diagnose|app|auth|dashboard|profile|admin|.*\\..*).*)'
+    ]
 };

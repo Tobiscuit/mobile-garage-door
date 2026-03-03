@@ -4,7 +4,7 @@
     "name": "framework"
   },
   "virtual:vinext-app-browser-entry": {
-    "file": "assets/index-Bz4DoO5O.js",
+    "file": "assets/index-CmDOrhQb.js",
     "name": "index",
     "src": "virtual:vinext-app-browser-entry",
     "isEntry": true,
@@ -53,7 +53,7 @@
     ]
   },
   "virtual:vite-rsc/client-references/group/shared:node_modules/vinext/dist/shims/error-boundary.js": {
-    "file": "assets/error-boundary-DwmqizYB.js",
+    "file": "assets/error-boundary-nQ4R6qRv.js",
     "name": "error-boundary",
     "src": "virtual:vite-rsc/client-references/group/shared:node_modules/vinext/dist/shims/error-boundary.js",
     "isDynamicEntry": true,
