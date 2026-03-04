@@ -3,9 +3,11 @@
 import React, { useState } from 'react';
 import Link from '@/shared/ui/Link';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from '@/hooks/useTranslations';
 
 export default function SignupPage() {
   const router = useRouter();
+  const t = useTranslations('signup_page');
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -29,13 +31,12 @@ export default function SignupPage() {
     setError('');
 
     if (formData.password !== formData.confirmPassword) {
-        setError("Passwords do not match.");
+        setError(t('error_passwords_match'));
         setLoading(false);
         return;
     }
 
     try {
-      // Use Users collection (unified IAM)
       const res = await fetch('/api/users', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -46,12 +47,10 @@ export default function SignupPage() {
             phone: formData.phone,
             customerType: formData.isBuilder ? 'builder' : 'residential',
             companyName: formData.isBuilder ? formData.companyName : undefined,
-            // role: 'customer' is enforced by default in Users collection
         }),
       });
 
       if (res.ok) {
-        // Signup successful, now login automatically
         const loginRes = await fetch('/api/users/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -65,10 +64,10 @@ export default function SignupPage() {
         }
       } else {
         const err = await res.json();
-        setError(err.errors?.[0]?.message || 'Registration failed.');
+        setError(err.errors?.[0]?.message || t('error_registration_failed'));
       }
     } catch (err) {
-      setError('Something went wrong. Please try again.');
+      setError(t('error_unexpected'));
     } finally {
       setLoading(false);
     }
@@ -79,8 +78,8 @@ export default function SignupPage() {
       <main className="flex-grow flex items-center justify-center px-6 py-24">
         <div className="w-full max-w-lg bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
           <div className="bg-golden-yellow p-8 text-center">
-            <h1 className="text-3xl font-black text-charcoal-blue mb-2">Join the Hub</h1>
-            <p className="text-charcoal-blue/80 text-sm font-medium">Create an account for instant 24/7 dispatch.</p>
+            <h1 className="text-3xl font-black text-charcoal-blue mb-2">{t('title')}</h1>
+            <p className="text-charcoal-blue/80 text-sm font-medium">{t('subtitle')}</p>
           </div>
           
           <div className="p-8">
@@ -93,20 +92,20 @@ export default function SignupPage() {
             <form onSubmit={handleSignup} className="space-y-5">
               
               <div>
-                <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Full Name</label>
+                <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">{t('fullname_label')}</label>
                 <input 
                   type="text" 
                   name="name"
                   required
                   className="w-full bg-gray-50 border border-gray-200 rounded-lg p-4 font-medium text-[#2c3e50] focus:ring-2 focus:ring-[#f1c40f] focus:border-transparent outline-none transition-all"
-                  placeholder="John Doe"
+                  placeholder={t('placeholder_name')}
                   onChange={handleChange}
                 />
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Email Address</label>
+                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">{t('email_label')}</label>
                     <input 
                     type="email" 
                     name="email"
@@ -128,19 +127,19 @@ export default function SignupPage() {
                         className="w-5 h-5 text-golden-yellow rounded focus:ring-golden-yellow border-gray-300"
                     />
                     <div>
-                        <div className="font-bold text-charcoal-blue text-sm">I represent a Builder / Company</div>
-                        <div className="text-xs text-gray-500">Manage multiple job sites and access commercial pricing.</div>
+                        <div className="font-bold text-charcoal-blue text-sm">{t('builder_toggle_title')}</div>
+                        <div className="text-xs text-gray-500">{t('builder_toggle_desc')}</div>
                     </div>
                 </label>
 
                 {formData.isBuilder && (
                     <div className="mt-4 animate-in fade-in slide-in-from-top-2">
-                        <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Company Name</label>
+                        <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">{t('company_label')}</label>
                         <input 
                             type="text" 
                             name="companyName"
                             className="w-full bg-white border border-gray-200 rounded-lg p-3 font-medium text-[#2c3e50] focus:ring-2 focus:ring-[#f1c40f] outline-none"
-                            placeholder="Acme Construction LLC"
+                            placeholder={t('placeholder_company')}
                             onChange={handleChange}
                         />
                     </div>
@@ -148,7 +147,7 @@ export default function SignupPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Password</label>
+                <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">{t('phone_label')}</label>
                     <input 
                     type="tel" 
                     name="phone"
@@ -162,24 +161,24 @@ export default function SignupPage() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Password</label>
+                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">{t('password_label')}</label>
                     <input 
                     type="password" 
                     name="password"
                     required
                     className="w-full bg-gray-50 border border-gray-200 rounded-lg p-4 font-medium text-[#2c3e50] focus:ring-2 focus:ring-[#f1c40f] focus:border-transparent outline-none transition-all"
-                    placeholder="Create a password"
+                    placeholder="••••••••"
                     onChange={handleChange}
                     />
                 </div>
                 <div>
-                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Confirm Password</label>
+                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">{t('confirm_password_label')}</label>
                     <input 
                     type="password" 
                     name="confirmPassword"
                     required
                     className="w-full bg-gray-50 border border-gray-200 rounded-lg p-4 font-medium text-[#2c3e50] focus:ring-2 focus:ring-[#f1c40f] focus:border-transparent outline-none transition-all"
-                    placeholder="Confirm password"
+                    placeholder="••••••••"
                     onChange={handleChange}
                     />
                 </div>
@@ -196,15 +195,15 @@ export default function SignupPage() {
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
                 ) : (
-                    'CREATE ACCOUNT'
+                    t('btn_create_account')
                 )}
               </button>
             </form>
 
             <div className="mt-8 text-center text-sm text-gray-400">
-              Already have an account?{' '}
+              {t('already_have_account')}{' '}
               <Link href="/login" className="text-golden-yellow font-bold hover:underline">
-                Sign in
+                {t('sign_in_link')}
               </Link>
             </div>
           </div>

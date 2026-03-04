@@ -5,6 +5,7 @@ import { users } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { getSessionSafe } from '@/lib/get-session-safe';
 import { getCloudflareContext } from "@/lib/cloudflare";
+import { getTranslations } from '@/lib/server-translations';
 
 async function completeStaffProfile(formData: FormData) {
   'use server';
@@ -44,8 +45,10 @@ async function completeStaffProfile(formData: FormData) {
 
 export default async function CompleteProfilePage({
   searchParams,
+  params,
 }: {
   searchParams: Promise<{ error?: string }>;
+  params: Promise<{ locale: string }>;
 }) {
   if (process.env.AUTH_BYPASS === 'true') {
     redirect('/dashboard/dispatch');
@@ -67,29 +70,30 @@ export default async function CompleteProfilePage({
     redirect('/app');
   }
 
-  const params = await searchParams;
-  const hasError = params.error === 'missing_name';
+  const [search, { locale }] = await Promise.all([searchParams, params]);
+  const hasError = search.error === 'missing_name';
+  const t = await getTranslations({ locale, namespace: 'profile_complete' });
 
   return (
     <div className="min-h-screen bg-cloudy-white font-work-sans flex flex-col">
       <main className="flex-grow flex items-center justify-center px-6 py-24">
         <div className="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
           <div className="bg-charcoal-blue p-8 text-center">
-            <h1 className="text-3xl font-black text-white mb-2">Complete Your Profile</h1>
-            <p className="text-gray-300 text-sm">Add your name to finish staff setup.</p>
+            <h1 className="text-3xl font-black text-white mb-2">{t('title')}</h1>
+            <p className="text-gray-300 text-sm">{t('subtitle')}</p>
           </div>
 
           <div className="p-8">
             {hasError && (
               <div className="bg-red-50 text-red-600 p-4 rounded-lg mb-6 text-sm font-medium border border-red-100">
-                Please enter your first and last name.
+                {t('error_missing_name')}
               </div>
             )}
 
             <form action={completeStaffProfile} className="space-y-6">
               <div>
                 <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">
-                  First Name
+                  {t('first_name_label')}
                 </label>
                 <input
                   name="firstName"
@@ -102,7 +106,7 @@ export default async function CompleteProfilePage({
 
               <div>
                 <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">
-                  Last Name
+                  {t('last_name_label')}
                 </label>
                 <input
                   name="lastName"
@@ -117,7 +121,7 @@ export default async function CompleteProfilePage({
                 type="submit"
                 className="w-full bg-charcoal-blue hover:bg-dark-charcoal text-white font-bold py-4 rounded-xl transition-all"
               >
-                Save and Continue
+                {t('btn_save')}
               </button>
             </form>
           </div>
