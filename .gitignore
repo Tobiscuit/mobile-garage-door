@@ -69,3 +69,7 @@ dev_server.log
 .secrets/
 admin-credentials.txt
 .coolify
+
+# Local Data
+/.local-data/
+
