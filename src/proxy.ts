@@ -1,45 +1,17 @@
 import createMiddleware from 'next-intl/middleware';
-import { NextResponse } from 'next/server';
 import { routing } from './i18n/routing';
 
 const intlMiddleware = createMiddleware(routing);
 
-// Non-localized routes that should bypass i18n middleware entirely.
-// These routes exist outside the [locale] segment and don't need
-// locale detection, prefix management, or i18n rewrites.
-const NON_LOCALIZED_PREFIXES = [
-    '/login',
-    '/portal',
-    '/signup',
-    '/diagnose',
-    '/app',
-    '/auth',
-    '/dashboard',
-    '/profile',
-    '/admin',
-];
-
 export function middleware(request: any) {
-    const pathname: string = request.nextUrl?.pathname || '';
-
-    // Skip i18n middleware for non-localized routes — let Vinext's router
-    // handle them directly via their static route patterns.
-    const isNonLocalized = NON_LOCALIZED_PREFIXES.some(
-        prefix => pathname === prefix || pathname.startsWith(prefix + '/')
-    );
-
-    if (isNonLocalized) {
-        return NextResponse.next();
-    }
-
-    // All other routes go through next-intl middleware for locale detection,
-    // prefix management, and i18n rewrites (/, /es, /vi, /es/about, etc.)
+    // Workaround: next-intl mutates nextUrl.clone() properties that are
+    // getter-only in Vinext's URL implementation. Wrap clone() to make
+    // those properties writable.
     if (request.nextUrl && typeof request.nextUrl.clone === 'function') {
         const originalClone = request.nextUrl.clone.bind(request.nextUrl);
         request.nextUrl.clone = () => {
             const cloned = originalClone();
 
-            // Override properties that next-intl mutates, avoiding getter-only crashes
             const propsToMock = ['port', 'host', 'protocol', 'pathname'];
             propsToMock.forEach(prop => {
                 let val = cloned[prop];
@@ -62,8 +34,9 @@ export { middleware as proxy };
 export default middleware;
 
 export const config = {
-    // Canonical next-intl matcher — catches all routes except API/static files.
-    // Non-localized routes are handled inside the middleware function above.
+    // Canonical next-intl matcher — all routes go through i18n middleware.
+    // With localePrefix: 'as-needed', default locale (en) has no prefix,
+    // other locales get prefixed (/es/login, /vi/about, etc.)
     matcher: [
         '/',
         '/(en|es|vi)/:path*',
