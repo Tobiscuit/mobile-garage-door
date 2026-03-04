@@ -1,0 +1,17 @@
+#!/bin/sh
+# Pre-commit hook: check translation key sync before allowing a commit
+# Only runs if message JSON files or source files were staged
+
+STAGED=$(git diff --cached --name-only)
+
+# Check if any translation-relevant files are staged
+if echo "$STAGED" | grep -qE '(messages/.*\.json|\.tsx?$)'; then
+  echo "🌐 Checking translations..."
+  node scripts/check-translations.mjs
+  if [ $? -ne 0 ]; then
+    echo ""
+    echo "❌ Commit blocked: fix missing translations first."
+    echo "   Run 'npm run lint:i18n' for details."
+    exit 1
+  fi
+fi
