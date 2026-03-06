@@ -7,30 +7,31 @@ import { users, serviceRequests, payments } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { getCloudflareContext } from "@/lib/cloudflare";
 
-const isProduction = process.env.SQUARE_ENVIRONMENT === 'production';
-
-const squareClient = new SquareClient({
-  token: process.env.SQUARE_ACCESS_TOKEN,
-  environment: isProduction ? SquareEnvironment.Production : SquareEnvironment.Sandbox,
-});
+// SquareClient is dynamically instantiated inside functions that need it using getCloudflareContext().env
 
 interface PaymentData {
-    sourceId: string;
-    amount?: number;
-    customerDetails: {
-        name: string;
-        phone: string;
-        email: string;
-        address: string;
-        issue: string;
-        urgency: 'Standard' | 'Emergency';
-    }
+  sourceId: string;
+  amount?: number;
+  customerDetails: {
+    name: string;
+    phone: string;
+    email: string;
+    address: string;
+    issue: string;
+    urgency: 'Standard' | 'Emergency';
+  }
 }
 
 export async function processPayment({ sourceId, amount = 9900, customerDetails }: PaymentData) {
   try {
     const { env } = await getCloudflareContext();
     const db = getDB(env.DB);
+
+    const isProduction = env.SQUARE_ENVIRONMENT === 'production';
+    const squareClient = new SquareClient({
+      token: env.SQUARE_ACCESS_TOKEN,
+      environment: isProduction ? SquareEnvironment.Production : SquareEnvironment.Sandbox,
+    });
 
     let squareCustomerId: string | undefined;
 
@@ -79,7 +80,7 @@ export async function processPayment({ sourceId, amount = 9900, customerDetails 
     });
 
     const paymentResult = JSON.parse(JSON.stringify(response.payment, (key, value) =>
-        typeof value === 'bigint' ? value.toString() : value
+      typeof value === 'bigint' ? value.toString() : value
     ));
 
     await db.insert(payments).values({
@@ -90,54 +91,54 @@ export async function processPayment({ sourceId, amount = 9900, customerDetails 
       sourceType: paymentResult.sourceType || 'CARD',
       note: `Dispatch Fee - ${customerDetails.name} (via App)`,
     });
-    
+
     const existingUsers = await db.select().from(users).where(eq(users.email, customerDetails.email)).limit(1);
 
     let payloadUserId: string;
 
     if (existingUsers.length > 0) {
-        const existing = existingUsers[0];
-        payloadUserId = existing.id;
-        
-        if (!existing.squareCustomerId && squareCustomerId) {
-            await db.update(users).set({ squareCustomerId }).where(eq(users.id, existing.id));
-        }
+      const existing = existingUsers[0];
+      payloadUserId = existing.id;
+
+      if (!existing.squareCustomerId && squareCustomerId) {
+        await db.update(users).set({ squareCustomerId }).where(eq(users.id, existing.id));
+      }
     } else {
-        payloadUserId = randomUUID();
-        await db.insert(users).values({
-            id: payloadUserId,
-            email: customerDetails.email,
-            name: customerDetails.name,
-            phone: customerDetails.phone,
-            address: customerDetails.address,
-            role: 'customer',
-            squareCustomerId: squareCustomerId,
-            emailVerified: false,
-        });
+      payloadUserId = randomUUID();
+      await db.insert(users).values({
+        id: payloadUserId,
+        email: customerDetails.email,
+        name: customerDetails.name,
+        phone: customerDetails.phone,
+        address: customerDetails.address,
+        role: 'customer',
+        squareCustomerId: squareCustomerId,
+        emailVerified: false,
+      });
     }
 
     const ticketId = `SR-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
     const newTickets = await db.insert(serviceRequests).values({
-        ticketId,
-        customerId: payloadUserId,
-        issueDescription: customerDetails.issue,
-        urgency: customerDetails.urgency === 'Emergency' ? 'emergency' : 'standard',
-        status: 'confirmed',
-        tripFeePayment: JSON.stringify(paymentResult),
+      ticketId,
+      customerId: payloadUserId,
+      issueDescription: customerDetails.issue,
+      urgency: customerDetails.urgency === 'Emergency' ? 'emergency' : 'standard',
+      status: 'confirmed',
+      tripFeePayment: JSON.stringify(paymentResult),
     }).returning();
 
     try {
-        const { revalidatePath } = await import('next/cache');
-        revalidatePath('/dashboard');
-    } catch (e) {}
+      const { revalidatePath } = await import('next/cache');
+      revalidatePath('/dashboard');
+    } catch (e) { }
 
     return { success: true, payment: paymentResult, ticket: newTickets[0] };
 
   } catch (error: any) {
     console.error('Payment/Booking Error:', error);
-    return { 
-        success: false, 
-        error: error.result?.errors?.[0]?.detail || error.message || 'Payment failed' 
+    return {
+      success: false,
+      error: error.result?.errors?.[0]?.detail || error.message || 'Payment failed'
     };
   }
 }

@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { updateSettings } from '@/app/(site)/dashboard/settings/actions';
+import { updateSettings } from '@/app/(site)/(private)/[locale]/dashboard/settings/actions';
 
 interface SettingsFormProps {
   initialData: any;
@@ -11,7 +11,7 @@ interface SettingsFormProps {
 export default function SettingsForm({ initialData }: SettingsFormProps) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+
   // State for complex fields (Arrays)
   const [stats, setStats] = useState(initialData.stats || []);
   const [values, setValues] = useState(initialData.values || []);
@@ -52,7 +52,7 @@ export default function SettingsForm({ initialData }: SettingsFormProps) {
 
     try {
       const formData = new FormData(e.currentTarget);
-      
+
       // Append JSON strings for array fields
       formData.append('stats', JSON.stringify(stats));
       formData.append('values', JSON.stringify(values));
@@ -98,7 +98,7 @@ export default function SettingsForm({ initialData }: SettingsFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8 max-w-5xl">
-      
+
       {/* COMPANY INFO */}
       <section className="backdrop-blur-md rounded-3xl p-8 shadow-xl" style={{ backgroundColor: 'var(--staff-surface)', border: '1px solid var(--staff-border)' }}>
         <h2 className="text-2xl font-black mb-6 flex items-center gap-3" style={{ color: 'var(--staff-text)' }}>
@@ -119,7 +119,7 @@ export default function SettingsForm({ initialData }: SettingsFormProps) {
         <h2 className="text-2xl font-black mb-6 flex items-center gap-3" style={{ color: 'var(--staff-text)' }}>
           <span className="text-[var(--staff-accent)]">02.</span> About Page Content
         </h2>
-        
+
         <div className="space-y-8">
           <TextareaField label="Mission Statement" name="missionStatement" defaultValue={initialData.missionStatement} />
 
@@ -132,25 +132,25 @@ export default function SettingsForm({ initialData }: SettingsFormProps) {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {stats.map((stat: any, index: number) => (
                 <div key={index} className="rounded-xl p-4 relative group" style={{ backgroundColor: 'var(--staff-surface-alt)', border: '1px solid var(--staff-border)' }}>
-                  <button 
-                    type="button" 
+                  <button
+                    type="button"
                     onClick={() => removeStat(index)}
                     className="absolute top-2 right-2 text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
                   >
                     ×
                   </button>
                   <div className="space-y-2">
-                    <input 
-                      type="text" 
-                      value={stat.value} 
+                    <input
+                      type="text"
+                      value={stat.value}
                       onChange={(e) => handleStatsChange(index, 'value', e.target.value)}
                       placeholder="Value (e.g. 15+)"
                       className="w-full bg-transparent border-b pb-1 font-bold focus:outline-none focus:border-[var(--staff-accent)]"
                       style={{ borderColor: 'var(--staff-border)', color: 'var(--staff-text)' }}
                     />
-                    <input 
-                      type="text" 
-                      value={stat.label} 
+                    <input
+                      type="text"
+                      value={stat.label}
                       onChange={(e) => handleStatsChange(index, 'label', e.target.value)}
                       placeholder="Label (e.g. Years)"
                       className="w-full bg-transparent border-b pb-1 text-sm focus:outline-none focus:border-[var(--staff-accent)]"
@@ -171,24 +171,24 @@ export default function SettingsForm({ initialData }: SettingsFormProps) {
             <div className="space-y-4">
               {values.map((val: any, index: number) => (
                 <div key={index} className="rounded-xl p-6 relative group" style={{ backgroundColor: 'var(--staff-surface-alt)', border: '1px solid var(--staff-border)' }}>
-                   <button 
-                    type="button" 
+                  <button
+                    type="button"
                     onClick={() => removeValue(index)}
                     className="absolute top-4 right-4 text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
                   >
                     ×
                   </button>
                   <div className="grid grid-cols-1 gap-4">
-                     <input 
-                      type="text" 
-                      value={val.title} 
+                    <input
+                      type="text"
+                      value={val.title}
                       onChange={(e) => handleValuesChange(index, 'title', e.target.value)}
                       placeholder="Value Title"
                       className="w-full bg-transparent border-b pb-2 text-[var(--staff-accent)] font-bold text-lg focus:outline-none focus:border-[var(--staff-accent)]"
                       style={{ borderColor: 'var(--staff-border)' }}
                     />
-                     <textarea 
-                      value={val.description} 
+                    <textarea
+                      value={val.description}
                       onChange={(e) => handleValuesChange(index, 'description', e.target.value)}
                       placeholder="Description"
                       rows={2}
@@ -243,23 +243,23 @@ export default function SettingsForm({ initialData }: SettingsFormProps) {
         </h2>
         <div className="space-y-6">
           <label className="flex items-center gap-3 p-4 rounded-xl cursor-pointer transition-colors hover:bg-black/5" style={{ border: '1px solid var(--staff-border)' }}>
-             <input 
-               type="checkbox" 
-               name="warrantyEnableNotifications" 
-               defaultChecked={initialData?.warranty?.enableNotifications}
-               className="w-5 h-5 rounded accent-[var(--staff-accent)]" 
-             />
-             <div className="flex flex-col">
-                <span className="font-bold text-sm" style={{ color: 'var(--staff-text)' }}>Enable 11-Month Warranty Checkup Emails</span>
-                <span className="text-xs" style={{ color: 'var(--staff-muted)' }}>Automatically emails customers a month before their 1-year labor warranty expires.</span>
-             </div>
+            <input
+              type="checkbox"
+              name="warrantyEnableNotifications"
+              defaultChecked={initialData?.warranty?.enableNotifications}
+              className="w-5 h-5 rounded accent-[var(--staff-accent)]"
+            />
+            <div className="flex flex-col">
+              <span className="font-bold text-sm" style={{ color: 'var(--staff-text)' }}>Enable 11-Month Warranty Checkup Emails</span>
+              <span className="text-xs" style={{ color: 'var(--staff-muted)' }}>Automatically emails customers a month before their 1-year labor warranty expires.</span>
+            </div>
           </label>
-          <TextareaField 
-             label="Warranty Email Template" 
-             name="warrantyEmailTemplate" 
-             defaultValue={initialData?.warranty?.notificationEmailTemplate} 
-             rows={4} 
-             placeholder="Use {{client}} and {{project}} as placeholders."
+          <TextareaField
+            label="Warranty Email Template"
+            name="warrantyEmailTemplate"
+            defaultValue={initialData?.warranty?.notificationEmailTemplate}
+            rows={4}
+            placeholder="Use {{client}} and {{project}} as placeholders."
           />
         </div>
       </section>

@@ -6,7 +6,6 @@ import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import SmartLink from '@/shared/ui/SmartLink';
 import { getTranslations } from '@/lib/server-translations';
-import parse, { Element } from 'html-react-parser';
 import { getCloudflareContext } from "@/lib/cloudflare";
 
 export const dynamic = 'force-dynamic';
@@ -25,6 +24,8 @@ const RichTextRenderer = ({ content }: { content: any | string }) => {
     }
 
     if (!parsedContent || !parsedContent.root || !parsedContent.root.children) return null;
+
+
 
     const renderNode = (node: any, index: number) => {
         switch (node.type) {
@@ -67,16 +68,16 @@ const RichTextRenderer = ({ content }: { content: any | string }) => {
                         {node.children?.map((child: any, i: number) => renderChild(child, i))}
                     </blockquote>
                 );
-             case 'link':
+            case 'link':
                 return (
                     <a key={index} href={node.fields?.url || '#'} target={node.fields?.newTab ? '_blank' : undefined} className="text-golden-yellow hover:underline font-bold transition-colors">
                         {node.children?.map((child: any, i: number) => renderChild(child, i))}
                     </a>
                 );
             default:
-                 if (node.children) {
+                if (node.children) {
                     return <div key={index}>{node.children.map((child: any, i: number) => renderChild(child, i))}</div>;
-                 }
+                }
                 return null;
         }
     };
@@ -91,11 +92,11 @@ const RichTextRenderer = ({ content }: { content: any | string }) => {
             return text;
         }
         if (node.type === 'link') {
-             return (
-                    <a key={index} href={node.fields?.url || '#'} target={node.fields?.newTab ? '_blank' : undefined} className="text-golden-yellow hover:underline font-bold transition-colors">
-                        {node.children?.map((child: any, i: number) => renderChild(child, i))}
-                    </a>
-                );
+            return (
+                <a key={index} href={node.fields?.url || '#'} target={node.fields?.newTab ? '_blank' : undefined} className="text-golden-yellow hover:underline font-bold transition-colors">
+                    {node.children?.map((child: any, i: number) => renderChild(child, i))}
+                </a>
+            );
         }
         return renderNode(node, index);
     };
@@ -111,6 +112,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
     const { slug, locale } = await params;
     const { env } = await getCloudflareContext();
     const db = getDB(env.DB);
+    if (!db) return notFound();
     const t = await getTranslations({ locale, namespace: 'blog_detail' });
 
     const post = await db.query.posts.findFirst({
@@ -121,7 +123,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
     });
 
     if (!post) {
-        notFound();
+        return notFound();
     }
 
     return (
@@ -137,17 +139,17 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
                         priority
                     />
                 ) : (
-                     <div className="absolute inset-0 bg-charcoal-blue"></div>
+                    <div className="absolute inset-0 bg-charcoal-blue"></div>
                 )}
                 <div className="absolute inset-0 bg-gradient-to-t from-charcoal-blue via-charcoal-blue/60 to-transparent"></div>
-                
+
                 <div className="absolute bottom-0 left-0 w-full p-8 md:p-16">
                     <div className="container mx-auto max-w-5xl">
                         <SmartLink href="/blog" className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-charcoal-blue font-bold uppercase tracking-widest transition-colors group">
-                        <svg className="w-4 h-4 group-hover:-translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
-                        {t('back')}
-                    </SmartLink>
-                        
+                            <svg className="w-4 h-4 group-hover:-translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+                            {t('back')}
+                        </SmartLink>
+
                         <div className="flex flex-wrap items-center gap-4 mb-4">
                             <span className="bg-golden-yellow text-charcoal-blue px-3 py-1 text-xs font-bold uppercase tracking-wider rounded-sm">
                                 {post.category?.replace(/-/g, ' ')}
@@ -156,12 +158,12 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
                                 {new Date(post.publishedAt || post.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
                             </span>
                         </div>
-                        
+
                         <h1 className="text-4xl md:text-6xl font-black text-white leading-tight mb-6 max-w-4xl">
                             {post.title}
                         </h1>
 
-                         <p className="text-xl text-gray-200 max-w-3xl leading-relaxed font-light border-l-4 border-golden-yellow/50 pl-6">
+                        <p className="text-xl text-gray-200 max-w-3xl leading-relaxed font-light border-l-4 border-golden-yellow/50 pl-6">
                             {post.excerpt}
                         </p>
                     </div>
@@ -174,42 +176,14 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
                     {/* Main Content */}
                     <article className="flex-1 max-w-3xl prose prose-lg prose-p:my-6 prose-ul:my-6 prose-ol:my-6 prose-headings:text-charcoal-blue prose-a:text-golden-yellow">
                         {post.htmlContent ? (
-                            <div className="prose max-w-none text-gray-700 prose-p:leading-relaxed">
-                                {parse(post.htmlContent, {
-                                    replace: (domNode) => {
-                                        if (domNode instanceof Element && domNode.tagName === 'img') {
-                                            const { src, alt, width, height } = domNode.attribs;
-                                            
-                                            const w = width ? parseInt(width, 10) : 1200;
-                                            const h = height ? parseInt(height, 10) : 675;
-
-                                            return (
-                                                <figure className="-mx-4 sm:-mx-8 md:-mx-16 lg:-mx-32 my-12 relative group">
-                                                    <div className="relative w-full overflow-hidden rounded-2xl shadow-2xl ring-1 ring-black/5 bg-gray-100">
-                                                        <Image
-                                                            src={src}
-                                                            alt={alt || "Blog Post Image"}
-                                                            width={w}
-                                                            height={h}
-                                                            className="w-full h-auto object-cover transform transition-transform duration-700 group-hover:scale-105"
-                                                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
-                                                        />
-                                                    </div>
-                                                    {alt && (
-                                                        <figcaption className="absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 backdrop-blur-md bg-white/70 rounded-full text-xs font-medium text-charcoal-blue border border-black/5 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none w-max max-w-[90%] text-center truncate">
-                                                            {alt}
-                                                        </figcaption>
-                                                    )}
-                                                </figure>
-                                            );
-                                        }
-                                    }
-                                })}
-                            </div>
+                            <div
+                                className="prose max-w-none text-gray-700 prose-p:leading-relaxed prose-img:rounded-2xl prose-img:shadow-2xl prose-img:w-full prose-img:my-12 prose-img:ring-1 prose-img:ring-black/5"
+                                dangerouslySetInnerHTML={{ __html: post.htmlContent }}
+                            />
                         ) : (
                             <RichTextRenderer content={post.content} />
                         )}
-                        
+
                         {/* Author Bio / Footer */}
                         <div className="mt-16 pt-8 border-t border-gray-200 flex items-center gap-4">
                             <div className="w-12 h-12 bg-charcoal-blue rounded-full flex items-center justify-center text-golden-yellow font-bold text-xl">
@@ -217,7 +191,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
                             </div>
                             <div>
                                 <div className="text-sm font-bold text-charcoal-blue">{t('team_name')}</div>
-                            <div className="text-xs text-gray-400">{t('team_subtitle')}</div>
+                                <div className="text-xs text-gray-400">{t('team_subtitle')}</div>
                             </div>
                         </div>
                     </article>
@@ -229,12 +203,12 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
                             <div className="w-16 h-16 bg-golden-yellow/10 rounded-full flex items-center justify-center mb-6 mx-auto">
                                 <svg className="w-8 h-8 text-golden-yellow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                             </div>
-                                <h3 className="font-bold text-white text-lg mb-2">{t('cta_heading')}</h3>
-                                <p className="text-sm text-gray-400 mb-4">{t('cta_desc')}</p>
-                                <SmartLink href="/contact?type=repair" className="inline-block bg-golden-yellow text-charcoal-blue font-bold py-3 px-6 rounded-lg text-sm hover:bg-white transition-all w-full text-center">
-                                    {t('cta_button')}
-                                </SmartLink>
-                                <p className="text-center text-xs text-gray-500 mt-3">{t('cta_phone')}</p>
+                            <h3 className="font-bold text-white text-lg mb-2">{t('cta_heading')}</h3>
+                            <p className="text-sm text-gray-400 mb-4">{t('cta_desc')}</p>
+                            <SmartLink href="/contact?type=repair" className="inline-block bg-golden-yellow text-charcoal-blue font-bold py-3 px-6 rounded-lg text-sm hover:bg-white transition-all w-full text-center">
+                                {t('cta_button')}
+                            </SmartLink>
+                            <p className="text-center text-xs text-gray-500 mt-3">{t('cta_phone')}</p>
                         </div>
                     </aside>
                 </div>

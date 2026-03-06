@@ -2,6 +2,9 @@
 const nextConfig = {
   reactStrictMode: false,
   serverExternalPackages: ['pino', 'graphql'],
+  images: {
+    unoptimized: true,
+  },
   async redirects() {
     return [
       {

@@ -74,4 +74,6 @@ admin-credentials.txt
 
 # Local Data
 /.local-data/
+local_dump.sql
+mark_applied.sql
 

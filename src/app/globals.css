@@ -2,6 +2,8 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
+@source "../";
+
 @theme {
   --color-charcoal-blue: #2c3e50;
   --color-cloudy-white: #f7f9fb;

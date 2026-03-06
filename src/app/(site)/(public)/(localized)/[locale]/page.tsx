@@ -10,7 +10,8 @@ import { getCloudflareContext } from "@/lib/cloudflare";
 import { withTranslations } from "@/db/helpers";
 
 export default async function Home({ params }: { params: Promise<{ locale: string }> }) {
-  const { locale } = await params;
+  const resolvedParams = (await params) || { locale: 'en' } as any;
+  const locale = resolvedParams.locale || 'en';
   const { env } = await getCloudflareContext();
   const db = getDB(env.DB);
 

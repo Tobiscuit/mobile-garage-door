@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
-import { updateUser } from '@/app/(site)/dashboard/users/actions';
+import { updateUser } from '@/app/(site)/(private)/[locale]/dashboard/users/actions';
 
 export function UserProfileCard({ user }: { user: any }) {
   const router = useRouter();

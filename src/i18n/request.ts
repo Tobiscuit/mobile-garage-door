@@ -7,10 +7,18 @@ export default getRequestConfig(async ({ requestLocale }) => {
     const requested = await requestLocale;
     const locale = hasLocale(routing.locales, requested) ? requested : routing.defaultLocale;
 
+    let messages: any;
+    if (locale === 'es') {
+        messages = (await import('../../messages/es.json')).default;
+    } else if (locale === 'vi') {
+        messages = (await import('../../messages/vi.json')).default;
+    } else {
+        messages = (await import('../../messages/en.json')).default;
+    }
+
     return {
         locale,
-        // Provide the corresponding translations
-        messages: (await import(`../../messages/${locale}.json`)).default,
+        messages,
         // Set a default timezone (can be made dynamic later)
         timeZone: 'America/Chicago'
     };

@@ -10,8 +10,15 @@ import { getTranslations } from '@/lib/server-translations';
 async function completeStaffProfile(formData: FormData) {
   'use server';
 
-  const session = await getSessionSafe(await headers());
-  if (!session) {
+  let headerList = new Headers();
+  let isStaticPass = false;
+  try {
+    headerList = await headers();
+  } catch (e) {
+    isStaticPass = true;
+  }
+  const session = await getSessionSafe(headerList);
+  if (!session && !isStaticPass) {
     redirect('/login');
   }
 
@@ -54,8 +61,15 @@ export default async function CompleteProfilePage({
     redirect('/dashboard/dispatch');
   }
 
-  const session = await getSessionSafe(await headers());
-  if (!session) {
+  let headerList = new Headers();
+  let isStaticPass = false;
+  try {
+    headerList = await headers();
+  } catch (e) {
+    isStaticPass = true;
+  }
+  const session = await getSessionSafe(headerList);
+  if (!session && !isStaticPass) {
     redirect('/login');
   }
 

@@ -1,8 +1,5 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
-import '../globals.css'
-
-const inter = Inter({ subsets: ['latin'] })
+import '../../../../globals.css'
 
 export const metadata: Metadata = {
   metadataBase: new URL('http://localhost:3000'),
@@ -56,19 +53,21 @@ export const metadata: Metadata = {
 
 import { FloatingAiButton } from '@/features/landing/FloatingAiButton';
 import { PwaRegistry } from '@/components/PwaRegistry';
-import { headers } from 'next/headers';
+
 
 export default async function RootLayout({
   children,
+  params,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
+  params: Promise<{ locale: string }>;
 }) {
-  const reqHeaders = await headers();
-  const locale = reqHeaders.get('x-next-intl-locale') || 'en';
+  const resolvedParams = (await params) || {};
+  const locale = resolvedParams.locale || 'en';
 
   return (
     <html lang={locale} suppressHydrationWarning>
-      <body className={`${inter.className} bg-background text-primary`}>
+      <body className={`bg-background text-primary`}>
         {children}
         <FloatingAiButton />
         <PwaRegistry />

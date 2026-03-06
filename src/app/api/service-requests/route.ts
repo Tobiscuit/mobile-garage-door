@@ -6,10 +6,7 @@ import { SquareClient as Client, SquareEnvironment as Environment } from 'square
 import { randomUUID } from 'crypto';
 import { getCloudflareContext } from "@/lib/cloudflare";
 
-const squareClient = new Client({
-  token: process.env.SQUARE_ACCESS_TOKEN,
-  environment: process.env.SQUARE_ENVIRONMENT === 'production' ? Environment.Production : Environment.Sandbox,
-});
+// SquareClient is dynamically instantiated inside functions that need it using getCloudflareContext().env
 
 export async function POST(req: NextRequest) {
   try {
@@ -17,7 +14,7 @@ export async function POST(req: NextRequest) {
     const db = getDB(env.DB);
     const { getSessionSafe } = await import('@/lib/get-session-safe');
     const session = await getSessionSafe(req.headers);
-    
+
     let user = null;
     let customerId;
     if (session) {
@@ -32,29 +29,29 @@ export async function POST(req: NextRequest) {
     const { sourceId, issueDescription, urgency, scheduledTime, guestName, guestEmail, guestPhone, guestAddress } = body;
 
     if (!user && !isValidApiKey) {
-        if (guestName && guestPhone && guestEmail) {
-            const existing = await db.select().from(users).where(eq(users.email, guestEmail)).limit(1);
+      if (guestName && guestPhone && guestEmail) {
+        const existing = await db.select().from(users).where(eq(users.email, guestEmail)).limit(1);
 
-            if (existing.length > 0) {
-                customerId = existing[0].id;
-            } else {
-                customerId = randomUUID();
-                await db.insert(users).values({
-                    id: customerId,
-                    email: guestEmail,
-                    name: guestName,
-                    phone: guestPhone,
-                    address: guestAddress,
-                    role: 'customer',
-                });
-            }
+        if (existing.length > 0) {
+          customerId = existing[0].id;
         } else {
-             return NextResponse.json({ error: 'Unauthorized: Please login or provide guest details.' }, { status: 401 });
+          customerId = randomUUID();
+          await db.insert(users).values({
+            id: customerId,
+            email: guestEmail,
+            name: guestName,
+            phone: guestPhone,
+            address: guestAddress,
+            role: 'customer',
+          });
         }
+      } else {
+        return NextResponse.json({ error: 'Unauthorized: Please login or provide guest details.' }, { status: 401 });
+      }
     }
 
     const tripFee = 9900;
-    
+
     const result = await squareClient.payments.create({
       sourceId,
       idempotencyKey: randomUUID(),
@@ -66,7 +63,7 @@ export async function POST(req: NextRequest) {
     });
 
     const paymentResult = JSON.parse(JSON.stringify(result.payment, (key, value) =>
-        typeof value === 'bigint' ? value.toString() : value
+      typeof value === 'bigint' ? value.toString() : value
     ));
 
     const ticketId = `SR-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
@@ -78,27 +75,27 @@ export async function POST(req: NextRequest) {
       scheduledTime,
       status: 'confirmed',
       tripFeePayment: JSON.stringify({
-          paymentId: paymentResult.id,
-          amount: Number(paymentResult.amountMoney?.amount),
-          status: paymentResult.status,
+        paymentId: paymentResult.id,
+        amount: Number(paymentResult.amountMoney?.amount),
+        status: paymentResult.status,
       })
     }).returning();
 
     if (paymentResult.id) {
-         await db.insert(payments).values({
-            squarePaymentId: paymentResult.id,
-            amount: Number(paymentResult.amountMoney?.amount),
-            currency: paymentResult.amountMoney?.currency,
-            status: paymentResult.status,
-            sourceType: paymentResult.sourceType,
-        });
+      await db.insert(payments).values({
+        squarePaymentId: paymentResult.id,
+        amount: Number(paymentResult.amountMoney?.amount),
+        currency: paymentResult.amountMoney?.currency,
+        status: paymentResult.status,
+        sourceType: paymentResult.sourceType,
+      });
     }
-    
+
     return NextResponse.json({ success: true, serviceRequest: newTickets[0] });
   } catch (error: any) {
     console.error('Booking Error:', error);
     if (error.result && error.result.errors) {
-        return NextResponse.json({ error: error.result.errors[0].detail }, { status: 400 });
+      return NextResponse.json({ error: error.result.errors[0].detail }, { status: 400 });
     }
     return NextResponse.json({ error: error.message || 'Failed to process booking' }, { status: 500 });
   }

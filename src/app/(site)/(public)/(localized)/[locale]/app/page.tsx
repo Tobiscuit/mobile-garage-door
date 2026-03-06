@@ -7,10 +7,16 @@ export default async function AppEntryPage() {
     redirect('/dashboard/dispatch');
   }
 
-  const headerList = await headers();
+  let headerList = new Headers();
+  let isStaticPass = false;
+  try {
+    headerList = await headers();
+  } catch (e) {
+    isStaticPass = true;
+  }
   const session = await getSessionSafe(headerList);
 
-  if (!session) {
+  if (!session && !isStaticPass) {
     redirect('/login');
   }
 

@@ -6,10 +6,7 @@ import { eq } from "drizzle-orm";
 import { randomUUID } from 'crypto';
 import { getCloudflareContext } from "@/lib/cloudflare";
 
-const squareClient = new Client({
-  token: process.env.SQUARE_ACCESS_TOKEN,
-  environment: process.env.SQUARE_ENVIRONMENT === 'production' ? Environment.Production : Environment.Sandbox,
-});
+// SquareClient is dynamically instantiated inside functions that need it using getCloudflareContext().env
 
 export async function POST(req: NextRequest) {
   const body = await req.text();
@@ -20,17 +17,17 @@ export async function POST(req: NextRequest) {
     const db = getDB(env.DB);
 
     if (process.env.SQUARE_WEBHOOK_SIGNATURE_KEY && signature) {
-        const isValid = (WebhooksHelper as any).isValidWebhookEventSignature(
-          body,
-          signature,
-          process.env.SQUARE_WEBHOOK_SIGNATURE_KEY,
-          process.env.SQUARE_WEBHOOK_NOTIFICATION_URL || 'http://localhost:3000/api/square/webhook' 
-        );
+      const isValid = (WebhooksHelper as any).isValidWebhookEventSignature(
+        body,
+        signature,
+        process.env.SQUARE_WEBHOOK_SIGNATURE_KEY,
+        process.env.SQUARE_WEBHOOK_NOTIFICATION_URL || 'http://localhost:3000/api/square/webhook'
+      );
 
-        if (!isValid) {
-          console.error('Invalid signature');
-          return NextResponse.json({ error: 'Invalid signature' }, { status: 403 });
-        }
+      if (!isValid) {
+        console.error('Invalid signature');
+        return NextResponse.json({ error: 'Invalid signature' }, { status: 403 });
+      }
     }
 
     const event = JSON.parse(body);
@@ -50,34 +47,39 @@ export async function POST(req: NextRequest) {
 
         let userId = null;
         if (customerId) {
-            try {
-                const squareResp = await squareClient.customers.get({ customerId });
-                const customer = squareResp.customer;
-                
-                if (customer && customer.emailAddress) {
-                    const existingUser = await db.select().from(users).where(eq(users.email, customer.emailAddress)).limit(1);
+          try {
+            const squareClient = new Client({
+              token: env.SQUARE_ACCESS_TOKEN,
+              environment: env.SQUARE_ENVIRONMENT === 'production' ? Environment.Production : Environment.Sandbox,
+            });
 
-                    if (existingUser.length > 0) {
-                        userId = existingUser[0].id;
-                        if (!existingUser[0].squareCustomerId) {
-                            await db.update(users).set({ squareCustomerId: customerId }).where(eq(users.id, userId));
-                        }
-                    } else {
-                        userId = randomUUID();
-                        await db.insert(users).values({
-                            id: userId,
-                            email: customer.emailAddress,
-                            name: `${customer.givenName || ''} ${customer.familyName || ''}`.trim() || 'Square Customer',
-                            phone: customer.phoneNumber || '',
-                            role: 'customer',
-                            squareCustomerId: customerId,
-                            emailVerified: false,
-                        });
-                    }
+            const squareResp = await squareClient.customers.get({ customerId });
+            const customer = squareResp.customer;
+
+            if (customer && customer.emailAddress) {
+              const existingUser = await db.select().from(users).where(eq(users.email, customer.emailAddress)).limit(1);
+
+              if (existingUser.length > 0) {
+                userId = existingUser[0].id;
+                if (!existingUser[0].squareCustomerId) {
+                  await db.update(users).set({ squareCustomerId: customerId }).where(eq(users.id, userId));
                 }
-            } catch (err) {
-                console.error('Error fetching/syncing customer:', err);
+              } else {
+                userId = randomUUID();
+                await db.insert(users).values({
+                  id: userId,
+                  email: customer.emailAddress,
+                  name: `${customer.givenName || ''} ${customer.familyName || ''}`.trim() || 'Square Customer',
+                  phone: customer.phoneNumber || '',
+                  role: 'customer',
+                  squareCustomerId: customerId,
+                  emailVerified: false,
+                });
+              }
             }
+          } catch (err) {
+            console.error('Error fetching/syncing customer:', err);
+          }
         }
 
         const existingPayments = await db.select().from(payments).where(eq(payments.squarePaymentId, squarePaymentId)).limit(1);
@@ -113,11 +115,11 @@ export async function POST(req: NextRequest) {
         const existingInvoices = await db.select().from(invoices).where(eq(invoices.squareInvoiceId, squareInvoiceId)).limit(1);
 
         if (existingInvoices.length > 0) {
-            await db.update(invoices).set({
-                status,
-                amount,
-                updatedAt: new Date().toISOString(),
-            }).where(eq(invoices.id, existingInvoices[0].id));
+          await db.update(invoices).set({
+            status,
+            amount,
+            updatedAt: new Date().toISOString(),
+          }).where(eq(invoices.id, existingInvoices[0].id));
         }
         break;
       }

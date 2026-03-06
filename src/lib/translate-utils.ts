@@ -5,13 +5,15 @@
  */
 import { GoogleGenAI } from '@google/genai';
 
-const apiKey = process.env.GEMINI_API_KEY;
+import { getCloudflareContext } from '@/lib/cloudflare';
 
-// Singleton — don't create a new client per call
+// Singleton — don't create a new client per call within the same request
 let _genAI: GoogleGenAI | null = null;
-function getGenAI(): GoogleGenAI {
+async function getGenAI(): Promise<GoogleGenAI> {
   if (!_genAI) {
-    if (!apiKey) throw new Error('GEMINI_API_KEY is not set');
+    const { env } = await getCloudflareContext();
+    const apiKey = env.GEMINI_API_KEY || '';
+    if (!apiKey) throw new Error('GEMINI_API_KEY is not set in Cloudflare Secrets');
     _genAI = new GoogleGenAI({ apiKey });
   }
   return _genAI;
@@ -34,7 +36,7 @@ function getLanguageName(locale: string): string {
 export async function translate(text: string, context: string, targetLocale: string = 'es'): Promise<string> {
   if (!text || text.trim().length === 0) return text;
 
-  const genAI = getGenAI();
+  const genAI = await getGenAI();
   const langName = getLanguageName(targetLocale);
   const response = await genAI.models.generateContent({
     model: 'gemini-2.5-flash',
@@ -72,7 +74,7 @@ export async function translateLexicalTree(lexicalJSON: any, targetLocale: strin
   const allTexts = textNodes.map((n) => n.originalText);
   const batchInput = allTexts.join(BATCH_DELIMITER);
 
-  const genAI = getGenAI();
+  const genAI = await getGenAI();
   const langName = getLanguageName(targetLocale);
   const response = await genAI.models.generateContent({
     model: 'gemini-2.5-flash',

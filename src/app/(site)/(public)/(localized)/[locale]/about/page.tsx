@@ -8,7 +8,8 @@ import { getCloudflareContext } from "@/lib/cloudflare";
 export const dynamic = 'force-dynamic';
 
 export default async function AboutPage({ params }: { params: Promise<{ locale: string }> }) {
-    const { locale } = await params;
+    const resolvedParams = (await params) || { locale: 'en' } as any;
+    const locale = resolvedParams.locale || 'en';
     const { env } = await getCloudflareContext();
     const db = getDB(env.DB);
     const t = await getTranslations({ locale, namespace: 'about_page' });

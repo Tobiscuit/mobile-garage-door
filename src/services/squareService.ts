@@ -1,14 +1,18 @@
 import { SquareClient, SquareEnvironment } from 'square';
 import { randomUUID } from 'crypto';
+import { getCloudflareContext } from "@/lib/cloudflare";
 
-const squareClient = new SquareClient({
-  token: process.env.SQUARE_ACCESS_TOKEN,
-  environment: process.env.SQUARE_ENVIRONMENT === 'production' ? SquareEnvironment.Production : SquareEnvironment.Sandbox,
-});
+// SquareClient is dynamically instantiated inside functions that need it using getCloudflareContext().env
 
 export const squareService = {
   processPayment: async (sourceId: string, amount: number, note: string) => {
     try {
+      const { env } = await getCloudflareContext();
+      const squareClient = new SquareClient({
+        token: env.SQUARE_ACCESS_TOKEN,
+        environment: env.SQUARE_ENVIRONMENT === 'production' ? SquareEnvironment.Production : SquareEnvironment.Sandbox,
+      });
+
       const response = await squareClient.payments.create({
         sourceId,
         idempotencyKey: randomUUID(),

@@ -2,7 +2,8 @@ import React from 'react';
 import { getTranslations } from '@/lib/server-translations';
 
 export default async function PrivacyPolicy({ params }: { params: Promise<{ locale: string }> }) {
-  const { locale } = await params;
+  const resolvedParams = (await params) || { locale: 'en' } as any;
+  const locale = resolvedParams.locale || 'en';
   const t = await getTranslations({ locale, namespace: 'privacy' });
 
   return (

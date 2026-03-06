@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { createManualPayment } from '@/app/(site)/dashboard/actions';
+import { createManualPayment } from '@/app/(site)/(private)/[locale]/dashboard/actions';
 import { useRouter } from 'next/navigation';
 
 interface ManualPaymentModalProps {
@@ -30,7 +30,7 @@ export function ManualPaymentModal({ isOpen, onClose }: ManualPaymentModalProps)
             }
 
             const result = await createManualPayment(numAmount, sourceType, note);
-            
+
             if (result.success) {
                 // Refresh dashboard data
                 router.refresh();
@@ -53,7 +53,7 @@ export function ManualPaymentModal({ isOpen, onClose }: ManualPaymentModalProps)
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
             <div className="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-2xl animate-in fade-in zoom-in-95 duration-200">
-                
+
                 {/* Header */}
                 <div className="bg-charcoal-blue p-6 flex justify-between items-center">
                     <h2 className="text-xl font-black text-white uppercase tracking-wider">Record Payment</h2>
@@ -64,14 +64,14 @@ export function ManualPaymentModal({ isOpen, onClose }: ManualPaymentModalProps)
 
                 {/* Body */}
                 <form onSubmit={handleSubmit} className="p-6 space-y-6">
-                    
+
                     {/* Amount */}
                     <div>
                         <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Amount ($)</label>
                         <div className="relative">
                             <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold">$</span>
-                            <input 
-                                type="number" 
+                            <input
+                                type="number"
                                 step="0.01"
                                 required
                                 value={amount}
@@ -106,7 +106,7 @@ export function ManualPaymentModal({ isOpen, onClose }: ManualPaymentModalProps)
                     {/* Note */}
                     <div>
                         <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Note (Optional)</label>
-                        <textarea 
+                        <textarea
                             value={note}
                             onChange={(e) => setNote(e.target.value)}
                             className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl font-medium text-charcoal-blue focus:ring-2 focus:ring-golden-yellow outline-none transition-all resize-none"
@@ -116,7 +116,7 @@ export function ManualPaymentModal({ isOpen, onClose }: ManualPaymentModalProps)
                     </div>
 
                     {/* Submit */}
-                    <button 
+                    <button
                         type="submit"
                         disabled={isLoading}
                         className="w-full py-4 bg-golden-yellow text-charcoal-blue font-black uppercase tracking-wider rounded-xl shadow-lg hover:bg-yellow-400 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"

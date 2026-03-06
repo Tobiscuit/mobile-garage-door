@@ -5,16 +5,29 @@ import Footer from '@/shared/layout/Footer'
 import ScrollSaver from '@/shared/layout/ScrollSaver'
 import PageTransition from '@/shared/layout/PageTransition'
 import NextIntlProvider from '@/components/NextIntlProvider';
-import { headers } from 'next/headers';
+
 
 export default async function PublicLayout({
   children,
+  params,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
+  params: Promise<{ locale: string }>;
 }) {
-  const reqHeaders = await headers();
-  const locale = reqHeaders.get('x-next-intl-locale') || 'en';
-  const messages = (await import(`../../../../messages/${locale}.json`)).default;
+  const resolvedParams = (await params) || {};
+  const locale = resolvedParams.locale || 'en';
+  let messages: any = {};
+  try {
+    if (locale === 'es') {
+      messages = (await import('../../../../../../messages/es.json')).default;
+    } else if (locale === 'vi') {
+      messages = (await import('../../../../../../messages/vi.json')).default;
+    } else {
+      messages = (await import('../../../../../../messages/en.json')).default;
+    }
+  } catch (err) {
+    console.warn("Could not load public messages for locale:", locale, err);
+  }
 
   return (
     <NextIntlProvider messages={messages} locale={locale} timeZone="America/Chicago">

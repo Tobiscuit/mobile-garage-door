@@ -31,12 +31,12 @@ export default async function DashboardPage() {
           </h1>
         </div>
         <div className="text-left md:text-right">
-            <div className="text-xl md:text-2xl font-bold text-[#f1c40f]">
-                {new Date().toLocaleDateString('en-US', { weekday: 'long' })}
-            </div>
-            <div className="text-sm md:text-base" style={{ color: 'var(--staff-muted)' }}>
-                {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
-            </div>
+          <div className="text-xl md:text-2xl font-bold text-[#f1c40f]" suppressHydrationWarning>
+            {new Intl.DateTimeFormat('en-US', { weekday: 'long', timeZone: 'America/Chicago' }).format(new Date())}
+          </div>
+          <div className="text-sm md:text-base" style={{ color: 'var(--staff-muted)' }} suppressHydrationWarning>
+            {new Intl.DateTimeFormat('en-US', { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'America/Chicago' }).format(new Date())}
+          </div>
         </div>
       </div>
 
@@ -44,12 +44,12 @@ export default async function DashboardPage() {
 
       {/* MAIN DASHBOARD CONTENT */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
-        
+
         <QuickActions />
 
         {/* RIGHT: Active Users Widget */}
         <div className="lg:col-span-1">
-             <ActiveUsers />
+          <ActiveUsers />
         </div>
       </div>
     </div>

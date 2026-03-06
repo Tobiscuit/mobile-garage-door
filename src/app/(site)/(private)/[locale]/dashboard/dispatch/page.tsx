@@ -8,10 +8,16 @@ import { eq, desc } from "drizzle-orm";
 import { getCloudflareContext } from "@/lib/cloudflare";
 
 export default async function DispatchPage() {
-    const headersList = await headers();
+    let headersList = new Headers();
+    let isStaticPass = false;
+    try {
+        headersList = await headers();
+    } catch (e) {
+        isStaticPass = true;
+    }
     const session = await getSessionSafe(headersList);
 
-    if (!session) {
+    if (!session && !isStaticPass) {
         redirect('/login');
     }
 
@@ -28,10 +34,10 @@ export default async function DispatchPage() {
         customerEmail: users.email,
         customerAddress: users.address,
     })
-    .from(serviceRequests)
-    .leftJoin(users, eq(serviceRequests.customerId, users.id))
-    .where(eq(serviceRequests.status, 'confirmed'))
-    .orderBy(desc(serviceRequests.createdAt));
+        .from(serviceRequests)
+        .leftJoin(users, eq(serviceRequests.customerId, users.id))
+        .where(eq(serviceRequests.status, 'confirmed'))
+        .orderBy(desc(serviceRequests.createdAt));
 
     const technicians = await db.select().from(users).where(eq(users.role, 'technician'));
 

@@ -22,13 +22,13 @@ export const users = sqliteTable("users", {
   emailVerified: integer("email_verified", { mode: "boolean" }).default(false),
   image: text("image"),
   role: text("role", { enum: ["admin", "technician", "dispatcher", "customer"] }).default("customer"),
-  customerType: text("customer_type", { enum: ["residential", "builder"] }).default("residential"),
-  companyName: text("company_name"),
+  customerType: text("customerType", { enum: ["residential", "builder"] }).default("residential"),
+  companyName: text("companyName"),
   phone: text("phone"),
   address: text("address"),
-  lastLogin: text("last_login"),
-  pushSubscription: text("push_subscription"),
-  squareCustomerId: text("square_customer_id"),
+  lastLogin: text("lastLogin"),
+  pushSubscription: text("pushSubscription"),
+  squareCustomerId: text("squareCustomerId"),
   createdAt: isoText("created_at").notNull().$defaultFn(() => new Date().toISOString()),
   updatedAt: isoText("updated_at").notNull().$defaultFn(() => new Date().toISOString()),
 });
@@ -279,6 +279,10 @@ export const projectGalleryRelations = relations(projectGallery, ({ one }) => ({
 
 export const projectTagRelations = relations(projectTags, ({ one }) => ({
   project: one(projects, { fields: [projectTags.projectId], references: [projects.id] }),
+}));
+
+export const projectStatsRelations = relations(projectStats, ({ one }) => ({
+  project: one(projects, { fields: [projectStats.projectId], references: [projects.id] }),
 }));
 
 export const postRelations = relations(posts, ({ one, many }) => ({

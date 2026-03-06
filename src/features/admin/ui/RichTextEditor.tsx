@@ -22,8 +22,8 @@ const MenuBar = ({ editor }: { editor: Editor | null }) => {
 
   const buttonClass = (isActive: boolean) => twMerge(
     "p-2 rounded text-sm transition-colors",
-    isActive 
-      ? "bg-[var(--staff-accent)] text-[var(--staff-surface-alt)] font-bold" 
+    isActive
+      ? "bg-[var(--staff-accent)] text-[var(--staff-surface-alt)] font-bold"
       : "text-[var(--staff-muted)] hover:bg-[var(--staff-border)] hover:text-[var(--staff-text)]"
   );
 
@@ -48,15 +48,15 @@ const MenuBar = ({ editor }: { editor: Editor | null }) => {
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l8 8M6 16l14 14" /></svg>
       </button>
       <button
-         type="button"
-         onClick={() => editor.chain().focus().toggleStrike().run()}
-         disabled={!editor.can().chain().focus().toggleStrike().run()}
-         className={buttonClass(editor.isActive('strike'))}
-         title="Strike"
+        type="button"
+        onClick={() => editor.chain().focus().toggleStrike().run()}
+        disabled={!editor.can().chain().focus().toggleStrike().run()}
+        className={buttonClass(editor.isActive('strike'))}
+        title="Strike"
       >
-         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 12h16" /></svg>
+        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 12h16" /></svg>
       </button>
-      
+
       <div className="w-[1px] h-6 bg-[var(--staff-border)] mx-1 my-auto"></div>
 
       <button
@@ -75,7 +75,7 @@ const MenuBar = ({ editor }: { editor: Editor | null }) => {
       >
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h12M7 12h12M7 17h12M3 7h.01M3 12h.01M3 17h.01" /></svg>
       </button>
-      
+
       <div className="w-[1px] h-6 bg-[var(--staff-border)] mx-1 my-auto"></div>
 
       <button
@@ -84,41 +84,46 @@ const MenuBar = ({ editor }: { editor: Editor | null }) => {
         className={buttonClass(editor.isActive('blockquote'))}
         title="Quote"
       >
-         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" /></svg>
+        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" /></svg>
       </button>
     </div>
   )
 }
 
+const extensions = [
+  StarterKit,
+  Link.configure({
+    openOnClick: false,
+    HTMLAttributes: {
+      class: 'text-[var(--staff-accent)] underline cursor-pointer',
+    },
+  }),
+  Placeholder.configure({
+    placeholder: 'Write a reply... (/ for commands)',
+  }),
+];
+
 export const RichTextEditor = ({ content, onChange, onSend, disabled }: RichTextEditorProps) => {
   const editor = useEditor({
     immediatelyRender: false,
-    extensions: [
-      StarterKit,
-      Link.configure({
-        openOnClick: false,
-      }),
-      Placeholder.configure({
-        placeholder: 'Write a reply... (/ for commands)',
-      }),
-    ],
+    extensions,
     content,
     onUpdate: ({ editor }) => {
       onChange(editor.getHTML());
     },
     editorProps: {
-        attributes: {
-            class: 'prose prose-sm max-w-none focus:outline-none min-h-[150px] p-4 text-sm custom-scrollbar text-[var(--staff-text)] prose-headings:text-[var(--staff-text)] prose-p:text-[var(--staff-text)] prose-strong:text-[var(--staff-text)] prose-li:text-[var(--staff-text)] prose-code:text-[var(--staff-text)] prose-blockquote:text-[var(--staff-text)] prose-a:text-[var(--staff-accent)]',
-        },
-        handleKeyDown: (view, event) => {
-            if (event.key === 'Enter' && (event.ctrlKey || event.metaKey)) {
-                if (onSend) {
-                  onSend();
-                  return true;
-                }
-            }
-            return false;
+      attributes: {
+        class: 'prose prose-sm max-w-none focus:outline-none min-h-[150px] p-4 text-sm custom-scrollbar text-[var(--staff-text)] prose-headings:text-[var(--staff-text)] prose-p:text-[var(--staff-text)] prose-strong:text-[var(--staff-text)] prose-li:text-[var(--staff-text)] prose-code:text-[var(--staff-text)] prose-blockquote:text-[var(--staff-text)] prose-a:text-[var(--staff-accent)]',
+      },
+      handleKeyDown: (view, event) => {
+        if (event.key === 'Enter' && (event.ctrlKey || event.metaKey)) {
+          if (onSend) {
+            onSend();
+            return true;
+          }
         }
+        return false;
+      }
     },
     editable: !disabled,
   });
@@ -126,15 +131,15 @@ export const RichTextEditor = ({ content, onChange, onSend, disabled }: RichText
   // Sync content if props change externally (e.g. clear after send or AI generation)
   React.useEffect(() => {
     if (editor && content !== editor.getHTML()) {
-        editor.commands.setContent(content);
+      editor.commands.setContent(content);
     }
   }, [content, editor]);
 
   return (
     <div className={clsx(
-        "rounded-xl border border-[var(--staff-border)] bg-[var(--staff-surface)] overflow-hidden transition-colors duration-200",
-        editor?.isFocused && "border-[var(--staff-accent)] ring-1 ring-[var(--staff-accent)]/20",
-        disabled && "opacity-50 cursor-not-allowed"
+      "rounded-xl border border-[var(--staff-border)] bg-[var(--staff-surface)] overflow-hidden transition-colors duration-200",
+      editor?.isFocused && "border-[var(--staff-accent)] ring-1 ring-[var(--staff-accent)]/20",
+      disabled && "opacity-50 cursor-not-allowed"
     )}>
       <MenuBar editor={editor} />
       <EditorContent editor={editor} />

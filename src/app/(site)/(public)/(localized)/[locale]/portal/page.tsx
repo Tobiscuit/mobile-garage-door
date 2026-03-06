@@ -18,12 +18,19 @@ export default async function PortalDashboard({
 }: {
   params: Promise<{ locale: string }>;
 }) {
-  const { locale } = await params;
+  const resolvedParams = (await params) || { locale: 'en' } as any;
+  const locale = resolvedParams.locale || 'en';
   const t = await getTranslations({ locale, namespace: 'portal_page' });
-  const headerList = await headers();
+  let headerList = new Headers();
+  let isStaticPass = false;
+  try {
+    headerList = await headers();
+  } catch (e) {
+    isStaticPass = true;
+  }
   const session = await getSessionSafe(headerList);
 
-  if (!session) return null;
+  if (!session && !isStaticPass) return null;
 
   const { env } = await getCloudflareContext();
   const db = getDB(env.DB);
@@ -35,17 +42,17 @@ export default async function PortalDashboard({
 
   if (customerData) {
     if (user.name && customerData.name !== user.name) {
-       await db.update(users).set({ name: user.name }).where(eq(users.id, customerData.id));
-       customerData.name = user.name;
+      await db.update(users).set({ name: user.name }).where(eq(users.id, customerData.id));
+      customerData.name = user.name;
     }
   } else {
     const id = user.id;
     const newUsers = await db.insert(users).values({
-        id,
-        email: user.email,
-        name: user.name || '',
-        role: 'customer',
-        emailVerified: false,
+      id,
+      email: user.email,
+      name: user.name || '',
+      role: 'customer',
+      emailVerified: false,
     }).returning();
     customerData = newUsers[0];
   }
@@ -73,24 +80,24 @@ export default async function PortalDashboard({
 
   return (
     <div className="space-y-8">
-      <PortalHeader 
-        customerName={customer.companyName || customer.name || ''} 
-        isBuilder={isBuilder} 
+      <PortalHeader
+        customerName={customer.companyName || customer.name || ''}
+        isBuilder={isBuilder}
         isAdmin={['admin', 'technician', 'dispatcher'].includes(customerData.role || '')}
       />
-      
+
       {isBuilder && (
-         <div className="bg-blue-900/10 border border-blue-900/20 rounded-xl p-4 flex items-center justify-between">
-             <div className="flex items-center gap-3">
-                <div className="bg-blue-900 text-white p-2 rounded-lg">
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
-                </div>
-                <div>
-                    <h3 className="font-bold text-charcoal-blue">{t('builder_account')}</h3>
-                    <p className="text-sm text-gray-600">{t('builder_account_desc')}</p>
-                </div>
+        <div className="bg-blue-900/10 border border-blue-900/20 rounded-xl p-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="bg-blue-900 text-white p-2 rounded-lg">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
             </div>
-         </div>
+            <div>
+              <h3 className="font-bold text-charcoal-blue">{t('builder_account')}</h3>
+              <p className="text-sm text-gray-600">{t('builder_account_desc')}</p>
+            </div>
+          </div>
+        </div>
       )}
 
       <div className="grid lg:grid-cols-3 gap-8">

@@ -6,12 +6,17 @@ import { getCloudflareContext } from '@/lib/cloudflare';
 import { getDB } from '@/db';
 import { media } from '@/db/schema';
 
-const apiKey = process.env.GEMINI_API_KEY;
-const genAI = new GoogleGenAI({ apiKey: apiKey || '' });
+// --- Helper: Get GenAI Client ---
+async function getGenAI() {
+    const { env } = await getCloudflareContext();
+    const apiKey = env.GEMINI_API_KEY || '';
+    if (!apiKey) throw new Error('GEMINI_API_KEY is not set in Cloudflare Secrets');
+    return new GoogleGenAI({ apiKey });
+}
 
 // --- Helper: Generic Generator ---
 async function generateContent(systemPrompt: string, userPrompt: string, schema?: Schema, responseMimeType: string = 'application/json') {
-    if (!apiKey) throw new Error('GEMINI_API_KEY is not set');
+    const genAI = await getGenAI();
 
     try {
         const response = await genAI.models.generateContent({
@@ -71,7 +76,7 @@ export async function generatePostContent(prompt: string): Promise<any> {
         5. Provide a highly detailed 'imagePrompt' that will be used to generate the featured image.
     `;
 
-    if (!apiKey) throw new Error('GEMINI_API_KEY is not set');
+    const genAI = await getGenAI();
 
     let resultJson: any = {};
     try {
@@ -100,6 +105,7 @@ export async function generatePostContent(prompt: string): Promise<any> {
     let featuredImageId = null;
     try {
         if (resultJson.imagePrompt) {
+            const genAI = await getGenAI();
             const imageResponse = await genAI.models.generateContent({
                 model: 'gemini-3-pro-image-preview',
                 contents: resultJson.imagePrompt,
@@ -302,8 +308,6 @@ Here is the EXISTING REST OF THE DRAFT for your context (do not regenerate these
 `;
     }
 
-    if (!apiKey) throw new Error('GEMINI_API_KEY is not set');
-
     try {
         const parts: any[] = [];
         parts.push({ text: `${systemPrompt}\n\nTasks:\n${prompt}\n\nImage Context:` });
@@ -336,6 +340,7 @@ Here is the EXISTING REST OF THE DRAFT for your context (do not regenerate these
             }
         }
 
+        const genAI = await getGenAI();
         const response = await genAI.models.generateContent({
             model: 'gemini-3.1-pro-preview', // Vision-capable model
             contents: [
@@ -379,7 +384,7 @@ export async function extractProjectContext(contextString: string) {
         - "Commercial warehouse door in South Dallas" -> client: "Commercial Warehouse", location: "South Dallas, TX"
     `;
 
-    if (!apiKey) throw new Error('GEMINI_API_KEY is not set');
+    const genAI = await getGenAI();
 
     try {
         const response = await genAI.models.generateContent({

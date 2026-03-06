@@ -12,10 +12,16 @@ export const dynamic = 'force-dynamic';
 export default async function TechnicianDashboard() {
   const { env } = await getCloudflareContext();
   const db = getDB(env.DB);
-  const headerList = await headers();
+  let headerList = new Headers();
+  let isStaticPass = false;
+  try {
+    headerList = await headers();
+  } catch (e) {
+    isStaticPass = true;
+  }
   const { getSessionSafe } = await import('@/lib/get-session-safe');
   const session = await getSessionSafe(headerList);
-  if (!session) {
+  if (!session && !isStaticPass) {
     redirect('/login');
   }
 
@@ -29,14 +35,14 @@ export default async function TechnicianDashboard() {
 
   // Fetch customer details for each job
   const jobsWithCustomers = await Promise.all(assignedJobs.map(async (job) => {
-      const customer = job.customerId ? await db.select().from(users).where(eq(users.id, job.customerId)).limit(1) : [];
-      return { ...job, customer: customer[0] };
+    const customer = job.customerId ? await db.select().from(users).where(eq(users.id, job.customerId)).limit(1) : [];
+    return { ...job, customer: customer[0] };
   }));
 
   return (
     <div className="min-h-screen bg-charcoal-blue text-white p-6 md:p-12 font-sans">
       <div className="max-w-7xl mx-auto">
-        
+
         {/* Header */}
         <div className="flex justify-between items-end mb-12 border-b border-white/10 pb-6">
           <div>
@@ -60,7 +66,7 @@ export default async function TechnicianDashboard() {
             jobsWithCustomers.map((job: any) => (
               <div key={job.id} className="bg-white/5 rounded-2xl p-6 border border-white/10 hover:border-[#f1c40f]/50 transition-colors group">
                 <div className="flex flex-col md:flex-row gap-6 justify-between">
-                  
+
                   {/* Status Column */}
                   <div className="md:w-48 flex-shrink-0">
                     <div className={`inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-3 \${
@@ -75,30 +81,30 @@ export default async function TechnicianDashboard() {
                   {/* Details Column */}
                   <div className="flex-grow">
                     <div className="mb-4">
-                        <div className="text-sm text-gray-400 font-mono mb-1">Customer</div>
-                        <div className="text-lg font-bold">{job.customer?.name || 'Unknown'}</div>
-                        <div className="text-gray-400">{job.customer?.phone || ''}</div>
+                      <div className="text-sm text-gray-400 font-mono mb-1">Customer</div>
+                      <div className="text-lg font-bold">{job.customer?.name || 'Unknown'}</div>
+                      <div className="text-gray-400">{job.customer?.phone || ''}</div>
                     </div>
                     <div>
-                        <div className="text-sm text-gray-400 font-mono mb-1">Issue</div>
-                        <p className="text-gray-300 leading-relaxed">{job.issueDescription}</p>
+                      <div className="text-sm text-gray-400 font-mono mb-1">Issue</div>
+                      <p className="text-gray-300 leading-relaxed">{job.issueDescription}</p>
                     </div>
                   </div>
 
                   {/* Action Column */}
                   <div className="md:w-64 flex-shrink-0 flex flex-col justify-between items-end border-l border-white/10 pl-6 border-dashed">
                     <div className="text-right mb-4">
-                        <div className="text-sm text-gray-400 font-mono mb-1">Scheduled For</div>
-                        <div className="text-[#f1c40f] font-bold text-lg">
-                            {job.scheduledTime ? new Date(job.scheduledTime).toLocaleString() : 'TBD'}
-                        </div>
+                      <div className="text-sm text-gray-400 font-mono mb-1">Scheduled For</div>
+                      <div className="text-[#f1c40f] font-bold text-lg">
+                        {job.scheduledTime ? new Date(job.scheduledTime).toLocaleString() : 'TBD'}
+                      </div>
                     </div>
-                    
-                    <a 
-                        href={`/dashboard/dispatch`}
-                        className="w-full bg-white text-black font-bold py-3 px-4 rounded-lg text-center hover:bg-[#f1c40f] transition-colors"
+
+                    <a
+                      href={`/dashboard/dispatch`}
+                      className="w-full bg-white text-black font-bold py-3 px-4 rounded-lg text-center hover:bg-[#f1c40f] transition-colors"
                     >
-                        View Dispatch
+                      View Dispatch
                     </a>
                   </div>
 
