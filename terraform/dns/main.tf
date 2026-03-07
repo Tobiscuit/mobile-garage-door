@@ -103,3 +103,16 @@ resource "cloudflare_record" "dmarc" {
   type    = "TXT"
   comment = "Managed by Terraform: DMARC policy"
 }
+
+# ─────────────────────────────────────────────────────────────
+# Realtime Proxy: AI Diagnose WebSocket → Gemini Live API
+# ─────────────────────────────────────────────────────────────
+
+resource "cloudflare_record" "realtime_proxy" {
+  zone_id = var.cloudflare_zone_id
+  name    = "realtime-proxy"
+  content = "mobile-garage-door-realtime-proxy.tobiasramzy.workers.dev"
+  type    = "CNAME"
+  proxied = true
+  comment = "Managed by Terraform: Realtime proxy → Workers"
+}
