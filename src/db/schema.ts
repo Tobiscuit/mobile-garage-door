@@ -1,5 +1,5 @@
 import { relations } from 'drizzle-orm';
-import { sqliteTable, text, integer, real, customType } from "drizzle-orm/sqlite-core";
+import { sqliteTable, text, integer, real, customType, index } from "drizzle-orm/sqlite-core";
 
 const isoText = customType<{ data: string; driverData: string }>({
   dataType() {
@@ -370,10 +370,14 @@ export const passkey = sqliteTable("passkey", {
   name: text("name"),
   publicKey: text("publicKey").notNull(),
   userId: text("userId").notNull().references(() => users.id),
-  webauthnUserID: text("webauthnUserID").notNull(),
+  credentialID: text("credentialID").notNull(),
   counter: integer("counter").notNull(),
   deviceType: text("deviceType").notNull(),
   backedUp: integer("backedUp", { mode: "boolean" }).notNull(),
   transports: text("transports"),
   createdAt: integer("createdAt", { mode: "timestamp" }),
-});
+  aaguid: text("aaguid"),
+}, (table) => [
+  index("passkey_userId_idx").on(table.userId),
+  index("passkey_credentialID_idx").on(table.credentialID),
+]);
