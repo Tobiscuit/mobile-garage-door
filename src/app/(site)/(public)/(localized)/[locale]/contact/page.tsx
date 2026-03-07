@@ -7,7 +7,7 @@ import { ContactHero } from '@/features/contact/ContactHero';
 import { AddressAutocomplete } from '@/shared/ui/AddressAutocomplete';
 import { ServiceAreaMap } from '@/shared/ui/ServiceAreaMap';
 import { SquarePaymentModal } from '@/features/payment/SquarePaymentModal';
-import { getProfileForPrefill, getServiceAddresses, saveServiceAddress } from '@/app/actions/service-address';
+
 
 const ContactContent = () => {
     const searchParams = useSearchParams();
@@ -50,21 +50,20 @@ const ContactContent = () => {
         if (prefillLoaded) return;
         (async () => {
             try {
-                const [profile, addresses] = await Promise.all([
-                    getProfileForPrefill(),
-                    getServiceAddresses(),
-                ]);
-                if (profile) {
+                const res = await fetch('/api/user/prefill', { credentials: 'include' });
+                if (!res.ok) throw new Error('prefill failed');
+                const data = await res.json();
+                if (data.prefill) {
                     setFormData(prev => ({
                         ...prev,
-                        name: prev.name || profile.name,
-                        email: prev.email || profile.email,
-                        phone: prev.phone || profile.phone,
-                        address: prev.address || profile.lastAddress,
+                        name: prev.name || data.prefill.name,
+                        email: prev.email || data.prefill.email,
+                        phone: prev.phone || data.prefill.phone,
+                        address: prev.address || data.prefill.lastAddress,
                     }));
                 }
-                if (addresses.length > 0) {
-                    setRecentAddresses(addresses);
+                if (data.recentAddresses?.length > 0) {
+                    setRecentAddresses(data.recentAddresses);
                 }
             } catch (e) {
                 // Silent fail — non-logged-in users won't have data
@@ -87,7 +86,12 @@ const ContactContent = () => {
         e.preventDefault();
         // Save the address for future prefill
         if (formData.address) {
-            saveServiceAddress(formData.address).catch(() => {});
+            fetch('/api/user/save-address', {
+                method: 'POST',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ address: formData.address }),
+            }).catch(() => {});
         }
         // Open Payment Modal
         setShowPaymentModal(true);

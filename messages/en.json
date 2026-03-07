@@ -420,7 +420,12 @@
     "subtitle_customer": "What should we call you?",
     "name_label": "Your Name",
     "name_placeholder": "e.g. Maria Garcia",
-    "error_missing_name_customer": "Please enter your name."
+    "error_missing_name_customer": "Please enter your name.",
+    "customer_type_label": "How will you use our services?",
+    "type_residential": "My Home",
+    "type_residential_desc": "Residential service for my property",
+    "type_builder": "My Projects",
+    "type_builder_desc": "I'm a contractor managing job sites"
   },
   "portal_page": {
     "builder_account": "Builder Account",

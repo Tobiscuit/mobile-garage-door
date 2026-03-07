@@ -420,7 +420,12 @@
     "subtitle_customer": "Chúng tôi nên gọi bạn là gì?",
     "name_label": "Tên của bạn",
     "name_placeholder": "ví dụ: Nguyễn Văn A",
-    "error_missing_name_customer": "Vui lòng nhập tên của bạn."
+    "error_missing_name_customer": "Vui lòng nhập tên của bạn.",
+    "customer_type_label": "Bạn sẽ sử dụng dịch vụ của chúng tôi như thế nào?",
+    "type_residential": "Nhà Tôi",
+    "type_residential_desc": "Dịch vụ cho nhà riêng của tôi",
+    "type_builder": "Dự Án",
+    "type_builder_desc": "Tôi là nhà thầu quản lý công trình"
   },
   "portal_page": {
     "builder_account": "Tài Khoản Nhà Thầu",

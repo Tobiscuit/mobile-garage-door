@@ -420,7 +420,12 @@
     "subtitle_customer": "¿Cómo debemos llamarte?",
     "name_label": "Tu Nombre",
     "name_placeholder": "ej. María García",
-    "error_missing_name_customer": "Por favor, ingresa tu nombre."
+    "error_missing_name_customer": "Por favor, ingresa tu nombre.",
+    "customer_type_label": "¿Cómo utilizará nuestros servicios?",
+    "type_residential": "Mi Hogar",
+    "type_residential_desc": "Servicio residencial para mi propiedad",
+    "type_builder": "Mis Proyectos",
+    "type_builder_desc": "Soy contratista gestionando obras"
   },
   "portal_page": {
     "builder_account": "Cuenta Constructor",

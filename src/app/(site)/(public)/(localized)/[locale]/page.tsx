@@ -1,4 +1,6 @@
 import React from 'react';
+import { headers } from 'next/headers';
+import { redirect } from 'next/navigation';
 import Hero from '@/shared/layout/Hero';
 import Services from '@/features/landing/Services';
 import TrustIndicators from '@/features/landing/TrustIndicators';
@@ -8,10 +10,29 @@ import { services as servicesTable, testimonials as testimonialsTable } from "@/
 import { eq } from "drizzle-orm";
 import { getCloudflareContext } from "@/lib/cloudflare";
 import { withTranslations } from "@/db/helpers";
+import { getSessionSafe } from '@/lib/get-session-safe';
 
 export default async function Home({ params }: { params: Promise<{ locale: string }> }) {
   const resolvedParams = (await params) || { locale: 'en' } as any;
   const locale = resolvedParams.locale || 'en';
+
+  // Redirect returning logged-in users to their appropriate destination
+  let headerList = new Headers();
+  try { headerList = await headers(); } catch {}
+  const session = await getSessionSafe(headerList);
+  if (session?.user) {
+    const role = (session.user as any)?.role;
+    if (role === 'admin' || role === 'dispatcher') {
+      redirect('/dashboard');
+    }
+    if (role === 'technician') {
+      redirect('/dashboard/technician');
+    }
+    if (role === 'customer') {
+      redirect('/portal');
+    }
+  }
+
   const { env } = await getCloudflareContext();
   const db = getDB(env.DB);
 

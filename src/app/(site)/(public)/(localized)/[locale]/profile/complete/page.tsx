@@ -39,6 +39,11 @@ async function completeProfile(formData: FormData) {
     fullName = String(formData.get('name') || '').trim();
   }
 
+  let customerType = 'residential';
+  if (!isStaff) {
+    customerType = String(formData.get('customerType') || 'residential');
+  }
+
   if (!fullName) {
     redirect('/profile/complete?error=missing_name');
   }
@@ -53,7 +58,11 @@ async function completeProfile(formData: FormData) {
     redirect('/login');
   }
 
-  await db.update(users).set({ name: fullName }).where(eq(users.id, user.id));
+  const updateData: Record<string, string> = { name: fullName };
+  if (!isStaff) {
+    updateData.customerType = customerType;
+  }
+  await db.update(users).set(updateData).where(eq(users.id, user.id));
 
   // Redirect based on role
   if (role === 'admin' || role === 'dispatcher') {
@@ -155,6 +164,7 @@ export default async function CompleteProfilePage({
                   </div>
                 </>
               ) : (
+                <>
                 <div>
                   <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">
                     {t('name_label')}
@@ -168,6 +178,32 @@ export default async function CompleteProfilePage({
                     placeholder={t('name_placeholder')}
                   />
                 </div>
+
+                {/* Customer type self-segmentation — shown only once, on first login */}
+                <div>
+                  <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-3">
+                    {t('customer_type_label')}
+                  </label>
+                  <div className="grid grid-cols-2 gap-3">
+                    <label className="relative cursor-pointer">
+                      <input type="radio" name="customerType" value="residential" defaultChecked className="peer sr-only" />
+                      <div className="border-2 border-gray-200 peer-checked:border-[#f1c40f] peer-checked:bg-yellow-50 rounded-xl p-4 text-center transition-all hover:border-gray-300">
+                        <div className="text-2xl mb-1">🏠</div>
+                        <div className="font-bold text-charcoal-blue text-sm">{t('type_residential')}</div>
+                        <div className="text-[11px] text-gray-400 mt-0.5">{t('type_residential_desc')}</div>
+                      </div>
+                    </label>
+                    <label className="relative cursor-pointer">
+                      <input type="radio" name="customerType" value="builder" className="peer sr-only" />
+                      <div className="border-2 border-gray-200 peer-checked:border-[#f1c40f] peer-checked:bg-yellow-50 rounded-xl p-4 text-center transition-all hover:border-gray-300">
+                        <div className="text-2xl mb-1">🏗️</div>
+                        <div className="font-bold text-charcoal-blue text-sm">{t('type_builder')}</div>
+                        <div className="text-[11px] text-gray-400 mt-0.5">{t('type_builder_desc')}</div>
+                      </div>
+                    </label>
+                  </div>
+                </div>
+                </>
               )}
 
               <button
