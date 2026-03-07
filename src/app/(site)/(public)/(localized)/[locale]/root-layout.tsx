@@ -67,6 +67,14 @@ export default async function RootLayout({
 
   return (
     <html lang={locale} suppressHydrationWarning>
+      <head>
+        <link rel="manifest" href="/manifest.webmanifest" />
+        <meta name="theme-color" content="#1e293b" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-title" content="Mobil Garage" />
+        <link rel="apple-touch-icon" href="/icon-192x192.png" />
+      </head>
       <body className={`bg-background text-primary`}>
         {children}
         <FloatingAiButton />
