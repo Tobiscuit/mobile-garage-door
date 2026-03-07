@@ -381,3 +381,14 @@ export const passkey = sqliteTable("passkey", {
   index("passkey_userId_idx").on(table.userId),
   index("passkey_credentialID_idx").on(table.credentialID),
 ]);
+
+export const serviceAddresses = sqliteTable("service_addresses", {
+  id: text("id").primaryKey(),
+  userId: text("userId").notNull().references(() => users.id),
+  address: text("address").notNull(),
+  label: text("label"),
+  lastUsedAt: integer("lastUsedAt", { mode: "timestamp" }),
+  useCount: integer("useCount").default(1),
+}, (table) => [
+  index("service_addresses_userId_idx").on(table.userId),
+]);

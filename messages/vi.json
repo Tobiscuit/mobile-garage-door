@@ -423,7 +423,33 @@
     "error_missing_name_customer": "Vui lòng nhập tên của bạn."
   },
   "portal_page": {
-    "builder_account": "Tài khoản Nhà thầu",
-    "builder_account_desc": "Bạn có quyền truy cập vào các tính năng quản lý đa công trường."
+    "builder_account": "Tài Khoản Nhà Thầu",
+    "builder_account_desc": "Truy cập lịch trình ưu tiên và giá sỉ.",
+    "welcome_back": "Chào mừng trở lại",
+    "command_center": "Trung Tâm Điều Khiển",
+    "manage_builder": "Quản lý các công trường, lịch trình và thanh toán.",
+    "manage_customer": "Quản lý yêu cầu dịch vụ và xem lịch sử.",
+    "admin_view": "Xem Quản Trị",
+    "book_service": "Đặt Dịch Vụ",
+    "new_job_order": "Đơn Hàng Mới",
+    "builder_label": "Nhà Thầu",
+    "active_service": "Dịch Vụ Đang Hoạt Động",
+    "no_active_requests": "Không Có Yêu Cầu Nào",
+    "no_active_desc": "Mọi thứ đều ổn! Đặt dịch vụ ở trên khi bạn cần chúng tôi.",
+    "received": "Đã Nhận",
+    "confirmed": "Đã Xác Nhận",
+    "en_route": "Đang Đến",
+    "on_site": "Tại Chỗ",
+    "scheduled": "Đã Lên Lịch",
+    "pending_scheduling": "Đang Chờ Lên Lịch",
+    "service_history": "Lịch Sử Dịch Vụ",
+    "completed": "HOÀN THÀNH",
+    "account_details": "Thông Tin Tài Khoản",
+    "name_label": "Tên",
+    "email_label": "Email",
+    "phone_label": "Điện Thoại",
+    "need_assistance": "Cần hỗ trợ ngay?",
+    "support_desc": "Đội ngũ hỗ trợ của chúng tôi luôn sẵn sàng 24/7 để cập nhật vé.",
+    "sign_out": "Đăng Xuất"
   }
 }

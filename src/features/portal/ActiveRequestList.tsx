@@ -1,5 +1,5 @@
 import React from 'react';
-import Link from '@/shared/ui/Link';
+import { useTranslations } from '@/hooks/useTranslations';
 
 interface Request {
   id: string;
@@ -14,18 +14,18 @@ interface ActiveRequestListProps {
 }
 
 export function ActiveRequestList({ requests }: ActiveRequestListProps) {
+  const t = useTranslations('portal_page');
   return (
     <div className="lg:col-span-2 space-y-6">
-      <h2 className="text-xl font-bold text-charcoal-blue uppercase tracking-widest border-b border-gray-200 pb-2">Active Service</h2>
+      <h2 className="text-xl font-bold text-charcoal-blue uppercase tracking-widest border-b border-gray-200 pb-2">{t('active_service')}</h2>
 
       {requests.length === 0 ? (
         <div className="bg-white rounded-xl p-8 border border-gray-200 text-center shadow-sm">
           <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4 text-gray-400">
             <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
           </div>
-          <h3 className="text-lg font-bold text-charcoal-blue mb-1">No Active Requests</h3>
-          <p className="text-gray-500 mb-6">Everything looks good! Need help with your door?</p>
-          <Link href="/portal/book" className="text-golden-yellow font-bold hover:underline">Start a new request</Link>
+          <h3 className="text-lg font-bold text-charcoal-blue mb-1">{t('no_active_requests')}</h3>
+          <p className="text-gray-500">{t('no_active_desc')}</p>
         </div>
       ) : (
         <div className="space-y-4">
@@ -46,7 +46,7 @@ export function ActiveRequestList({ requests }: ActiveRequestListProps) {
                 <div className="flex justify-between items-start mb-4">
                   <div>
                     <h3 className="font-bold text-charcoal-blue text-lg mb-1">{String(req.issueDescription).substring(0, 50)}...</h3>
-                    <p className="text-sm text-gray-500">Scheduled: {req.scheduledTime ? new Date(req.scheduledTime).toLocaleDateString() + ' ' + new Date(req.scheduledTime).toLocaleTimeString() : 'Pending Scheduling'}</p>
+                    <p className="text-sm text-gray-500">{t('scheduled')}: {req.scheduledTime ? new Date(req.scheduledTime).toLocaleDateString() + ' ' + new Date(req.scheduledTime).toLocaleTimeString() : t('pending_scheduling')}</p>
                   </div>
                 </div>
 
@@ -61,10 +61,10 @@ export function ActiveRequestList({ requests }: ActiveRequestListProps) {
                     }`}></div>
                   </div>
                   <div className="flex justify-between text-[10px] font-bold text-gray-400 uppercase mt-2">
-                    <span>Received</span>
-                    <span>Confirmed</span>
-                    <span>En Route</span>
-                    <span>On Site</span>
+                    <span>{t('received')}</span>
+                    <span>{t('confirmed')}</span>
+                    <span>{t('en_route')}</span>
+                    <span>{t('on_site')}</span>
                   </div>
                 </div>
               </div>

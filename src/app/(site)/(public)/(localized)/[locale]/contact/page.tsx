@@ -7,6 +7,7 @@ import { ContactHero } from '@/features/contact/ContactHero';
 import { AddressAutocomplete } from '@/shared/ui/AddressAutocomplete';
 import { ServiceAreaMap } from '@/shared/ui/ServiceAreaMap';
 import { SquarePaymentModal } from '@/features/payment/SquarePaymentModal';
+import { getProfileForPrefill, getServiceAddresses, saveServiceAddress } from '@/app/actions/service-address';
 
 const ContactContent = () => {
     const searchParams = useSearchParams();
@@ -19,10 +20,14 @@ const ContactContent = () => {
     if (typeParam === 'install') heroType = 'install';
     if (typeParam === 'contractor') heroType = 'contractor';
 
+    const isFromPortal = searchParams.get('source') === 'portal';
+
     // State for urgency toggle
     const [urgency, setUrgency] = useState<'Standard' | 'Emergency'>('Standard');
     const [showPaymentModal, setShowPaymentModal] = useState(false);
     const [isPaid, setIsPaid] = useState(false);
+    const [recentAddresses, setRecentAddresses] = useState<{ address: string; label: string | null }[]>([]);
+    const [prefillLoaded, setPrefillLoaded] = useState(false);
 
     useEffect(() => {
         if (heroType === 'repair') {
@@ -40,6 +45,34 @@ const ContactContent = () => {
         issue: ''
     });
 
+    // Smart prefill: fetch profile + addresses for logged-in users
+    useEffect(() => {
+        if (prefillLoaded) return;
+        (async () => {
+            try {
+                const [profile, addresses] = await Promise.all([
+                    getProfileForPrefill(),
+                    getServiceAddresses(),
+                ]);
+                if (profile) {
+                    setFormData(prev => ({
+                        ...prev,
+                        name: prev.name || profile.name,
+                        email: prev.email || profile.email,
+                        phone: prev.phone || profile.phone,
+                        address: prev.address || profile.lastAddress,
+                    }));
+                }
+                if (addresses.length > 0) {
+                    setRecentAddresses(addresses);
+                }
+            } catch (e) {
+                // Silent fail — non-logged-in users won't have data
+            }
+            setPrefillLoaded(true);
+        })();
+    }, [prefillLoaded]);
+
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
@@ -52,6 +85,10 @@ const ContactContent = () => {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+        // Save the address for future prefill
+        if (formData.address) {
+            saveServiceAddress(formData.address).catch(() => {});
+        }
         // Open Payment Modal
         setShowPaymentModal(true);
     };
@@ -195,6 +232,7 @@ const ContactContent = () => {
                                         className="w-full bg-gray-50 border border-gray-200 rounded-xl p-4 font-bold text-charcoal-blue focus:ring-2 focus:ring-golden-yellow focus:border-transparent outline-none transition-all"
                                         placeholder={t('location_placeholder')}
                                         defaultValue={formData.address}
+                                        recentAddresses={recentAddresses}
                                     />
                                 </div>
 

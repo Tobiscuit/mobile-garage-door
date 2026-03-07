@@ -423,7 +423,33 @@
     "error_missing_name_customer": "Por favor, ingresa tu nombre."
   },
   "portal_page": {
-    "builder_account": "Cuenta de Constructor",
-    "builder_account_desc": "Tiene acceso a funciones de administración de múltiples sitios."
+    "builder_account": "Cuenta Constructor",
+    "builder_account_desc": "Acceso a programación prioritaria y precios por volumen.",
+    "welcome_back": "Bienvenido de nuevo",
+    "command_center": "Centro de Mando",
+    "manage_builder": "Gestione sitios de trabajo, horarios y facturación.",
+    "manage_customer": "Gestione sus solicitudes de servicio y vea el historial.",
+    "admin_view": "Vista de Admin",
+    "book_service": "Reservar Servicio",
+    "new_job_order": "Nuevo Pedido",
+    "builder_label": "Constructor",
+    "active_service": "Servicio Activo",
+    "no_active_requests": "Sin Solicitudes Activas",
+    "no_active_desc": "¡Todo se ve bien! Reserve un servicio arriba cuando nos necesite.",
+    "received": "Recibido",
+    "confirmed": "Confirmado",
+    "en_route": "En Camino",
+    "on_site": "En Sitio",
+    "scheduled": "Programado",
+    "pending_scheduling": "Programación Pendiente",
+    "service_history": "Historial de Servicio",
+    "completed": "COMPLETADO",
+    "account_details": "Detalles de Cuenta",
+    "name_label": "Nombre",
+    "email_label": "Correo",
+    "phone_label": "Teléfono",
+    "need_assistance": "¿Necesita asistencia inmediata?",
+    "support_desc": "Nuestro equipo de soporte está disponible 24/7 para actualizaciones de tickets.",
+    "sign_out": "Cerrar Sesión"
   }
 }
