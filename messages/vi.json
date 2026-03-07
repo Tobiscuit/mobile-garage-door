@@ -416,7 +416,11 @@
     "error_missing_name": "Vui lòng nhập tên và họ của bạn.",
     "first_name_label": "Tên",
     "last_name_label": "Họ",
-    "btn_save": "Lưu và Tiếp tục"
+    "btn_save": "Lưu và Tiếp tục",
+    "subtitle_customer": "Chúng tôi nên gọi bạn là gì?",
+    "name_label": "Tên của bạn",
+    "name_placeholder": "ví dụ: Nguyễn Văn A",
+    "error_missing_name_customer": "Vui lòng nhập tên của bạn."
   },
   "portal_page": {
     "builder_account": "Tài khoản Nhà thầu",

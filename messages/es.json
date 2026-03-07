@@ -416,7 +416,11 @@
     "error_missing_name": "Por favor, ingrese su nombre y apellido.",
     "first_name_label": "Nombre",
     "last_name_label": "Apellido",
-    "btn_save": "Guardar y Continuar"
+    "btn_save": "Guardar y Continuar",
+    "subtitle_customer": "¿Cómo debemos llamarte?",
+    "name_label": "Tu Nombre",
+    "name_placeholder": "ej. María García",
+    "error_missing_name_customer": "Por favor, ingresa tu nombre."
   },
   "portal_page": {
     "builder_account": "Cuenta de Constructor",

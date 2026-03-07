@@ -416,7 +416,11 @@
     "error_missing_name": "Please enter your first and last name.",
     "first_name_label": "First Name",
     "last_name_label": "Last Name",
-    "btn_save": "Save and Continue"
+    "btn_save": "Save and Continue",
+    "subtitle_customer": "What should we call you?",
+    "name_label": "Your Name",
+    "name_placeholder": "e.g. Maria Garcia",
+    "error_missing_name_customer": "Please enter your name."
   },
   "portal_page": {
     "builder_account": "Builder Account",

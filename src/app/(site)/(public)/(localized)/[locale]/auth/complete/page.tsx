@@ -21,9 +21,10 @@ export default async function AuthCompletePage() {
   }
 
   const role = (session.user as any)?.role;
-  const profileComplete = true; // Temporary mock
+  const profileComplete = !!session.user.name;
 
-  if ((role === 'admin' || role === 'technician' || role === 'dispatcher') && !profileComplete) {
+  // All roles must complete their profile (name) before proceeding
+  if (!profileComplete) {
     redirect('/profile/complete');
   }
 
