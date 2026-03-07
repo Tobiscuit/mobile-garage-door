@@ -199,6 +199,7 @@ const ContactContent = () => {
                                         type="text" 
                                         name="name"
                                         required
+                                        value={formData.name}
                                         className="w-full bg-gray-50 border border-gray-200 rounded-xl p-4 font-bold text-charcoal-blue focus:ring-2 focus:ring-golden-yellow focus:border-transparent outline-none transition-all"
                                         placeholder={t('full_name')}
                                         onChange={handleInputChange}
@@ -211,6 +212,7 @@ const ContactContent = () => {
                                             type="email" 
                                             name="email"
                                             required
+                                            value={formData.email}
                                             className="w-full bg-gray-50 border border-gray-200 rounded-xl p-4 font-bold text-charcoal-blue focus:ring-2 focus:ring-golden-yellow focus:border-transparent outline-none transition-all"
                                             placeholder="john@example.com"
                                             onChange={handleInputChange}
@@ -222,6 +224,7 @@ const ContactContent = () => {
                                             type="tel" 
                                             name="phone"
                                             required
+                                            value={formData.phone}
                                             className="w-full bg-gray-50 border border-gray-200 rounded-xl p-4 font-bold text-charcoal-blue focus:ring-2 focus:ring-golden-yellow focus:border-transparent outline-none transition-all"
                                             placeholder="(555) 000-0000"
                                             onChange={handleInputChange}
