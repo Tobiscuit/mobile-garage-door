@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import Link from '@/shared/ui/Link';
 import { useTranslations } from '@/hooks/useTranslations';
