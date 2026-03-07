@@ -117,7 +117,7 @@ export default function DiagnosePage() {
       
       const wsUrl = window.location.hostname === 'localhost' 
           ? 'ws://localhost:3001' 
-          : 'wss://mobile-garage-door-realtime-proxy.tobiasramzy.workers.dev';
+          : 'wss://realtime-proxy.mobilgaragedoor.com';
           
       const ws = new WebSocket(wsUrl);
       wsRef.current = ws;

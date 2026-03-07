@@ -186,7 +186,9 @@ export const staffInvites = sqliteTable("staff_invites", {
   role: text("role", { enum: ["technician", "admin"] }).default("technician"),
   firstName: text("first_name"),
   lastName: text("last_name"),
+  token: text("token").unique(),
   status: text("status", { enum: ["pending", "accepted", "revoked"] }).default("pending"),
+  expiresAt: text("expires_at"),
   acceptedAt: text("accepted_at"),
   invitedById: text("invited_by_id").references(() => users.id),
   createdAt: text("created_at").notNull().$defaultFn(() => new Date().toISOString()),
@@ -283,6 +285,19 @@ export const projectTagRelations = relations(projectTags, ({ one }) => ({
 
 export const projectStatsRelations = relations(projectStats, ({ one }) => ({
   project: one(projects, { fields: [projectStats.projectId], references: [projects.id] }),
+}));
+
+export const settingsRelations = relations(settings, ({ many }) => ({
+  stats: many(settingStats),
+  values: many(settingValues),
+}));
+
+export const settingStatsRelations = relations(settingStats, ({ one }) => ({
+  setting: one(settings, { fields: [settingStats.settingId], references: [settings.id] }),
+}));
+
+export const settingValuesRelations = relations(settingValues, ({ one }) => ({
+  setting: one(settings, { fields: [settingValues.settingId], references: [settings.id] }),
 }));
 
 export const postRelations = relations(posts, ({ one, many }) => ({

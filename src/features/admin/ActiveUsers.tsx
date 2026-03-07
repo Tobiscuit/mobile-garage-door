@@ -39,13 +39,19 @@ export default function ActiveUsers() {
 
   return (
     <div className="backdrop-blur-md rounded-xl p-4 md:p-6 h-full" style={{ backgroundColor: 'var(--staff-surface)', border: '1px solid var(--staff-border)' }}>
-      <h3 className="text-lg md:text-xl font-bold mb-4 flex items-center gap-2" style={{ color: 'var(--staff-text)' }}>
-        <span className="relative flex h-2.5 w-2.5 md:h-3 md:w-3">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-          <span className="relative inline-flex rounded-full h-2.5 w-2.5 md:h-3 md:w-3 bg-green-500"></span>
-        </span>
-        Active Users
-      </h3>
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-lg md:text-xl font-bold flex items-center gap-2" style={{ color: 'var(--staff-text)' }}>
+          <span className="relative flex h-2.5 w-2.5 md:h-3 md:w-3">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2.5 w-2.5 md:h-3 md:w-3 bg-green-500"></span>
+          </span>
+          Active Users
+        </h3>
+        <a href="/dashboard/users/create" className="text-xs font-bold flex items-center gap-1 transition-opacity hover:opacity-80" style={{ color: 'var(--staff-accent)' }}>
+          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
+          Invite
+        </a>
+      </div>
       <div className="space-y-3">
         {users.map((user) => {
           const lastLogin = user.lastLogin ? new Date(user.lastLogin) : null;
@@ -73,7 +79,7 @@ export default function ActiveUsers() {
           )
         })}
         {users.length === 0 && (
-          <div className="text-center py-4" style={{ color: 'var(--staff-muted)' }}>No users found</div>
+          <div className="text-center py-4" style={{ color: 'var(--staff-muted)' }}>No staff members yet</div>
         )}
       </div>
     </div>

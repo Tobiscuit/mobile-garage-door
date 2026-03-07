@@ -14,14 +14,12 @@ export function QuickActions() {
         try {
             const result = await syncSquarePayments();
             if (result.success) {
-                // Optional: Toast notification
                 console.log(`Synced ${result.count} payments.`);
             } else {
                 console.error('Sync failed');
             }
         } catch (e) {
             console.error('Detailed Sync Error:', e);
-            // If it's an object with a message, log that too
             if (e instanceof Error) {
                 console.error('Error Message:', e.message);
                 console.error('Error Stack:', e.stack);

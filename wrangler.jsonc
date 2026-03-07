@@ -35,5 +35,10 @@
       "binding": "VINEXT_CACHE",
       "id": "14e1c4a34c4f4246b4455b28d72b6231"
     }
+  ],
+  // Custom domains: mobilgaragedoor.com → this Worker
+  "routes": [
+    { "pattern": "mobilgaragedoor.com/*", "zone_id": "6dcb9ee96a3af731e0124a38ecaf9114" },
+    { "pattern": "www.mobilgaragedoor.com/*", "zone_id": "6dcb9ee96a3af731e0124a38ecaf9114" }
   ]
 }

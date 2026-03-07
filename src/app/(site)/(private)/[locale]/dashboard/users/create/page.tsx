@@ -6,29 +6,31 @@ export default function CreateUserPage() {
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-2xl mx-auto mt-12">
       <div className="mb-8 text-center">
-        <h1 className="text-4xl font-black text-white">Invite Staff Member</h1>
-        <p className="text-[#bdc3c7] mt-2">Add an approved staff email and role for passwordless sign-in.</p>
+        <h1 className="text-4xl font-black" style={{ color: 'var(--staff-text)' }}>Invite Staff Member</h1>
+        <p className="mt-2" style={{ color: 'var(--staff-muted)' }}>Add an approved staff email and role for passwordless sign-in.</p>
       </div>
 
-      <form action={inviteStaff} className="bg-[#34495e]/50 backdrop-blur-md border border-[#ffffff08] rounded-2xl p-8 shadow-xl">
+      <form action={inviteStaff} className="backdrop-blur-md rounded-2xl p-8 shadow-xl" style={{ backgroundColor: 'var(--staff-surface)', border: '1px solid var(--staff-border)' }}>
           <div className="space-y-6">
               <div>
-                <label className="block text-xs font-bold text-[#bdc3c7] uppercase tracking-wider mb-2">Email Address</label>
+                <label className="block text-xs font-bold uppercase tracking-wider mb-2" style={{ color: 'var(--staff-muted)' }}>Email Address</label>
                 <input 
                   name="email"
                   type="email" 
                   required
-                  className="w-full bg-[#2c3e50] border border-[#ffffff10] rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#f1c40f] transition-colors"
+                  className="w-full rounded-xl px-4 py-3 focus:outline-none transition-colors"
+                  style={{ backgroundColor: 'var(--staff-surface-alt)', border: '1px solid var(--staff-border)', color: 'var(--staff-text)' }}
                   placeholder="admin@example.com"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-[#bdc3c7] uppercase tracking-wider mb-2">Role</label>
+                <label className="block text-xs font-bold uppercase tracking-wider mb-2" style={{ color: 'var(--staff-muted)' }}>Role</label>
                 <select
                   name="role"
                   defaultValue="technician"
-                  className="w-full bg-[#2c3e50] border border-[#ffffff10] rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#f1c40f] transition-colors"
+                  className="w-full rounded-xl px-4 py-3 focus:outline-none transition-colors"
+                  style={{ backgroundColor: 'var(--staff-surface-alt)', border: '1px solid var(--staff-border)', color: 'var(--staff-text)' }}
                 >
                   <option value="technician">Technician</option>
                   <option value="admin">Admin</option>
@@ -37,20 +39,22 @@ export default function CreateUserPage() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-[#bdc3c7] uppercase tracking-wider mb-2">First Name (Optional)</label>
+                  <label className="block text-xs font-bold uppercase tracking-wider mb-2" style={{ color: 'var(--staff-muted)' }}>First Name (Optional)</label>
                   <input
                     name="firstName"
                     type="text"
-                    className="w-full bg-[#2c3e50] border border-[#ffffff10] rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#f1c40f] transition-colors"
+                    className="w-full rounded-xl px-4 py-3 focus:outline-none transition-colors"
+                    style={{ backgroundColor: 'var(--staff-surface-alt)', border: '1px solid var(--staff-border)', color: 'var(--staff-text)' }}
                     placeholder="Alex"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-[#bdc3c7] uppercase tracking-wider mb-2">Last Name (Optional)</label>
+                  <label className="block text-xs font-bold uppercase tracking-wider mb-2" style={{ color: 'var(--staff-muted)' }}>Last Name (Optional)</label>
                   <input
                     name="lastName"
                     type="text"
-                    className="w-full bg-[#2c3e50] border border-[#ffffff10] rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#f1c40f] transition-colors"
+                    className="w-full rounded-xl px-4 py-3 focus:outline-none transition-colors"
+                    style={{ backgroundColor: 'var(--staff-surface-alt)', border: '1px solid var(--staff-border)', color: 'var(--staff-text)' }}
                     placeholder="Rivera"
                   />
                 </div>
@@ -59,12 +63,13 @@ export default function CreateUserPage() {
               <div className="pt-6">
                 <button 
                     type="submit"
-                    className="w-full py-4 bg-[#f1c40f] text-[#2c3e50] font-bold rounded-xl hover:bg-[#f39c12] hover:scale-105 transition-all shadow-[0_4px_20px_rgba(241,196,15,0.3)]"
+                    className="w-full py-4 font-bold rounded-xl hover:scale-105 transition-all"
+                    style={{ backgroundColor: 'var(--staff-accent)', color: 'var(--staff-surface-alt)', boxShadow: '0 4px 20px color-mix(in srgb, var(--staff-accent) 30%, transparent)' }}
                 >
                     Create Invite
                 </button>
                 <div className="text-center mt-4">
-                     <Link href="/dashboard/users" className="text-sm text-[#7f8c8d] hover:text-white transition-colors">
+                     <Link href="/dashboard/users" className="text-sm transition-colors hover:opacity-80" style={{ color: 'var(--staff-muted)' }}>
                         Cancel
                      </Link>
                 </div>
@@ -74,3 +79,4 @@ export default function CreateUserPage() {
     </div>
   );
 }
+

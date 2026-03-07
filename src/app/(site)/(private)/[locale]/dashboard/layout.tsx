@@ -32,6 +32,12 @@ export default async function DashboardLayout({
     redirect('/login');
   }
 
+  // Role guard: only staff can access the dashboard
+  const userRole = (session?.user as any)?.role;
+  if (!isStaticPass && (!userRole || userRole === 'customer')) {
+    redirect('/portal');
+  }
+
   let themePreference = 'candlelight';
   try {
     const { env } = await getCloudflareContext();

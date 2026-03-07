@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Link from '@/shared/ui/Link';
 import { usePathname } from 'next/navigation';
 import ThemeToggle from './ThemeToggle';
+import MobileProfileSheet from './MobileProfileSheet';
 
 // Simple text logo since we removed the Payload CMS Logo component
 const Logo = () => (
@@ -25,10 +26,12 @@ const LogoutIcon = () => <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24
 const DispatchIcon = () => <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>;
 const EmailIcon = () => <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>;
 const ChevronRight = () => <svg className="w-4 h-4 ml-auto opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>;
+const MoreIcon = () => <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>;
 
 const Sidebar: React.FC = () => {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false); // Mobile toggle state logic here if needed
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   const isActive = (path: string) => {
     if (path === '/dashboard') {
@@ -84,15 +87,26 @@ const Sidebar: React.FC = () => {
           <DispatchIcon />
           <span className="text-[10px] font-bold">Dispatch</span>
         </Link>
-        <Link href="/dashboard/services" className={`p-2 rounded-lg flex flex-col items-center gap-1 ${isActive('/dashboard/services') ? 'text-[var(--staff-accent)]' : ''}`} style={{ color: isActive('/dashboard/services') ? 'var(--staff-accent)' : 'var(--staff-muted)' }}>
-          <ServiceIcon />
-          <span className="text-[10px] font-bold">Services</span>
+        <Link href="/dashboard/projects" className={`p-2 rounded-lg flex flex-col items-center gap-1 ${isActive('/dashboard/projects') ? 'text-[var(--staff-accent)]' : ''}`} style={{ color: isActive('/dashboard/projects') ? 'var(--staff-accent)' : 'var(--staff-muted)' }}>
+          <ProjectIcon />
+          <span className="text-[10px] font-bold">Projects</span>
         </Link>
         <Link href="/dashboard/settings" className={`p-2 rounded-lg flex flex-col items-center gap-1 ${isActive('/dashboard/settings') ? 'text-[var(--staff-accent)]' : ''}`} style={{ color: isActive('/dashboard/settings') ? 'var(--staff-accent)' : 'var(--staff-muted)' }}>
           <SettingsIcon />
           <span className="text-[10px] font-bold">Settings</span>
         </Link>
+        <button
+          onClick={() => setIsProfileOpen(true)}
+          className="p-2 rounded-lg flex flex-col items-center gap-1 transition-colors"
+          style={{ color: isProfileOpen ? 'var(--staff-accent)' : 'var(--staff-muted)' }}
+        >
+          <MoreIcon />
+          <span className="text-[10px] font-bold">More</span>
+        </button>
       </nav>
+
+      {/* Mobile Profile Sheet */}
+      <MobileProfileSheet isOpen={isProfileOpen} onClose={() => setIsProfileOpen(false)} />
 
       {/* DESKTOP SIDEBAR - Hidden on small screens */}
       <aside className="hidden md:flex fixed left-0 top-0 h-screen w-[280px] backdrop-blur-xl flex-col z-50" style={{ backgroundColor: 'var(--staff-surface)', borderRight: '1px solid var(--staff-border)' }}>
@@ -107,7 +121,6 @@ const Sidebar: React.FC = () => {
         <nav className="flex-1 px-4 overflow-y-auto custom-scrollbar">
           <NavGroup title="Core">
             <NavItem href="/dashboard" icon={CommandIcon} label="Command Center" />
-            <NavItem href="/portal" icon={() => <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>} label="Customer Portal" />
             <NavItem href="/dashboard/dispatch" icon={DispatchIcon} label="Dispatch Board" />
             <NavItem href="/dashboard/emails" icon={EmailIcon} label="Inbox" />
           </NavGroup>
@@ -131,6 +144,10 @@ const Sidebar: React.FC = () => {
 
         {/* FOOTER */}
         <div className="p-4" style={{ borderTop: '1px solid var(--staff-border)' }}>
+          <Link href="/portal" className="flex items-center gap-2 px-4 py-2 mb-3 rounded-lg text-xs font-semibold transition-all hover:bg-[var(--staff-border)]/20" style={{ color: 'var(--staff-muted)' }}>
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+            Customer View
+          </Link>
           <div className="mb-3">
             <ThemeToggle />
           </div>
