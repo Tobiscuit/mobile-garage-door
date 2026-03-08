@@ -6,6 +6,7 @@ import { getDB } from "@/db";
 import { users } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { getCloudflareContext } from "@/lib/cloudflare";
+import TechJobActions from '@/features/dashboard/TechJobActions';
 
 export const dynamic = 'force-dynamic';
 
@@ -92,7 +93,7 @@ export default async function TechnicianDashboard() {
                   </div>
 
                   {/* Action Column */}
-                  <div className="md:w-64 flex-shrink-0 flex flex-col justify-between items-end border-l border-white/10 pl-6 border-dashed">
+                  <div className="md:w-64 flex-shrink-0 flex flex-col justify-between border-l border-white/10 pl-6 border-dashed">
                     <div className="text-right mb-4">
                       <div className="text-sm text-gray-400 font-mono mb-1">Scheduled For</div>
                       <div className="text-[#f1c40f] font-bold text-lg">
@@ -100,12 +101,11 @@ export default async function TechnicianDashboard() {
                       </div>
                     </div>
 
-                    <a
-                      href={`/dashboard/dispatch`}
-                      className="w-full bg-white text-black font-bold py-3 px-4 rounded-lg text-center hover:bg-[#f1c40f] transition-colors"
-                    >
-                      View Dispatch
-                    </a>
+                    <TechJobActions
+                      jobId={job.id}
+                      ticketId={job.ticketId}
+                      currentStatus={job.status || 'pending'}
+                    />
                   </div>
 
                 </div>
