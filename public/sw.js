@@ -66,25 +66,63 @@ self.addEventListener('message', (event) => {
   }
 });
 
-// Push Notification Foundation
+// Push Notification Handler
 self.addEventListener('push', function (event) {
-  if (event.data) {
+  if (!event.data) return;
+
+  try {
     const data = event.data.json();
     const options = {
-      body: data.body,
+      body: data.body || '',
       icon: data.icon || '/icon-192x192.png',
-      badge: '/badge.png',
+      badge: data.badge || '/badge.png',
       vibrate: [100, 50, 100],
+      // Tag groups notifications — same tag replaces previous (no spam)
+      tag: data.tag || 'general',
+      // Renotify even if same tag (so the user notices the update)
+      renotify: true,
+      // Keep notification visible until user interacts
+      requireInteraction: data.data?.milestone === 'eta_3',
       data: {
+        url: data.data?.url || '/',
+        ticketId: data.data?.ticketId || null,
+        milestone: data.data?.milestone || null,
         dateOfArrival: Date.now(),
-        primaryKey: '1',
       },
     };
-    event.waitUntil(self.registration.showNotification(data.title, options));
+    event.waitUntil(self.registration.showNotification(data.title || 'Mobil Garage Door', options));
+  } catch (e) {
+    console.error('[SW] Push parse error:', e);
   }
 });
 
+// Notification Click Handler — deep-link to tracking page
 self.addEventListener('notificationclick', function (event) {
   event.notification.close();
-  event.waitUntil(clients.openWindow('/'));
+
+  // Determine the target URL
+  let targetUrl = '/';
+  const data = event.notification.data;
+
+  if (data?.ticketId) {
+    targetUrl = `/portal/track/${data.ticketId}`;
+  } else if (data?.url) {
+    targetUrl = data.url;
+  }
+
+  // Focus existing window or open new one
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function (clientList) {
+      // Try to focus an existing window on the same origin
+      for (const client of clientList) {
+        if (client.url.includes(self.location.origin) && 'focus' in client) {
+          client.navigate(targetUrl);
+          return client.focus();
+        }
+      }
+      // No existing window — open new one
+      return clients.openWindow(targetUrl);
+    })
+  );
 });
+

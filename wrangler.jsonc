@@ -34,6 +34,10 @@
     {
       "binding": "VINEXT_CACHE",
       "id": "14e1c4a34c4f4246b4455b28d72b6231"
+    },
+    {
+      "binding": "TRACKING_KV",
+      "id": "f0fcc9d39cc9422ea2c932fa968dc6a9"
     }
   ],
   // Custom domains: mobilgaragedoor.com → this Worker
