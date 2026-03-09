@@ -2,14 +2,78 @@
 
 import { useState, useEffect, useCallback } from 'react';
 
-/**
- * PostPaymentPrompt — shown after successful Square payment.
- * Platform-aware:
- *   - Android/Desktop: Just push permission (no install nagging)
- *   - iOS (not installed): Add to Home Screen instructions + push
- *   - iOS (installed): Just push permission
- */
-export default function PostPaymentPrompt() {
+const translations = {
+  en: {
+    ios_title: 'Get arrival alerts on your phone',
+    ios_desc: 'Add Mobil Garage Door to your home screen to receive notifications when your technician is nearby.',
+    ios_btn: 'Show me how',
+    ios_instructions_title: 'Add to Home Screen',
+    ios_step1_pre: 'Tap the ',
+    ios_step1_bold: 'Share',
+    ios_step1_post: ' button',
+    ios_step2_pre: 'Scroll down and tap ',
+    ios_step2_bold: '"Add to Home Screen"',
+    ios_step3_pre: 'Tap ',
+    ios_step3_bold: 'Add',
+    ios_step3_post: ' — then open the app from your home screen',
+    ios_later: "I'll do it later",
+    push_title: 'Know when your tech arrives',
+    push_desc: 'Get a notification when your technician is 15 minutes away and when they arrive.',
+    push_btn: 'Enable notifications',
+    not_now: 'Not now',
+    done_title: "You're all set!",
+    done_desc: "We'll notify you when your technician is on the way.",
+  },
+  es: {
+    ios_title: 'Recibe alertas de llegada en tu teléfono',
+    ios_desc: 'Agrega Mobil Garage Door a tu pantalla de inicio para recibir notificaciones cuando tu técnico esté cerca.',
+    ios_btn: 'Muéstrame cómo',
+    ios_instructions_title: 'Agregar a pantalla de inicio',
+    ios_step1_pre: 'Toca el botón ',
+    ios_step1_bold: 'Compartir',
+    ios_step1_post: '',
+    ios_step2_pre: 'Desplázate y toca ',
+    ios_step2_bold: '"Agregar a inicio"',
+    ios_step3_pre: 'Toca ',
+    ios_step3_bold: 'Agregar',
+    ios_step3_post: ' — luego abre la app desde tu inicio',
+    ios_later: 'Lo haré después',
+    push_title: 'Sé cuándo llega tu técnico',
+    push_desc: 'Recibe una notificación cuando tu técnico esté a 15 minutos y cuando llegue.',
+    push_btn: 'Activar notificaciones',
+    not_now: 'Ahora no',
+    done_title: '¡Listo!',
+    done_desc: 'Te notificaremos cuando tu técnico esté en camino.',
+  },
+  vi: {
+    ios_title: 'Nhận thông báo khi kỹ thuật viên đến',
+    ios_desc: 'Thêm Mobil Garage Door vào màn hình chính để nhận thông báo khi kỹ thuật viên đến gần.',
+    ios_btn: 'Hướng dẫn',
+    ios_instructions_title: 'Thêm vào màn hình chính',
+    ios_step1_pre: 'Nhấn nút ',
+    ios_step1_bold: 'Chia sẻ',
+    ios_step1_post: '',
+    ios_step2_pre: 'Cuộn xuống và nhấn ',
+    ios_step2_bold: '"Thêm vào màn hình chính"',
+    ios_step3_pre: 'Nhấn ',
+    ios_step3_bold: 'Thêm',
+    ios_step3_post: ' — rồi mở ứng dụng từ màn hình chính',
+    ios_later: 'Để sau',
+    push_title: 'Biết khi kỹ thuật viên đến',
+    push_desc: 'Nhận thông báo khi kỹ thuật viên còn 15 phút và khi họ đến nơi.',
+    push_btn: 'Bật thông báo',
+    not_now: 'Không phải bây giờ',
+    done_title: 'Hoàn tất!',
+    done_desc: 'Chúng tôi sẽ thông báo khi kỹ thuật viên đang trên đường đến.',
+  },
+} as const;
+
+interface PostPaymentPromptProps {
+  locale?: string;
+}
+
+export default function PostPaymentPrompt({ locale = 'en' }: PostPaymentPromptProps) {
+  const t = translations[locale as keyof typeof translations] || translations.en;
   const [show, setShow] = useState(false);
   const [platform, setPlatform] = useState<'ios' | 'android' | 'desktop'>('desktop');
   const [isInstalled, setIsInstalled] = useState(false);
@@ -96,14 +160,12 @@ export default function PostPaymentPrompt() {
         <div className="push-prompt-card">
           <button className="push-prompt-close" onClick={handleDismiss} aria-label="Close">×</button>
           <p className="push-prompt-emoji">📲</p>
-          <h3 className="push-prompt-title">Get arrival alerts on your phone</h3>
-          <p className="push-prompt-desc">
-            Add Mobil Garage Door to your home screen to receive notifications when your technician is nearby.
-          </p>
+          <h3 className="push-prompt-title">{t.ios_title}</h3>
+          <p className="push-prompt-desc">{t.ios_desc}</p>
           <button className="push-prompt-btn" onClick={() => setStep('ios-instructions')}>
-            Show me how
+            {t.ios_btn}
           </button>
-          <button className="push-prompt-link" onClick={handleDismiss}>Not now</button>
+          <button className="push-prompt-link" onClick={handleDismiss}>{t.not_now}</button>
         </div>
         <PromptStyles />
       </div>
@@ -117,13 +179,13 @@ export default function PostPaymentPrompt() {
         <div className="push-prompt-card">
           <button className="push-prompt-close" onClick={handleDismiss} aria-label="Close">×</button>
           <p className="push-prompt-emoji">📱</p>
-          <h3 className="push-prompt-title">Add to Home Screen</h3>
+          <h3 className="push-prompt-title">{t.ios_instructions_title}</h3>
           <ol className="push-prompt-steps">
-            <li>Tap the <strong>Share</strong> button <span className="push-prompt-icon">⬆️</span></li>
-            <li>Scroll down and tap <strong>&quot;Add to Home Screen&quot;</strong></li>
-            <li>Tap <strong>Add</strong> — then open the app from your home screen</li>
+            <li>{t.ios_step1_pre}<strong>{t.ios_step1_bold}</strong>{t.ios_step1_post} <span className="push-prompt-icon">⬆️</span></li>
+            <li>{t.ios_step2_pre}<strong>{t.ios_step2_bold}</strong></li>
+            <li>{t.ios_step3_pre}<strong>{t.ios_step3_bold}</strong>{t.ios_step3_post}</li>
           </ol>
-          <button className="push-prompt-link" onClick={handleDismiss}>I&apos;ll do it later</button>
+          <button className="push-prompt-link" onClick={handleDismiss}>{t.ios_later}</button>
         </div>
         <PromptStyles />
       </div>
@@ -137,14 +199,12 @@ export default function PostPaymentPrompt() {
         <div className="push-prompt-card">
           <button className="push-prompt-close" onClick={handleDismiss} aria-label="Close">×</button>
           <p className="push-prompt-emoji">🔔</p>
-          <h3 className="push-prompt-title">Know when your tech arrives</h3>
-          <p className="push-prompt-desc">
-            Get a notification when your technician is 15 minutes away and when they arrive.
-          </p>
+          <h3 className="push-prompt-title">{t.push_title}</h3>
+          <p className="push-prompt-desc">{t.push_desc}</p>
           <button className="push-prompt-btn" onClick={handleEnableNotifications}>
-            Enable notifications
+            {t.push_btn}
           </button>
-          <button className="push-prompt-link" onClick={handleDismiss}>Not now</button>
+          <button className="push-prompt-link" onClick={handleDismiss}>{t.not_now}</button>
         </div>
         <PromptStyles />
       </div>
@@ -157,10 +217,8 @@ export default function PostPaymentPrompt() {
       <div className="push-prompt">
         <div className="push-prompt-card push-prompt-success">
           <p className="push-prompt-emoji">✅</p>
-          <h3 className="push-prompt-title">You&apos;re all set!</h3>
-          <p className="push-prompt-desc">
-            We&apos;ll notify you when your technician is on the way.
-          </p>
+          <h3 className="push-prompt-title">{t.done_title}</h3>
+          <p className="push-prompt-desc">{t.done_desc}</p>
         </div>
         <PromptStyles />
       </div>

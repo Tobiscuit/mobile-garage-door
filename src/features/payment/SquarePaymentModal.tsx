@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Script from 'next/script';
 import { processPayment } from '@/app/actions/processPayment';
+import PostPaymentPrompt from '@/features/portal/PostPaymentPrompt';
 
 interface SquarePaymentModalProps {
     isOpen: boolean;
@@ -166,6 +167,7 @@ export const SquarePaymentModal: React.FC<SquarePaymentModalProps> = ({ isOpen, 
                             </div>
                             <h4 className="text-xl font-black text-charcoal-blue mb-2">Payment Verified</h4>
                             <p className="text-gray-500 text-sm">Dispatching technician now...</p>
+                            <PostPaymentPrompt />
                         </div>
                     )}
 
