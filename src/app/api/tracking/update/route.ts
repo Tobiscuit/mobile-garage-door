@@ -5,6 +5,7 @@ import { eq, and } from 'drizzle-orm';
 import { getCloudflareContext } from '@/lib/cloudflare';
 import { computeFuzzyLocation } from '@/lib/geo';
 import { sendPushNotification, getMilestoneNotification } from '@/lib/push';
+import { validateGpsInput, safeParseKvData } from '@/lib/tracking-validation';
 
 /**
  * POST /api/tracking/update
@@ -23,11 +24,13 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { lat, lng, accuracy, serviceRequestId } = body;
 
-    if (!lat || !lng || !serviceRequestId) {
-      return NextResponse.json({ error: 'Missing lat, lng, or serviceRequestId' }, { status: 400 });
+    // ── Validate GPS input ──────────────────────────────────────────────
+    const validation = validateGpsInput(body);
+    if (!validation.valid || !validation.sanitized) {
+      return NextResponse.json({ error: validation.error }, { status: 400 });
     }
+    const { lat, lng, accuracy, serviceRequestId } = validation.sanitized;
 
     // Verify the tech is assigned to this service request
     const [sr] = await db
@@ -54,12 +57,11 @@ export async function POST(request: NextRequest) {
       ? await db.select().from(users).where(eq(users.id, sr.customerId)).limit(1)
       : [null];
 
-    // Parse customer address to approximate coordinates
-    // For now, we store customer location in KV alongside the tracking data
-    // In production, this would geocode the address. For MVP, customer provides coords via portal.
+    // Read existing KV state for customer coords
     const trackingKey = `tracking:${serviceRequestId}`;
-    const existingRaw = await (env as any).TRACKING_KV.get(trackingKey);
-    const existing = existingRaw ? JSON.parse(existingRaw) : null;
+    const existing = safeParseKvData<{ customerLat?: number; customerLng?: number }>(
+      await (env as any).TRACKING_KV.get(trackingKey)
+    );
 
     // Customer location — either from existing state or default
     const customerLat = existing?.customerLat || 29.7604; // Houston default
@@ -78,6 +80,8 @@ export async function POST(request: NextRequest) {
       lastUpdate: new Date().toISOString(),
       customerLat,
       customerLng,
+      // Store the customer ID for ownership verification on reads
+      customerId: sr.customerId,
     };
     await (env as any).TRACKING_KV.put(trackingKey, JSON.stringify(kvPayload), {
       expirationTtl: 7200, // Auto-expire after 2 hours
@@ -92,7 +96,7 @@ export async function POST(request: NextRequest) {
       session.user.id,
       lat,
       lng,
-      accuracy || null,
+      accuracy,
       fuzzy.radius,
       fuzzy.milestone
     ).run();
@@ -109,7 +113,6 @@ export async function POST(request: NextRequest) {
       if (!milestoneCheck) {
         // First time crossing this milestone — send push!
         const techName = session.user.name || 'Your technician';
-        // Determine customer locale (default to 'en')
         const locale = 'en'; // TODO: store user locale preference
         const notification = getMilestoneNotification(fuzzy.milestone, techName, locale);
         notification.data = {

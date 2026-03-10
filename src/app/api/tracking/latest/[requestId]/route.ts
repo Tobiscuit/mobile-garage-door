@@ -1,10 +1,17 @@
 import { type NextRequest, NextResponse } from 'next/server';
+import { getDB } from '@/db';
+import { serviceRequests } from '@/db/schema';
+import { eq, and } from 'drizzle-orm';
 import { getCloudflareContext } from '@/lib/cloudflare';
+import { safeParseKvData } from '@/lib/tracking-validation';
 
 /**
  * GET /api/tracking/latest/[requestId]
  * Returns the latest fuzzy location for a service request.
  * Called by the customer's portal, polling every 10s.
+ * 
+ * SECURITY: Verifies the requesting user is the actual customer
+ * for this service request (ownership check).
  */
 export async function GET(
   request: NextRequest,
@@ -20,19 +27,56 @@ export async function GET(
     }
 
     const { requestId } = await params;
+    const parsedId = parseInt(requestId, 10);
+
+    if (isNaN(parsedId) || parsedId <= 0) {
+      return NextResponse.json({ error: 'Invalid request ID' }, { status: 400 });
+    }
+
+    // ── Ownership check — verify the user is the customer OR the assigned tech ──
+    const db = getDB(env.DB)!;
+    const [sr] = await db
+      .select({
+        id: serviceRequests.id,
+        customerId: serviceRequests.customerId,
+        assignedTechId: serviceRequests.assignedTechId,
+      })
+      .from(serviceRequests)
+      .where(eq(serviceRequests.id, parsedId))
+      .limit(1);
+
+    if (!sr) {
+      return NextResponse.json({ error: 'Service request not found' }, { status: 404 });
+    }
+
+    // Allow access to: the customer, the assigned tech, or admin/dispatcher
+    const userId = session.user.id;
+    const userRole = (session.user as any).role;
+    const isCustomer = sr.customerId === userId;
+    const isTech = sr.assignedTechId === userId;
+    const isStaff = ['admin', 'dispatcher'].includes(userRole || '');
+
+    if (!isCustomer && !isTech && !isStaff) {
+      return NextResponse.json({ error: 'Not authorized to view this tracking data' }, { status: 403 });
+    }
 
     // Read latest fuzzy location from KV
-    const trackingKey = `tracking:${requestId}`;
-    const raw = await (env as any).TRACKING_KV.get(trackingKey);
+    const trackingKey = `tracking:${parsedId}`;
+    const data = safeParseKvData<{
+      center: { lat: number; lng: number };
+      radius: number;
+      status: string;
+      etaMinutes: number;
+      techName: string;
+      lastUpdate: string;
+    }>(await (env as any).TRACKING_KV.get(trackingKey));
 
-    if (!raw) {
+    if (!data) {
       return NextResponse.json({
         tracking: null,
         message: 'No active tracking for this request',
       });
     }
-
-    const data = JSON.parse(raw);
 
     // Calculate staleness
     const lastUpdate = new Date(data.lastUpdate);

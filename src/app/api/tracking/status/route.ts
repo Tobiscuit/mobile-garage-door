@@ -3,11 +3,13 @@ import { getDB } from '@/db';
 import { serviceRequests } from '@/db/schema';
 import { eq, and } from 'drizzle-orm';
 import { getCloudflareContext } from '@/lib/cloudflare';
+import { validateStatusTransition } from '@/lib/tracking-validation';
 
 /**
  * PATCH /api/tracking/status
  * Allows a tech to update their assigned service request status.
- * Used for "I'm heading out" (→ dispatched) and "Job complete" (→ completed).
+ * Enforces one-way state machine transitions:
+ *   pending → confirmed → dispatched → on_site → completed
  */
 export async function PATCH(request: NextRequest) {
   try {
@@ -23,10 +25,8 @@ export async function PATCH(request: NextRequest) {
     const body = await request.json();
     const { serviceRequestId, status } = body;
 
-    // Only allow specific transitions
-    const allowedStatuses = ['dispatched', 'on_site', 'completed'];
-    if (!allowedStatuses.includes(status)) {
-      return NextResponse.json({ error: 'Invalid status' }, { status: 400 });
+    if (!serviceRequestId || !status || typeof status !== 'string') {
+      return NextResponse.json({ error: 'serviceRequestId and status are required' }, { status: 400 });
     }
 
     // Verify the tech is assigned to this request
@@ -43,6 +43,12 @@ export async function PATCH(request: NextRequest) {
 
     if (!sr) {
       return NextResponse.json({ error: 'Not assigned to this request' }, { status: 403 });
+    }
+
+    // ── Enforce status transition rules ─────────────────────────────────
+    const transition = validateStatusTransition(sr.status || 'pending', status);
+    if (!transition.valid) {
+      return NextResponse.json({ error: transition.error }, { status: 400 });
     }
 
     // Update status
