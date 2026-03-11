@@ -1,4 +1,4 @@
-import webpush from 'web-push';
+import { sendWebPush, type PushSubscription as WebPushSubscription } from './web-push';
 
 interface PushPayload {
   title: string;
@@ -15,7 +15,7 @@ interface PushPayload {
 
 /**
  * Send a Web Push notification to a user's stored subscription.
- * Uses the web-push library with VAPID authentication.
+ * Uses our zero-dependency Web Crypto implementation (no npm packages).
  * 
  * @param subscription - JSON string of PushSubscription from users.pushSubscription
  * @param payload - Notification content
@@ -28,7 +28,7 @@ export async function sendPushNotification(
   env: { VAPID_PRIVATE_KEY: string }
 ): Promise<boolean> {
   try {
-    const pushSubscription = JSON.parse(subscription);
+    const pushSubscription: WebPushSubscription = JSON.parse(subscription);
 
     if (!pushSubscription?.endpoint || !pushSubscription?.keys) {
       console.error('Invalid push subscription format');
@@ -43,12 +43,6 @@ export async function sendPushNotification(
       return false;
     }
 
-    webpush.setVapidDetails(
-      'mailto:service@mobilgaragedoor.com',
-      publicKey,
-      privateKey
-    );
-
     const notificationPayload = JSON.stringify({
       title: payload.title,
       body: payload.body,
@@ -58,20 +52,29 @@ export async function sendPushNotification(
       data: payload.data || {},
     });
 
-    await webpush.sendNotification(pushSubscription, notificationPayload, {
-      TTL: 3600, // 1 hour
+    const { ok, status } = await sendWebPush(pushSubscription, notificationPayload, {
+      vapidPublicKey: publicKey,
+      vapidPrivateKey: privateKey,
+      vapidSubject: 'mailto:service@mobilgaragedoor.com',
+      ttl: 3600,
       urgency: 'high',
       topic: payload.tag || 'tech-tracking',
     });
 
-    console.log(`Push sent: ${payload.title}`);
-    return true;
-  } catch (error: any) {
+    if (ok) {
+      console.log(`Push sent: ${payload.title}`);
+      return true;
+    }
+
     // 410 Gone or 404 = subscription expired/invalid
-    if (error?.statusCode === 410 || error?.statusCode === 404) {
+    if (status === 410 || status === 404) {
       console.log('Push subscription expired, should be cleaned up');
       return false;
     }
+
+    console.error(`Push send failed with status: ${status}`);
+    return false;
+  } catch (error: any) {
     console.error('Push send error:', error?.message || error);
     return false;
   }

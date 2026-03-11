@@ -34,7 +34,6 @@
     "@tiptap/react": "^3.20.0",
     "@tiptap/starter-kit": "^3.20.0",
     "@types/jsdom": "^27.0.0",
-    "@types/web-push": "^3.6.4",
     "@unpic/react": "^0.1.14",
     "better-auth": "^1.5.3",
     "clsx": "^2.1.1",
@@ -51,8 +50,7 @@
     "square": "^44.0.0",
     "tailwind-merge": "^3.4.1",
     "tsx": "^4.21.0",
-    "vinext": "^0.0.21",
-    "web-push": "^3.6.7"
+    "vinext": "^0.0.27"
   },
   "devDependencies": {
     "@cloudflare/vite-plugin": "^1.5.0",
