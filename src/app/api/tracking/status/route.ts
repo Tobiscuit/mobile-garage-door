@@ -4,6 +4,7 @@ import { serviceRequests } from '@/db/schema';
 import { eq, and } from 'drizzle-orm';
 import { getCloudflareContext } from '@/lib/cloudflare';
 import { validateStatusTransition } from '@/lib/tracking-validation';
+import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
 
 /**
  * PATCH /api/tracking/status
@@ -20,6 +21,20 @@ export async function PATCH(request: NextRequest) {
 
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // ── Rate limit ────────────────────────────────────────────────────
+    const rl = await checkRateLimit(
+      (env as any).TRACKING_KV,
+      `ratelimit:status:${session.user.id}`,
+      RATE_LIMITS.statusChange.maxRequests,
+      RATE_LIMITS.statusChange.windowSeconds
+    );
+    if (!rl.allowed) {
+      return NextResponse.json(
+        { error: 'Too many requests', retryAfter: rl.retryAfterSeconds },
+        { status: 429 }
+      );
     }
 
     const body = await request.json();

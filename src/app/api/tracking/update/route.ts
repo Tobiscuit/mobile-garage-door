@@ -6,6 +6,7 @@ import { getCloudflareContext } from '@/lib/cloudflare';
 import { computeFuzzyLocation } from '@/lib/geo';
 import { sendPushNotification, getMilestoneNotification } from '@/lib/push';
 import { validateGpsInput, safeParseKvData } from '@/lib/tracking-validation';
+import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
 
 /**
  * POST /api/tracking/update
@@ -21,6 +22,20 @@ export async function POST(request: NextRequest) {
 
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // ── Rate limit ────────────────────────────────────────────────────
+    const rl = await checkRateLimit(
+      (env as any).TRACKING_KV,
+      `ratelimit:update:${session.user.id}`,
+      RATE_LIMITS.trackingUpdate.maxRequests,
+      RATE_LIMITS.trackingUpdate.windowSeconds
+    );
+    if (!rl.allowed) {
+      return NextResponse.json(
+        { error: 'Too many requests', retryAfter: rl.retryAfterSeconds },
+        { status: 429 }
+      );
     }
 
     const body = await request.json();
