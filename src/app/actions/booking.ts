@@ -6,21 +6,8 @@ import { eq, or } from "drizzle-orm";
 import { redirect } from 'next/navigation';
 import { squareService } from '@/services/squareService';
 import { randomUUID } from 'crypto';
-import webpush from 'web-push';
+import { sendPushNotification } from '@/lib/push';
 import { getCloudflareContext } from "@/lib/cloudflare";
-
-// Configure Web Push
-try {
-    if (process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
-        webpush.setVapidDetails(
-            'mailto:admin@mobilegaragedoor.com',
-            process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY,
-            process.env.VAPID_PRIVATE_KEY
-        );
-    }
-} catch (err) {
-    console.error('Error configuring Web Push in booking:', err);
-}
 
 interface CustomerData {
   guestName: string;
@@ -106,19 +93,15 @@ export async function createBooking(prevState: any, formData: FormData) {
         const notifications = admins
             .filter((user: any) => user.pushSubscription)
             .map((user: any) => {
-                try {
-                    const sub = JSON.parse(user.pushSubscription);
-                    return webpush.sendNotification(
-                        sub,
-                        JSON.stringify({
-                            title: 'New Service Request!',
-                            body: `${guestName}: ${issueDescription}`,
-                            url: '/admin/mission-control'
-                        })
-                    );
-                } catch (e) {
-                    return Promise.resolve();
-                }
+                return sendPushNotification(
+                    user.pushSubscription,
+                    {
+                        title: 'New Service Request!',
+                        body: `${guestName}: ${issueDescription}`,
+                        data: { url: '/admin/mission-control' },
+                    },
+                    env as any
+                ).catch(() => {});
             });
         
         await Promise.all(notifications);

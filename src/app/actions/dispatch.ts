@@ -3,23 +3,8 @@
 import { getDB } from "@/db";
 import { users, serviceRequests } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import webpush from 'web-push';
+import { sendPushNotification } from "@/lib/push";
 import { getCloudflareContext } from "@/lib/cloudflare";
-
-// Configure Web Push
-try {
-    if (process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
-        webpush.setVapidDetails(
-            'mailto:admin@mobilegaragedoor.com',
-            process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY,
-            process.env.VAPID_PRIVATE_KEY
-        );
-    } else {
-        console.warn('VAPID Keys missing - Push Notifications disabled');
-    }
-} catch (err) {
-    console.error('Error configuring Web Push:', err);
-}
 
 export async function assignJobToTechnician(jobId: number, technicianId: string) {
     try {
@@ -44,14 +29,14 @@ export async function assignJobToTechnician(jobId: number, technicianId: string)
         
         if (tech && tech.pushSubscription) {
              try {
-                 const subscription = JSON.parse(tech.pushSubscription);
-                 await webpush.sendNotification(
-                     subscription,
-                     JSON.stringify({ 
+                 await sendPushNotification(
+                     tech.pushSubscription,
+                     { 
                          title: 'New Mission Assigned!', 
                          body: `Ticket #${updatedJob.ticketId}: ${updatedJob.issueDescription}`,
-                         url: `/technician`
-                     })
+                         data: { url: '/technician' },
+                     },
+                     env as any
                  );
                  console.log(`Push notification sent to ${tech.email}`);
              } catch (pushError) {
