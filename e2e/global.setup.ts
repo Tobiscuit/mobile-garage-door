@@ -5,36 +5,44 @@ import path from 'path';
 // Load env vars
 dotenv.config({ path: path.join(process.cwd(), '.env') });
 
+function runSql(sql: string) {
+  try {
+    execSync(`npx wrangler d1 execute DB --local --yes --command "${sql}"`, { stdio: 'ignore' });
+  } catch (e) {
+    // Don't crash setup on delete failures
+  }
+}
+
 async function globalSetup() {
   console.log('--- Playwright Global Setup: Synchronizing Test Users ---');
 
-  const adminEmail = 'playwright-admin@test.com';
-  const customerEmail = 'playwright-customer@test.com';
+  // ── 1. Clean up ALL test data from previous runs ──
+  // Delete Better Auth sessions and accounts for test users
+  runSql(`DELETE FROM session WHERE userId IN (SELECT id FROM users WHERE email LIKE '%@test.com' OR email LIKE 'e2e-%');`);
+  runSql(`DELETE FROM account WHERE userId IN (SELECT id FROM users WHERE email LIKE '%@test.com' OR email LIKE 'e2e-%');`);
+  runSql(`DELETE FROM passkey WHERE userId IN (SELECT id FROM users WHERE email LIKE '%@test.com' OR email LIKE 'e2e-%');`);
 
-  // 1. Clean up old test states absolutely completely
-  const deleteUsersCmd = `DELETE FROM users WHERE email IN ('${adminEmail}', '${customerEmail}');`;
-  const deleteInvitesCmd = `DELETE FROM staff_invites WHERE email = '${adminEmail}';`;
+  // Delete test users themselves
+  runSql(`DELETE FROM users WHERE email LIKE '%@test.com' OR email LIKE 'e2e-%';`);
 
-  // 2. We DO NOT manually seed BetterAuth sessions or users! It's too brittle due to hashing.
-  // Instead, we seed a Payload staff_invites record so when the Admin signs up natively, 
-  // they are automatically upgraded!
-  const insertInviteCmd = `INSERT INTO staff_invites (email, role, status, created_at, updated_at) VALUES ('${adminEmail}', 'admin', 'pending', datetime('now'), datetime('now'));`;
+  // Delete test staff invites
+  runSql(`DELETE FROM staff_invites WHERE email LIKE '%@test.com';`);
 
-  const runSql = (sql: string) => {
-    try {
-      // Using local wrangler D1 to execute against the local dev database
-      execSync(`npx wrangler d1 execute DB --local --yes --command "${sql}"`, { stdio: 'ignore' });
-    } catch (e) {
-      console.error(`Failed to execute SQL: ${sql}`);
-      // Don't crash setup on delete failures, just log
-    }
-  };
+  // Delete test service requests
+  runSql(`DELETE FROM service_requests WHERE ticketId LIKE 'E2E-%';`);
 
-  runSql(deleteUsersCmd);
-  runSql(deleteInvitesCmd);
-  runSql(insertInviteCmd);
+  // ── 2. Seed staff invites so signup auto-upgrades roles ──
+  const adminEmails = ['playwright-admin@test.com', 'e2e-dashboard-admin@test.com'];
+  const techEmails = ['playwright-tech@test.com', 'e2e-dashboard-tech@test.com'];
 
-  console.log('✅ Injected pending staff invite for Playwright Admin!');
+  for (const email of adminEmails) {
+    runSql(`INSERT INTO staff_invites (email, role, status, created_at, updated_at) VALUES ('${email}', 'admin', 'pending', datetime('now'), datetime('now'));`);
+  }
+  for (const email of techEmails) {
+    runSql(`INSERT INTO staff_invites (email, role, status, created_at, updated_at) VALUES ('${email}', 'technician', 'pending', datetime('now'), datetime('now'));`);
+  }
+
+  console.log('✅ Cleaned test data and seeded staff invites!');
 }
 
 export default globalSetup;

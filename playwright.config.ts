@@ -2,11 +2,12 @@ import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
   testDir: './e2e',
-  fullyParallel: true,
+  fullyParallel: false, // Run serially to avoid Better Auth rate limiting
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 1 : undefined,
+  workers: 1, // Single worker to prevent rate limiting
   reporter: 'html',
+  timeout: 30000,
   
   // We specify a global setup file to run DB seeding and cookie generation BEFORE tests start
   globalSetup: './e2e/global.setup.ts',

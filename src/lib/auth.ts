@@ -72,7 +72,10 @@ export function createAuth(env: CloudflareEnv) {
         clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
       },
     },
-    emailAndPassword: { enabled: false },
+    emailAndPassword: {
+      // Enabled in dev/test for Playwright E2E tests; disabled in production (Google OAuth + magic link only)
+      enabled: process.env.NODE_ENV !== 'production',
+    },
     account: {
       accountLinking: {
         enabled: true,
@@ -80,7 +83,8 @@ export function createAuth(env: CloudflareEnv) {
       },
     },
     rateLimit: {
-      enabled: true,
+      // Disabled in dev for Playwright E2E tests
+      enabled: process.env.NODE_ENV === 'production',
       window: 60,
       max: 100,
       customRules: {
