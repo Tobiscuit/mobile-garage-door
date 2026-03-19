@@ -5,8 +5,9 @@ import NativeSignInPrompt from '@/features/auth/NativeSignInPrompt';
 import Sidebar from '@/features/admin/Sidebar';
 import React from 'react';
 import { getDB } from "@/db";
-import { settings as settingsTable } from "@/db/schema";
+import { settings as settingsTable, posts, notifications } from "@/db/schema";
 import { getCloudflareContext } from "@/lib/cloudflare";
+import { eq, and, sql } from 'drizzle-orm';
 import NextIntlProvider from '@/components/NextIntlProvider';
 
 export default async function DashboardLayout({
@@ -39,12 +40,22 @@ export default async function DashboardLayout({
   }
 
   let themePreference = 'candlelight';
+  let pendingPostCount = 0;
+  let unreadNotifCount = 0;
   try {
     const { env } = await getCloudflareContext();
-    const db = getDB(env.DB);
+    const db = getDB(env.DB)!;
     const settingsData = await db.query.settings.findFirst();
     if (settingsData?.themePreference) {
       themePreference = settingsData.themePreference;
+    }
+    // Count pending_review posts for sidebar badge
+    const [countResult] = await db.select({ count: sql<number>`count(*)` }).from(posts).where(eq(posts.status, 'pending_review'));
+    pendingPostCount = countResult?.count ?? 0;
+    // Count unread notifications for current user
+    if (session?.user?.id) {
+      const [notifResult] = await db.select({ count: sql<number>`count(*)` }).from(notifications).where(and(eq(notifications.userId, session.user.id), eq(notifications.read, false)));
+      unreadNotifCount = notifResult?.count ?? 0;
     }
   } catch (error) {
     console.error("LAYOUT SETTINGS FETCH CRASH:", error);
@@ -81,7 +92,7 @@ export default async function DashboardLayout({
               `try{var t=localStorage.getItem('app-theme')||'light';document.documentElement.setAttribute('data-app-theme',t);${themePreference === 'original' ? "document.documentElement.setAttribute('data-light-theme','original');" : ''}}catch(e){}`,
           }}
         />
-        <Sidebar />
+        <Sidebar pendingPostCount={pendingPostCount} unreadNotifCount={unreadNotifCount} userRole={userRole} />
 
         {/* MAIN CONTENT AREA - Matches sidebar width 280px on desktop, full width on mobile */}
         <main className="md:ml-[280px] min-h-screen relative z-0 pb-20 md:pb-0">

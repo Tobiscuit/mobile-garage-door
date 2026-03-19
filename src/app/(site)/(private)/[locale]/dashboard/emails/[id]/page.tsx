@@ -1,3 +1,4 @@
+import { requireAdmin } from '@/lib/require-role';
 import React from 'react';
 import Link from '@/shared/ui/Link';
 import { getThreadDetails } from '../actions'; // We'll update actions.ts to export this
@@ -11,6 +12,7 @@ interface PageProps {
 }
 
 export default async function EmailThreadPage({ params }: PageProps) {
+  await requireAdmin();
   const { id } = await params;
   const threadData = await getThreadDetails(id);
 

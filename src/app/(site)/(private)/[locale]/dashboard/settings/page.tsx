@@ -1,3 +1,4 @@
+import { requireAdmin } from '@/lib/require-role';
 import React from 'react';
 import Link from '@/shared/ui/Link';
 import { getSettings } from './actions';
@@ -9,6 +10,7 @@ export const metadata: Metadata = {
 };
 
 export default async function SettingsPage() {
+  await requireAdmin();
   const settings = await getSettings();
 
   return (

@@ -274,7 +274,10 @@
     "dispatch_confirmed": "ĐIỀU ĐỘNG ĐÃ XÁC NHẬN",
     "dispatch_desc": "Kỹ thuật viên của bạn đã được thông báo và đang trên đường đến",
     "your_location": "địa điểm của bạn",
-    "loading": "Đang thiết lập kết nối..."
+    "loading": "Đang thiết lập kết nối...",
+    "response_time": "Thời Gian Phản Hồi",
+    "preferred_time": "Ngày & Giờ Ưa Thích",
+    "emergency_asap_note": "Đội ngũ của chúng tôi sẽ liên hệ bạn trong vài phút."
   },
   "contact_hero": {
     "emergency_badge": "Điều động khẩn cấp 24/7",
@@ -335,7 +338,8 @@
     "trip_fee": "Đảm bảo lịch của bạn ngay bây giờ. Phí di chuyển 9 USD sẽ được khấu trừ vào chi phí sửa chữa của bạn.",
     "processing": "Đang xử lý...",
     "authorize": "ỦY QUYỀN 9 USD",
-    "secure_note": "Thanh toán an toàn 100% qua Square. Chúng tôi không lưu trữ thông tin thẻ của bạn."
+    "secure_note": "Thanh toán an toàn 100% qua Square. Chúng tôi không lưu trữ thông tin thẻ của bạn.",
+    "emergency_asap_desc": "Yêu cầu khẩn cấp của bạn sẽ được gửi đi ngay lập tức. Đội ngũ của chúng tôi sẽ liên hệ bạn sớm."
   },
   "floating_ai": {
     "tooltip": "Trợ lý dịch vụ"

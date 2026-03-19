@@ -1,3 +1,4 @@
+import { requireAdmin } from '@/lib/require-role';
 import React from 'react';
 import Link from '@/shared/ui/Link';
 import { notFound } from 'next/navigation';
@@ -5,6 +6,7 @@ import { getPostById, updatePost } from '../actions';
 import PostForm from '@/features/admin/posts/PostForm';
 
 export default async function EditPostPage({ params }: { params: Promise<{ id: string }> }) {
+  await requireAdmin();
   const { id } = await params;
   const post = await getPostById(id);
 

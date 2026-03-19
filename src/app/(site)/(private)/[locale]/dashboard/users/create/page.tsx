@@ -1,8 +1,10 @@
+import { requireAdmin } from '@/lib/require-role';
 import React from 'react';
 import Link from '@/shared/ui/Link';
 import { inviteStaff } from '../actions';
 
-export default function CreateUserPage() {
+export default async function CreateUserPage() {
+  await requireAdmin();
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-2xl mx-auto mt-12">
       <div className="mb-8 text-center">

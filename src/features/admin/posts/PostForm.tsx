@@ -5,14 +5,16 @@ import { useRouter } from 'next/navigation';
 import MediaUpload from '@/features/admin/ui/MediaUpload';
 import { generatePostContent } from '@/actions/ai';
 import { RichTextEditor } from '@/features/admin/ui/RichTextEditor';
+import { Wand2, CheckCircle, XCircle, AlertTriangle } from 'lucide-react';
 
 interface PostFormProps {
   action: (prevState: any, formData: FormData) => Promise<any>;
   initialData?: any;
   buttonLabel: string;
+  autoOpenAi?: boolean;
 }
 
-export default function PostForm({ action, initialData, buttonLabel }: PostFormProps) {
+export default function PostForm({ action, initialData, buttonLabel, autoOpenAi }: PostFormProps) {
   const router = useRouter();
 
   const [featuredImageId, setFeaturedImageId] = React.useState<string | null>(initialData?.featuredImage?.id || initialData?.featuredImage || null);
@@ -21,7 +23,7 @@ export default function PostForm({ action, initialData, buttonLabel }: PostFormP
   const [state, formAction, isPending] = useActionState(action, null);
 
   // AI State
-  const [isAiOpen, setIsAiOpen] = useState(false);
+  const [isAiOpen, setIsAiOpen] = useState(autoOpenAi && !initialData);
   const [aiPrompt, setAiPrompt] = useState('');
   const [isAiLoading, setIsAiLoading] = useState(false);
 
@@ -119,7 +121,7 @@ export default function PostForm({ action, initialData, buttonLabel }: PostFormP
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
                 <div className="bg-[var(--staff-surface)] border border-[var(--staff-border)] rounded-2xl p-6 shadow-2xl w-full max-w-md animate-in zoom-in-95 duration-200">
                     <h3 className="text-xl font-black text-[var(--staff-accent)] mb-4 flex items-center gap-2">
-                        <span>✨</span> AI Magic Writer
+                        <Wand2 className="w-4 h-4" /> AI Magic Writer
                     </h3>
                     <div className="mb-4">
                         <label className="block text-xs font-bold text-[var(--staff-muted)] uppercase tracking-wider mb-2">What should I write about?</label>
@@ -173,7 +175,7 @@ export default function PostForm({ action, initialData, buttonLabel }: PostFormP
 
       {state?.error && (
         <div className="bg-red-500/10 border border-red-500/20 p-4 rounded-xl mb-6 text-red-500 font-bold animate-in fade-in slide-in-from-top-2">
-            ⚠️ {state.error}
+            <AlertTriangle className="w-4 h-4 inline -mt-0.5" /> {state.error}
         </div>
       )}
 
@@ -263,6 +265,12 @@ export default function PostForm({ action, initialData, buttonLabel }: PostFormP
                 {/* STATUS */}
                 <div className="mb-4">
                     <label className="block text-xs text-[var(--staff-muted)] mb-1">Status</label>
+                    {initialData?.status === 'pending_review' ? (
+                      <div className="flex items-center gap-2 px-3 py-2 bg-amber-500/10 border border-amber-500/30 rounded-xl">
+                        <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+                        <span className="text-amber-400 font-bold text-sm">Pending Review</span>
+                      </div>
+                    ) : (
                     <select 
                         name="status"
                         defaultValue={initialData?.status || 'draft'}
@@ -271,6 +279,7 @@ export default function PostForm({ action, initialData, buttonLabel }: PostFormP
                         <option value="draft">Draft</option>
                         <option value="published">Published</option>
                     </select>
+                    )}
                 </div>
 
                 {/* PUBLISHED AT */}
@@ -279,7 +288,7 @@ export default function PostForm({ action, initialData, buttonLabel }: PostFormP
                     <input 
                         name="publishedAt"
                         type="date"
-                        defaultValue={initialData?.publishedAt ? new Date(initialData.publishedAt).toISOString().split('T')[0] : ''}
+                        defaultValue={initialData?.publishedAt ? new Date(initialData.publishedAt).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]}
                         className="w-full bg-[var(--staff-bg)] border border-[var(--staff-border)] rounded-xl px-3 py-2 text-[var(--staff-text)] focus:outline-none focus:border-[var(--staff-accent)]"
                     />
                 </div>
@@ -303,19 +312,40 @@ export default function PostForm({ action, initialData, buttonLabel }: PostFormP
 
                 {/* ACTIONS */}
                 <div className="flex flex-col gap-3">
+                     {initialData?.status === 'pending_review' ? (
+                       <>
+                         <button 
+                           type="submit"
+                           name="status"
+                           value="published"
+                           className="w-full py-3 bg-[#2ecc71] text-white font-bold rounded-xl hover:opacity-90 hover:scale-105 transition-all shadow-[0_4px_20px_rgba(46,204,113,0.3)]"
+                         >
+                           {isPending ? 'Publishing...' : <><CheckCircle className="w-4 h-4 inline -mt-0.5" /> Approve & Publish</>}
+                         </button>
+                         <button 
+                           type="submit"
+                           name="status"
+                           value="draft"
+                           className="w-full py-2 text-[#e74c3c] border border-[#e74c3c]/30 font-bold rounded-lg hover:bg-[#e74c3c]/10 transition-all text-sm"
+                         >
+                           <XCircle className="w-4 h-4 inline -mt-0.5" /> Reject (move to drafts)
+                         </button>
+                       </>
+                     ) : (
+                       <button 
+                           type="submit"
+                           className="w-full py-3 bg-[var(--staff-accent)] text-[var(--staff-surface-alt)] font-bold rounded-xl hover:opacity-90 hover:scale-105 transition-all shadow-[0_4px_20px_var(--staff-accent)]"
+                       >
+                           {isPending ? 'Saving...' : buttonLabel}
+                       </button>
+                     )}
                      <button 
-                        type="submit"
-                        className="w-full py-3 bg-[var(--staff-accent)] text-[var(--staff-surface-alt)] font-bold rounded-xl hover:opacity-90 hover:scale-105 transition-all shadow-[0_4px_20px_var(--staff-accent)]"
-                    >
-                        {isPending ? 'Saving...' : buttonLabel}
-                    </button>
-                    <button 
-                        type="button"
-                        onClick={() => router.back()}
-                        className="w-full py-2 text-[var(--staff-muted)] font-bold hover:text-[var(--staff-text)] transition-colors text-sm"
-                    >
-                        Cancel
-                    </button>
+                         type="button"
+                         onClick={() => router.back()}
+                         className="w-full py-2 text-[var(--staff-muted)] font-bold hover:text-[var(--staff-text)] transition-colors text-sm"
+                     >
+                         Cancel
+                     </button>
                 </div>
             </div>
 

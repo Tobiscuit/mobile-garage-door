@@ -33,6 +33,17 @@ export const users = sqliteTable("users", {
   updatedAt: isoText("updated_at").notNull().$defaultFn(() => new Date().toISOString()),
 });
 
+// Push subscriptions — one per device per user
+export const pushSubscriptions = sqliteTable("push_subscriptions", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  userId: text("user_id").notNull(),
+  endpoint: text("endpoint").notNull().unique(),
+  subscription: text("subscription").notNull(),
+  userAgent: text("user_agent"),
+  createdAt: isoText("created_at").notNull().$defaultFn(() => new Date().toISOString()),
+  updatedAt: isoText("updated_at").notNull().$defaultFn(() => new Date().toISOString()),
+});
+
 // Business tables
 export const services = sqliteTable("services", {
   id: integer("id").primaryKey({ autoIncrement: true }),
@@ -119,6 +130,9 @@ export const serviceRequests = sqliteTable("service_requests", {
   status: text("status", { enum: ["pending", "confirmed", "dispatched", "on_site", "completed", "cancelled"] }).default("pending"),
   assignedTechId: text("assigned_tech_id").references(() => users.id),
   tripFeePayment: text("trip_fee_payment"),
+  quotedPrice: integer("quoted_price"), // Amount in cents, e.g. 35000 = $350.00
+  customerLat: real("customer_lat"),
+  customerLng: real("customer_lng"),
   createdAt: text("created_at").notNull().$defaultFn(() => new Date().toISOString()),
   updatedAt: text("updated_at").notNull().$defaultFn(() => new Date().toISOString()),
 });
@@ -144,8 +158,10 @@ export const posts = sqliteTable("posts", {
   featuredImageId: integer("featured_image_id").references(() => media.id),
   category: text("category"),
   publishedAt: text("published_at"),
-  status: text("status", { enum: ["draft", "published"] }).default("draft"),
+  status: text("status", { enum: ["draft", "published", "pending_review"] }).default("draft"),
   quickNotes: text("quick_notes"),
+  aiGenerated: integer("ai_generated", { mode: "boolean" }).default(false),
+  aiTopicSource: text("ai_topic_source"), // 'ai_ideation' | 'admin_queue' | null
   createdAt: text("created_at").notNull().$defaultFn(() => new Date().toISOString()),
   updatedAt: text("updated_at").notNull().$defaultFn(() => new Date().toISOString()),
 });
@@ -154,6 +170,28 @@ export const postKeywords = sqliteTable("post_keywords", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   postId: integer("post_id").references(() => posts.id, { onDelete: "cascade" }),
   keyword: text("keyword").notNull(),
+});
+
+export const postKeywordsRelations = relations(postKeywords, ({ one }) => ({
+  post: one(posts, { fields: [postKeywords.postId], references: [posts.id] }),
+}));
+
+export const topicQueue = sqliteTable("topic_queue", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  topic: text("topic").notNull(),
+  usedAt: text("used_at"),
+  createdAt: text("created_at").notNull().$defaultFn(() => new Date().toISOString()),
+});
+
+export const notifications = sqliteTable("notifications", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  userId: text("user_id").notNull(),
+  type: text("type").notNull(), // 'blog_draft' | 'tech_dispatched' | 'job_accepted' | 'tracking_update'
+  title: text("title").notNull(),
+  body: text("body"),
+  actionUrl: text("action_url"),
+  read: integer("read", { mode: "boolean" }).default(false),
+  createdAt: text("created_at").notNull().$defaultFn(() => new Date().toISOString()),
 });
 
 export const invoices = sqliteTable("invoices", {
@@ -233,7 +271,7 @@ export const emailAttachments = sqliteTable("email_attachments", {
 
 export const settings = sqliteTable("settings", {
   id: integer("id").primaryKey({ autoIncrement: true }),
-  companyName: text("company_name").default("Mobil Garage Door Pros"),
+  companyName: text("company_name").default("Mobil Garage Door"),
   phone: text("phone").default("832-419-1293"),
   email: text("email").default("service@mobilgaragedoor.com"),
   licenseNumber: text("license_number").default("TX Registered & Bonded"),

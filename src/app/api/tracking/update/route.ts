@@ -4,7 +4,7 @@ import { users, serviceRequests } from '@/db/schema';
 import { eq, and } from 'drizzle-orm';
 import { getCloudflareContext } from '@/lib/cloudflare';
 import { computeFuzzyLocation } from '@/lib/geo';
-import { sendPushNotification, getMilestoneNotification } from '@/lib/push';
+import { sendPushToUser, getMilestoneNotification } from '@/lib/push';
 import { validateGpsInput, safeParseKvData } from '@/lib/tracking-validation';
 import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
 
@@ -78,9 +78,9 @@ export async function POST(request: NextRequest) {
       await (env as any).TRACKING_KV.get(trackingKey)
     );
 
-    // Customer location — either from existing state or default
-    const customerLat = existing?.customerLat || 29.7604; // Houston default
-    const customerLng = existing?.customerLng || -95.3698;
+    // Customer location — prefer stored geocoded coords, then existing KV state, then Houston default
+    const customerLat = (sr as any).customerLat || existing?.customerLat || 29.7604;
+    const customerLng = (sr as any).customerLng || existing?.customerLng || -95.3698;
 
     // Compute fuzzy location
     const fuzzy = computeFuzzyLocation(lat, lng, customerLat, customerLng);
@@ -116,8 +116,8 @@ export async function POST(request: NextRequest) {
       fuzzy.milestone
     ).run();
 
-    // Check milestones and fire push notification
-    if (fuzzy.milestone && customer?.pushSubscription) {
+    // Check milestones and fire push notification to ALL customer devices
+    if (fuzzy.milestone && sr.customerId) {
       // Check if this milestone has already been sent (dedup)
       const milestoneCheck = await (env as any).DB.prepare(
         `SELECT id FROM tracking_events
@@ -136,7 +136,7 @@ export async function POST(request: NextRequest) {
           url: `/portal/track/${sr.ticketId}`,
         };
 
-        await sendPushNotification(customer.pushSubscription, notification, env as any);
+        await sendPushToUser(sr.customerId, notification, env as any);
       }
     }
 

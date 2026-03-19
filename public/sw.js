@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mobile-garage-door-pwa-v1';
+const CACHE_NAME = 'mobile-garage-door-pwa-v2';
 
 // Assets to cache for basic offline shell functionality
 const OFFLINE_URLS = [
@@ -33,6 +33,14 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
+  const url = new URL(event.request.url);
+
+  // Skip cross-origin requests entirely (e.g. cloudflareinsights, CDNs)
+  if (url.origin !== self.location.origin) return;
+
+  // Skip /_vinext/ image optimization requests
+  if (url.pathname.startsWith('/_vinext/')) return;
+
   // Stale-while-revalidate strategy for navigational requests
   if (event.request.mode === 'navigate') {
     event.respondWith(
@@ -44,7 +52,7 @@ self.addEventListener('fetch', (event) => {
   }
 
   // Network-first for API requests
-  if (event.request.url.includes('/api/')) {
+  if (url.pathname.startsWith('/api/')) {
     event.respondWith(
       fetch(event.request).catch(() => caches.match(event.request))
     );

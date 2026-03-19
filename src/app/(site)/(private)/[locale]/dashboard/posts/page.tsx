@@ -1,3 +1,4 @@
+import { requireAdmin } from '@/lib/require-role';
 
 import React from 'react';
 import Link from '@/shared/ui/Link';
@@ -5,6 +6,7 @@ import { getPosts } from './actions';
 import { DataTable } from '@/features/admin/ui/DataTable';
 
 export default async function PostsPage() {
+  await requireAdmin();
   const posts = await getPosts();
 
   return (
@@ -27,15 +29,13 @@ export default async function PostsPage() {
         <Link
           href="/dashboard/posts/create"
           className="
-            flex items-center gap-2 bg-[#f1c40f] text-[#2c3e50] font-bold px-6 py-3 rounded-xl 
-            shadow-[0_4px_20px_rgba(241,196,15,0.3)] hover:shadow-[0_6px_25px_rgba(241,196,15,0.5)] 
+            flex items-center gap-2 bg-[#6366f1] text-white font-bold px-6 py-3 rounded-xl 
+            shadow-[0_4px_20px_rgba(99,102,241,0.3)] hover:shadow-[0_6px_25px_rgba(99,102,241,0.5)] 
             hover:-translate-y-1 transition-all duration-300
           "
         >
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-          </svg>
-          <span>Write Post</span>
+          <span>✨</span>
+          <span>Generate Post</span>
         </Link>
       </div>
 
@@ -66,10 +66,21 @@ export default async function PostsPage() {
             header: 'Status',
             cell: (item: any) => (
               <div className="flex items-center gap-2">
-                <div className={`w-2 h-2 rounded-full ${item.status === 'published' ? 'bg-[#2ecc71]' : 'bg-[#95a5a6]'}`}></div>
-                <span className={`text-xs font-bold uppercase tracking-wider ${item.status === 'published' ? 'text-[#2ecc71]' : 'text-[#95a5a6]'}`}>
-                  {item.status || 'Draft'}
+                <div className={`w-2 h-2 rounded-full ${
+                  item.status === 'published' ? 'bg-[#2ecc71]' :
+                  item.status === 'pending_review' ? 'bg-[#f39c12] animate-pulse' :
+                  'bg-[#95a5a6]'
+                }`}></div>
+                <span className={`text-xs font-bold uppercase tracking-wider ${
+                  item.status === 'published' ? 'text-[#2ecc71]' :
+                  item.status === 'pending_review' ? 'text-[#f39c12]' :
+                  'text-[#95a5a6]'
+                }`}>
+                  {item.status === 'pending_review' ? 'Needs Review' : (item.status || 'Draft')}
                 </span>
+                {item.aiGenerated ? (
+                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#6366f1]/20 text-[#6366f1] font-bold">AI</span>
+                ) : null}
               </div>
             )
           },

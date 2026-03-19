@@ -9,7 +9,7 @@ import MobileProfileSheet from './MobileProfileSheet';
 // Simple text logo since we removed the Payload CMS Logo component
 const Logo = () => (
   <div className="text-xl font-black tracking-tight" style={{ color: 'var(--staff-accent)' }}>
-    Mobil Garage<span className="text-sm font-medium ml-1 opacity-60">Pro</span>
+    Mobil Garage
   </div>
 );
 
@@ -28,10 +28,12 @@ const EmailIcon = () => <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24"
 const ChevronRight = () => <svg className="w-4 h-4 ml-auto opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>;
 const MoreIcon = () => <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>;
 
-const Sidebar: React.FC = () => {
+const Sidebar: React.FC<{ pendingPostCount?: number; unreadNotifCount?: number; userRole?: string }> = ({ pendingPostCount, unreadNotifCount, userRole }) => {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false); // Mobile toggle state logic here if needed
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+
+  const isTech = userRole === 'technician';
 
   const isActive = (path: string) => {
     if (path === '/dashboard') {
@@ -40,7 +42,7 @@ const Sidebar: React.FC = () => {
     return pathname === path || pathname?.startsWith(`${path}/`);
   };
 
-  const NavItem = ({ href, icon: Icon, label }: { href: string; icon: any; label: string }) => {
+  const NavItem = ({ href, icon: Icon, label, badge }: { href: string; icon: any; label: string; badge?: number }) => {
     const active = isActive(href);
     return (
       <Link
@@ -61,7 +63,12 @@ const Sidebar: React.FC = () => {
           <Icon />
         </span>
         <span className="relative z-10">{label}</span>
-        {active && <ChevronRight />}
+        {badge && badge > 0 ? (
+          <span className="ml-auto relative z-10 text-[10px] font-bold min-w-[20px] h-5 flex items-center justify-center rounded-full bg-[#f39c12] text-white animate-pulse">
+            {badge}
+          </span>
+        ) : null}
+        {active && !badge && <ChevronRight />}
       </Link>
     );
   };
@@ -79,30 +86,67 @@ const Sidebar: React.FC = () => {
     <>
       {/* MOBILE BOTTOM NAV - Visible only on small screens */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 backdrop-blur-xl z-50 flex justify-around items-center p-2 pb-safe" style={{ backgroundColor: 'var(--staff-surface)', borderTop: '1px solid var(--staff-border)' }}>
-        <Link href="/dashboard" className={`p-2 rounded-lg flex flex-col items-center gap-1 ${isActive('/dashboard') && !isActive('/dashboard/dispatch') ? 'text-[var(--staff-accent)]' : ''}`} style={{ color: isActive('/dashboard') && !isActive('/dashboard/dispatch') ? 'var(--staff-accent)' : 'var(--staff-muted)' }}>
-          <CommandIcon />
-          <span className="text-[10px] font-bold">Home</span>
-        </Link>
-        <Link href="/dashboard/dispatch" className={`p-2 rounded-lg flex flex-col items-center gap-1 ${isActive('/dashboard/dispatch') ? 'text-[var(--staff-accent)]' : ''}`} style={{ color: isActive('/dashboard/dispatch') ? 'var(--staff-accent)' : 'var(--staff-muted)' }}>
-          <DispatchIcon />
-          <span className="text-[10px] font-bold">Dispatch</span>
-        </Link>
-        <Link href="/dashboard/projects" className={`p-2 rounded-lg flex flex-col items-center gap-1 ${isActive('/dashboard/projects') ? 'text-[var(--staff-accent)]' : ''}`} style={{ color: isActive('/dashboard/projects') ? 'var(--staff-accent)' : 'var(--staff-muted)' }}>
-          <ProjectIcon />
-          <span className="text-[10px] font-bold">Projects</span>
-        </Link>
-        <Link href="/dashboard/settings" className={`p-2 rounded-lg flex flex-col items-center gap-1 ${isActive('/dashboard/settings') ? 'text-[var(--staff-accent)]' : ''}`} style={{ color: isActive('/dashboard/settings') ? 'var(--staff-accent)' : 'var(--staff-muted)' }}>
-          <SettingsIcon />
-          <span className="text-[10px] font-bold">Settings</span>
-        </Link>
-        <button
-          onClick={() => setIsProfileOpen(true)}
-          className="p-2 rounded-lg flex flex-col items-center gap-1 transition-colors"
-          style={{ color: isProfileOpen ? 'var(--staff-accent)' : 'var(--staff-muted)' }}
-        >
-          <MoreIcon />
-          <span className="text-[10px] font-bold">More</span>
-        </button>
+        {isTech ? (
+          <>
+            <Link href="/dashboard/technician" className={`p-2 rounded-lg flex flex-col items-center gap-1`} style={{ color: isActive('/dashboard/technician') ? 'var(--staff-accent)' : 'var(--staff-muted)' }}>
+              <CommandIcon />
+              <span className="text-[10px] font-bold">My Jobs</span>
+            </Link>
+            <Link href="/dashboard/notifications" className={`p-2 rounded-lg flex flex-col items-center gap-1 relative`} style={{ color: isActive('/dashboard/notifications') ? 'var(--staff-accent)' : 'var(--staff-muted)' }}>
+              <div className="relative">
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
+                {(unreadNotifCount ?? 0) > 0 && (
+                  <span className="absolute -top-1.5 -right-1.5 text-[9px] font-bold min-w-[16px] h-4 flex items-center justify-center rounded-full bg-[#e74c3c] text-white animate-pulse px-1">
+                    {unreadNotifCount! > 9 ? '9+' : unreadNotifCount}
+                  </span>
+                )}
+              </div>
+              <span className="text-[10px] font-bold">Alerts</span>
+            </Link>
+            <button
+              onClick={() => setIsProfileOpen(true)}
+              className="p-2 rounded-lg flex flex-col items-center gap-1 transition-colors"
+              style={{ color: isProfileOpen ? 'var(--staff-accent)' : 'var(--staff-muted)' }}
+            >
+              <MoreIcon />
+              <span className="text-[10px] font-bold">More</span>
+            </button>
+          </>
+        ) : (
+          <>
+            <Link href="/dashboard" className={`p-2 rounded-lg flex flex-col items-center gap-1 ${isActive('/dashboard') && !isActive('/dashboard/dispatch') ? 'text-[var(--staff-accent)]' : ''}`} style={{ color: isActive('/dashboard') && !isActive('/dashboard/dispatch') ? 'var(--staff-accent)' : 'var(--staff-muted)' }}>
+              <CommandIcon />
+              <span className="text-[10px] font-bold">Home</span>
+            </Link>
+            <Link href="/dashboard/dispatch" className={`p-2 rounded-lg flex flex-col items-center gap-1 ${isActive('/dashboard/dispatch') ? 'text-[var(--staff-accent)]' : ''}`} style={{ color: isActive('/dashboard/dispatch') ? 'var(--staff-accent)' : 'var(--staff-muted)' }}>
+              <DispatchIcon />
+              <span className="text-[10px] font-bold">Dispatch</span>
+            </Link>
+            <Link href="/dashboard/projects" className={`p-2 rounded-lg flex flex-col items-center gap-1 ${isActive('/dashboard/projects') ? 'text-[var(--staff-accent)]' : ''}`} style={{ color: isActive('/dashboard/projects') ? 'var(--staff-accent)' : 'var(--staff-muted)' }}>
+              <ProjectIcon />
+              <span className="text-[10px] font-bold">Projects</span>
+            </Link>
+            <Link href="/dashboard/notifications" className={`p-2 rounded-lg flex flex-col items-center gap-1 relative ${isActive('/dashboard/notifications') ? 'text-[var(--staff-accent)]' : ''}`} style={{ color: isActive('/dashboard/notifications') ? 'var(--staff-accent)' : 'var(--staff-muted)' }}>
+              <div className="relative">
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
+                {(unreadNotifCount ?? 0) > 0 && (
+                  <span className="absolute -top-1.5 -right-1.5 text-[9px] font-bold min-w-[16px] h-4 flex items-center justify-center rounded-full bg-[#e74c3c] text-white animate-pulse px-1">
+                    {unreadNotifCount! > 9 ? '9+' : unreadNotifCount}
+                  </span>
+                )}
+              </div>
+              <span className="text-[10px] font-bold">Alerts</span>
+            </Link>
+            <button
+              onClick={() => setIsProfileOpen(true)}
+              className="p-2 rounded-lg flex flex-col items-center gap-1 transition-colors"
+              style={{ color: isProfileOpen ? 'var(--staff-accent)' : 'var(--staff-muted)' }}
+            >
+              <MoreIcon />
+              <span className="text-[10px] font-bold">More</span>
+            </button>
+          </>
+        )}
       </nav>
 
       {/* Mobile Profile Sheet */}
@@ -112,34 +156,53 @@ const Sidebar: React.FC = () => {
       <aside className="hidden md:flex fixed left-0 top-0 h-screen w-[280px] backdrop-blur-xl flex-col z-50" style={{ backgroundColor: 'var(--staff-surface)', borderRight: '1px solid var(--staff-border)' }}>
         {/* LOGO AREA */}
         <div className="p-6 mb-2 shrink-0">
-          <Link href="/dashboard" className="block w-40 hover:opacity-90 transition-opacity">
+          <Link href={isTech ? '/dashboard/technician' : '/dashboard'} className="block w-40 hover:opacity-90 transition-opacity">
             <Logo />
           </Link>
+          {/* Role Badge */}
+          <div className={`mt-2 inline-block px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-widest ${
+            isTech 
+              ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20'
+              : 'bg-[var(--staff-accent)]/10 border border-[var(--staff-accent)]/20'
+          }`} style={!isTech ? { color: 'var(--staff-accent)' } : {}}>
+            {userRole || 'staff'}
+          </div>
         </div>
 
         {/* SCROLLABLE NAV */}
         <nav className="flex-1 px-4 overflow-y-auto custom-scrollbar">
-          <NavGroup title="Core">
-            <NavItem href="/dashboard" icon={CommandIcon} label="Command Center" />
-            <NavItem href="/dashboard/dispatch" icon={DispatchIcon} label="Dispatch Board" />
-            <NavItem href="/dashboard/emails" icon={EmailIcon} label="Inbox" />
-          </NavGroup>
+          {isTech ? (
+            <>
+              <NavGroup title="Field Operations">
+                <NavItem href="/dashboard/technician" icon={CommandIcon} label="My Assignments" />
+                <NavItem href="/dashboard/notifications" icon={DispatchIcon} label="Alerts" badge={unreadNotifCount} />
+              </NavGroup>
+            </>
+          ) : (
+            <>
+              <NavGroup title="Core">
+                <NavItem href="/dashboard" icon={CommandIcon} label="Command Center" />
+                <NavItem href="/dashboard/dispatch" icon={DispatchIcon} label="Dispatch Board" />
+                <NavItem href="/dashboard/emails" icon={EmailIcon} label="Inbox" />
+              </NavGroup>
 
-          <NavGroup title="Operations">
-            <NavItem href="/dashboard/services" icon={ServiceIcon} label="Services" />
-            <NavItem href="/dashboard/projects" icon={ProjectIcon} label="Projects" />
-            <NavItem href="/dashboard/testimonials" icon={UsersIcon} label="Testimonials" />
-          </NavGroup>
+              <NavGroup title="Operations">
+                <NavItem href="/dashboard/services" icon={ServiceIcon} label="Services" />
+                <NavItem href="/dashboard/projects" icon={ProjectIcon} label="Projects" />
+                <NavItem href="/dashboard/testimonials" icon={UsersIcon} label="Testimonials" />
+              </NavGroup>
 
-          <NavGroup title="Content">
-            <NavItem href="/dashboard/posts" icon={PostIcon} label="Blog Posts" />
-            <NavItem href="/dashboard/media" icon={MediaIcon} label="Media Library" />
-          </NavGroup>
+              <NavGroup title="Content">
+                <NavItem href="/dashboard/posts" icon={PostIcon} label="Blog Posts" badge={pendingPostCount} />
+                <NavItem href="/dashboard/media" icon={MediaIcon} label="Media Library" />
+              </NavGroup>
 
-          <NavGroup title="Configuration">
-            <NavItem href="/dashboard/users" icon={UsersIcon} label="Users" />
-            <NavItem href="/dashboard/settings" icon={SettingsIcon} label="Site Settings" />
-          </NavGroup>
+              <NavGroup title="Configuration">
+                <NavItem href="/dashboard/users" icon={UsersIcon} label="Users" />
+                <NavItem href="/dashboard/settings" icon={SettingsIcon} label="Site Settings" />
+              </NavGroup>
+            </>
+          )}
         </nav>
 
         {/* FOOTER */}

@@ -5,6 +5,7 @@ import { createProject, updateProject } from '@/app/(site)/(private)/[locale]/da
 import MediaUpload from '@/features/admin/ui/MediaUpload';
 import { RichTextEditor } from '@/features/admin/ui/RichTextEditor';
 import { generateProjectCaseStudy, generateMultimodalProjectCaseStudy, extractProjectContext } from '@/actions/ai';
+import { Wand2 } from 'lucide-react';
 
 interface ProjectFormProps {
     initialData?: any;
@@ -486,7 +487,7 @@ export default function ProjectForm({ initialData, isEdit = false }: ProjectForm
                                 <div className="relative group">
                                     <div className="absolute -inset-[1px] bg-gradient-to-r from-[#8e2de2] to-[#4a00e0] rounded-xl opacity-20 blur-sm group-hover:opacity-40 transition-opacity"></div>
                                     <div className="relative flex gap-2 bg-[var(--staff-surface)] border border-[var(--staff-border)] rounded-xl p-2 items-center">
-                                        <span className="pl-3 pr-1 text-lg">✨</span>
+                                        <span className="pl-3 pr-1 text-lg text-[var(--staff-accent)]"><Wand2 className="w-4 h-4" /></span>
                                         <input
                                             type="text"
                                             value={smartContextPrompt}

@@ -31,6 +31,11 @@
 	 * https://developers.cloudflare.com/workers/configuration/secrets/
 	 */
 	// "vars": {  "MY_VARIABLE": "production_value" }
+	"vars": {
+		"MAIN_APP_URL": "https://mobilgaragedoor.com"
+	},
+	// Secrets (set via `wrangler secret put`):
+	// GEMINI_API_KEY, MAIN_APP_API_KEY
 	/**
 	 * Static Assets
 	 * https://developers.cloudflare.com/workers/static-assets/binding/
@@ -41,16 +46,18 @@
 	 * https://developers.cloudflare.com/workers/wrangler/configuration/#service-bindings
 	 */
 	// "services": [  {   "binding": "MY_SERVICE",   "service": "my-service"  } ],
-    "ai": {
-        "binding": "AI"
-    },
-    "vectorize": [
-        {
-            "binding": "VECTOR_INDEX",
-            "index_name": "seo-memory"
-        }
-    ],
-    "triggers": {
-        "crons": ["0 0 * * 1"] // Run every Monday at midnight
-    }
+	"ai": {
+		"binding": "AI"
+	},
+	"vectorize": [
+		{
+			"binding": "VECTOR_INDEX",
+			"index_name": "seo-memory"
+		}
+	],
+	"triggers": {
+		"crons": [
+			"0 9 1,15 * *"
+		]
+	}
 }

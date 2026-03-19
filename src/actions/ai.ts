@@ -20,7 +20,7 @@ async function generateContent(systemPrompt: string, userPrompt: string, schema?
 
     try {
         const response = await genAI.models.generateContent({
-            model: 'gemini-2.0-flash', // Upgraded to faster/cheaper model for 2026
+            model: 'gemini-3.1-pro-preview',
             contents: [
                 {
                     role: 'user',

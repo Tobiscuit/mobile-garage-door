@@ -236,9 +236,12 @@ export async function getActiveJobsList() {
 
     const results = await db.select({
       id: serviceRequests.id,
+      ticketId: serviceRequests.ticketId,
       status: serviceRequests.status,
       customerName: users.name,
+      customerEmail: users.email,
       urgency: serviceRequests.urgency,
+      quotedPrice: serviceRequests.quotedPrice,
       createdAt: serviceRequests.createdAt,
       issue: serviceRequests.issueDescription
     })

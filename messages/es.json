@@ -274,7 +274,10 @@
     "dispatch_confirmed": "DESPACHO CONFIRMADO",
     "dispatch_desc": "Su técnico ha sido alertado y está en camino a",
     "your_location": "su ubicación",
-    "loading": "Estableciendo Conexión..."
+    "loading": "Estableciendo Conexión...",
+    "response_time": "Tiempo de Respuesta",
+    "preferred_time": "Fecha y Hora Preferida",
+    "emergency_asap_note": "Nuestro equipo se comunicará con usted en minutos."
   },
   "contact_hero": {
     "emergency_badge": "Despacho de Emergencia 24/7",
@@ -335,7 +338,8 @@
     "trip_fee": "Asegure su turno ahora. La tarifa de viaje de $9 se acredita a su reparación.",
     "processing": "Procesando...",
     "authorize": "AUTORIZAR $9",
-    "secure_note": "Pago 100% Seguro vía Square. No almacenamos los datos de su tarjeta."
+    "secure_note": "Pago 100% seguro a través de Square. No almacenamos los datos de su tarjeta.",
+    "emergency_asap_desc": "Su solicitud de emergencia será despachada inmediatamente. Nuestro equipo se comunicará con usted en breve."
   },
   "floating_ai": {
     "tooltip": "Asistente de Servicio"

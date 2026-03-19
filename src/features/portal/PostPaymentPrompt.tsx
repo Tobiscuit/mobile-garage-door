@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { Bell, CheckCircle } from 'lucide-react';
 
 const translations = {
   en: {
@@ -198,7 +199,7 @@ export default function PostPaymentPrompt({ locale = 'en' }: PostPaymentPromptPr
       <div className="push-prompt">
         <div className="push-prompt-card">
           <button className="push-prompt-close" onClick={handleDismiss} aria-label="Close">×</button>
-          <p className="push-prompt-emoji">🔔</p>
+          <p className="push-prompt-emoji"><Bell className="w-8 h-8" /></p>
           <h3 className="push-prompt-title">{t.push_title}</h3>
           <p className="push-prompt-desc">{t.push_desc}</p>
           <button className="push-prompt-btn" onClick={handleEnableNotifications}>
@@ -216,7 +217,7 @@ export default function PostPaymentPrompt({ locale = 'en' }: PostPaymentPromptPr
     return (
       <div className="push-prompt">
         <div className="push-prompt-card push-prompt-success">
-          <p className="push-prompt-emoji">✅</p>
+          <p className="push-prompt-emoji"><CheckCircle className="w-8 h-8" /></p>
           <h3 className="push-prompt-title">{t.done_title}</h3>
           <p className="push-prompt-desc">{t.done_desc}</p>
         </div>

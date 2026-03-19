@@ -1,17 +1,22 @@
+import { requireAdmin } from '@/lib/require-role';
 import React from 'react';
 import Link from '@/shared/ui/Link';
 import ActiveUsers from '@/features/admin/ActiveUsers';
 import { KPIGrid } from '@/features/dashboard/KPIGrid';
 import { QuickActions } from '@/features/dashboard/QuickActions';
+import PushNotificationBanner from '@/features/dashboard/PushNotificationBanner';
 import { getDashboardStats } from './actions';
 
 export const dynamic = 'force-dynamic';
 
 export default async function DashboardPage() {
+  await requireAdmin();
   const stats = await getDashboardStats();
 
   return (
     <div className="animate-in fade-in duration-500 slide-in-from-bottom-4">
+      {/* PUSH NOTIFICATION PROMPT — shows when not subscribed */}
+      <PushNotificationBanner />
       {/* HEADER */}
       <div
         className="flex flex-col md:flex-row justify-between items-start md:items-end mb-6 md:mb-12 pb-4 md:pb-6 gap-4"

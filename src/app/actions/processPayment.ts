@@ -6,6 +6,7 @@ import { getDB } from "@/db";
 import { users, serviceRequests, payments } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { getCloudflareContext } from "@/lib/cloudflare";
+import { geocodeAddress } from "@/lib/geocode";
 
 // SquareClient is dynamically instantiated inside functions that need it using getCloudflareContext().env
 
@@ -19,6 +20,7 @@ interface PaymentData {
     address: string;
     issue: string;
     urgency: 'Standard' | 'Emergency';
+    scheduledTime?: string;
   }
 }
 
@@ -103,6 +105,10 @@ export async function processPayment({ sourceId, amount = 9900, customerDetails 
       if (!existing.squareCustomerId && squareCustomerId) {
         await db.update(users).set({ squareCustomerId }).where(eq(users.id, existing.id));
       }
+      // Update phone if missing
+      if (!existing.phone && customerDetails.phone) {
+        await db.update(users).set({ phone: customerDetails.phone }).where(eq(users.id, existing.id));
+      }
     } else {
       payloadUserId = randomUUID();
       await db.insert(users).values({
@@ -117,14 +123,20 @@ export async function processPayment({ sourceId, amount = 9900, customerDetails 
       });
     }
 
+    // Geocode the customer address for tracking ETA
+    const coords = await geocodeAddress(customerDetails.address);
+
     const ticketId = `SR-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
     const newTickets = await db.insert(serviceRequests).values({
       ticketId,
       customerId: payloadUserId,
       issueDescription: customerDetails.issue,
       urgency: customerDetails.urgency === 'Emergency' ? 'emergency' : 'standard',
-      status: 'confirmed',
+      scheduledTime: customerDetails.scheduledTime || null,
+      status: 'pending',
       tripFeePayment: JSON.stringify(paymentResult),
+      customerLat: coords?.lat ?? null,
+      customerLng: coords?.lng ?? null,
     }).returning();
 
     try {

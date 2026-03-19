@@ -1,3 +1,4 @@
+import { requireAdmin } from '@/lib/require-role';
 import React from 'react';
 import Link from '@/shared/ui/Link';
 import { getEmailThreads } from './actions';
@@ -6,6 +7,7 @@ import { DataTable } from '@/features/admin/ui/DataTable';
 export const dynamic = 'force-dynamic';
 
 export default async function EmailsPage() {
+  await requireAdmin();
   const threads = await getEmailThreads();
 
   return (

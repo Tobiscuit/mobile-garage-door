@@ -137,6 +137,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
                         fill
                         className="object-cover"
                         priority
+                        loader={({ src, width, quality }) => `${src}?w=${width}&q=${quality || 75}`}
                     />
                 ) : (
                     <div className="absolute inset-0 bg-charcoal-blue"></div>

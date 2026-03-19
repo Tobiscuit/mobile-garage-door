@@ -17,6 +17,7 @@ interface SquarePaymentModalProps {
         address: string;
         issue: string;
         urgency: 'Standard' | 'Emergency';
+        scheduledTime?: string;
     }
 }
 

@@ -1,9 +1,11 @@
+import { requireAdmin } from '@/lib/require-role';
 import React from 'react';
 import Link from '@/shared/ui/Link';
 import { getTestimonials } from './actions';
 import { DataTable } from '@/features/admin/ui/DataTable';
 
 export default async function TestimonialsPage() {
+  await requireAdmin();
   const testimonials = await getTestimonials();
 
   return (

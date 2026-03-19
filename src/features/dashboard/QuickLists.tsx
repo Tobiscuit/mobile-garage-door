@@ -2,10 +2,12 @@
 
 import React, { useEffect, useState } from 'react';
 import { getActiveJobsList, getTechnicianStatusList } from '@/app/(site)/(private)/[locale]/dashboard/actions';
+import { SendInvoiceModal } from './SendInvoiceModal';
 
 export function ActiveJobsList() {
   const [jobs, setJobs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [invoiceJob, setInvoiceJob] = useState<any | null>(null);
 
   useEffect(() => {
     getActiveJobsList().then(data => {
@@ -23,25 +25,52 @@ export function ActiveJobsList() {
   if (jobs.length === 0) return <div className="text-center py-8" style={{ color: 'var(--staff-muted)' }}>No active jobs found</div>;
 
   return (
-    <div className="space-y-3">
-      {jobs.map(job => (
-        <div key={job.id} className="p-4 rounded-xl transition-colors group" style={{ backgroundColor: 'var(--staff-surface)', border: '1px solid var(--staff-border)' }}>
-          <div className="flex justify-between items-start mb-2">
-            <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider
-              ${job.status === 'pending' ? 'bg-yellow-500/20 text-yellow-400' : ''}
-              ${job.status === 'confirmed' ? 'bg-blue-500/20 text-blue-400' : ''}
-              ${job.status === 'dispatched' ? 'bg-purple-500/20 text-purple-400' : ''}
-              ${job.status === 'on_site' ? 'bg-green-500/20 text-green-400' : ''}
-            `}>
-              {job.status.replace('_', ' ')}
-            </span>
-            <span className="text-[10px]" style={{ color: 'var(--staff-muted)' }} suppressHydrationWarning>{new Intl.DateTimeFormat('en-US', { month: 'numeric', day: 'numeric', year: 'numeric', timeZone: 'America/Chicago' }).format(new Date(job.createdAt))}</span>
+    <>
+      <div className="space-y-3">
+        {jobs.map(job => (
+          <div key={job.id} className="p-4 rounded-xl transition-colors group" style={{ backgroundColor: 'var(--staff-surface)', border: '1px solid var(--staff-border)' }}>
+            <div className="flex justify-between items-start mb-2">
+              <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider
+                ${job.status === 'pending' ? 'bg-yellow-500/20 text-yellow-400' : ''}
+                ${job.status === 'confirmed' ? 'bg-blue-500/20 text-blue-400' : ''}
+                ${job.status === 'dispatched' ? 'bg-purple-500/20 text-purple-400' : ''}
+                ${job.status === 'on_site' ? 'bg-green-500/20 text-green-400' : ''}
+              `}>
+                {job.status.replace('_', ' ')}
+              </span>
+              <span className="text-[10px]" style={{ color: 'var(--staff-muted)' }} suppressHydrationWarning>{new Intl.DateTimeFormat('en-US', { month: 'numeric', day: 'numeric', year: 'numeric', timeZone: 'America/Chicago' }).format(new Date(job.createdAt))}</span>
+            </div>
+            <div className="font-bold mb-1 group-hover:text-[var(--staff-accent)] transition-colors" style={{ color: 'var(--staff-text)' }}>{job.issue || 'Service Request'}</div>
+            <div className="flex items-center justify-between">
+              <div className="text-xs" style={{ color: 'var(--staff-muted)' }}>{job.customerName}</div>
+              <button
+                onClick={() => setInvoiceJob(job)}
+                className="px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all hover:-translate-y-0.5"
+                style={{
+                  background: 'linear-gradient(135deg, #27ae60, #2ecc71)',
+                  color: '#fff',
+                  boxShadow: '0 2px 8px rgba(39,174,96,0.2)',
+                }}
+              >
+                💰 Invoice
+              </button>
+            </div>
+            {job.quotedPrice && (
+              <div className="mt-1 text-[10px] text-green-400">
+                Quoted: ${(job.quotedPrice / 100).toFixed(2)}
+              </div>
+            )}
           </div>
-          <div className="font-bold mb-1 group-hover:text-[var(--staff-accent)] transition-colors" style={{ color: 'var(--staff-text)' }}>{job.issue || 'Service Request'}</div>
-          {job.customerName && <div className="text-xs" style={{ color: 'var(--staff-muted)' }}>{job.customerName}</div>}
-        </div>
-      ))}
-    </div>
+        ))}
+      </div>
+
+      {invoiceJob && (
+        <SendInvoiceModal
+          job={invoiceJob}
+          onClose={() => setInvoiceJob(null)}
+        />
+      )}
+    </>
   );
 }
 

@@ -42,7 +42,8 @@ const ContactContent = () => {
         email: '',
         phone: '',
         address: '',
-        issue: ''
+        issue: '',
+        scheduledTime: ''
     });
 
     // Smart prefill: fetch profile + addresses for logged-in users
@@ -68,6 +69,27 @@ const ContactContent = () => {
             } catch (e) {
                 // Silent fail — non-logged-in users won't have data
             }
+
+            // AI Diagnosis prefill from sessionStorage
+            try {
+                const raw = sessionStorage.getItem('aiDiagnosis');
+                if (raw) {
+                    const diagnosis = JSON.parse(raw);
+                    if (diagnosis.fromDiagnosis) {
+                        setFormData(prev => ({
+                            ...prev,
+                            issue: diagnosis.issueDescription || prev.issue,
+                        }));
+                        if (diagnosis.urgency === 'emergency') {
+                            setUrgency('Emergency');
+                        }
+                        sessionStorage.removeItem('aiDiagnosis');
+                    }
+                }
+            } catch (e) {
+                console.error('Failed to parse aiDiagnosis', e);
+            }
+
             setPrefillLoaded(true);
         })();
     }, [prefillLoaded]);
@@ -113,26 +135,37 @@ const ContactContent = () => {
                 <ContactHero type={heroType} />
                 <div className="container mx-auto max-w-4xl -mt-20 relative z-20 px-6 pb-24">
                     <div className="bg-white rounded-3xl shadow-2xl p-12 text-center border-t-8 border-green-500">
-                        <div className="w-24 h-24 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6 animate-bounce">
+                        <div className="w-24 h-24 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
                              <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
                         </div>
-                        <h2 className="text-4xl font-black text-charcoal-blue mb-4">{t('dispatch_confirmed')}</h2>
-                        <p className="text-gray-500 text-lg mb-8 max-w-lg mx-auto">
-                            {t('dispatch_desc')} <span className="font-bold text-charcoal-blue">{formData.address || t('your_location')}</span>.
+                        <h2 className="text-4xl font-black text-charcoal-blue mb-4">
+                            {urgency === 'Emergency' ? 'REQUEST RECEIVED' : 'REQUEST RECEIVED'}
+                        </h2>
+                        <p className="text-gray-500 text-lg mb-4 max-w-lg mx-auto">
+                            Your service request for <span className="font-bold text-charcoal-blue">{formData.address || t('your_location')}</span> has been submitted successfully.
+                        </p>
+                        <p className="text-gray-400 text-sm mb-8 max-w-md mx-auto">
+                            {urgency === 'Emergency' 
+                                ? "🚨 Our team is reviewing your emergency request and will assign a technician shortly. You'll receive a notification when they're on the way."
+                                : "We'll review your request and assign a technician. You'll receive a notification with your appointment details."
+                            }
                         </p>
                         
-                        {/* Technician Tracker Placeholder */}
+                        {/* Map showing service area */}
                         <div className="bg-charcoal-blue rounded-3xl p-1 overflow-hidden shadow-lg relative h-64 mb-8">
                              <ServiceAreaMap />
                              <div className="absolute top-4 left-4 bg-white/10 backdrop-blur-md px-4 py-2 rounded-lg border border-white/20">
-                                <div className="text-[10px] text-gray-300 font-bold uppercase tracking-widest">ETA</div>
-                                <div className="text-white font-mono font-bold text-xl">15-30 MIN</div>
+                                <div className="text-[10px] text-gray-300 font-bold uppercase tracking-widest">Status</div>
+                                <div className="text-white font-mono font-bold text-lg">PENDING REVIEW</div>
                              </div>
                         </div>
 
-                        <p className="text-sm text-gray-400 font-bold uppercase tracking-widest">
-                            Ticket #{Math.floor(Math.random() * 100000)} • Priority: {urgency}
+                        <p className="text-sm text-gray-400 font-bold uppercase tracking-widest mb-4">
+                            Priority: {urgency}
                         </p>
+                        <a href="/portal" className="inline-block bg-charcoal-blue hover:bg-dark-charcoal text-white font-bold py-3 px-8 rounded-xl transition-all">
+                            View in My Portal →
+                        </a>
                     </div>
                 </div>
              </>
@@ -244,7 +277,16 @@ const ContactContent = () => {
                                 </div>
 
                                 <div className="space-y-2">
-                                    <label className="text-xs font-bold text-gray-400 uppercase tracking-widest">{t('issue_label')}</label>
+                                    <div className="flex items-center justify-between">
+                                        <label className="text-xs font-bold text-gray-400 uppercase tracking-widest">{t('issue_label')}</label>
+                                        <a
+                                            href="/diagnose"
+                                            className="flex items-center gap-1.5 text-xs font-bold text-golden-yellow hover:text-charcoal-blue transition-colors group"
+                                        >
+                                            <span className="w-4 h-4 bg-golden-yellow/10 rounded-full flex items-center justify-center group-hover:bg-golden-yellow/20 transition-colors">⚡</span>
+                                            Try AI Diagnosis
+                                        </a>
+                                    </div>
                                     <textarea 
                                         name="issue"
                                         rows={4}
@@ -253,6 +295,30 @@ const ContactContent = () => {
                                         placeholder={t('issue_placeholder')}
                                         onChange={handleInputChange}
                                     ></textarea>
+                                </div>
+
+                                {/* Scheduling — Standard gets date picker, Emergency gets ASAP */}
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-gray-400 uppercase tracking-widest">
+                                        {urgency === 'Emergency' ? t('response_time') || 'Response Time' : t('preferred_time') || 'Preferred Date & Time'}
+                                    </label>
+                                    {urgency === 'Emergency' ? (
+                                        <div className="bg-red-50 border-2 border-red-200 rounded-xl p-4 flex items-center gap-3">
+                                            <span className="text-2xl">🚨</span>
+                                            <div>
+                                                <div className="font-black text-red-600">ASAP</div>
+                                                <div className="text-xs text-red-500/70">{t('emergency_asap_note') || 'Our team will contact you within minutes.'}</div>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <input
+                                            type="datetime-local"
+                                            name="scheduledTime"
+                                            value={formData.scheduledTime || ''}
+                                            className="w-full bg-gray-50 border border-gray-200 rounded-xl p-4 font-bold text-charcoal-blue focus:ring-2 focus:ring-golden-yellow focus:border-transparent outline-none transition-all"
+                                            onChange={handleInputChange}
+                                        />
+                                    )}
                                 </div>
 
                                 <button 

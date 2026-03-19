@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { Truck, MapPin, CheckCircle, AlertTriangle, Navigation } from 'lucide-react';
 
 interface TechJobActionsProps {
   jobId: number;
@@ -15,7 +16,7 @@ interface TechJobActionsProps {
  */
 export default function TechJobActions({ jobId, ticketId, currentStatus }: TechJobActionsProps) {
   const [status, setStatus] = useState(currentStatus);
-  const [isTracking, setIsTracking] = useState(currentStatus === 'dispatched');
+  const [isTracking, setIsTracking] = useState(false);
   const [updating, setUpdating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const watchIdRef = useRef<number | null>(null);
@@ -151,7 +152,7 @@ export default function TechJobActions({ jobId, ticketId, currentStatus }: TechJ
       {isTracking && (
         <div className="tech-actions-banner">
           <span className="tech-actions-dot" />
-          📍 Sharing location for #{ticketId}
+          <Navigation className="w-4 h-4" /> Sharing location for #{ticketId}
         </div>
       )}
 
@@ -163,7 +164,7 @@ export default function TechJobActions({ jobId, ticketId, currentStatus }: TechJ
             disabled={updating}
             className="tech-actions-btn tech-actions-btn-primary"
           >
-            {updating ? '...' : "🚐 I'm heading out"}
+            {updating ? '...' : <><Truck className="w-4 h-4 inline -mt-0.5" /> I'm heading out</>}
           </button>
         )}
 
@@ -174,7 +175,7 @@ export default function TechJobActions({ jobId, ticketId, currentStatus }: TechJ
               disabled={updating}
               className="tech-actions-btn tech-actions-btn-success"
             >
-              {updating ? '...' : "📍 I've arrived"}
+              {updating ? '...' : <><MapPin className="w-4 h-4 inline -mt-0.5" /> I've arrived</>}
             </button>
             <button
               onClick={stopTracking}
@@ -191,16 +192,16 @@ export default function TechJobActions({ jobId, ticketId, currentStatus }: TechJ
             disabled={updating}
             className="tech-actions-btn tech-actions-btn-complete"
           >
-            {updating ? '...' : '✅ Job complete'}
+            {updating ? '...' : <><CheckCircle className="w-4 h-4 inline -mt-0.5" /> Job complete</>}
           </button>
         )}
 
         {status === 'completed' && (
-          <div className="tech-actions-done">✅ Completed</div>
+          <div className="tech-actions-done"><CheckCircle className="w-4 h-4 inline -mt-0.5" /> Completed</div>
         )}
       </div>
 
-      {error && <div className="tech-actions-error">⚠️ {error}</div>}
+      {error && <div className="tech-actions-error"><AlertTriangle className="w-4 h-4 inline -mt-0.5" /> {error}</div>}
 
       <style>{`
         .tech-actions {
@@ -255,24 +256,24 @@ export default function TechJobActions({ jobId, ticketId, currentStatus }: TechJ
         .tech-actions-btn:disabled { opacity: 0.5; cursor: wait; }
 
         .tech-actions-btn-primary {
-          background: linear-gradient(135deg, #F59E0B, #D97706);
-          color: #000;
+          background: var(--staff-accent);
+          color: var(--staff-bg);
         }
 
         .tech-actions-btn-success {
-          background: linear-gradient(135deg, #10B981, #059669);
-          color: #fff;
+          background: var(--staff-accent);
+          color: var(--staff-bg);
         }
 
         .tech-actions-btn-complete {
-          background: linear-gradient(135deg, #3B82F6, #2563EB);
-          color: #fff;
+          background: var(--staff-accent);
+          color: var(--staff-bg);
         }
 
         .tech-actions-btn-ghost {
-          background: rgba(255,255,255,0.05);
-          border: 1px solid rgba(255,255,255,0.1);
-          color: rgba(255,255,255,0.5);
+          background: var(--staff-border);
+          border: 1px solid var(--staff-border);
+          color: var(--staff-muted);
           font-size: 0.8rem;
           padding: 0.5rem;
         }

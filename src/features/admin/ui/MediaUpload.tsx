@@ -74,6 +74,7 @@ export default function MediaUpload({ onUploadComplete, initialMedia, label = 'C
               alt="Preview"
               fill
               className="object-cover"
+              loader={({ src }) => src}
             />
             <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
               <span className="text-white font-bold text-sm">Change Image</span>

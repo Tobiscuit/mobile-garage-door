@@ -1,3 +1,4 @@
+import { requireAdmin } from '@/lib/require-role';
 import React from 'react';
 import Link from '@/shared/ui/Link';
 import { getUsers } from './actions';
@@ -5,6 +6,7 @@ import { UserTable } from '@/features/admin/ui/UserTable';
 import { InviteUserButton } from '@/features/admin/ui/InviteUserButton';
 
 export default async function UsersPage() {
+  await requireAdmin();
   const users = await getUsers();
 
   return (

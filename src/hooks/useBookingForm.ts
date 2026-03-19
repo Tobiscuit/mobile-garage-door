@@ -53,7 +53,14 @@ export function useBookingForm() {
   }, [isInitialized]);
 
   const updateField = <K extends keyof BookingFormData>(key: K, value: BookingFormData[K]) => {
-    setFormData((prev) => ({ ...prev, [key]: value }));
+    setFormData((prev) => {
+      const next = { ...prev, [key]: value };
+      // Auto-set scheduledTime when urgency changes
+      if (key === 'urgency') {
+        next.scheduledTime = value === 'emergency' ? 'ASAP' : '';
+      }
+      return next;
+    });
   };
 
   const nextStep = () => setStep((prev) => Math.min(prev + 1, 3) as BookingStep);

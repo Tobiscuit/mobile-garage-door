@@ -1,9 +1,11 @@
+import { requireAdmin } from '@/lib/require-role';
 import React from 'react';
 import Link from '@/shared/ui/Link';
 import TestimonialForm from '@/features/admin/testimonials/TestimonialForm';
 import { createTestimonial } from '../actions';
 
-export default function CreateTestimonialPage() {
+export default async function CreateTestimonialPage() {
+  await requireAdmin();
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="mb-8">

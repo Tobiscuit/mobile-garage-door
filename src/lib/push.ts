@@ -1,4 +1,7 @@
 import { sendWebPush, type PushSubscription as WebPushSubscription } from './web-push';
+import { getDB } from '@/db';
+import { pushSubscriptions } from '@/db/schema';
+import { eq } from 'drizzle-orm';
 
 interface PushPayload {
   title: string;
@@ -14,13 +17,8 @@ interface PushPayload {
 }
 
 /**
- * Send a Web Push notification to a user's stored subscription.
- * Uses our zero-dependency Web Crypto implementation (no npm packages).
- * 
- * @param subscription - JSON string of PushSubscription from users.pushSubscription
- * @param payload - Notification content
- * @param env - Worker env for VAPID keys
- * @returns true if sent successfully, false if subscription is invalid/expired
+ * Send a Web Push notification to a single subscription string (legacy format).
+ * Used by tracking/update route and dispatch.
  */
 export async function sendPushNotification(
   subscription: string,
@@ -56,9 +54,6 @@ export async function sendPushNotification(
       vapidPublicKey: publicKey,
       vapidPrivateKey: privateKey,
       vapidSubject: 'mailto:service@mobilgaragedoor.com',
-      ttl: 3600,
-      urgency: 'high',
-      topic: payload.tag || 'tech-tracking',
     });
 
     if (ok) {
@@ -66,7 +61,6 @@ export async function sendPushNotification(
       return true;
     }
 
-    // 410 Gone or 404 = subscription expired/invalid
     if (status === 410 || status === 404) {
       console.log('Push subscription expired, should be cleaned up');
       return false;
@@ -77,6 +71,35 @@ export async function sendPushNotification(
   } catch (error: any) {
     console.error('Push send error:', error?.message || error);
     return false;
+  }
+}
+
+/**
+ * Send push notification to ALL devices for a given user (via push_subscriptions table).
+ * Use this for customer-facing notifications.
+ */
+export async function sendPushToUser(
+  userId: string,
+  payload: PushPayload,
+  env: { VAPID_PRIVATE_KEY: string; DB: any }
+): Promise<number> {
+  try {
+    const db = getDB(env.DB)!;
+    const subs = await db.select()
+      .from(pushSubscriptions)
+      .where(eq(pushSubscriptions.userId, userId));
+
+    if (subs.length === 0) return 0;
+
+    let sent = 0;
+    for (const sub of subs) {
+      const ok = await sendPushNotification(sub.subscription, payload, env);
+      if (ok) sent++;
+    }
+    return sent;
+  } catch (error: any) {
+    console.error('sendPushToUser error:', error?.message || error);
+    return 0;
   }
 }
 

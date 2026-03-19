@@ -8,6 +8,7 @@ import { squareService } from '@/services/squareService';
 import { randomUUID } from 'crypto';
 import { sendPushNotification } from '@/lib/push';
 import { getCloudflareContext } from "@/lib/cloudflare";
+import { geocodeAddress } from "@/lib/geocode";
 
 interface CustomerData {
   guestName: string;
@@ -66,6 +67,9 @@ export async function createBooking(prevState: any, formData: FormData) {
       `Trip Fee for ${guestName} (${guestEmail})`
     );
 
+    // Geocode the customer address for tracking ETA
+    const coords = await geocodeAddress(guestAddress);
+
     const ticketId = `SR-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
     await db.insert(serviceRequests).values({
       ticketId,
@@ -79,6 +83,8 @@ export async function createBooking(prevState: any, formData: FormData) {
         amount: Number(paymentResult.amountMoney?.amount),
         status: paymentResult.status,
       }),
+      customerLat: coords?.lat ?? null,
+      customerLng: coords?.lng ?? null,
     });
 
     // Notify Admins

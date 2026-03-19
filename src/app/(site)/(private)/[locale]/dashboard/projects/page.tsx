@@ -1,3 +1,4 @@
+import { requireAdmin } from '@/lib/require-role';
 
 import React from 'react';
 import Link from '@/shared/ui/Link';
@@ -6,6 +7,7 @@ import { DataTable } from '@/features/admin/ui/DataTable';
 import Image from 'next/image';
 
 export default async function ProjectsPage() {
+  await requireAdmin();
   const projects = await getProjects();
 
   return (

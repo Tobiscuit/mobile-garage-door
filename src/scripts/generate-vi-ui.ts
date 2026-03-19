@@ -15,7 +15,7 @@ async function run() {
 
   console.log('⏳ Translating UI strings to Vietnamese...');
   const response = await genAI.models.generateContent({
-    model: 'gemini-2.5-flash',
+    model: 'gemini-3-flash-preview',
     contents: `Translate the following JSON from English to Vietnamese.
 The audience is Houston-area homeowners and contractors looking for garage door repair/installation.
 Keep it professional.

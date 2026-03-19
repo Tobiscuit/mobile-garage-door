@@ -1,3 +1,4 @@
+import { requireAdmin } from '@/lib/require-role';
 import React from 'react';
 import Link from '@/shared/ui/Link';
 import { notFound } from 'next/navigation';
@@ -5,6 +6,7 @@ import { getProjectById } from '../actions';
 import ProjectForm from '@/features/admin/projects/ProjectForm';
 
 export default async function EditProjectPage({ params }: { params: Promise<{ id: string }> }) {
+  await requireAdmin();
   const { id } = await params;
   const project = await getProjectById(id);
 

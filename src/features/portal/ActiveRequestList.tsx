@@ -48,7 +48,7 @@ export function ActiveRequestList({ requests }: ActiveRequestListProps) {
                 <div className="flex justify-between items-start mb-4">
                   <div>
                     <h3 className="font-bold text-charcoal-blue text-lg mb-1">{String(req.issueDescription).substring(0, 50)}...</h3>
-                    <p className="text-sm text-gray-500">{t('scheduled')}: {req.scheduledTime ? new Date(req.scheduledTime).toLocaleDateString() + ' ' + new Date(req.scheduledTime).toLocaleTimeString() : t('pending_scheduling')}</p>
+                    <p className="text-sm text-gray-500">{t('scheduled')}: {req.scheduledTime === 'ASAP' ? <span className="text-red-600 font-bold">ASAP</span> : req.scheduledTime ? new Date(req.scheduledTime).toLocaleDateString() + ' ' + new Date(req.scheduledTime).toLocaleTimeString() : t('pending_scheduling')}</p>
                   </div>
                 </div>
 
@@ -69,6 +69,17 @@ export function ActiveRequestList({ requests }: ActiveRequestListProps) {
                     <span>{t('on_site')}</span>
                   </div>
                 </div>
+
+                {/* Track Technician Button — only for dispatched/on_site */}
+                {(req.status === 'dispatched' || req.status === 'on_site') && (
+                  <a
+                    href={`/en/portal/track/${req.ticketId}`}
+                    className="mt-4 flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-charcoal-blue text-golden-yellow font-bold text-sm uppercase tracking-wider hover:bg-charcoal-blue/90 transition-all hover:-translate-y-0.5 shadow-lg"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                    Track Technician Live
+                  </a>
+                )}
               </div>
             </div>
           ))}

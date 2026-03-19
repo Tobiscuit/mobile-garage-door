@@ -9,22 +9,28 @@ export function DispatchClient({ jobs, technicians }: { jobs: any[], technicians
     const [loading, setLoading] = useState<string | null>(null);
     const [selectedTechs, setSelectedTechs] = useState<{[key: string]: string}>({});
     const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+    const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+
+    const showToast = (message: string, type: 'success' | 'error' = 'success') => {
+        setToast({ message, type });
+        setTimeout(() => setToast(null), 4000);
+    };
 
     const handleAssign = async (jobId: string) => {
         const techId = selectedTechs[jobId];
         if (!techId) {
-            alert('Please select a technician first');
+            showToast('Please select a technician first', 'error');
             return;
         }
 
         setLoading(jobId);
         try {
             await assignJobToTechnician(jobId, techId);
-            alert('Job Dispatched Successfully! Technician Notified.');
+            showToast('Job Dispatched Successfully! Technician Notified.');
             router.refresh();
         } catch (e) {
             console.error(e);
-            alert('Error dispatching job');
+            showToast('Error dispatching job', 'error');
         } finally {
             setLoading(null);
         }
@@ -39,6 +45,26 @@ export function DispatchClient({ jobs, technicians }: { jobs: any[], technicians
 
     return (
         <div className="space-y-8 pb-20">
+            {/* Toast Notification */}
+            {toast && (
+                <div 
+                    className="fixed top-6 left-1/2 -translate-x-1/2 z-50 px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 animate-in fade-in slide-in-from-top-4 transition-all"
+                    style={toast.type === 'success' 
+                        ? { backgroundColor: 'var(--staff-accent)', color: 'var(--staff-bg)' }
+                        : { backgroundColor: '#dc2626', color: '#fff' }
+                    }
+                >
+                    {toast.type === 'success' ? (
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                    ) : (
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    )}
+                    <span className="font-bold text-sm">{toast.message}</span>
+                    <button onClick={() => setToast(null)} className="ml-2 opacity-70 hover:opacity-100">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+            )}
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
                 <div>
                     <h1 className="text-4xl font-black uppercase tracking-tighter" style={{ color: 'var(--staff-text)' }}>

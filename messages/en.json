@@ -274,7 +274,10 @@
     "dispatch_confirmed": "DISPATCH CONFIRMED",
     "dispatch_desc": "Your technician has been alerted and is en route to",
     "your_location": "your location",
-    "loading": "Establishing Uplink..."
+    "loading": "Establishing Uplink...",
+    "response_time": "Response Time",
+    "preferred_time": "Preferred Date & Time",
+    "emergency_asap_note": "Our team will contact you within minutes."
   },
   "contact_hero": {
     "emergency_badge": "24/7 Emergency Dispatch",
@@ -335,7 +338,8 @@
     "trip_fee": "Secure your slot now. The 9 Trip Fee is credited towards your repair.",
     "processing": "Processing...",
     "authorize": "AUTHORIZE 9",
-    "secure_note": "100% Secure Payment via Square. We do not store your card details."
+    "secure_note": "100% Secure Payment via Square. We do not store your card details.",
+    "emergency_asap_desc": "Your emergency request will be dispatched immediately. Our team will contact you shortly."
   },
   "floating_ai": {
     "tooltip": "Service Hero"

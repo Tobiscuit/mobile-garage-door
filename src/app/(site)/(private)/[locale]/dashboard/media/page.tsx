@@ -1,3 +1,4 @@
+import { requireAdmin } from '@/lib/require-role';
 import React from 'react';
 import Link from '@/shared/ui/Link';
 import { getDB } from "@/db";
@@ -14,6 +15,7 @@ async function getMedia() {
 }
 
 export default async function MediaPage() {
+  await requireAdmin();
   const mediaItems = await getMedia();
 
   return (

@@ -191,7 +191,7 @@ export default function DiagnosePage() {
                             } catch (e) {
                                 console.error("Cleanup error before redirect:", e);
                             }
-                            router.push('/book-service');
+                            router.push('/contact?source=portal');
                         }, 1500);
                     }
                 }
@@ -436,6 +436,9 @@ export default function DiagnosePage() {
                 >
                     Start Diagnostic
                 </button>
+                <p className="text-gray-500 text-xs text-center mt-4 leading-relaxed max-w-sm mx-auto">
+                    🤖 <strong className="text-gray-400">AI-Powered Preliminary Assessment</strong> — This tool provides an initial diagnosis based on what it sees and hears. A qualified technician will confirm the issue and perform repairs on-site.
+                </p>
             </div>
         ) : (
             <>

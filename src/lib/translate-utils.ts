@@ -39,7 +39,7 @@ export async function translate(text: string, context: string, targetLocale: str
   const genAI = await getGenAI();
   const langName = getLanguageName(targetLocale);
   const response = await genAI.models.generateContent({
-    model: 'gemini-2.5-flash',
+    model: 'gemini-3-flash-preview',
     contents: `Translate the following ${context} from English to ${langName}.
 The audience is Houston-area homeowners and contractors.
 Keep it professional, natural, and culturally appropriate.
@@ -77,7 +77,7 @@ export async function translateLexicalTree(lexicalJSON: any, targetLocale: strin
   const genAI = await getGenAI();
   const langName = getLanguageName(targetLocale);
   const response = await genAI.models.generateContent({
-    model: 'gemini-2.5-flash',
+    model: 'gemini-3-flash-preview',
     contents: `Translate each of the following text segments from English to ${langName}.
 The audience is Houston-area homeowners and contractors.
 Keep it professional, natural, and culturally appropriate.

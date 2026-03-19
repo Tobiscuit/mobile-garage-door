@@ -1,3 +1,4 @@
+import { requireAdmin } from '@/lib/require-role';
 import React from 'react';
 import Link from '@/shared/ui/Link';
 import { notFound } from 'next/navigation';
@@ -5,6 +6,7 @@ import { getServiceById } from '../actions';
 import ServiceForm from '@/features/admin/services/ServiceForm';
 
 export default async function EditServicePage({ params }: { params: Promise<{ id: string }> }) {
+  await requireAdmin();
   const { id } = await params;
   const service = await getServiceById(id);
 

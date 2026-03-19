@@ -77,6 +77,7 @@ export default async function BlogIndex({ params }: { params: Promise<{ locale: 
                                             alt={post.featuredImage.alt || post.title}
                                             fill
                                             className="object-cover transition-transform duration-700 group-hover:scale-110"
+                                            loader={({ src, width, quality }) => `${src}?w=${width}&q=${quality || 75}`}
                                         />
                                     ) : (
                                         <div className="absolute inset-0 flex items-center justify-center bg-charcoal-blue">

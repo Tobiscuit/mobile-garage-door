@@ -1,8 +1,10 @@
+import { requireAdmin } from '@/lib/require-role';
 import React from 'react';
 import Link from '@/shared/ui/Link';
 import ServiceForm from '@/features/admin/services/ServiceForm';
 
-export default function CreateServicePage() {
+export default async function CreateServicePage() {
+  await requireAdmin();
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="mb-8">

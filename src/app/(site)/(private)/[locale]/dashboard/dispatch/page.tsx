@@ -1,3 +1,4 @@
+import { requireAdmin } from '@/lib/require-role';
 import { DispatchClient } from './DispatchClient';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
@@ -8,6 +9,7 @@ import { eq, desc } from "drizzle-orm";
 import { getCloudflareContext } from "@/lib/cloudflare";
 
 export default async function DispatchPage() {
+  await requireAdmin();
     let headersList = new Headers();
     let isStaticPass = false;
     try {
@@ -36,7 +38,7 @@ export default async function DispatchPage() {
     })
         .from(serviceRequests)
         .leftJoin(users, eq(serviceRequests.customerId, users.id))
-        .where(eq(serviceRequests.status, 'confirmed'))
+        .where(eq(serviceRequests.status, 'pending'))
         .orderBy(desc(serviceRequests.createdAt));
 
     const technicians = await db.select().from(users).where(eq(users.role, 'technician'));

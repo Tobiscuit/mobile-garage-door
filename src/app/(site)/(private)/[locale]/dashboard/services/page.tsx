@@ -1,3 +1,4 @@
+import { requireAdmin } from '@/lib/require-role';
 import React from 'react';
 import Link from '@/shared/ui/Link';
 import { getServices } from './actions';
@@ -5,6 +6,7 @@ import { DataTable } from '@/features/admin/ui/DataTable';
 
 // This is a Server Component
 export default async function ServicesPage() {
+  await requireAdmin();
   const services = await getServices();
 
   return (

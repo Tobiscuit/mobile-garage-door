@@ -1,3 +1,4 @@
+import { requireAdmin } from '@/lib/require-role';
 import React from 'react';
 import Link from '@/shared/ui/Link';
 import { notFound } from 'next/navigation';
@@ -5,6 +6,7 @@ import { getTestimonialById, updateTestimonial } from '../actions';
 import TestimonialForm from '@/features/admin/testimonials/TestimonialForm';
 
 export default async function EditTestimonialPage({ params }: { params: Promise<{ id: string }> }) {
+  await requireAdmin();
   const { id } = await params;
   const testimonial = await getTestimonialById(id);
 
