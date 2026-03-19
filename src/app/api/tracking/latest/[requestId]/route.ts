@@ -1,10 +1,8 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { getDB } from '@/db';
 import { serviceRequests } from '@/db/schema';
-import { eq, and } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import { getCloudflareContext } from '@/lib/cloudflare';
-import { safeParseKvData } from '@/lib/tracking-validation';
-import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
 
 /**
  * GET /api/tracking/latest/[requestId]
@@ -25,20 +23,6 @@ export async function GET(
 
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    // ── Rate limit ────────────────────────────────────────────────────
-    const rl = await checkRateLimit(
-      (env as any).TRACKING_KV,
-      `ratelimit:latest:${session.user.id}`,
-      RATE_LIMITS.trackingLatest.maxRequests,
-      RATE_LIMITS.trackingLatest.windowSeconds
-    );
-    if (!rl.allowed) {
-      return NextResponse.json(
-        { error: 'Too many requests', retryAfter: rl.retryAfterSeconds },
-        { status: 429 }
-      );
     }
 
     const { requestId } = await params;
@@ -75,16 +59,13 @@ export async function GET(
       return NextResponse.json({ error: 'Not authorized to view this tracking data' }, { status: 403 });
     }
 
-    // Read latest fuzzy location from KV
-    const trackingKey = `tracking:${parsedId}`;
-    const data = safeParseKvData<{
-      center: { lat: number; lng: number };
-      radius: number;
-      status: string;
-      etaMinutes: number;
-      techName: string;
-      lastUpdate: string;
-    }>(await (env as any).TRACKING_KV.get(trackingKey));
+    // Read latest tracking state from D1
+    const data = await (env as any).DB.prepare(
+      `SELECT center_lat, center_lng, radius, status, eta_minutes,
+              tech_name, last_update
+       FROM tracking_latest
+       WHERE service_request_id = ?`
+    ).bind(parsedId).first();
 
     if (!data) {
       return NextResponse.json({
@@ -94,24 +75,25 @@ export async function GET(
     }
 
     // Calculate staleness
-    const lastUpdate = new Date(data.lastUpdate);
+    const lastUpdate = new Date(data.last_update + 'Z'); // D1 datetime is UTC without Z
     const now = new Date();
     const staleMinutes = Math.round((now.getTime() - lastUpdate.getTime()) / 60000);
 
     return NextResponse.json({
       tracking: {
-        center: data.center,
+        center: { lat: data.center_lat, lng: data.center_lng },
         radius: data.radius,
         status: data.status,
-        etaMinutes: data.etaMinutes,
-        techName: data.techName,
-        lastUpdate: data.lastUpdate,
+        etaMinutes: data.eta_minutes,
+        techName: data.tech_name,
+        lastUpdate: data.last_update,
         staleMinutes,
         isStale: staleMinutes > 5,
       },
     });
   } catch (error) {
-    console.error('Tracking latest error:', error);
-    return NextResponse.json({ error: 'Failed to get tracking data' }, { status: 500 });
+    const msg = error instanceof Error ? error.message : String(error);
+    console.error('Tracking latest error:', msg, error);
+    return NextResponse.json({ error: 'Failed to get tracking data', detail: msg }, { status: 500 });
   }
 }

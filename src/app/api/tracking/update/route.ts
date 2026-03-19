@@ -5,13 +5,12 @@ import { eq, and } from 'drizzle-orm';
 import { getCloudflareContext } from '@/lib/cloudflare';
 import { computeFuzzyLocation } from '@/lib/geo';
 import { sendPushToUser, getMilestoneNotification } from '@/lib/push';
-import { validateGpsInput, safeParseKvData } from '@/lib/tracking-validation';
-import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
+import { validateGpsInput } from '@/lib/tracking-validation';
 
 /**
  * POST /api/tracking/update
  * Called by the tech's PWA every 30s with their GPS coordinates.
- * Computes fuzzy location → writes KV (latest) + D1 (audit) → fires push on milestone.
+ * Computes fuzzy location → writes D1 (latest + audit) → fires push on milestone.
  */
 export async function POST(request: NextRequest) {
   try {
@@ -22,20 +21,6 @@ export async function POST(request: NextRequest) {
 
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    // ── Rate limit ────────────────────────────────────────────────────
-    const rl = await checkRateLimit(
-      (env as any).TRACKING_KV,
-      `ratelimit:update:${session.user.id}`,
-      RATE_LIMITS.trackingUpdate.maxRequests,
-      RATE_LIMITS.trackingUpdate.windowSeconds
-    );
-    if (!rl.allowed) {
-      return NextResponse.json(
-        { error: 'Too many requests', retryAfter: rl.retryAfterSeconds },
-        { status: 429 }
-      );
     }
 
     const body = await request.json();
@@ -67,40 +52,31 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Request not in trackable status' }, { status: 400 });
     }
 
-    // Get customer info for distance calculation and push
-    const [customer] = sr.customerId
-      ? await db.select().from(users).where(eq(users.id, sr.customerId)).limit(1)
-      : [null];
-
-    // Read existing KV state for customer coords
-    const trackingKey = `tracking:${serviceRequestId}`;
-    const existing = safeParseKvData<{ customerLat?: number; customerLng?: number }>(
-      await (env as any).TRACKING_KV.get(trackingKey)
-    );
-
-    // Customer location — prefer stored geocoded coords, then existing KV state, then Houston default
-    const customerLat = (sr as any).customerLat || existing?.customerLat || 29.7604;
-    const customerLng = (sr as any).customerLng || existing?.customerLng || -95.3698;
+    // Customer location — prefer stored geocoded coords, then Houston default
+    const customerLat = (sr as any).customerLat || 29.7604;
+    const customerLng = (sr as any).customerLng || -95.3698;
 
     // Compute fuzzy location
     const fuzzy = computeFuzzyLocation(lat, lng, customerLat, customerLng);
 
-    // Write to KV — latest state (fast reads for customer polling)
-    const kvPayload = {
-      center: fuzzy.center,
-      radius: fuzzy.radius,
-      status: fuzzy.status,
-      etaMinutes: fuzzy.etaMinutes,
-      techName: session.user.name || 'Your technician',
-      lastUpdate: new Date().toISOString(),
+    // Write to D1 — latest state (replaces KV for fast reads)
+    await (env as any).DB.prepare(
+      `INSERT OR REPLACE INTO tracking_latest
+       (service_request_id, center_lat, center_lng, radius, status, eta_minutes,
+        tech_name, customer_lat, customer_lng, customer_id, last_update)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))`
+    ).bind(
+      serviceRequestId,
+      fuzzy.center.lat,
+      fuzzy.center.lng,
+      fuzzy.radius,
+      fuzzy.status,
+      fuzzy.etaMinutes,
+      session.user.name || 'Your technician',
       customerLat,
       customerLng,
-      // Store the customer ID for ownership verification on reads
-      customerId: sr.customerId,
-    };
-    await (env as any).TRACKING_KV.put(trackingKey, JSON.stringify(kvPayload), {
-      expirationTtl: 7200, // Auto-expire after 2 hours
-    });
+      sr.customerId
+    ).run();
 
     // Write to D1 — audit trail
     await (env as any).DB.prepare(
