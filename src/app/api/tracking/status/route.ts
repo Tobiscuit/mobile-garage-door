@@ -4,7 +4,6 @@ import { serviceRequests } from '@/db/schema';
 import { eq, and } from 'drizzle-orm';
 import { getCloudflareContext } from '@/lib/cloudflare';
 import { validateStatusTransition } from '@/lib/tracking-validation';
-import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
 
 /**
  * PATCH /api/tracking/status
@@ -23,19 +22,7 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // ── Rate limit ────────────────────────────────────────────────────
-    const rl = await checkRateLimit(
-      (env as any).TRACKING_KV,
-      `ratelimit:status:${session.user.id}`,
-      RATE_LIMITS.statusChange.maxRequests,
-      RATE_LIMITS.statusChange.windowSeconds
-    );
-    if (!rl.allowed) {
-      return NextResponse.json(
-        { error: 'Too many requests', retryAfter: rl.retryAfterSeconds },
-        { status: 429 }
-      );
-    }
+
 
     const body = await request.json();
     const { serviceRequestId, status } = body;
@@ -75,16 +62,19 @@ export async function PATCH(request: NextRequest) {
       })
       .where(eq(serviceRequests.id, serviceRequestId));
 
-    // If completed, clean up KV tracking data
+    // If completed, clean up D1 tracking data
     if (status === 'completed') {
       try {
-        await (env as any).TRACKING_KV.delete(`tracking:${serviceRequestId}`);
+        await (env as any).DB.prepare(
+          'DELETE FROM tracking_latest WHERE service_request_id = ?'
+        ).bind(serviceRequestId).run();
       } catch {}
     }
 
     return NextResponse.json({ success: true, status });
   } catch (error) {
-    console.error('Status update error:', error);
-    return NextResponse.json({ error: 'Failed to update status' }, { status: 500 });
+    const msg = error instanceof Error ? error.message : String(error);
+    console.error('Status update error:', msg, error);
+    return NextResponse.json({ error: 'Failed to update status', detail: msg }, { status: 500 });
   }
 }
