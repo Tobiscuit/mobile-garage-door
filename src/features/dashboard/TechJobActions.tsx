@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Truck, MapPin, CheckCircle, AlertTriangle, Navigation } from 'lucide-react';
+import { Truck, MapPin, CheckCircle, AlertTriangle, Navigation, ShieldCheck } from 'lucide-react';
 
 interface TechJobActionsProps {
   jobId: number;
@@ -151,8 +151,13 @@ export default function TechJobActions({ jobId, ticketId, currentStatus }: TechJ
       {/* Tracking banner */}
       {isTracking && (
         <div className="tech-actions-banner">
-          <span className="tech-actions-dot" />
-          <Navigation className="w-4 h-4" /> Sharing location for #{ticketId}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <span className="tech-actions-dot" />
+            <Navigation className="w-4 h-4" /> Sharing location for #{ticketId}
+          </div>
+          <div style={{ fontSize: '0.7rem', opacity: 0.7, marginTop: '0.25rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+            <ShieldCheck className="w-3 h-3" /> Only an approximate area is shared — your exact GPS stays private.
+          </div>
         </div>
       )}
 
@@ -210,14 +215,14 @@ export default function TechJobActions({ jobId, ticketId, currentStatus }: TechJ
 
         .tech-actions-banner {
           display: flex;
-          align-items: center;
+          flex-direction: column; /* Changed to column to stack content and privacy note */
           gap: 0.5rem;
           padding: 0.5rem 0.75rem;
-          background: rgba(16, 185, 129, 0.1);
-          border: 1px solid rgba(16, 185, 129, 0.3);
+          background: color-mix(in srgb, var(--staff-accent) 10%, transparent);
+          border: 1px solid color-mix(in srgb, var(--staff-accent) 30%, transparent);
           border-radius: 0.5rem;
           font-size: 0.8rem;
-          color: #10B981;
+          color: var(--staff-accent);
           margin-bottom: 0.75rem;
           font-weight: 600;
         }
@@ -225,7 +230,7 @@ export default function TechJobActions({ jobId, ticketId, currentStatus }: TechJ
         .tech-actions-dot {
           width: 8px;
           height: 8px;
-          background: #10B981;
+          background: var(--staff-accent);
           border-radius: 50%;
           animation: blink 1.5s infinite;
         }
@@ -281,9 +286,9 @@ export default function TechJobActions({ jobId, ticketId, currentStatus }: TechJ
         .tech-actions-done {
           text-align: center;
           padding: 0.75rem;
-          background: rgba(16, 185, 129, 0.1);
+          background: color-mix(in srgb, var(--staff-accent) 15%, transparent);
           border-radius: 0.5rem;
-          color: #10B981;
+          color: var(--staff-accent);
           font-weight: 700;
         }
 
