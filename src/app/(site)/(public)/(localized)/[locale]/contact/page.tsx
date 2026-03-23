@@ -291,6 +291,7 @@ const ContactContent = () => {
                                         name="issue"
                                         rows={4}
                                         required
+                                        value={formData.issue}
                                         className="w-full bg-gray-50 border border-gray-200 rounded-xl p-4 font-medium text-charcoal-blue focus:ring-2 focus:ring-golden-yellow focus:border-transparent outline-none transition-all resize-none"
                                         placeholder={t('issue_placeholder')}
                                         onChange={handleInputChange}
