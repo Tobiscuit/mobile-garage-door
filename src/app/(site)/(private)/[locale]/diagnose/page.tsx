@@ -2,12 +2,10 @@
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import Link from '@/shared/ui/Link';
-import { useRouter, usePathname } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 export default function DiagnosePage() {
   const router = useRouter();
-  const pathname = usePathname();
-  const locale = pathname.split('/')[1] || 'en';
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [status, setStatus] = useState<'idle' | 'connecting' | 'connected' | 'error'>('idle');
   const [aiState, setAiState] = useState<'listening' | 'thinking' | 'speaking'>('listening');
@@ -226,7 +224,7 @@ export default function DiagnosePage() {
                         } catch (e) {
                             console.error('Cleanup error before redirect:', e);
                         }
-                        router.push(`/${locale}/contact?source=portal`);
+                        router.push('/contact?source=portal');
                     }, 500);
                 }
             }
@@ -248,7 +246,7 @@ export default function DiagnosePage() {
             diagnosisReadyRef.current = false;
             setTimeout(() => {
               stopMedia();
-              router.push(`/${locale}/contact?source=portal`);
+              router.push('/contact?source=portal');
             }, 1000);
           }
       };
