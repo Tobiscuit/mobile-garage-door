@@ -242,6 +242,15 @@ export default function DiagnosePage() {
 
       ws.onclose = () => {
           setStatus('idle');
+          // Fallback: if diagnosis was stored but turnComplete never fired
+          // (e.g. safety filter killed the connection), redirect anyway
+          if (diagnosisReadyRef.current) {
+            diagnosisReadyRef.current = false;
+            setTimeout(() => {
+              stopMedia();
+              router.push(`/${locale}/contact?source=portal`);
+            }, 1000);
+          }
       };
   };
 
