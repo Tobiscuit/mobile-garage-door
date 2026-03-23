@@ -70,7 +70,17 @@ const ContactContent = () => {
                 // Silent fail — non-logged-in users won't have data
             }
 
-            // AI Diagnosis prefill from sessionStorage
+            // Restore form data saved before AI diagnosis round-trip
+            try {
+                const savedForm = sessionStorage.getItem('contactFormData');
+                if (savedForm) {
+                    const parsed = JSON.parse(savedForm);
+                    setFormData(prev => ({ ...prev, ...parsed }));
+                    sessionStorage.removeItem('contactFormData');
+                }
+            } catch {}
+
+            // AI Diagnosis prefill from sessionStorage (overwrites issue field)
             try {
                 const raw = sessionStorage.getItem('aiDiagnosis');
                 if (raw) {
@@ -281,6 +291,11 @@ const ContactContent = () => {
                                         <label className="text-xs font-bold text-gray-400 uppercase tracking-widest">{t('issue_label')}</label>
                                         <a
                                             href="/diagnose"
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                sessionStorage.setItem('contactFormData', JSON.stringify(formData));
+                                                window.location.href = '/diagnose';
+                                            }}
                                             className="flex items-center gap-1.5 text-xs font-bold text-golden-yellow hover:text-charcoal-blue transition-colors group"
                                         >
                                             <span className="w-4 h-4 bg-golden-yellow/10 rounded-full flex items-center justify-center group-hover:bg-golden-yellow/20 transition-colors">⚡</span>
