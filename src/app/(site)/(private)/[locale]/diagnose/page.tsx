@@ -2,10 +2,12 @@
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import Link from '@/shared/ui/Link';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 
 export default function DiagnosePage() {
   const router = useRouter();
+  const pathname = usePathname();
+  const locale = pathname.split('/')[1] || 'en';
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [status, setStatus] = useState<'idle' | 'connecting' | 'connected' | 'error'>('idle');
   const [aiState, setAiState] = useState<'listening' | 'thinking' | 'speaking'>('listening');
@@ -24,6 +26,7 @@ export default function DiagnosePage() {
   const fullTranscriptRef = useRef('');
   const typewriterTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const displayedLenRef = useRef(0);
+  const diagnosisReadyRef = useRef(false);
 
   useEffect(() => {
     return () => {
@@ -181,18 +184,9 @@ export default function DiagnosePage() {
                             fromDiagnosis: true
                         }));
 
-                        console.log('[WS] ✅ DIAGNOSIS STORED, REDIRECTING in 1.5s:', args);
+                        console.log('[WS] ✅ DIAGNOSIS STORED, waiting for AI to finish speaking:', args);
                         setAiMessage("Filing your service report... Redirecting you now.");
-
-                        setTimeout(() => {
-                            try {
-                                wsRef.current?.close();
-                                stopMedia();
-                            } catch (e) {
-                                console.error("Cleanup error before redirect:", e);
-                            }
-                            router.push('/contact?source=portal');
-                        }, 1500);
+                        diagnosisReadyRef.current = true;
                     }
                 }
             }
@@ -220,6 +214,20 @@ export default function DiagnosePage() {
                 if (typewriterTimerRef.current) {
                     clearInterval(typewriterTimerRef.current);
                     typewriterTimerRef.current = null;
+                }
+
+                // If diagnosis was stored, redirect now that AI finished speaking
+                if (diagnosisReadyRef.current) {
+                    diagnosisReadyRef.current = false;
+                    setTimeout(() => {
+                        try {
+                            wsRef.current?.close();
+                            stopMedia();
+                        } catch (e) {
+                            console.error('Cleanup error before redirect:', e);
+                        }
+                        router.push(`/${locale}/contact?source=portal`);
+                    }, 500);
                 }
             }
           } catch (e) {
