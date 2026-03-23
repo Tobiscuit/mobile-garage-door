@@ -185,6 +185,15 @@ export default function DiagnosePage() {
                         console.log('[WS] ✅ DIAGNOSIS STORED, waiting for AI to finish speaking:', args);
                         setAiMessage("Filing your service report... Redirecting you now.");
                         diagnosisReadyRef.current = true;
+
+                        // Safety timeout: if turnComplete and onclose both fail to fire
+                        setTimeout(() => {
+                          if (diagnosisReadyRef.current) {
+                            diagnosisReadyRef.current = false;
+                            try { wsRef.current?.close(); stopMedia(); } catch {}
+                            router.push('/contact?source=portal');
+                          }
+                        }, 8000);
                     }
                 }
             }
@@ -397,10 +406,23 @@ export default function DiagnosePage() {
 
       {/* HEADER */}
       <div className="absolute top-0 left-0 right-0 p-4 flex justify-between items-center z-20 bg-gradient-to-b from-black/80 to-transparent">
-        <Link href="/" className="text-white/80 hover:text-white flex items-center gap-2">
+        <a
+          href="/contact?source=portal"
+          onClick={(e) => {
+            e.preventDefault();
+            try { wsRef.current?.close(); stopMedia(); } catch {}
+            // If diagnosis was stored, go to contact. Otherwise go home.
+            if (diagnosisReadyRef.current || sessionStorage.getItem('aiDiagnosis')) {
+              window.location.href = '/contact?source=portal';
+            } else {
+              window.location.href = '/';
+            }
+          }}
+          className="text-white/80 hover:text-white flex items-center gap-2"
+        >
            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
            <span className="text-sm font-bold uppercase tracking-widest">Exit</span>
-        </Link>
+        </a>
         <div className={`px-3 py-1 border rounded-full flex items-center gap-2 backdrop-blur-md transition-colors ${
             status === 'connected' ? 'bg-green-600/30 border-green-500/50' : 
             status === 'error' ? 'bg-red-600/30 border-red-500/50' : 
