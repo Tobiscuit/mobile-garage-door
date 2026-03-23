@@ -223,18 +223,24 @@ export default function DiagnosePage() {
                     typewriterTimerRef.current = null;
                 }
 
-                // If diagnosis was stored, redirect now that AI finished speaking
+                // If diagnosis was stored, redirect after audio finishes playing
                 if (diagnosisReadyRef.current) {
                     diagnosisReadyRef.current = false;
-                    setTimeout(() => {
-                        try {
-                            wsRef.current?.close();
-                            stopMedia();
-                        } catch (e) {
-                            console.error('Cleanup error before redirect:', e);
+                    const drainAndRedirect = () => {
+                      const ctx = playbackContextRef.current;
+                      // Wait until audio buffer is drained (or no audio context)
+                      if (ctx && ctx.state !== 'closed' && nextStartTimeRef.current > ctx.currentTime) {
+                        // Still playing — check again in 200ms, give up after 10s
+                        const elapsed = ctx.currentTime;
+                        if (elapsed < nextStartTimeRef.current + 10) {
+                          setTimeout(drainAndRedirect, 200);
+                          return;
                         }
-                        router.push('/contact?source=portal');
-                    }, 500);
+                      }
+                      try { wsRef.current?.close(); stopMedia(); } catch {}
+                      router.push('/contact?source=portal');
+                    };
+                    drainAndRedirect();
                 }
             }
           } catch (e) {
