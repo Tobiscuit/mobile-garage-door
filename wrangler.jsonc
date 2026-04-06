@@ -13,6 +13,9 @@
       "migrations_dir": "src/db/migrations"
     }
   ],
+  "images": {
+    "binding": "IMAGES"
+  },
   "r2_buckets": [
     {
       "binding": "MEDIA_BUCKET",

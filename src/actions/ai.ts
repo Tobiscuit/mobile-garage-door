@@ -117,32 +117,49 @@ export async function generatePostContent(prompt: string): Promise<any> {
             });
 
             let base64Image = null;
+            let imageMimeType = 'image/jpeg';
             const firstCandidate = imageResponse.candidates?.[0];
             if (firstCandidate?.content?.parts) {
                 for (const part of firstCandidate.content.parts) {
                     if (part.inlineData?.data) {
                         base64Image = part.inlineData.data;
+                        imageMimeType = part.inlineData.mimeType || 'image/jpeg';
                         break;
                     }
                 }
             }
 
             if (base64Image) {
-                const imageBuffer = Uint8Array.from(atob(base64Image), c => c.charCodeAt(0));
-                const filename = `${resultJson.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}.png`;
+                const rawBuffer = Uint8Array.from(atob(base64Image), c => c.charCodeAt(0));
+                const filename = `${resultJson.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}.webp`;
+
+                // Convert to real WebP using Cloudflare IMAGES binding (free tier)
+                const { env } = await getCloudflareContext();
+                let finalBuffer: ArrayBuffer;
+                try {
+                    console.log(`[AI Writer] Converting ${imageMimeType} (${rawBuffer.length} bytes) → WebP via IMAGES binding...`);
+                    const blob = new Blob([rawBuffer], { type: imageMimeType });
+                    finalBuffer = await (env as any).IMAGES
+                        .input(blob.stream())
+                        .output({ format: 'image/webp', quality: 85 })
+                        .toArrayBuffer();
+                    console.log(`[AI Writer] WebP conversion complete: ${rawBuffer.length} → ${finalBuffer.byteLength} bytes`);
+                } catch (convErr) {
+                    console.error('[AI Writer] IMAGES conversion failed, storing raw:', convErr);
+                    finalBuffer = rawBuffer.buffer;
+                }
 
                 // Upload to R2
-                const { env } = await getCloudflareContext();
-                await env.MEDIA_BUCKET.put(`blog/${filename}`, imageBuffer, {
-                    httpMetadata: { contentType: 'image/png' },
+                await env.MEDIA_BUCKET.put(`blog/${filename}`, finalBuffer, {
+                    httpMetadata: { contentType: 'image/webp' },
                 });
 
                 // Create media record in D1
                 const db = getDB(env.DB);
                 const [uploaded] = await db.insert(media).values({
                     filename,
-                    mimeType: 'image/png',
-                    filesize: imageBuffer.length,
+                    mimeType: 'image/webp',
+                    filesize: finalBuffer.byteLength,
                     alt: resultJson.title,
                     url: `/api/media/blog/${filename}`,
                 }).returning();

@@ -90,22 +90,39 @@ export async function POST(request: Request) {
           });
 
           let base64Image: string | null = null;
+          let imageMimeType: string = 'image/jpeg';
           const firstCandidate = imageResponse.candidates?.[0];
           if (firstCandidate?.content?.parts) {
             for (const part of firstCandidate.content.parts) {
               if (part.inlineData?.data) {
                 base64Image = part.inlineData.data;
+                imageMimeType = part.inlineData.mimeType || 'image/jpeg';
                 break;
               }
             }
           }
 
           if (base64Image) {
-            const imageBuffer = Uint8Array.from(atob(base64Image), c => c.charCodeAt(0));
+            const rawBuffer = Uint8Array.from(atob(base64Image), c => c.charCodeAt(0));
             const filename = `${body.slug}.webp`;
 
-            // Upload to R2 as WebP (Cloudflare will serve it optimized)
-            await (env as any).MEDIA_BUCKET.put(`blog/${filename}`, imageBuffer, {
+            // Convert to real WebP using Cloudflare IMAGES binding (free tier)
+            let finalBuffer: ArrayBuffer;
+            try {
+              console.log(`[Draft API] Converting ${imageMimeType} (${rawBuffer.length} bytes) → WebP via IMAGES binding...`);
+              const blob = new Blob([rawBuffer], { type: imageMimeType });
+              finalBuffer = await (env as any).IMAGES
+                .input(blob.stream())
+                .output({ format: 'image/webp', quality: 85 })
+                .toArrayBuffer();
+              console.log(`[Draft API] WebP conversion complete: ${rawBuffer.length} → ${finalBuffer.byteLength} bytes (${Math.round((1 - finalBuffer.byteLength / rawBuffer.length) * 100)}% smaller)`);
+            } catch (convErr) {
+              console.error('[Draft API] IMAGES conversion failed, storing raw:', convErr);
+              finalBuffer = rawBuffer.buffer;
+            }
+
+            // Upload final WebP to R2
+            await (env as any).MEDIA_BUCKET.put(`blog/${filename}`, finalBuffer, {
               httpMetadata: { contentType: 'image/webp' },
             });
 
@@ -113,7 +130,7 @@ export async function POST(request: Request) {
             const [uploaded] = await db.insert(media).values({
               filename,
               mimeType: 'image/webp',
-              filesize: imageBuffer.length,
+              filesize: finalBuffer.byteLength,
               alt: body.title,
               url: `/api/media/blog/${filename}`,
             }).returning();
