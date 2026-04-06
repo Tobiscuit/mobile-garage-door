@@ -111,10 +111,11 @@ export async function POST(request: Request) {
             try {
               console.log(`[Draft API] Converting ${imageMimeType} (${rawBuffer.length} bytes) → WebP via IMAGES binding...`);
               const blob = new Blob([rawBuffer], { type: imageMimeType });
-              finalBuffer = await (env as any).IMAGES
+              const result = await (env as any).IMAGES
                 .input(blob.stream())
-                .output({ format: 'image/webp', quality: 85 })
-                .toArrayBuffer();
+                .output({ format: 'image/webp', quality: 85 });
+              const webpResponse = result.response();
+              finalBuffer = await webpResponse.arrayBuffer();
               console.log(`[Draft API] WebP conversion complete: ${rawBuffer.length} → ${finalBuffer.byteLength} bytes (${Math.round((1 - finalBuffer.byteLength / rawBuffer.length) * 100)}% smaller)`);
             } catch (convErr) {
               console.error('[Draft API] IMAGES conversion failed, storing raw:', convErr);

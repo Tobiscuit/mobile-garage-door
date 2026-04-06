@@ -139,10 +139,11 @@ export async function generatePostContent(prompt: string): Promise<any> {
                 try {
                     console.log(`[AI Writer] Converting ${imageMimeType} (${rawBuffer.length} bytes) → WebP via IMAGES binding...`);
                     const blob = new Blob([rawBuffer], { type: imageMimeType });
-                    finalBuffer = await (env as any).IMAGES
+                    const result = await (env as any).IMAGES
                         .input(blob.stream())
-                        .output({ format: 'image/webp', quality: 85 })
-                        .toArrayBuffer();
+                        .output({ format: 'image/webp', quality: 85 });
+                    const webpResponse = result.response();
+                    finalBuffer = await webpResponse.arrayBuffer();
                     console.log(`[AI Writer] WebP conversion complete: ${rawBuffer.length} → ${finalBuffer.byteLength} bytes`);
                 } catch (convErr) {
                     console.error('[AI Writer] IMAGES conversion failed, storing raw:', convErr);
