@@ -30,12 +30,14 @@ const Header: React.FC = () => {
       <header className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b border-white/10 backdrop-blur-xl bg-charcoal-blue/90 text-white supports-[backdrop-filter]:bg-charcoal-blue/60">
         <div className="container mx-auto px-6 h-20 flex items-center justify-between">
 
-          {/* LOGO: Engineered & Solid */}
+          {/* LOGO: Company Brand */}
           <Link href="/" className="flex items-center gap-3 group">
-            <div className="bg-golden-yellow/10 p-2 rounded-lg border border-golden-yellow/20 group-hover:border-golden-yellow/50 transition-colors">
-              <svg className="h-6 w-6 text-golden-yellow" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path>
-              </svg>
+            <div className="bg-white rounded-lg overflow-hidden w-10 h-10 flex-shrink-0 group-hover:shadow-[0_0_12px_rgba(241,196,15,0.3)] transition-shadow">
+              <img
+                src="/images/logos/logo.jpg"
+                alt="Mobil Garage Door"
+                className="w-full h-full object-contain"
+              />
             </div>
             <span className="text-xl font-bold tracking-tight font-display">
               MOBIL<span className="text-gray-300 font-light">GARAGE</span>

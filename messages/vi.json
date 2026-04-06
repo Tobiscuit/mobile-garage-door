@@ -125,7 +125,8 @@
     "secret_weapon": "của nhà thầu.",
     "right_desc": "Giá ưu đãi theo khối lượng, lịch trình đảm bảo và lắp đặt nhãn trắng cho các nhà xây dựng nhà ở và nhà thầu tổng hợp.",
     "view_catalog": "Xem danh mục triển khai",
-    "builder_portal": "Cổng thông tin nhà thầu"
+    "builder_portal": "Cổng thông tin nhà thầu",
+    "since_badge": "Từ năm 2000"
   },
   "value_stack": {
     "badge": "Đảm bảo \"Không Đau Đầu\"",
@@ -243,7 +244,7 @@
     "cta_phone": "hoặc gọi 832-419-1293"
   },
   "about_page": {
-    "since": "Từ năm 2014",
+    "since": "Từ năm 2000",
     "heading_1": "Chúng tôi không bán cửa.",
     "heading_2": "Chúng tôi bán An ninh.",
     "standard_heading": "Tiêu chuẩn.",

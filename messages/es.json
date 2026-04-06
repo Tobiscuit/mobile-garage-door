@@ -125,7 +125,8 @@
     "secret_weapon": "del Contratista.",
     "right_desc": "Precios por volumen, horarios garantizados e instalación marca blanca para constructores y contratistas generales.",
     "view_catalog": "Ver Catálogo de Proyectos",
-    "builder_portal": "Portal de Constructores"
+    "builder_portal": "Portal de Constructores",
+    "since_badge": "Desde 2000"
   },
   "value_stack": {
     "badge": "La Garantía \"Sin Dolor de Cabeza\"",
@@ -243,7 +244,7 @@
     "cta_phone": "o llame al 832-419-1293"
   },
   "about_page": {
-    "since": "Desde 2014",
+    "since": "Desde 2000",
     "heading_1": "No vendemos puertas.",
     "heading_2": "Vendemos Seguridad.",
     "standard_heading": "El Estándar.",

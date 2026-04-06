@@ -125,7 +125,8 @@
     "secret_weapon": "Secret Weapon.",
     "right_desc": "Volume pricing, guaranteed scheduling, and white-label installation for home builders and general contractors.",
     "view_catalog": "View Deployment Catalog",
-    "builder_portal": "Builder Portal"
+    "builder_portal": "Builder Portal",
+    "since_badge": "Since 2000"
   },
   "value_stack": {
     "badge": "The \"No-Headache\" Guarantee",
@@ -243,7 +244,7 @@
     "cta_phone": "or call 832-419-1293"
   },
   "about_page": {
-    "since": "Since 2014",
+    "since": "Since 2000",
     "heading_1": "We don't sell doors.",
     "heading_2": "We sell Security.",
     "standard_heading": "The Standard.",
