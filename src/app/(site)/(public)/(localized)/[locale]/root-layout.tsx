@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import '../../../../globals.css'
 
 export const metadata: Metadata = {
-  metadataBase: new URL('http://localhost:3000'),
+  metadataBase: new URL('https://mobilgaragedoor.com'),
   title: 'Mobil Garage Door - Your Trusted Partner for Garage Doors',
   description: 'Professional garage door services including repair, installation, and maintenance. Reliable and professional solutions for all your garage door needs.',
   keywords: ['garage door repair', 'garage door installation', 'garage door maintenance', 'mobil garage door service'],
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: 'https://mobil-garage-door.vercel.app',
+    url: 'https://mobilgaragedoor.com',
     title: 'Mobil Garage Door - Your Trusted Partner for Garage Doors',
     description: 'Professional garage door services including repair, installation, and maintenance. Reliable and professional solutions for all your garage door needs.',
     siteName: 'Mobil Garage Door',
