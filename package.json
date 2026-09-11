@@ -12,6 +12,7 @@
     "lint": "eslint .",
     "lint:i18n": "node scripts/check-translations.mjs",
     "test": "vitest src/",
+    "test:smoke": "vitest --config vitest.smoke.config.ts --run",
     "test:e2e": "playwright test",
     "type-check": "tsc --noEmit",
     "seed": "tsx src/scripts/seed.ts",

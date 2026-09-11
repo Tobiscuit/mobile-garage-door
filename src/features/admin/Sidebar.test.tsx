@@ -15,10 +15,6 @@ vi.mock('next/link', () => ({
 }));
 
 // Mock child components
-vi.mock('@/features/payload/Logo', () => ({
-  default: () => <div data-testid="mock-logo">Logo</div>,
-}));
-
 vi.mock('./ThemeToggle', () => ({
   default: () => <div data-testid="mock-theme-toggle">Theme Toggle</div>,
 }));
@@ -33,23 +29,28 @@ describe('Admin Sidebar Component', () => {
     expect(screen.getByText('Dispatch Board')).toBeInTheDocument();
   });
 
-  it('renders the Customer Portal perspective switcher link', () => {
+  it('renders the customer-view perspective switcher pointing to /portal', () => {
     render(<Sidebar />);
-    
-    const portalLinkText = screen.getByText('Customer Portal');
-    expect(portalLinkText).toBeInTheDocument();
-    
-    const portalLink = portalLinkText.closest('a');
-    expect(portalLink).toHaveAttribute('href', '/portal');
+
+    // The switcher is labelled "Customer View". "Customer Portal" appeared
+    // nowhere in the component — that assertion had never actually run,
+    // because this suite failed to collect on the unresolvable
+    // next/navigation import.
+    const switcherLabel = screen.getByText('Customer View');
+    expect(switcherLabel).toBeInTheDocument();
+    expect(switcherLabel.closest('a')).toHaveAttribute('href', '/portal');
   });
 
-  it('renders the Log Out button pointing to /dashboard/logout', () => {
+  it('renders Log Out as a button rather than a link', () => {
     render(<Sidebar />);
-    
-    const logoutLinkText = screen.getByText('Log Out');
-    expect(logoutLinkText).toBeInTheDocument();
-    
-    const logoutLink = logoutLinkText.closest('a');
-    expect(logoutLink).toHaveAttribute('href', '/dashboard/logout');
+
+    const logoutLabel = screen.getByText('Log Out');
+    expect(logoutLabel).toBeInTheDocument();
+
+    // Signing out calls authClient.signOut() and then redirects, so this is a
+    // <button> — not a link to a /dashboard/logout route, which is what the
+    // previous assertion described.
+    expect(logoutLabel.closest('button')).toBeInTheDocument();
+    expect(logoutLabel.closest('a')).toBeNull();
   });
 });

@@ -1,6 +1,7 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterAll } from 'vitest';
+import { renderWithIntl } from '@/test/render-with-intl';
 import { AccountSidebar } from './AccountSidebar';
 
 // Mock PasskeyManager to keep test focused
@@ -39,7 +40,7 @@ describe('AccountSidebar UI Component', () => {
 
   it('renders customer details correctly', () => {
     const customer = { name: 'Alice', email: 'alice@example.com', phone: '123-456-7890' };
-    render(<AccountSidebar customer={customer} />);
+    renderWithIntl(<AccountSidebar customer={customer} />);
     
     expect(screen.getByText('Alice')).toBeInTheDocument();
     expect(screen.getByText('alice@example.com')).toBeInTheDocument();
@@ -48,14 +49,14 @@ describe('AccountSidebar UI Component', () => {
 
   it('renders the PasskeyManager', () => {
     const customer = { name: 'Alice', email: 'alice@example.com', phone: '123-456-7890' };
-    render(<AccountSidebar customer={customer} />);
+    renderWithIntl(<AccountSidebar customer={customer} />);
     
     expect(screen.getByTestId('mock-passkey-manager')).toBeInTheDocument();
   });
 
   it('calls authClient.signOut and redirects when Sign Out is clicked', async () => {
     const customer = { name: 'Alice', email: 'alice@example.com', phone: '123-456-7890' };
-    render(<AccountSidebar customer={customer} />);
+    renderWithIntl(<AccountSidebar customer={customer} />);
     
     const signOutButton = screen.getByText('Sign Out');
     fireEvent.click(signOutButton);
