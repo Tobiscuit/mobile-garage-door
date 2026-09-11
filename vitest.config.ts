@@ -23,7 +23,10 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'),
+      // import.meta.dirname, not __dirname: Vite's native config loader (the
+      // planned default) does not provide CommonJS globals, and vitest 5 warns
+      // about them.
+      '@': path.resolve(import.meta.dirname, './src'),
       ...Object.fromEntries(
         nextShims.map((shim) => [`next/${shim}`, `vinext/shims/${shim}`]),
       ),

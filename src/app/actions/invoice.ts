@@ -144,10 +144,14 @@ export async function sendSquareInvoice(
     if (!invoice?.id) throw new Error('Failed to create Invoice');
 
     // 3. Publish the invoice (this sends the email)
-    const publishResult = await squareClient.invoices.publish(invoice.id, {
+    // Square SDK 45 takes a single request object here, with the invoice id
+    // moved into it as `invoiceId`. That also removes the `as any` this call
+    // previously needed to type-check against the old positional signature.
+    const publishResult = await squareClient.invoices.publish({
+      invoiceId: invoice.id,
       version: invoice.version ?? 0,
       idempotencyKey: randomUUID(),
-    } as any);
+    });
 
     const publishedInvoice = publishResult.invoice;
 

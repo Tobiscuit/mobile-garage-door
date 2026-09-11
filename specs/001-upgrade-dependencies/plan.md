@@ -136,22 +136,64 @@ installing the real `next` package. Workers globals come from the
 - `vitest.config.ts`: tests resolve `next/*` through the vinext plugin (fallback:
   explicit aliases), which is what unblocks `Header.test.tsx` and `Sidebar.test.tsx`.
 
-### 3. better-auth 1.5 → 1.7 — account identity (the highest-risk item)
+### 3. better-auth 1.5 → 1.7 — no schema migration is required (verified)
 
-This app uses better-auth's **native D1 adapter** (`database: env.DB` in
-`src/lib/auth.ts`), not the Drizzle adapter — the Drizzle tables in
-`src/db/schema.ts` are hand-maintained for application queries.
+**This section originally planned an `account.issuer` column plus a backfill.
+That was wrong, and the evidence is below.** The 1.7 upgrade guide lists
+"Account identity — an `issuer` column and a compound index … Yes, backfill"
+among its schema changes, but that row belongs to the OIDC-provider feature set
+(protected resources, DPoP, SCIM, device authorization, the provider client
+store) that this application does not enable.
 
-1.7 adds an `issuer` column to `account` plus a unique compound index on
-`(issuer, accountId)`, and the upgrade guide flags it as requiring a **backfill**,
-with values determined per account type: credential rows take `local:credential`
-with the linked user's id, OAuth rows without an issuer take
-`local:oauth:<encoded providerId>`. This repo has credential, Google OAuth and
-passkey accounts, so it applies.
+What 1.7.4 actually declares, read from the shipped
+`@better-auth/core@1.7.4/dist/db/schema/account.d.mts`:
 
-The guide's other manual-preparation items — SCIM, the OAuth provider client
-store, Device Authorization — do **not** apply: the only plugins configured are
-`passkey`, `magicLink` and the Google social provider.
+```
+accountSchema: id, createdAt, updatedAt, providerId, accountId, userId,
+               accessToken, refreshToken, idToken, accessTokenExpiresAt,
+               refreshTokenExpiresAt, scope, password
+AccountKey    = Pick<BaseAccount, "providerId" | "accountId">
+```
+
+No `issuer`, and the account key is still `(providerId, accountId)`. Every
+`issuer` occurrence in that package is under `oauth2/*`. The `session`, `user`
+and `verification` schemas likewise match the columns already in
+`src/db/schema.ts`, and the passkey plugin's fields are **identical** between
+1.5.3 and 1.7.4 (`credentialID, publicKey, counter, deviceType, backedUp,
+transports, aaguid, userId, name`).
+
+So: better-auth moves 1.5.3 → 1.7.4 with **no migration, no backfill, and no
+change to `src/db/migrations/`**. The runtime behaviour is covered by the smoke
+suite, which exercises the auth-gated API contracts.
+
+Two notes for the reviewer:
+
+- `npx auth generate` could not be used against this app's own config —
+  `createAuth()` requires a Workers D1 binding a Node CLI cannot provide, and
+  the CLI refuses `--adapter kysely` with "Only kysely adapter is supported for
+  migrations". The schema above therefore comes from the published package.
+- `rateLimit` is enabled in production but better-auth defaults to in-memory
+  storage, so the `rateLimit` model it defines needs no table here.
+
+### 3b. Superseded: the original account-identity plan
+
+> **Superseded — do not act on this section.** It is kept only to record what
+> was planned and why it was dropped. The authoritative finding is §3 above:
+> better-auth 1.7.4 declares no `issuer` column, so **no migration is written
+> and none should be applied**.
+
+The original plan read the 1.7 upgrade guide's "Account identity — an `issuer`
+column and a compound index … Yes, backfill" row as applying here, and scheduled
+an additive migration plus a per-account-type backfill. Reading the shipped
+`@better-auth/core@1.7.4` schema showed that row belongs to the OIDC-provider
+feature set, which this app does not enable.
+
+What remains true from the original analysis: this app uses better-auth's
+**native D1 adapter** (`database: env.DB` in `src/lib/auth.ts`), not the Drizzle
+adapter — the Drizzle tables in `src/db/schema.ts` are hand-maintained for
+application queries. The guide's SCIM, OAuth-client-store and
+Device-Authorization preparation steps do not apply either: the only plugins
+configured are `passkey`, `magicLink` and the Google social provider.
 
 `npx auth generate` cannot be used against the app's own config, because
 `createAuth()` requires a Workers D1 binding that a Node CLI has no way to
@@ -160,8 +202,9 @@ mirroring this app's plugins, then hand-authored into a migration.
 
 Migrations here are applied by **`wrangler d1 migrations apply`**, not drizzle-kit:
 `src/db/migrations/meta/_journal.json` stops at `0002` while the directory holds
-files through `0016`, so everything since has been plain sequential SQL. The new
-migration follows that convention and the Drizzle schema is updated to match.
+files through `0016`, so everything since has been plain sequential SQL. That
+convention is recorded here for whoever writes the next migration; this branch
+adds none.
 
 ### 4. square 44 → 45 — webhook verification
 
@@ -193,6 +236,55 @@ entry; `postcss` itself stays as `@tailwindcss/postcss`'s peer.
 - **`@cloudflare/workers-types` 4 → 5** — global type shapes.
 - **`typescript` 5.7 → 7** — the native compiler; `tsconfig` options and any tooling reading the TS API are checked.
 
+### 7. Rolldown chunk ordering broke every server-rendered route
+
+Found by the smoke suite, which went from 10/10 to 2/10 the moment the framework
+moved. Every dynamic route returned 500 with:
+
+```
+TypeError: Cannot read properties of undefined (reading 'Symbol')
+  at dist/server/_next/static/schema-*.js
+```
+
+The throwing code is drizzle-orm's `PgTable` class body:
+
+```js
+class PgTable extends Table {
+  static Symbol = Object.assign({}, Table.Symbol, { … });
+  [Table.Symbol.ExtraConfigBuilder] = undefined;   // Table is undefined here
+}
+```
+
+The chain is `drizzle-orm` (root barrel, imported in 47 files for `eq`, `and`,
+`relations`) → `relations.js` → `pg-core/primary-keys.js`. Postgres dialect code
+is therefore reachable in a D1/SQLite app, and Vite 8's Rolldown split `PgTable`
+into a different chunk from the base `Table` it extends and evaluated it first.
+
+Fixed in `vite.config.ts` with `build.rolldownOptions.output.codeSplitting.groups`
+— the Vite 8 replacement for `manualChunks` — pinning `drizzle-orm` to a single
+chunk so module evaluation order is restored.
+
+Two things this was **not**, both ruled out by experiment: the
+`reflectMetadataPlugin` workaround (disabling it changed nothing, so it stays),
+and CJS interop (`legacy.inconsistentCjsInterop` would have been the wrong tool).
+
+### 8. The upgrade could not be installed boundary by boundary
+
+The plan below was written as separate installs per migration boundary. npm
+refused, three times, because the peer ranges interlock:
+
+| Attempt | Rejection |
+|---|---|
+| vinext 1.0 alone | beta.9 peers `@vitejs/plugin-rsc ^0.5.34`, still at 0.5.21 |
+| better-auth + drizzle | `@unpic/react@0.1.15` peers `react ^17 \|\| ^18` vs React 19.3 |
+| the rest | `next-intl@4.8.3` peers `typescript ^5` vs TypeScript 7 |
+
+So the dependency changes were staged in `package.json` and resolved by a single
+`npm install`. Verification stayed per-boundary: the gates ran after each code
+migration, and the smoke suite is what caught §7. `next-intl@4.14.4` drops the
+`typescript` peer entirely, and `@unpic/react` was removable because nothing
+imports it — vinext depends on it internally.
+
 ## Order of work
 
 Each step ends green before the next begins.
@@ -219,5 +311,18 @@ Each step ends green before the next begins.
 
 ## Holds
 
-None so far. Any hold must name the upstream blocker, the evidence, and a
-revisit trigger.
+**`drizzle-kit`'s esbuild chain — 4 moderate advisories, accepted.**
+`npm audit` ends at 4 moderate findings, all one chain:
+`drizzle-kit → @esbuild-kit/esm-loader → @esbuild-kit/core-utils → esbuild`.
+The only remediation npm offers is `drizzle-kit@0.18.1`, thirteen majors
+**backwards**, which would break the migration tooling — that is a downgrade,
+not a fix. `drizzle-kit` is a build-time migration CLI and does not appear
+anywhere in the built Worker (`grep` over `dist/server` finds no reference), so
+none of it is reachable from deployed code.
+**Revisit trigger:** when drizzle-kit drops `@esbuild-kit/*` (it is superseded
+by `tsx` upstream) or publishes a release whose advisory chain is clear.
+
+`npm audit fix` (non-breaking only, never `--force`) was applied and took the
+tree from 18 findings — 1 critical, 7 high, 10 moderate — down to these 4.
+
+No dependency is held back from its target version.

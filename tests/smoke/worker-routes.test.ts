@@ -46,6 +46,13 @@ beforeAll(async () => {
     [
       'wrangler',
       'dev',
+      // Serve the plugin-generated config, not the source wrangler.jsonc.
+      // vinext 1.0 sets `main` to the bare specifier
+      // "vinext/server/fetch-handler", which wrangler's own bundler cannot
+      // resolve; @cloudflare/vite-plugin emits a complete, deployable config
+      // alongside the build output, and that is what actually runs.
+      '-c',
+      'dist/server/wrangler.json',
       '--port',
       String(PORT),
       '--inspector-port',

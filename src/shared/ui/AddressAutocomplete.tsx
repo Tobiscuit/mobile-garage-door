@@ -133,7 +133,17 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
 
     try {
       const response = await fetch(`/api/places/details/${prediction.place_id}?sessionToken=${sessionToken}`);
-      const placeDetails = await response.json();
+      // TypeScript 7 types Response.json() as `unknown` where 5.x gave `any`,
+      // so the shape this handler already assumed is now stated explicitly.
+      // These fields mirror the Google Places (New) details response proxied
+      // by /api/places/details. Runtime behaviour is unchanged.
+      const placeDetails = (await response.json()) as {
+        id?: string;
+        displayName?: { text?: string };
+        formattedAddress?: string;
+        location: { latitude: number; longitude: number };
+        addressComponents?: any;
+      };
 
       if (placeDetails.id) {
         const placeResult = {
