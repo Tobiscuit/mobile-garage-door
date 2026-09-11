@@ -1,0 +1,74 @@
+name: CI
+
+# Verification only. This workflow deploys nothing and needs no secrets.
+# Deployment stays with the existing deploy-worker.yml, which is untouched.
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      # Strict peer resolution, deliberately without --legacy-peer-deps: the
+      # lockfile could not be installed this way before the dependency upgrade,
+      # so this step is itself a regression test.
+      - name: Install
+        run: npm ci
+
+      - name: Translations are in sync
+        run: npm run lint:i18n
+
+      # Reported, not enforced. `tsc --noEmit` was already failing before the
+      # upgrade and still reports ~166 errors, almost all of them the
+      # pre-existing "'db' is possibly 'null'" pattern that
+      # docs/plans/TECHNICAL_DEBT_REMEDIATION.md is about, plus TypeScript 7
+      # typing `await response.json()` as `unknown`. Gating on it would mean
+      # gating on work this pull request deliberately did not do. Left visible
+      # so the number can be driven down and the step flipped to blocking.
+      - name: Typecheck (non-blocking, pre-existing failures)
+        run: npm run type-check
+        continue-on-error: true
+
+      - name: Unit tests
+        run: npm test -- --run
+
+      - name: Build
+        run: npm run build
+
+      # The smoke suite serves the built Worker on workerd. Pages query D1, so
+      # the local database needs its tables. 0005_seed_settings.sql fails from
+      # scratch with a FOREIGN KEY constraint error (a pre-existing defect: it
+      # INSERTs rows referencing settings id 1 after an UPDATE that matched no
+      # row), which stops the run early. The migrations that do apply are
+      # enough for these routes, so the step is best-effort and the smoke
+      # assertions are what actually gate.
+      - name: Apply D1 migrations locally (best-effort)
+        run: npx wrangler d1 migrations apply DB --local || true
+
+      - name: Smoke tests (built Worker on workerd)
+        run: npm run test:smoke
+
+# Not run here:
+#   * npm run lint — this repository has no eslint config file at all, so
+#     `eslint .` exits 2. Adding one is a separate change.
+#   * npm run test:e2e — Playwright's global setup seeds a database and signs
+#     in; it needs a browser download and credentials that do not belong in a
+#     public repository's CI.
