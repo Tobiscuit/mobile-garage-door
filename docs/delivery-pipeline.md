@@ -47,12 +47,20 @@ pipeline, not a working one.
 
 vinext builds through `@cloudflare/vite-plugin`, which reads the root
 `wrangler.jsonc`, flattens it through Wrangler's own configuration schema, and
-writes the result to `dist/server/wrangler.json`. It also writes a redirect file:
+writes the result to `dist/server/wrangler.json`. That same plugin — it defines
+`PATH_TO_DEPLOY_CONFIG = ".wrangler/deploy/config.json"` — also writes a redirect
+file:
 
 ```json
 // .wrangler/deploy/config.json   (a build artifact — gitignored)
 { "configPath": "../../dist/server/wrangler.json", "auxiliaryWorkers": [] }
 ```
+
+**Both files are gitignored build output, so building and deploying must happen
+in the same workspace.** A deploy run against a fresh checkout — cloning, then
+deploying without building — finds neither file, falls back to the committed
+`wrangler.jsonc`, and fails on an entry point that only exists after a build.
+That is precisely what the deleted workflow did.
 
 Wrangler checks for that redirect on `deploy`, `dev`, and version-management
 commands, and announces it:
@@ -186,11 +194,18 @@ Two kinds exist, and both matter here:
   `<ALIAS>-<WORKER_NAME>.<SUBDOMAIN>.workers.dev`, assigned at upload:
 
   ```bash
-  npx wrangler versions upload -c dist/server/wrangler.json --preview-alias staging
+  npx wrangler versions upload -c dist/server/wrangler.json --preview-alias review-checkout
   ```
 
   Use this when a link must stay valid across several pushes, such as sending the
-  client one URL to review.
+  client one URL to review, and name the alias after the thing being reviewed.
+
+  > **Do not add `--preview-alias` to the preview trigger.** One preview trigger
+  > serves every non-production branch, so a fixed alias there is last-build-wins:
+  > two branches building at the same time would silently overwrite each other's
+  > preview, and the URL would point at whichever finished last. Bare
+  > `versions upload` gives every version its own collision-free URL. Reach for an
+  > alias by hand, for one long-lived branch that needs a stable link.
 
 ## Promotion flow
 
