@@ -10,22 +10,38 @@ import { getCloudflareContext } from "@/lib/cloudflare";
 
 export async function POST(req: NextRequest) {
   const body = await req.text();
-  const signature = req.headers.get('x-square-hmac-sha256');
+  // Square sends the signature as `x-square-hmacsha256-signature`. This route
+  // previously read `x-square-hmac-sha256`, a header Square never sends, so the
+  // guard below could never run and every webhook POST was processed unverified.
+  const signature = req.headers.get('x-square-hmacsha256-signature');
 
   try {
     const { env } = await getCloudflareContext();
     const db = getDB(env.DB);
 
-    if (process.env.SQUARE_WEBHOOK_SIGNATURE_KEY && signature) {
-      const isValid = (WebhooksHelper as any).isValidWebhookEventSignature(
-        body,
-        signature,
-        process.env.SQUARE_WEBHOOK_SIGNATURE_KEY,
-        process.env.SQUARE_WEBHOOK_NOTIFICATION_URL || 'http://localhost:3000/api/square/webhook'
-      );
+    if (process.env.SQUARE_WEBHOOK_SIGNATURE_KEY) {
+      // Square SDK 45 exposes WebhooksHelper.verifySignature(): async, taking an
+      // options object and returning a boolean. It replaces the positional
+      // isValidWebhookEventSignature() this route called through an `as any`
+      // cast — a method the SDK does not actually expose, so the check could
+      // never have succeeded even with the correct header.
+      //
+      // Note the behaviour change: when a signature key is configured, a request
+      // arriving without a signature header is now rejected instead of being
+      // waved through.
+      const isValid =
+        signature !== null &&
+        (await WebhooksHelper.verifySignature({
+          requestBody: body,
+          signatureHeader: signature,
+          signatureKey: process.env.SQUARE_WEBHOOK_SIGNATURE_KEY,
+          notificationUrl:
+            process.env.SQUARE_WEBHOOK_NOTIFICATION_URL ||
+            'http://localhost:3000/api/square/webhook',
+        }));
 
       if (!isValid) {
-        console.error('Invalid signature');
+        console.error('Square webhook signature verification failed');
         return NextResponse.json({ error: 'Invalid signature' }, { status: 403 });
       }
     }

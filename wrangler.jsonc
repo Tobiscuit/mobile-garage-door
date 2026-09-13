@@ -4,7 +4,10 @@
   "compatibility_flags": [
     "nodejs_compat"
   ],
-  "main": "worker/index.ts",
+  // vinext 1.0 ships its own fetch handler, which registers the cache adapters
+  // declared in vite.config.ts and passes the ExecutionContext through to them.
+  // It replaces the hand-written worker/index.ts that 0.0.x required.
+  "main": "vinext/server/fetch-handler",
   "d1_databases": [
     {
       "binding": "DB",
