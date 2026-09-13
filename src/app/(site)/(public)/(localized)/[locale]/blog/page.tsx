@@ -3,7 +3,7 @@ import { getDB } from "@/db";
 import { posts as postsTable, media as mediaTable } from "@/db/schema";
 import { eq, desc } from "drizzle-orm";
 import Link from '@/shared/ui/Link';
-import Image from 'next/image';
+import BlogFeaturedImage from '@/features/blog/BlogFeaturedImage';
 import SmartLink from '@/shared/ui/SmartLink';
 import { getTranslations } from '@/lib/server-translations';
 import { getCloudflareContext } from "@/lib/cloudflare";
@@ -72,12 +72,10 @@ export default async function BlogIndex({ params }: { params: Promise<{ locale: 
                                 {/* Image Container */}
                                 <div className="aspect-video relative bg-charcoal-blue overflow-hidden">
                                     {post.featuredImage?.url ? (
-                                        <Image
+                                        <BlogFeaturedImage
                                             src={post.featuredImage.url}
                                             alt={post.featuredImage.alt || post.title}
-                                            fill
                                             className="object-cover transition-transform duration-700 group-hover:scale-110"
-                                            loader={({ src, width, quality }) => `${src}?w=${width}&q=${quality || 75}`}
                                         />
                                     ) : (
                                         <div className="absolute inset-0 flex items-center justify-center bg-charcoal-blue">

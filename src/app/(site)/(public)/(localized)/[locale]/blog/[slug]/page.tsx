@@ -3,7 +3,7 @@ import { getDB } from "@/db";
 import { posts as postsTable } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { notFound } from 'next/navigation';
-import Image from 'next/image';
+import BlogFeaturedImage from '@/features/blog/BlogFeaturedImage';
 import SmartLink from '@/shared/ui/SmartLink';
 import { getTranslations } from '@/lib/server-translations';
 import { getCloudflareContext } from "@/lib/cloudflare";
@@ -131,13 +131,11 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
             {/* Hero Section */}
             <div className="relative h-[60vh] min-h-[400px] w-full overflow-hidden">
                 {post.featuredImage?.url ? (
-                    <Image
+                    <BlogFeaturedImage
                         src={post.featuredImage.url}
                         alt={post.featuredImage.alt || post.title}
-                        fill
                         className="object-cover"
                         priority
-                        loader={({ src, width, quality }) => `${src}?w=${width}&q=${quality || 75}`}
                     />
                 ) : (
                     <div className="absolute inset-0 bg-charcoal-blue"></div>
