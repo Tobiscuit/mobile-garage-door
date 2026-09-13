@@ -139,13 +139,15 @@ describe('public pages render', () => {
     const html = await response.text();
     expect(html).toContain('<title>');
     expect(html).toContain('Mobil Garage Door');
+    expectNoServerComponentsRenderError(html);
   });
 
   it.each(['/services', '/portfolio', '/contact'])(
-    'serves %s',
+    'serves %s without a Server Components error',
     async (path) => {
       const response = await fetch(`${BASE_URL}${path}`);
       expect(response.status).toBe(200);
+      expectNoServerComponentsRenderError(await response.text());
     },
   );
 });
@@ -176,7 +178,10 @@ describe('localized routing', () => {
   it.each(['/es', '/vi'])('serves the %s locale prefix', async (path) => {
     const response = await fetch(`${BASE_URL}${path}`);
     expect(response.status).toBe(200);
-    expect(await response.text()).toContain('<title>');
+
+    const html = await response.text();
+    expect(html).toContain('<title>');
+    expectNoServerComponentsRenderError(html);
   });
 });
 
