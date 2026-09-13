@@ -46,6 +46,17 @@
       "id": "f0fcc9d39cc9422ea2c932fa968dc6a9"
     }
   ],
+  // Preview URLs are how a branch gets reviewed before it is promoted: the
+  // Workers Builds preview trigger runs `wrangler versions upload`, which
+  // publishes a version WITHOUT routing production traffic to it. Stated
+  // explicitly rather than left to defaults — preview URLs otherwise follow
+  // `workers_dev`, which was also unset, so the behaviour was inherited and
+  // unreviewable. See docs/delivery-pipeline.md.
+  //
+  // A preview version binds to the PRODUCTION D1, R2 and KV resources declared
+  // below; it is isolated in code, not in data. Access must gate these URLs.
+  "preview_urls": true,
+
   // Custom domains: mobilgaragedoor.com → this Worker
   "routes": [
     { "pattern": "mobilgaragedoor.com/*", "zone_id": "6dcb9ee96a3af731e0124a38ecaf9114" },
