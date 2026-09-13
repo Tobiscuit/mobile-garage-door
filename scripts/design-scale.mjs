@@ -49,6 +49,16 @@ export const SPACE = {
   pairs: [['s', 'm'], ['m', 'l'], ['l', 'xl'], ['xl', '2xl']],
 };
 
+/**
+ * Font metrics for the metric-matched fallback face. Source:
+ * @capsizecss/metrics 4.2.0; the Work Sans values equal the hhea/OS/2 tables of
+ * the woff2 files the site serves (upm 1000, ascent 930, descent -243).
+ */
+export const FONT_METRICS = {
+  workSans: { unitsPerEm: 1000, ascent: 930, descent: -243, lineGap: 0, xWidthAvg: 499 },
+  arial: { unitsPerEm: 2048, ascent: 1854, descent: -434, lineGap: 67, xWidthAvg: 913 },
+};
+
 /** Reds sampled from the logo files (median of interior pixels; see design.md). */
 export const LOGO = {
   red: '#ba233f', // ring logo: public/icon-512x512.png (lossless), matches logo.jpg
@@ -258,7 +268,7 @@ export const CONTRAST_PAIRS = [
 // ─── Generated CSS ────────────────────────────────────────────────────────────
 
 export function scaleCss() {
-  const lines = [];
+  const lines = [`  --phi: ${round(PHI, 6)};`, `  --phi-fr: ${round(PHI, 6)}fr;`];
   for (const n of TYPE.steps) {
     const { min, max } = typeStep(n);
     lines.push(`  --step-${n < 0 ? `n${-n}` : n}: ${fluid(min, max)};`);
@@ -275,6 +285,24 @@ export function scaleCss() {
   return lines.join('\n');
 }
 
+/**
+ * @font-face descriptors that scale Arial to Work Sans's average glyph width
+ * and vertical metrics, so swapping fonts doesn't shift layout (the method
+ * Next.js's font fallback uses).
+ */
+export function fallbackFontCss() {
+  const w = FONT_METRICS.workSans;
+  const a = FONT_METRICS.arial;
+  const sizeAdjust = w.xWidthAvg / w.unitsPerEm / (a.xWidthAvg / a.unitsPerEm);
+  const pct = (n) => `${round(n * 100, 4)}%`;
+  return [
+    `  size-adjust: ${pct(sizeAdjust)};`,
+    `  ascent-override: ${pct(w.ascent / (w.unitsPerEm * sizeAdjust))};`,
+    `  descent-override: ${pct(Math.abs(w.descent) / (w.unitsPerEm * sizeAdjust))};`,
+    `  line-gap-override: ${pct(w.lineGap / (w.unitsPerEm * sizeAdjust))};`,
+  ].join('\n');
+}
+
 export function themeCss() {
   return Object.entries(colorTokens())
     .map(([name, token]) => `  --color-${name}: ${token.value}; /* ${token.source} */`)
@@ -282,14 +310,17 @@ export function themeCss() {
 }
 
 const BLOCKS = [
+  { file: 'src/app/globals.css', marker: 'design-scale:font-fallback', render: fallbackFontCss },
   { file: 'src/app/brand-theme.css', marker: 'design-scale:colors', render: themeCss },
   { file: 'src/app/(site)/(public)/(localized)/[locale]/site.css', marker: 'design-scale:scale', render: scaleCss },
 ];
 
 function replaceBlock(source, marker, body) {
-  const pattern = new RegExp(`(/\\* <${marker}> \\*/\\n)[\\s\\S]*?(\\n\\s*/\\* </${marker}> \\*/)`);
+  // Everything between the two marker comments is regenerated; the closing
+  // marker keeps its own indentation, so writing twice is a no-op.
+  const pattern = new RegExp(`(/\\* <${marker}> \\*/)[\\s\\S]*?([ \\t]*/\\* </${marker}> \\*/)`);
   if (!pattern.test(source)) throw new Error(`marker <${marker}> not found`);
-  return source.replace(pattern, `$1${body}$2`);
+  return source.replace(pattern, (_, open, close) => `${open}\n${body}\n${close}`);
 }
 
 // ─── Checks ───────────────────────────────────────────────────────────────────
