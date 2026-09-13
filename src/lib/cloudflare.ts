@@ -1,6 +1,9 @@
 // Cloudflare context helpers
-// Re-export KVCacheHandler from vinext/cloudflare
-export { KVCacheHandler } from 'vinext/cloudflare';
+//
+// The KVCacheHandler re-export that used to live here is gone: vinext 1.0
+// removed the `vinext/cloudflare` entry point, and the KV data cache is now
+// declared in vite.config.ts through @vinext/cloudflare's kvDataAdapter().
+// Nothing in the codebase imported the re-export.
 
 // Canonical Cloudflare Workers env access (March 2025+)
 // Uses the built-in cloudflare:workers module — no globals, no ALS, no proxy.

@@ -1,6 +1,7 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
+import { renderWithIntl } from '@/test/render-with-intl';
 import { PortalHeader } from './PortalHeader';
 
 // Mock Next.js Link component to render as a simple anchor tag in tests
@@ -12,7 +13,7 @@ vi.mock('next/link', () => ({
 
 describe('PortalHeader UI Component', () => {
   it('renders the customer name correctly', () => {
-    render(<PortalHeader customerName="Juan Admin" />);
+    renderWithIntl(<PortalHeader customerName="Juan Admin" />);
     
     // Check that the welcome message and customer name render
     expect(screen.getByText(/Welcome back/i)).toBeInTheDocument();
@@ -23,7 +24,7 @@ describe('PortalHeader UI Component', () => {
   });
 
   it('renders the [Admin View] button ONLY when isAdmin is true', () => {
-    render(<PortalHeader customerName="Juan Admin" isAdmin={true} />);
+    renderWithIntl(<PortalHeader customerName="Juan Admin" isAdmin={true} />);
     
     // The Admin View button should now be visible!
     const adminButton = screen.getByText(/Admin View/i);
@@ -34,7 +35,7 @@ describe('PortalHeader UI Component', () => {
   });
 
   it('renders Builder specific syntax when isBuilder is true', () => {
-    render(<PortalHeader customerName="Best Builds LLC" isBuilder={true} />);
+    renderWithIntl(<PortalHeader customerName="Best Builds LLC" isBuilder={true} />);
     
     expect(screen.getByText(/Command Center/i)).toBeInTheDocument();
     expect(screen.getByText(/Manage active job sites/i)).toBeInTheDocument();

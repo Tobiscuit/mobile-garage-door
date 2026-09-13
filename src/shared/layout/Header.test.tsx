@@ -49,7 +49,7 @@ describe('Header UI Component', () => {
     expect(desktopLink).toHaveAttribute('href', '/login');
   });
 
-  it('renders DASHBOARD pointing to /app when a user is logged in', () => {
+  it('renders DASHBOARD pointing to /dashboard when a user is logged in', () => {
     // Mock active session
     (authClient.useSession as any).mockReturnValue({ 
       data: { user: { id: '123', email: 'test@test.com' } } 
@@ -64,7 +64,12 @@ describe('Header UI Component', () => {
     const dashboardLinks = screen.getAllByText('DASHBOARD');
     expect(dashboardLinks.length).toBeGreaterThan(0);
     
+    // getDashboardUrl() sends admins and dispatchers to /dashboard, and only
+    // technicians to /dashboard/technician. This mocked session carries no
+    // role, so /dashboard is the real destination. The previous '/app'
+    // expectation was stale and had never actually run: the suite failed to
+    // collect at all on the unresolvable next/navigation import.
     const desktopLink = dashboardLinks[0].closest('a');
-    expect(desktopLink).toHaveAttribute('href', '/app');
+    expect(desktopLink).toHaveAttribute('href', '/dashboard');
   });
 });
