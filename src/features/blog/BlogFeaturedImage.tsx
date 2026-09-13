@@ -7,26 +7,27 @@ interface BlogFeaturedImageProps {
   alt: string
   className?: string
   priority?: boolean
-}
-
-// The same loader the blog pages used inline, unchanged, so image URLs stay
-// identical. /api/media serves the stored object whatever `w` and `q` say; the
-// query only gives next/image a distinct URL per srcset width.
-function mediaLoader({ src, width, quality }: { src: string; width: number; quality?: number }) {
-  return `${src}?w=${width}&q=${quality || 75}`
+  /** How wide the image renders, for the browser's candidate choice. */
+  sizes: string
 }
 
 /**
  * A blog post's featured image.
  *
- * The loader lives here, inside a Client Component, because it is a function
- * and next/image is itself a Client Component under vinext 1.0. When the
- * blog's Server Component pages passed `loader` inline, the function could not
- * be serialized across the Server -> Client boundary: the server streamed an
- * RSC error row in place of the image, and the browser threw React error #441
- * into the error boundary on every post that has a featured image. Next.js
- * documents the rule: in the App Router a custom loader needs 'use client'.
+ * It stays a Client Component because next/image is one under vinext 1.0.
+ *
+ * It no longer passes a custom `loader`. Under vinext 1.0, a loader on a
+ * `fill` image is called once with `width: 0` and no srcset is generated, so
+ * every image was requested as `?w=0&q=75` whatever `sizes` said. The query
+ * bought nothing: /api/media serves the stored object whatever `w` and `q`
+ * say, and `images.unoptimized` is on for the whole site. Without the loader
+ * the request is the object URL itself: one cache key per image, and no
+ * function prop that could fail to cross the Server → Client boundary
+ * (React error #441).
+ *
+ * `sizes` is still required and passed through, so the markup stays correct
+ * the day these images gain a resizing srcset.
  */
-export default function BlogFeaturedImage({ src, alt, className, priority }: BlogFeaturedImageProps) {
-  return <Image src={src} alt={alt} fill className={className} priority={priority} loader={mediaLoader} />
+export default function BlogFeaturedImage({ src, alt, className, priority, sizes }: BlogFeaturedImageProps) {
+  return <Image src={src} alt={alt} fill className={className} priority={priority} sizes={sizes} />
 }

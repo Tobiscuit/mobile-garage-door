@@ -4,10 +4,13 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import Header from './Header';
 import { authClient } from '@/lib/auth-client';
 
-// Mock next-intl translations
+// Mock next-intl translations. The header used to hard-code "DASHBOARD" in
+// English; it now reads nav.dashboard like every other label, so the mock maps
+// that key the same way it maps nav.login. The assertions below are unchanged.
 vi.mock('next-intl', () => ({
   useTranslations: () => (key: string) => {
     if (key === 'login') return 'PORTAL LOGIN';
+    if (key === 'dashboard') return 'DASHBOARD';
     return key;
   },
 }));

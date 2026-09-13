@@ -1,86 +1,83 @@
 import React from 'react';
 import { getTranslations } from '@/lib/server-translations';
+import { BUSINESS, TEL_HREF } from '@/lib/seo/site';
 
-const Footer: React.FC = async () => {
-  const t = await getTranslations('footer');
-  const tCommon = await getTranslations('common');
+/**
+ * Site footer, in the page's locale (it used to call getTranslations('footer')
+ * without a locale, which always resolved to English).
+ *
+ * Every link here existed before or points at a page in the main navigation.
+ * The service areas are plain text now: they were href="#" links to nowhere.
+ * The licence and insurance lines are unverified claims kept as the site made
+ * them (specs/002-design-refresh/copy.md §2, tier B).
+ */
+const Footer = async ({ locale }: { locale: string }) => {
+  const t = await getTranslations({ locale, namespace: 'footer' });
 
   return (
-    <footer className="bg-black text-gray-400 border-t border-white/10 pt-20 pb-10 text-sm font-sans">
-      <div className="w-full max-w-[1800px] mx-auto px-6 md:px-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
-          
-          {/* BRAND */}
-          <div className="col-span-1 md:col-span-1">
-            <h3 className="text-white text-xl font-bold mb-6 font-display tracking-tight">MOBIL<span className="text-gray-600">GARAGE</span></h3>
-            <p className="leading-relaxed mb-6">
-              {t('brand_description')}
+    <footer className="site-footer surface-deep">
+      <div className="wrap wrap--wide">
+        <div className="site-footer__grid">
+          <div className="site-footer__brand stack">
+            <p className="wordmark">
+              <span className="wordmark__mobil">Mobil</span> Garage Door
             </p>
-            <div className="flex gap-4">
-               {/* Social placeholders - minimalist */}
-               <div className="w-8 h-8 bg-white/10 rounded-full hover:bg-golden-yellow hover:text-black transition-colors flex items-center justify-center cursor-pointer">IG</div>
-               <div className="w-8 h-8 bg-white/10 rounded-full hover:bg-golden-yellow hover:text-black transition-colors flex items-center justify-center cursor-pointer">LN</div>
-            </div>
+            <p>{t('brand_description')}</p>
+            <p>
+              <a className="text-link" href={TEL_HREF}>
+                {t('call', { phone: BUSINESS.phoneDisplay })}
+              </a>
+            </p>
           </div>
 
-          {/* SERVICE AREA */}
+          <nav aria-labelledby="footer-explore">
+            <h2 id="footer-explore" className="site-footer__heading">{t('explore')}</h2>
+            <ul className="site-footer__list">
+              <li><a href="/services">{t('nav_services')}</a></li>
+              <li><a href="/portfolio">{t('nav_projects')}</a></li>
+              <li><a href="/blog">{t('nav_blog')}</a></li>
+              <li><a href="/about">{t('nav_about')}</a></li>
+              <li><a href="/contact">{t('nav_contact')}</a></li>
+            </ul>
+          </nav>
+
           <div>
-            <h4 className="text-white font-bold mb-6 uppercase tracking-wider text-xs">{t('deployment_zones')}</h4>
-            <ul className="space-y-3">
-              <li><a href="#" className="hover:text-white transition-colors">Greater Katy & West Houston</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">The Woodlands & North Houston</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Sugar Land & Richmond</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Houston Interior & Heights</a></li>
+            <h2 className="site-footer__heading">{t('deployment_zones')}</h2>
+            <ul className="site-footer__list site-footer__areas">
+              {BUSINESS.serviceAreas.map((area) => (
+                <li key={area}>{area}</li>
+              ))}
+              <li>{t('areas_note')}</li>
             </ul>
           </div>
 
-          {/* SUPPORT */}
-          <div>
-            <h4 className="text-white font-bold mb-6 uppercase tracking-wider text-xs">{t('client_support')}</h4>
-            <ul className="space-y-3">
-              <li><a href="/contact" className="hover:text-white transition-colors">{t('warranty_claim')}</a></li>
-              <li><a href="/login" className="hover:text-white transition-colors">{t('builder_portal')}</a></li>
-              <li><a href="/contact?type=repair" className="hover:text-white transition-colors">{t('emergency_callback')}</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">{t('sla_docs')}</a></li>
+          <nav aria-labelledby="footer-support">
+            <h2 id="footer-support" className="site-footer__heading">{t('client_support')}</h2>
+            <ul className="site-footer__list">
+              <li><a href="/contact">{t('warranty_claim')}</a></li>
+              <li><a href="/login">{t('builder_portal')}</a></li>
+              <li><a href="/contact?type=repair">{t('emergency_callback')}</a></li>
             </ul>
-          </div>
+          </nav>
 
-          {/* OFFICIAL DATA */}
           <div>
-            <h4 className="text-white font-bold mb-6 uppercase tracking-wider text-xs">{t('official_data')}</h4>
-            <div className="space-y-4">
+            <h2 className="site-footer__heading">{t('official_data')}</h2>
+            <dl className="site-footer__legal">
               <div>
-                <div className="text-xs text-gray-600 uppercase">{t('state_license')}</div>
-                <div className="text-white font-mono">#9942-B-RES</div>
+                <dt>{t('state_license')}</dt>
+                <dd>#9942-B-RES</dd>
               </div>
               <div>
-                <div className="text-xs text-gray-600 uppercase">{t('insurance')}</div>
-                <div className="text-white font-mono">Liberty Mutual • $2M Agg</div>
+                <dt>{t('insurance')}</dt>
+                <dd>Liberty Mutual • $2M Agg</dd>
               </div>
-              <div>
-                <div className="text-xs text-gray-600 uppercase">{t('hq_dispatch')}</div>
-                <div className="text-white">
-                  {t('rapid_response')}<br />
-                  Houston & Surrounding Areas
-                </div>
-              </div>
-            </div>
+            </dl>
           </div>
-
         </div>
 
-        {/* BOTTOM BAR */}
-        <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p>{tCommon('copyright', { year: new Date().getFullYear() })}</p>
-          <div className="flex gap-6 text-xs">
-            <a href="/privacy" className="hover:text-white">{tCommon('privacy_policy')}</a>
-            <a href="#" className="hover:text-white">{t('terms')}</a>
-            <a href="#" className="hover:text-white">{t('sitemap')}</a>
-          </div>
-          <div className="flex items-center gap-2 text-xs font-mono text-gray-600">
-            <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-            {t('systems_operational')}
-          </div>
+        <div className="site-footer__bottom">
+          <p>{t('copyright', { year: new Date().getFullYear() })}</p>
+          <a className="text-link" href="/privacy">{t('privacy_policy')}</a>
         </div>
       </div>
     </footer>
