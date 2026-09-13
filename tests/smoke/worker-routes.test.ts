@@ -1,14 +1,26 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { spawn, type ChildProcess } from 'node:child_process';
+import { execFileSync, spawn, type ChildProcess } from 'node:child_process';
 
 /**
  * Smoke tests for the built Worker, served by the real Workers runtime
  * (workerd, via `wrangler dev`) rather than a Node shim.
  *
- * Prerequisites, both of which CI performs before this suite:
- *   1. `npm run build` — `wrangler dev` serves the build output.
- *   2. `wrangler d1 migrations apply DB --local` — pages query D1, and an
- *      empty database makes the server render fail.
+ * Prerequisite, which CI performs before this suite: `npm run build` —
+ * `wrangler dev` serves the build output.
+ *
+ * The suite prepares its own local D1 in `beforeAll`, because two independent
+ * problems meant the server never read the database the migrations built:
+ *
+ *   1. `wrangler dev -c dist/server/wrangler.json` persists local state beside
+ *      that config, in dist/server/.wrangler/state, while
+ *      `wrangler d1 migrations apply --local` writes to ./.wrangler/state. The
+ *      server was reading an empty database. Every command here now passes the
+ *      same --persist-to.
+ *   2. On an empty database, 0005_seed_settings.sql fails a foreign key: it
+ *      inserts rows referencing production's singleton settings row, which
+ *      does not exist yet. That stopped the run, so every later migration —
+ *      including 0011_blog_pipeline — was skipped. The suite recreates the
+ *      precondition instead of editing a migration production already applied.
  *
  * Bindings are local-only miniflare state. The three vars below are dummy
  * values injected on the command line: nothing is read from `.dev.vars`, and
@@ -17,12 +29,35 @@ import { spawn, type ChildProcess } from 'node:child_process';
  * every server-rendered page returns 500.
  */
 
-const PORT = 4401;
-const INSPECTOR_PORT = 9234;
+const PORT = Number(process.env.SMOKE_PORT ?? 4401);
+const INSPECTOR_PORT = Number(process.env.SMOKE_INSPECTOR_PORT ?? 9234);
 const BASE_URL = `http://127.0.0.1:${PORT}`;
+const PERSIST_TO = '.wrangler/state';
+const DATABASE_TIMEOUT_MS = 120_000;
 const READY_TIMEOUT_MS = 180_000;
 
 let server: ChildProcess | undefined;
+
+function runWrangler(args: string[]): void {
+  execFileSync('npx', ['wrangler', ...args], { stdio: 'pipe', timeout: 60_000 });
+}
+
+function prepareLocalDatabase(): void {
+  const applyMigrations = ['d1', 'migrations', 'apply', 'DB', '--local', '--persist-to', PERSIST_TO];
+  const executeFile = (file: string) => [
+    'd1', 'execute', 'DB', '--local', '--persist-to', PERSIST_TO, '--file', file,
+  ];
+
+  try {
+    runWrangler(applyMigrations);
+  } catch {
+    // Expected on an empty database: 0005_seed_settings.sql stops the run.
+  }
+  runWrangler(executeFile('tests/smoke/fixtures/settings-singleton.sql'));
+  // With the precondition in place, every remaining migration must apply.
+  runWrangler(applyMigrations);
+  runWrangler(executeFile('tests/smoke/fixtures/blog-posts.sql'));
+}
 
 async function waitUntilServing(deadline: number): Promise<void> {
   let lastError: unknown;
@@ -40,7 +75,19 @@ async function waitUntilServing(deadline: number): Promise<void> {
   );
 }
 
+/**
+ * A Server Component that fails to render or serialize does not change the
+ * response status. The server streams an error row (`"<id>:E{"digest":…}`)
+ * into the inline RSC payload, and the browser then throws React error #441
+ * into the nearest error boundary. A 200 alone proves nothing: the payload has
+ * to be free of error rows.
+ */
+function expectNoServerComponentsRenderError(html: string): void {
+  expect(html).not.toMatch(/"\d+:E\{/);
+}
+
 beforeAll(async () => {
+  prepareLocalDatabase();
   server = spawn(
     'npx',
     [
@@ -53,6 +100,10 @@ beforeAll(async () => {
       // alongside the build output, and that is what actually runs.
       '-c',
       'dist/server/wrangler.json',
+      // Without this, state persists beside dist/server/wrangler.json and the
+      // server reads an empty database instead of the one prepared above.
+      '--persist-to',
+      PERSIST_TO,
       '--port',
       String(PORT),
       '--inspector-port',
@@ -67,7 +118,7 @@ beforeAll(async () => {
     { stdio: 'ignore', detached: true },
   );
   await waitUntilServing(Date.now() + READY_TIMEOUT_MS);
-}, READY_TIMEOUT_MS + 10_000);
+}, DATABASE_TIMEOUT_MS + READY_TIMEOUT_MS + 10_000);
 
 afterAll(() => {
   if (server?.pid !== undefined) {
@@ -95,6 +146,26 @@ describe('public pages render', () => {
     async (path) => {
       const response = await fetch(`${BASE_URL}${path}`);
       expect(response.status).toBe(200);
+    },
+  );
+});
+
+describe('blog', () => {
+  // The fixture post has a featured image, like every published production
+  // post. That branch renders next/image; an empty blog never does, which is
+  // how a crash on every real post went unnoticed.
+  const FIXTURE_TITLE = 'Smoke Fixture Post With A Featured Image';
+
+  it.each(['/blog', '/blog/smoke-fixture-post-with-featured-image'])(
+    'renders %s with its featured image and no Server Components error',
+    async (path) => {
+      const response = await fetch(`${BASE_URL}${path}`);
+      expect(response.status).toBe(200);
+
+      const html = await response.text();
+      expect(html).toContain(FIXTURE_TITLE);
+      expect(html).toMatch(/<img[^>]+smoke-fixture-cover\.webp/);
+      expectNoServerComponentsRenderError(html);
     },
   );
 });
