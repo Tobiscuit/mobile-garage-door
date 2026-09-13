@@ -96,6 +96,7 @@ vinext reimplements the Next.js API surface. I checked each API against the inst
 | `app/robots.ts` → `/robots.txt` | ✅ | Must sit at the app root (`nestable: false`); rules, `host`, `sitemap`; `text/plain` |
 | JSON-LD | n/a | Neither Next.js nor vinext has a Metadata field for it. Next.js's JSON-LD guide (v16.2.9) renders a native `<script type="application/ld+json">` and escapes `<` as `<`. |
 | Client component page + `generateMetadata` | ❌ (same as Next.js) | `/contact` is `'use client'`, so its metadata comes from a new server `contact/layout.tsx` that renders its children unchanged. |
+| Streaming metadata + `htmlLimitedBots` | ✅ like Next.js 15.2+ | **Found during implementation.** When any segment exports `generateMetadata`, vinext streams the tags into a hidden `<div>` in `<body>` (`server/app-page-element-builder.js`: `metadataPlacement = hasDynamicMetadata && streamGeneratedHead ? "body" : "head"`). Only user agents matching its HTML-limited-bots regex get them in `<head>`: `-Google` crawlers, Chrome-Lighthouse, Bingbot, DuckDuckBot, Twitterbot, facebookexternalhit and others (`utils/html-limited-bots.js`). Googlebot and AI search crawlers (OAI-SearchBot, Claude-SearchBot, PerplexityBot) are not on the list. The option is read from `next.config` as a RegExp or string (`config/next-config.js`). |
 
 **Behaviour of the stack around metadata** (observed on the local build and live site):
 - **next-intl `Link` header.** The middleware already sends a `Link` header with reciprocal `hreflang` for en, es, vi and `x-default` on every matched route (`alternateLinks` defaults to on), using the request origin.
@@ -145,6 +146,10 @@ The full title and description table per locale is in `copy.md` §SEO.
 - Each localized URL has one absolute, self-referencing canonical on `https://mobilgaragedoor.com`, formatted exactly like vinext's resolver (root is `https://mobilgaragedoor.com`, `/es/services` stays unslashed).
 - Query strings are dropped: `/contact?type=repair` canonicalizes to `/contact`.
 - `og:url`, sitemap `<loc>`, JSON-LD `url` and hreflang `href` all use the same string from the same function. Google says not to specify different canonicals through different techniques.
+- **In `<head>` for every user agent.** `next.config.js` sets `htmlLimitedBots: /.*/`, the documented way to disable streaming metadata (Next.js v16.2.9 `htmlLimitedBots` reference, via context7; vinext honours it).
+  - Why: Google accepts `rel="canonical"` "only … if it appears in the `<head>` section". AI search crawlers aren't on vinext's list, and whether they run JavaScript is unverified.
+  - Cost: metadata resolves before the first byte of `<head>`. On static pages that is a translation lookup; on post and project pages, one indexed D1 query by slug.
+  - Smoke-tested with Googlebot, a mobile Chrome UA and an OAI-SearchBot UA.
 
 ### 4.3 hreflang and languages
 - **Every localized URL** — home, services, about, portfolio, blog, contact, privacy, **and** each blog post and project — carries the full cluster: `en` → unprefixed, `es` → `/es…`, `vi` → `/vi…`, `x-default` → the English URL.
@@ -224,7 +229,8 @@ Sitemap: https://mobilgaragedoor.com/sitemap.xml
   - **Fonts.** The render-blocking `@import` of Google Fonts is replaced with the **same Work Sans variable font, self-hosted**: latin, latin-ext and vietnamese subsets by `unicode-range`, SIL OFL included. It uses `font-display: swap` and a `<link rel="preload">` for the latin subset. Lighthouse attributed ~774 ms of render blocking to the old import.
   - **Hero.** It is server-rendered text with no entrance animation (opacity-0 elements are not LCP candidates).
   - **Blog hero image.** It keeps `fetchpriority="high"` and eager loading, with a correct `sizes`.
-- **Logo weight.** The 465 KB `logo.jpg` shown at 40×40 is replaced in the header by a tight crop in AVIF and WebP at 1×/2×/3× (a few KB), with explicit `width`/`height`.
+- **Logo weight.** The 465 KB `logo.jpg` shown at 40×40 is replaced in the header by a tight crop in AVIF and WebP at 1×/2×/3× (2–11 KB), with explicit `width`/`height`. On phones the hero's larger mark is the LCP element, so it gets `fetchpriority="high"` and width-based `srcset` (320/640/960 w).
+- **What still limits lab LCP** (measured, §8). On `/`, observed FCP = observed LCP = 154 ms unthrottled, yet simulated LCP is ~3.1–3.5 s. The HTML modulepreloads about 237 KB of framework JavaScript (vinext runtime, React, better-auth client for the header session) before first paint, and Lighthouse's pessimistic Slow 4G estimate counts every request started before LCP. Shrinking that runtime is framework work outside a design refresh (follow-up in §4.12).
 - **CLS.**
   - The fallback font is metric-matched to Work Sans with `size-adjust: 111.9334%`, `ascent-override: 83.0851%`, `descent-override: 21.7093%` and `line-gap-override: 0%`. These are computed from Work Sans's `hhea`/`OS/2` metrics, which match `@capsizecss/metrics`, against Arial.
   - Images have explicit dimensions or an `aspect-ratio` box, and nothing animates layout properties.
@@ -265,20 +271,31 @@ The Search Console generative-AI control defaults to "Include" (Google blog, 202
 - A language switcher. None exists today, and it would be new functionality.
 - `localeDetection: false` (Q7) and "Always Use HTTPS" (Q8): routing and zone settings.
 - The PWA `theme_color` and manifest colours (the dispatch app shares them).
+- The ~237 KB of client JavaScript preloaded on every public page (§4.9). The auth-session hook in the header is one avoidable part.
 
 ---
 
 ## 5. Tests
 
-Added to `tests/smoke/worker-routes.test.ts`, against the built Worker on workerd with synthetic D1 fixtures:
-- **one h1:** every public page (en) plus the es and vi home and services, each still guarded against Server Components error rows.
-- **canonical per locale:** exactly one `<link rel="canonical">` in `<head>`, equal to the production URL of that locale's path.
-- **reciprocal hreflang:** for each page, the en/es/vi documents each list en, es, vi and `x-default`, the three sets are identical, and each document's own canonical is in its set.
-- **structured data:** every `application/ld+json` block parses. The home page has `HomeAndConstructionBusiness` (`name`, `url`, `telephone`), `WebSite` (`name`, `url`) and one `Service` per fixture service (`name`, `provider`). The post has `BlogPosting` (`headline`, `datePublished`, `image`). No node contains `aggregateRating`, `review`, `priceRange`, `openingHoursSpecification` or `address`.
-- **sitemap:** 200 `application/xml`, contains every static path × locale, `xhtml:link` alternates with `x-default`, and the fixture post and project.
-- **robots:** 200 `text/plain`; a small matcher implementing Google's longest-match rule confirms public paths are allowed and `/dashboard`, `/portal` and the `/es/*`, `/vi/*` variants are disallowed; `Sitemap:` is absolute.
+Added to `tests/smoke/worker-routes.test.ts`, run against the built Worker on workerd with the synthetic fixtures (`blog-posts.sql`, plus the new `public-content.sql`: three services, two testimonials, one project). 101 of the suite's 113 tests are new; the original 12 are unchanged and still pass. Every test fetches as Googlebot unless noted.
 
-Unit tests (`npm test`): the URL, alternates and metadata helpers; the JSON-LD builders (no forbidden properties, `<` escaped); the design-scale checker.
+| Group | What it proves | Tests |
+|---|---|---|
+| SEO: headings | Every redesigned page (7 static + 2 detail) in en/es/vi has exactly one `<h1>`, and no Server Components error row | 27 |
+| SEO: metadata in `<head>` | One absolute, self-referencing canonical per page per locale; title, description and canonical in the initial `<head>` for a Googlebot, a mobile Chrome and an OAI-SearchBot user agent (guards `htmlLimitedBots`); unique titles and descriptions across the 21 static page × locale combinations; `<html lang>` per locale | 27 + 3 + 1 + 3 |
+| SEO: hreflang | For each page, the en/es/vi documents carry the identical cluster (en, es, vi, x-default), each contains its own canonical, and it matches next-intl's `Link` header by pathname | 9 |
+| SEO: structured data | Every JSON-LD block on every page × locale parses and contains no `aggregateRating`, `review`, `priceRange`, `openingHours(Specification)`, `address` or `geo`. Home carries `HomeAndConstructionBusiness` (name, url, telephone), `WebSite` (name, url) and one `Service` per fixture service with its provider. The post carries `BlogPosting` (headline, datePublished, image) | 27 + 2 |
+| SEO: sitemap.xml | 200 XML; every page in every locale; `x-default` and localized alternates; no private, API or auth URL | 1 |
+| SEO: robots.txt | 200 text/plain. Google's longest-match rule (implemented in the test) allows public pages, blog images and `/login`, and disallows `/dashboard`, `/portal`, `/admin` and their `/es`, `/vi` variants. Absolute `Sitemap:` | 1 |
+
+Unit tests (`npm test`, 113 across 13 files, 37 new):
+- `src/lib/seo/site.test.ts`: pins the next-intl routing assumptions; localized paths, absolute URLs, reciprocal alternates, robots rules.
+- `src/lib/seo/metadata.test.ts`: localized titles, canonicals, hreflang, Open Graph, noindex, social image dimensions.
+- `src/lib/seo/structured-data.test.ts`: types and facts, no forbidden properties, `<` escaping.
+- `src/lib/seo/text.test.ts`: description excerpts and locale dates.
+- `src/shared/design/design-scale.test.ts`: generated CSS in sync, monotonic scales, WCAG contrast pairs, φ spacing.
+
+Changed test: `src/shared/layout/Header.test.tsx`. The mock now maps `nav.dashboard` to "DASHBOARD", as it already mapped `nav.login`, because the header reads that label from messages instead of a hard-coded English string. Both assertions (login link → `/login` when logged out; dashboard link → `/dashboard` when logged in) are unchanged.
 
 ---
 
@@ -307,6 +324,24 @@ Unit tests (`npm test`): the URL, alternates and metadata helpers; the JSON-LD b
 
 ## 8. Lighthouse before → after
 
-Lighthouse 13.4.1 via `npx` (not a dependency), mobile defaults (Moto G Power emulation, simulated Slow 4G, 4× CPU), headless Chromium 1243, against the local production build on workerd (port 4421) with synthetic D1 data. Median of 3 runs per page, measured serially on the same machine.
+Method, identical for both columns:
+- Lighthouse 13.4.1 via `npx` (not a dependency), default mobile config: Moto G Power emulation, simulated Slow 4G, 4× CPU.
+- Headless Chromium 1243, against the local production build on workerd (`wrangler dev -c dist/server/wrangler.json`, port 4421) with synthetic D1 data.
+- Three runs per page, run one after another; the table shows the **median**.
 
-*(Filled in after the redesign build; see §8 table below.)*
+| Page | LCP | CLS | TBT | FCP | Performance | Accessibility | Best practices | SEO | Transfer |
+|---|---|---|---|---|---|---|---|---|---|
+| `/` | 3,575 → **3,505 ms** | 0.020 → **0** | 0 → **0 ms** | 2,750 → **1,871 ms** | 86 → **90** | 95 → **100** | 96 → 96 | 100 → 92 † | 825 → **390 KB** |
+| `/services` | 3,504 → **3,247 ms** | 0 → **0** | 0 → **0 ms** | 2,749 → **1,872 ms** | 86 → **92** | 95 → **100** | 96 → 96 | 100 → 92 † | 817 → **371 KB** |
+| `/contact` | 3,661 → **3,579 ms** | 0.006 → **0** | 0 → **0 ms** | 2,760 → **1,879 ms** | 85 → **89** | 89 → **100** | 96 → 96 | 100 → 92 † | 831 → **384 KB** |
+| `/blog/<post>` | 3,737 → **3,435 ms** | 0 → **0** | 0 → **0 ms** | 2,762 → **1,878 ms** | 85 → **90** | 93 → **100** | 96 → 96 | 100 → 92 † | 834 → **388 KB** |
+
+- **Accessibility.** Before, `color-contrast` failed on all four pages, `heading-order` on the post and `label` on the contact form. After: no failing accessibility audits.
+- **Best practices.** 96 both times. The remaining failures are local artifacts present before and after: the better-auth client's CORS request to the production `get-session` URL, and a missing `/favicon.ico`.
+- **† SEO 92: a local measurement artifact, not a site defect.** The single failing audit is `canonical`, with the explanation "Points to another `hreflang` location (http://127.0.0.1:4421/)".
+  - The canonical and HTML hreflang correctly use `https://mobilgaragedoor.com`.
+  - next-intl's `Link` response header builds its hreflang URLs from the *request* origin, which locally is `http://127.0.0.1:4421`. Lighthouse merges both sources and sees the tested URL and the canonical as two different hreflang locations.
+  - On production the request origin *is* `https://mobilgaragedoor.com`. The live header on 2026-09-13 read `<https://mobilgaragedoor.com/services>; rel="alternate"; hreflang="en" …`, so the clusters coincide and the audit's condition can't occur.
+  - Before, the audit was "not applicable": there was no canonical at all.
+  - The smoke tests assert that both clusters agree by pathname (§5).
+- **LCP.** Improved on all four pages (−2% to −8%) and FCP by 32%, but simulated LCP is still above the 2.5 s "good" threshold. The cause, measured, is in §4.9.

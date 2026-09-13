@@ -1,6 +1,6 @@
 # Spec 002 — Red-and-white design refresh, copy rewrite and SEO
 
-**Status:** in progress
+**Status:** implemented; PR open against `develop` (never merged by the agent)
 **Branch:** `feat/design-refresh-2026-09` (cut from `origin/develop` at `6c52084`, `--no-track`)
 **Depends on:** PR #6 (`fix/blog-crash-on-upgraded-runtime`), merged into this branch first (`ea3fcbc`). It fixes the blog crash under vinext 1.0 and makes the smoke suite read a seeded, migrated D1.
 **Date:** 2026-09-13
@@ -40,7 +40,7 @@ The confirmation comes from the site itself: the services it lists (springs, ope
 
 **Out of scope (untouched)**
 - Portal, dashboard, admin, auth (`login`, `signup`, `auth/complete`, `profile/complete`), payments, booking components, `diagnose`, and every API route. These keep their current look inside the new header and footer.
-- `src/proxy.ts`, `src/i18n/*` (i18n routing), `next.config.js`, `vite.config.ts`, `wrangler.jsonc`, CI workflows.
+- `src/proxy.ts`, `src/i18n/*` (i18n routing), `vite.config.ts`, `wrangler.jsonc`, CI workflows. `next.config.js` gets one SEO option only, `htmlLimitedBots: /.*/`, so metadata renders in `<head>` for every crawler (`seo.md` §4.2); its redirects, rewrites and image settings are untouched.
 - Database content: service, testimonial, project and post text, and the About page stats and values.
 - Known defects, reported but not fixed: the undefined `squareClient` in `api/service-requests/route.ts`, the ~166 pre-existing type errors, the missing eslint config, the failing Vercel check, and `booking.trip_fee`/`booking.authorize`, which read "The 9 Trip Fee"/"AUTHORIZE 9" in all locales (booking namespace, out of scope).
 - Content generation or blog automation (Tobias's separate SEO engine product).

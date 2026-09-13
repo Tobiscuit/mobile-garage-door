@@ -26,47 +26,49 @@
 - [x] Copy change set applied to `messages/{en,es,vi}.json` (237 changes; out-of-scope namespaces byte-identical)
 
 ## 3. Design system
-- [ ] `src/app/brand-theme.css` (generated `@theme` colours), imported by `globals.css`
-- [ ] Self-host Work Sans (latin, latin-ext, vietnamese) + `OFL.txt`; replace the Google Fonts `@import`; metric-matched fallback; preload latin
-- [ ] `site.css` for public routes: generated scales, base typography scoped to `.page`, component layer
-- [ ] Header logo mark (`<picture>` AVIF/WebP 1×/2×/3×) and `og-default.jpg`
-- [ ] Unit test running `checkAll()` (tokens match the generator, monotonic scales, contrast pairs)
+- [x] `src/app/brand-theme.css` (generated `@theme` colours), imported by `globals.css`
+- [x] Self-host Work Sans (latin, latin-ext, vietnamese) + `OFL.txt`; replace the Google Fonts `@import`; metric-matched fallback (generated); preload latin
+- [x] `site.css` for public routes: generated scales, base typography scoped to `.page`, component layer
+- [x] Logo mark `<picture>` (AVIF/WebP, header by density, hero by width) and `og-default.jpg`
+- [x] Unit test running `checkAll()` (tokens match the generator, monotonic scales, contrast pairs)
 
 ## 4. Shared layout
-- [ ] Skip link, single `<main id="main">`
-- [ ] Header: logo + wordmark, localized nav with `aria-current`, call and request actions, accessible `inert` mobile menu, `:has()` scroll lock, scroll-driven elevation
-- [ ] Mobile action bar (phones), hidden on the request form
-- [ ] Footer in the page locale: service areas as text, crawlable page links, support links, phone, licence block; dead links and fake status removed
-- [ ] Floating AI button restyle; loading state restyle
-- [ ] Update `Header.test.tsx` for the localized dashboard label (same behaviour asserted)
+- [x] Skip link, single `<main id="main">`
+- [x] Header: logo + wordmark, localized nav with `aria-current`, call and request actions, `inert` mobile menu with Escape, `:has()` scroll lock, scroll-driven elevation; breakpoints measured in en/es/vi from 360 to 1440 px
+- [x] Mobile action bar (phones), hidden on the request form via `:has([data-request-form])`
+- [x] Footer in the page locale: service areas as text, crawlable page links, support links, phone, licence block; dead links and fake status removed
+- [x] Floating AI button restyle (utilities, shared with private routes); loading state restyle
+- [x] `Header.test.tsx`: the mock maps `nav.dashboard` like `nav.login` (same assertions)
 
 ## 5. Pages
-- [ ] Home: hero (`id="repair"`, one `h1`, proof card, builders panel), services (subgrid + container queries), value stack, by-the-numbers + testimonials; server components
-- [ ] Services: one `h1`, two path cards, capability cards, brands band
-- [ ] About: `h1`, stats, standard + values, licensing tiles, call-to-action with phone
-- [ ] Portfolio index and detail: no nested `<main>`, placeholder without debug text, headings in order
-- [ ] Blog index and post: `BlogFeaturedImage` without the loader and with `sizes`; locale dates; reading progress; call-to-action with phone
-- [ ] Contact: same fields, names, handlers and endpoints; associated labels; `aria-pressed`; localized strings; `contact/layout.tsx` for metadata
-- [ ] Privacy: localized labels, no nested `<main>`
+- [x] Home: hero (`id="repair"`, one `h1`, proof card, builders panel), services (subgrid + container queries), value stack, by-the-numbers + testimonials; all server components now
+- [x] Services: one `h1`, two `h2` path cards, capability cards, brands band
+- [x] About: `h1`, stats, standard + values, licensing tiles, call-to-action with phone
+- [x] Portfolio index and detail: no nested `<main>`, localized placeholder instead of "IMG_MISSING_001", headings in order, fake sort controls removed
+- [x] Blog index and post: `BlogFeaturedImage` without the loader and with `sizes`; locale dates; reading progress; call-to-action with phone
+- [x] Contact: same fields, names, handlers and endpoints (verified line by line against `origin/develop`); associated labels; `aria-pressed`; localized strings; `contact/layout.tsx` for metadata
+- [x] Privacy: localized labels, no nested `<main>`, localized date
 
 ## 6. SEO
-- [ ] `src/lib/seo/site.ts`: origin, business facts, localized paths, absolute URLs, alternates
-- [ ] `src/lib/seo/metadata.ts`: page metadata (title, description, canonical, hreflang, Open Graph, Twitter, robots)
-- [ ] `generateMetadata` in the public layout and every page (blog post and project from D1; non-published posts `noindex`)
-- [ ] `src/lib/seo/structured-data.ts` + `JsonLd`: business, WebSite, Service, BlogPosting
-- [ ] `src/app/sitemap.ts` (static × locales + published posts + projects from D1)
-- [ ] `src/app/robots.ts`
-- [ ] Unit tests for the helpers
+- [x] `src/lib/seo/site.ts`: origin, business facts, localized paths, absolute URLs, alternates
+- [x] `src/lib/seo/metadata.ts`: page metadata (title, description, canonical, hreflang, Open Graph, Twitter, robots)
+- [x] `generateMetadata` in every page (blog post and project from D1; non-published posts `noindex`)
+- [x] `htmlLimitedBots: /.*/` so metadata is in `<head>` for every user agent (found: vinext streams it into `<body>` otherwise)
+- [x] `src/lib/seo/structured-data.ts` + `JsonLd`: business, WebSite, Service, BlogPosting
+- [x] `src/app/sitemap.ts` (static pages × locales + published posts + projects from D1)
+- [x] `src/app/robots.ts`
+- [x] Unit tests for the helpers
 
 ## 7. Tests and gates
-- [ ] Smoke fixture `public-content.sql` (synthetic services, testimonials, project) loaded in `beforeAll`
-- [ ] Smoke `SEO` suite: one h1, canonical per locale, reciprocal hreflang, JSON-LD, sitemap, robots
-- [ ] `npm run lint:i18n` · `npm test -- --run` · `npm run build` · `npm run test:smoke` (ports 4421/9253)
+- [x] Smoke fixture `public-content.sql` (synthetic services, testimonials, project) loaded in `beforeAll`
+- [x] Smoke SEO suite: 101 new tests (one h1, canonical per locale, head placement per user agent, unique titles, `lang`, reciprocal hreflang vs `Link` header, JSON-LD, sitemap, robots)
+- [x] `npm run lint:i18n` (458 keys × 3, 352 references) · `npm test -- --run` (113) · `npm run build` · `npm run test:smoke` (113, ports 4421/9253)
+- [x] `tsc --noEmit`: 166 errors, the pre-existing count (no new errors)
 
 ## 8. Evidence
-- [ ] Lighthouse after (same method); fill `seo.md` §8
-- [ ] After screenshots; commit compressed before/after for home and services at 390/1440
-- [ ] Record test changes in the PR
+- [x] Lighthouse after (same method); `seo.md` §8
+- [x] After screenshots; before/after WebP for home and services at 390/1440 in `screenshots/`
+- [x] Test changes recorded (`seo.md` §5)
 
 ## 9. Delivery
 - [ ] Push branch; open PR into `develop` stating it depends on #6; watch CI `verify` to green

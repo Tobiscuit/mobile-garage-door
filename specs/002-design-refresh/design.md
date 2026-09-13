@@ -224,23 +224,26 @@ Status from `web-features` 3.38.0 / `@mdn/browser-compat-data` 8.1.1 (2026-09-10
 ## 8. Page designs
 
 Shared across public pages:
-- **Header** (white, sticky, 1 px line):
-  - **Left:** the logo mark (`<picture>`, 56 px tall, AVIF/WebP) and the "*Mobil* Garage Door" wordmark.
-  - **Centre (≥ 64em):** Services, Projects, Blog, About.
+- **Header** (white, fixed, 1 px line). Breakpoints were set by measuring the longest locale (Vietnamese) at 360, 390, 768, 1024, 1280 and 1440 px, with no overflow at any of them:
+  - **Left:** the logo mark (`<picture>`, 48 px tall, AVIF/WebP, never squeezed: `flex: none` + `aspect-ratio`) and the "*Mobil* Garage Door" wordmark. The wordmark drops to step 0 below 30em, and below 24em it stacks "Mobil" over "Garage Door" like the logo's own lockup.
+  - **Centre (≥ 80em):** Services, Projects, Blog, About, with `aria-current` on the active page.
   - **Right:**
-    - **Desktop:** "Call 832-419-1293" text button, *Request service* red button, and a small "Portal login" / "Dashboard" link (same session logic as today).
-    - **Phones:** a 48 px call icon button and a 48 px menu button. The full-screen white menu shows the same links in 56 px rows.
+    - **From 90em:** "Call 832-419-1293" as a text button.
+    - **Below 90em:** a 48 px red call icon button with the same accessible name.
+    - **From 48em:** *Request service*.
+    - **From 80em:** a "Portal login" / "Dashboard" link (session logic unchanged).
+    - **Below 80em:** a 48 px menu button opening a full-screen white menu with the same links and actions. The menu is `inert` when closed, closes on Escape, and locks page scroll with `html:has(.site-menu[data-open])`.
 - **Mobile action bar** (under 48em, fixed to the bottom, safe-area aware): *Call* (white) and *Request service* (red), split 1 : φ. Body padding reserves its height, so it never covers content. It is hidden on `/contact`, which *is* the request form, via `body:has([data-request-form])`.
 - **Footer** (deep red, white text):
   - **Columns:** brand plus one-sentence description; "Service areas" as plain text, formerly dead links; "Explore", crawlable links to every main page; "Customer support" (the three existing links); contact (tel link); "License & insurance" (tier-B facts, small print).
   - **Bottom row:** copyright and privacy.
   - **Removed:** dead links, fake status indicators and placeholder social circles.
-- **Floating AI button:** restyled red and white; lifted above the action bar on phones.
+- **Floating AI button:** restyled red and white. It uses Tailwind utilities, because the root layout also renders it on private routes, which don't load `site.css`. It is lifted above the action bar on phones by an unlayered `body:has(.action-bar)` rule. The footer's bottom row keeps its corner free (`padding-inline-end`), so the button never covers the privacy link.
 
 | Page | 390 px | 1440 px |
 |---|---|---|
-| **Home** | **Hero** (`id="repair"`, the target of the existing `#repair` link): eyebrow "Since 2000 · Houston & surrounding areas"; `h1` at `--step-display`; lead; *Call* and *Request service* full width; tier-B note line; AI diagnosis text link. Then the **proof card**: logo mark large, emergency/rating badges, the four service areas. Then the builders `h2` panel. **Services**: DB cards stacked, container queries give each a row layout. **Value stack**: red band, four promises in a 2×2 grid. **By the numbers**: four stat tiles in 2 × 2, testimonial cards stacked. | Hero `1.618fr 1fr`: copy left, proof card right; builders panel as a full-width blush strip below. Services in three columns with subgrid-aligned rows (the "Critical Response" card gets a red top stripe and "Priority repair" chip). Value stack: heading left, promises right (φ split). Stats: four across; testimonials two across. |
-| **Services** | `h1` + lead; two path cards (Repairs `h2` → `/contact?type=repair`; New doors `h2` → `/contact?type=install`); "Everything we handle" `h2` + "5,000+ repairs" stat; DB cards stacked; authorized-brands band. | Path cards side by side (φ split favouring repair); capability cards in a four-column grid with subgrid rows; brands in one row. |
+| **Home** (value stack: heading block over a four-up promise grid that falls back to one column) | **Hero** (`id="repair"`, the target of the existing `#repair` link): eyebrow "Since 2000 · Houston & surrounding areas"; `h1` at `--step-display`; lead; *Call* and *Request service* full width; tier-B note line; AI diagnosis text link. Then the **proof card**: logo mark large, emergency/rating badges, the four service areas. Then the builders `h2` panel. **Services**: DB cards stacked, container queries give each a row layout. **Value stack**: red band, four promises in a 2×2 grid. **By the numbers**: four stat tiles in 2 × 2, testimonial cards stacked. | Hero `1.618fr 1fr`: copy left, proof card right; builders panel as a full-width blush strip below. Services in three columns with subgrid-aligned rows (the "Critical Response" card gets a red top stripe and "Priority repair" chip). Value stack: heading left, promises right (φ split). Stats: four across; testimonials two across. |
+| **Services** | `h1` + lead; two path cards (Repairs `h2` → `/contact?type=repair`; New doors `h2` → `/contact?type=install`); "Everything we handle" `h2` + "5,000+ repairs" stat; DB cards stacked; authorized-brands band on brand red (distinct from the deep-red footer). | Path cards side by side (φ split favouring repair); capability cards in a four-column grid with subgrid rows; brands in one row. |
 | **About** | Eyebrow "Since 2000"; `h1`; mission statement (DB); stats (DB) in a 2 × 2 grid; "Our standard" `h2` + values (DB) as a numbered list; licensing tiles in 2 × 2; red call-to-action band. | Mission beside stats (φ split); values list beside the standard copy; tiles four across. |
 | **Projects** (portfolio) | `h1` + lead + "1.2k+ total projects" stat; project cards (DB, 4:3 images) stacked; red call-to-action band. | Stat card beside heading; project grid two across (container queries shrink the caption on narrow cards). |
 | **Project detail** | Back link; `h1`; client / location / completion as a definition list; hero image (16:9, `sizes="100vw"`); Challenge and Solution `h2` panels stacked (challenge on red, solution on white); stats; "Project details" `h2` card; call-to-action. | Challenge and solution side by side; stats four across. |
@@ -249,7 +252,16 @@ Shared across public pages:
 | **Contact** | Hero `h1` per `?type=` (four variants, unchanged logic); form card first (fields unchanged; 2 px bordered inputs; toggle buttons); contact card (tel, mailto); map. | Form : contact card in `1.618fr 1fr`. |
 | **Privacy** | `h1`; sections `h2` in a 65ch column; contact box. | Same column, centred. |
 
-## 9. Files
+## 9. Implementation notes
+- **Class names that would collide with Tailwind 4 utilities are avoided.** Tailwind ships `container` in its higher-priority `utilities` layer, so the layout wrapper is `.wrap` / `.wrap--wide`.
+- **Unlayered rules are used only where an unlayered legacy rule would otherwise win:**
+  - the menu scroll lock, against `globals.css`'s `html { overflow-y: scroll }`;
+  - the floating-button lift, against its positioning utility.
+- **Stack spacing.** List and grid components don't reset `margin` (Tailwind's preflight already does). A reset in the same layer would cancel `.stack > * + *`.
+- **Stats** are `<dl>` → `<div class="stat">` → `<dt>` label + `<dd>` (value span + optional note), so the markup is valid.
+- **Screenshots** (`screenshots/`) come from local builds with synthetic data only, via Playwright with Chromium 1243. The *before* set used Playwright's full-page capture. The *after* set sizes the viewport to the page height, so fixed elements (header, mobile action bar, floating button) sit where a visitor sees them instead of mid-image. Captures at 1440 are scaled to 960 px wide and all are WebP (q72).
+
+## 10. Files
 
 - **Public design system (new):**
   - `src/app/brand-theme.css`: generated colour `@theme`, imported by `globals.css`.
@@ -257,7 +269,7 @@ Shared across public pages:
 - **Global (shared with private routes):** `src/app/globals.css`. The Google Fonts `@import` is replaced by self-hosted `@font-face` for the same family; `brand-theme.css` is imported. No existing token changes.
 - **Assets (new):**
   - `public/fonts/work-sans/*.woff2` + `OFL.txt`
-  - `public/images/logos/logo-mark-{56,112,168}.{avif,webp}` (tight crop of `logo.jpg`)
+  - `public/images/logos/logo-mark-{56,112,168}.{avif,webp}` (header, by density) and `logo-mark-w{320,640,960}.{avif,webp}` (hero, by width), all a tight 1043×717 crop of `logo.jpg`
   - `public/images/social/og-default.jpg`
 
   All are generated from existing files with `sharp` in the scratchpad; no dependency added.

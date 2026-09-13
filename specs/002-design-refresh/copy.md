@@ -57,6 +57,7 @@ These entered with the Jan–Feb 2026 template redesigns (`4a08694`, `a56acfa`, 
 | Industrial-grade parts; "highest-rated components in the industry"; smart doors add value and security | services page |
 | ⚠ Authorized dealer and installer for LiftMaster, Chamberlain, Amarr, Clopay | services page. Trademark authorisation claims need the dealer agreements |
 | Secure transmission · 256-bit encryption | contact form |
+| Service area "Houston metro + 50 miles" (was "Houston Metro + 50mi") | contact page map caption. The footer names four areas, not a radius. A Google Business Profile can't use a radius either (areas must be cities or postal codes) |
 | Emails `dispatch@mobilgarage.com`, `privacy@mobilegaragedoor.com` | contact and privacy pages. ⚠ Neither domain is the site's (`mobilgaragedoor.com`) |
 
 ### Removed — UI the code proves false, or that does nothing
@@ -75,6 +76,7 @@ Removing these adds nothing and changes no behaviour.
 | Footer `href="#"` links: the four service areas, "SLA Documentation", "Terms of Service", "Sitemap" | They go nowhere. Areas stay as text; no terms page exists (question) |
 | Footer "IG" / "LN" circles | `<div>`s styled as buttons, no links |
 | 🚨 emoji in contact strings | Decorative; screen readers read "police car light" |
+| "Online" pulsing status and "Initializing Uplink..." on the service-area map; "Active Sector" | Static strings in `ServiceAreaMap.tsx`; relabelled "Service area" and "Loading map…" |
 
 ### Softened (⬇), never strengthened
 - "We Fix It Now." → dropped; the stated arrival time stays
@@ -465,9 +467,9 @@ These are claims that would help conversion but that the site doesn't make today
 | `capabilities_desc` | en | We don't just "swap parts". We engineer solutions for longevity using the highest rated components in the industry. | We don't just swap parts. We build repairs to last, using the highest-rated components in the industry. | "Engineer solutions for longevity" in plain words; same superlative (flagged). | ✅ tier B kept, not amplified |
 |  | es | No solo "cambiamos piezas". Diseñamos soluciones para la longevidad usando los componentes mejor calificados de la industria. | No solo cambiamos piezas. Hacemos reparaciones que duran, con los componentes mejor calificados de la industria. |  |  |
 |  | vi | Chúng tôi không chỉ "thay thế linh kiện". Chúng tôi thiết kế các giải pháp để đảm bảo tuổi thọ cao bằng cách sử dụng các bộ phận được đánh giá cao nhất trong ngành. | Chúng tôi không chỉ thay linh kiện. Chúng tôi sửa chữa để bền lâu, với các linh kiện được đánh giá cao nhất trong ngành. |  |  |
-| `repairs_label` | en | Repairs Completed | repairs completed | Reads with the number as one phrase ("5,000+ repairs completed"). | ✅ tier B kept, not amplified |
-|  | es | Reparaciones Completadas | reparaciones completadas |  |  |
-|  | vi | Lượt sửa chữa đã hoàn thành | lượt sửa chữa đã hoàn thành |  |  |
+| `repairs_label` | en | Repairs Completed | Repairs completed | Sentence case; the label now sits above the number (5,000+, unchanged). | ✅ tier B kept, not amplified |
+|  | es | Reparaciones Completadas | Reparaciones completadas |  |  |
+|  | vi | Lượt sửa chữa đã hoàn thành | Lượt sửa chữa đã hoàn thành |  |  |
 | `configure_service` | en | Configure Service | Request this service | "Configure Service" suggested a configurator; the link opens the request form for that service. | no claim |
 |  | es | Configurar Servicio | Solicitar este servicio |  |  |
 |  | vi | Cấu hình dịch vụ | Yêu cầu dịch vụ này |  |  |
@@ -630,6 +632,9 @@ These are claims that would help conversion but that the site doesn't make today
 | `cta_general` | en | General Inquiry | General inquiry | Sentence case. | no claim |
 |  | es | Consulta General | Consulta general |  |  |
 |  | vi | Yêu cầu chung | Yêu cầu chung |  |  |
+| `placeholder_image` | en | — | Photo coming soon | Replaces the debug text "IMG_MISSING_001" on project pages without a photo. | 🗑 false by construction, removed |
+|  | es | — | Foto próximamente |  |  |
+|  | vi | — | Ảnh sẽ sớm được cập nhật |  |  |
 
 ### `blog_page`
 
@@ -818,6 +823,24 @@ These are claims that would help conversion but that the site doesn't make today
 | `view_portal` | en | — | View in my portal | Was hard-coded English "View in My Portal →". | no claim |
 |  | es | — | Ver en mi portal |  |  |
 |  | vi | — | Xem trong cổng của tôi |  |  |
+| `address_matching` | en | — | Matching addresses | Address suggestions heading; was hard-coded English "Matching Sites". | no claim |
+|  | es | — | Direcciones que coinciden |  |  |
+|  | vi | — | Địa chỉ phù hợp |  |  |
+| `address_recent` | en | — | Recent addresses | Was hard-coded English "Recent Sites". | no claim |
+|  | es | — | Direcciones recientes |  |  |
+|  | vi | — | Địa chỉ gần đây |  |  |
+| `address_new` | en | — | New address | Was hard-coded English "New Address". | no claim |
+|  | es | — | Dirección nueva |  |  |
+|  | vi | — | Địa chỉ mới |  |  |
+| `map_loading` | en | — | Loading map… | Was hard-coded English "Initializing Uplink...". | no claim |
+|  | es | — | Cargando mapa… |  |  |
+|  | vi | — | Đang tải bản đồ… |  |  |
+| `map_area_label` | en | — | Service area | Was hard-coded English "Active Sector". The pulsing "Online" status beside it was a static string and is removed. | 🗑 false by construction, removed |
+|  | es | — | Área de servicio |  |  |
+|  | vi | — | Khu vực phục vụ |  |  |
+| `map_area_value` | en | — | Houston metro + 50 miles | Was hard-coded English "Houston Metro + 50mi"; same radius claim. | ✅ tier B kept, not amplified |
+|  | es | — | Área metropolitana de Houston + 50 millas |  |  |
+|  | vi | — | Khu vực đô thị Houston + 50 dặm |  |  |
 
 ### `privacy`
 
