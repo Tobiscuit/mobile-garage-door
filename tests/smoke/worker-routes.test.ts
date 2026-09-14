@@ -381,10 +381,13 @@ describe('SEO: hreflang', () => {
 });
 
 describe('SEO: structured data', () => {
-  const FORBIDDEN = ['aggregateRating', 'review', 'priceRange', 'openingHoursSpecification', 'openingHours', 'address', 'geo'];
+  const FORBIDDEN = [
+    'aggregateRating', 'review', 'priceRange', 'openingHoursSpecification', 'openingHours', 'address', 'geo',
+    'hasCredential', 'hasCertification', 'memberOf', 'award',
+  ];
 
   it.each(LOCALES.flatMap((locale) => ALL_PAGES.map((path) => localizedPath(locale, path))))(
-    '%s has only parseable JSON-LD, with no invented ratings, prices, hours or address',
+    '%s has only parseable JSON-LD, with no invented ratings, prices, hours, address, credentials or awards',
     async (path) => {
       const { html } = await fetchPage(path);
       const blocks = jsonLdBlocks(html); // throws if any block doesn't parse
@@ -420,6 +423,95 @@ describe('SEO: structured data', () => {
       image: `${SITE_ORIGIN}/api/media/blog/smoke-fixture-cover.webp`,
     });
   });
+});
+
+/**
+ * Trust claims Tobias confirmed are not real (2026-09-14; specs/002-design-refresh/copy.md §2):
+ * the state licence number, the insurer and its $2M policy, BBB accreditation, IDA
+ * membership and certified technicians, and the "#1" ranking. Also the generic
+ * licensed/insured/accredited lines that rested on them, in all three languages.
+ * The last pattern catches the sentinels public-content.sql stores in the dashboard's
+ * licence, insurance and BBB settings.
+ */
+const FALSE_TRUST_CLAIMS: RegExp[] = [
+  /9942/,
+  /Liberty Mutual/i,
+  /\$\s?2\s?M\b/,
+  /\$\s?2 million/i,
+  /2 triệu đô/i,
+  /\bBBB\b/,
+  /Better Business Bureau/i,
+  /\bIDA\b/,
+  /International Door Association/i,
+  /\b(rated|ranked|como)\s+#\s?1\b/i,
+  /xếp hạng\s+#\s?1\b/i,
+  /#\s?1\s+(by|among|in|entre|por|bởi)\b/i,
+  /\blicen[cs]ed\b/i,
+  /\bstate licen[cs]e\b/i,
+  /\blicen[cs]e\s*(&|and)\s*insurance\b/i,
+  /\bbonded\b/i,
+  /\binsured\b/i,
+  /\bliability (coverage|insurance)\b/i,
+  /\baccredit(ed|ation)\b/i,
+  /\bcertified tech/i,
+  /\bcon licencia\b/i,
+  /\blicencia estatal\b/i,
+  /\blicencia y seguro\b/i,
+  /\basegurad[oa]s?\b/i,
+  /\bacreditad[oa]s?\b/i,
+  /\bacreditación\b/i,
+  /\btécnicos certificados\b/i,
+  /responsabilidad civil/i,
+  /cấp phép/i,
+  /có bảo hiểm/i,
+  /bảo hiểm trách nhiệm/i,
+  /giấy phép tiểu bang/i,
+  /giấy phép(,| và) bảo hiểm/i,
+  /được chứng nhận/i,
+  /SMOKE-SENTINEL-/,
+];
+
+/**
+ * All the text a page ships: the markup (JSON-LD included) plus the inline RSC
+ * payload the browser hydrates from. The public layout hands the whole message
+ * catalogue to the client, so a message no component renders still ships in the
+ * payload. vinext pushes the payload from inline scripts as string chunks that
+ * split mid-word, so the chunks are decoded and joined before matching. The
+ * object they're pushed onto differs by build (the live site's HTML uses
+ * `self.__VINEXT_RSC_CHUNKS__`, this branch's build a navigation-runtime
+ * object), so any inline `.push("…")` counts.
+ */
+function shippedText(html: string): { text: string; payload: string } {
+  const inlineScripts = [...html.matchAll(/<script(?![^>]*\ssrc=)[^>]*>([\s\S]*?)<\/script>/gi)].map((match) => match[1]);
+  const payload = inlineScripts
+    .flatMap((script) => [...script.matchAll(/\.push\(("(?:[^"\\]|\\.)*")\)/g)])
+    .map((match) => JSON.parse(match[1]) as string)
+    .join('');
+  const markup = html
+    .replace(/&amp;/g, '&')
+    .replace(/&#x27;|&#39;/g, "'")
+    .replace(/&quot;/g, '"')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>');
+  return { text: `${markup}\n${payload}`.normalize('NFC'), payload };
+}
+
+describe('trust claims', () => {
+  const PAGES = [...ALL_PAGES, '/login', '/signup'];
+
+  it.each(LOCALES.flatMap((locale) => PAGES.map((path) => localizedPath(locale, path))))(
+    '%s ships none of the licence, insurance, BBB, IDA or #1 claims',
+    async (path) => {
+      const { response, html } = await fetchPage(path, BROWSER_UA);
+      expect(response.status).toBe(200);
+      const { text, payload } = shippedText(html);
+      // The scan must see the hydration payload, or a claim hiding there would pass unnoticed.
+      expect(payload).toContain('Mobil Garage Door');
+      for (const claim of FALSE_TRUST_CLAIMS) {
+        expect(text.match(claim)?.[0], `${path} matches ${claim}`).toBeUndefined();
+      }
+    },
+  );
 });
 
 describe('SEO: sitemap.xml', () => {

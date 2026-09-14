@@ -8,8 +8,9 @@ import { BUSINESS, TEL_HREF } from '@/lib/seo/site';
  *
  * Every link here existed before or points at a page in the main navigation.
  * The service areas are plain text now: they were href="#" links to nowhere.
- * The licence and insurance lines are unverified claims kept as the site made
- * them (specs/002-design-refresh/copy.md §2, tier B).
+ * A fifth column used to hold a state licence number and an insurer that Tobias
+ * confirmed aren't real. It's gone; the brand column now carries what is true:
+ * the 24/7 emergency line above the phone link (specs/002-design-refresh/copy.md §2).
  */
 const Footer = async ({ locale }: { locale: string }) => {
   const t = await getTranslations({ locale, namespace: 'footer' });
@@ -23,11 +24,12 @@ const Footer = async ({ locale }: { locale: string }) => {
               <span className="wordmark__mobil">Mobil</span> Garage Door
             </p>
             <p>{t('brand_description')}</p>
-            <p>
-              <a className="text-link" href={TEL_HREF}>
+            <div className="site-footer__emergency">
+              <h2 className="site-footer__heading">{t('emergency_heading')}</h2>
+              <a className="site-footer__call text-link" href={TEL_HREF}>
                 {t('call', { phone: BUSINESS.phoneDisplay })}
               </a>
-            </p>
+            </div>
           </div>
 
           <nav aria-labelledby="footer-explore">
@@ -59,20 +61,6 @@ const Footer = async ({ locale }: { locale: string }) => {
               <li><a href="/contact?type=repair">{t('emergency_callback')}</a></li>
             </ul>
           </nav>
-
-          <div>
-            <h2 className="site-footer__heading">{t('official_data')}</h2>
-            <dl className="site-footer__legal">
-              <div>
-                <dt>{t('state_license')}</dt>
-                <dd>#9942-B-RES</dd>
-              </div>
-              <div>
-                <dt>{t('insurance')}</dt>
-                <dd>Liberty Mutual • $2M Agg</dd>
-              </div>
-            </dl>
-          </div>
         </div>
 
         <div className="site-footer__bottom">

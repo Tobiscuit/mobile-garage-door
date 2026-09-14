@@ -35,12 +35,16 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
         missionStatement: "To provide fast, honest, and expert garage door service to every homeowner and contractor in our community—ensuring no one is ever left stranded with a broken door.",
         stats: [] as any[],
         values: [] as any[],
-        licenseNumber: "TX Registered & Bonded",
-        insuranceAmount: "$2M Policy"
     };
 
     if (db) {
-        const [settingsRow] = await db.select().from(settingsTable).limit(1);
+        // Only the columns this page shows. The settings row also holds the
+        // dashboard's licence, insurance and BBB fields; Tobias confirmed those
+        // claims aren't real, so they're never read here (copy.md §2).
+        const [settingsRow] = await db
+            .select({ id: settingsTable.id, missionStatement: settingsTable.missionStatement })
+            .from(settingsTable)
+            .limit(1);
         const stats = settingsRow
             ? await db.select().from(settingStats).where(eq(settingStats.settingId, settingsRow.id))
             : [];
@@ -52,8 +56,6 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
             missionStatement: settingsRow?.missionStatement || settingsObj.missionStatement,
             stats,
             values,
-            licenseNumber: settingsRow?.licenseNumber || settingsObj.licenseNumber,
-            insuranceAmount: settingsRow?.insuranceAmount || settingsObj.insuranceAmount
         };
     }
 
@@ -107,25 +109,31 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
                 </div>
             </section>
 
-            <section className="section" aria-labelledby="licensed-heading">
+            {/* Confirmed facts only. This section used to show licence, insurance, IDA and BBB claims that aren't real. */}
+            <section className="section" aria-labelledby="facts-heading">
                 <div className="wrap wrap--wide stack" style={{ '--stack-space': 'var(--space-l)' } as React.CSSProperties}>
-                    <h2 id="licensed-heading" className="title-2">{t('licensed_heading')}</h2>
+                    <div className="stack" style={{ '--stack-space': 'var(--space-xs)' } as React.CSSProperties}>
+                        <h2 id="facts-heading" className="title-2">{t('facts_heading')}</h2>
+                        <p className="lead muted">{t('facts_lead')}</p>
+                    </div>
                     <dl className="tile-grid">
                         <div className="tile">
-                            <dt>{t('license_label')}</dt>
-                            <dd>{settings.licenseNumber}</dd>
+                            <dt>{t('emergency_label')}</dt>
+                            <dd>{t('emergency_value')}</dd>
                         </div>
                         <div className="tile">
-                            <dt>{t('insurance_label')}</dt>
-                            <dd>{settings.insuranceAmount}</dd>
+                            <dt>{t('phone_label')}</dt>
+                            <dd>
+                                <a href={TEL_HREF} className="text-link">{BUSINESS.phoneDisplay}</a>
+                            </dd>
                         </div>
                         <div className="tile">
-                            <dt>{t('ida_label')}</dt>
-                            <dd>{t('ida_value')}</dd>
+                            <dt>{t('area_label')}</dt>
+                            <dd>{t('area_value')}</dd>
                         </div>
                         <div className="tile">
-                            <dt>{t('rating_label')}</dt>
-                            <dd>{t('rating_value')}</dd>
+                            <dt>{t('since_label')}</dt>
+                            <dd>{BUSINESS.foundingYear}</dd>
                         </div>
                     </dl>
                 </div>

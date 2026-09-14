@@ -13,6 +13,7 @@ import { LogoMark } from '@/shared/layout/LogoMark';
  *   which previously pointed at no element.
  * - No entrance animation: an element at opacity 0 isn't an LCP candidate.
  * - Links keep their destinations: /contact?type=repair, /diagnose, /portfolio, /login.
+ * - No "Rated #1" line: Tobias confirmed the ranking isn't real (copy.md §2).
  */
 const Hero = async ({ locale }: { locale: string }) => {
   const t = await getTranslations({ locale, namespace: 'hero' });
@@ -67,7 +68,6 @@ const Hero = async ({ locale }: { locale: string }) => {
             <p className="eyebrow">{t('contractor_eyebrow')}</p>
             <h2 className="title-3">{t('contractor_title')}</h2>
             <p className="muted">{t('right_desc')}</p>
-            <p className="fine-print">{t('rated_badge')}</p>
           </div>
           <div className="cluster">
             <Link href="/portfolio" className="button">{t('view_catalog')}</Link>

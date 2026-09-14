@@ -183,6 +183,11 @@ html {
     white-space: nowrap;
   }
 
+  /* A phone number inside running text: its hyphens are break opportunities, so keep it on one line. */
+  .phone-number {
+    white-space: nowrap;
+  }
+
   .skip-link {
     position: fixed;
     inset-block-start: var(--space-xs);
@@ -727,18 +732,16 @@ html {
     margin-block-start: var(--space-2xs);
   }
 
-  .site-footer__legal {
-    display: grid;
-    gap: var(--space-2xs);
-    font-size: var(--step-n1);
+  /* "24/7 emergency calls" ends the brand column: set apart from the description like a column of its own. */
+  .site-footer__brand > .site-footer__emergency {
+    margin-block-start: var(--space-m);
+  }
 
-    & dt {
-      font-weight: 700;
-    }
-
-    & dd {
-      margin: 0 0 var(--space-xs);
-    }
+  /* The phone link under that heading: the same tap height as the footer's list links. */
+  .site-footer__call {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--tap-min);
   }
 
   .site-footer__bottom {

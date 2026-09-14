@@ -7,7 +7,9 @@ import { BUSINESS, LOCALES, SITE_ORIGIN } from './site';
  * that is not visible to readers of the page"), and only tier-A facts
  * (specs/002-design-refresh/copy.md §2). Deliberately absent, because the
  * site doesn't state them or they are unverified: address, geo, opening
- * hours, price range, ratings, reviews, sameAs, email, licence numbers.
+ * hours, price range, ratings, reviews, sameAs, email. Also absent: licences,
+ * insurance, memberships, accreditations and awards, which Tobias confirmed
+ * the business doesn't hold (2026-09-14).
  * See specs/002-design-refresh/seo.md §4.5.
  */
 
@@ -25,6 +27,11 @@ export const FORBIDDEN_PROPERTIES = [
   'openingHours',
   'address',
   'geo',
+  // Where licence, BBB, IDA and "#1" claims would go (schema.org Organization properties).
+  'hasCredential',
+  'hasCertification',
+  'memberOf',
+  'award',
 ] as const;
 
 const absolute = (url: string) => (/^https?:\/\//.test(url) ? url : `${SITE_ORIGIN}${url.startsWith('/') ? '' : '/'}${url}`);

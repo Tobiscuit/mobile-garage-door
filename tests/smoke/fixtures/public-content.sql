@@ -51,3 +51,13 @@ VALUES (9411, 9401, 9301, NULL, 0);
 
 INSERT OR REPLACE INTO project_tags (id, project_id, tag)
 VALUES (9421, 9401, 'Sample tag');
+
+-- The dashboard's licence, insurance and BBB settings, filled with sentinels.
+-- Tobias confirmed those claims aren't real (2026-09-14), but the dashboard can
+-- still store any value in these fields, so the suite checks that no public page
+-- renders them, whatever they hold.
+UPDATE settings
+SET license_number = 'SMOKE-SENTINEL-LICENSE-NUMBER',
+    insurance_amount = 'SMOKE-SENTINEL-INSURANCE-AMOUNT',
+    bbb_rating = 'SMOKE-SENTINEL-BBB-RATING'
+WHERE id = 1;
