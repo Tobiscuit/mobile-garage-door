@@ -48,7 +48,7 @@ The confirmation comes from the site itself: the services it lists (springs, ope
 ## Hard constraints
 
 1. **No functionality changes.** Routes, redirects, rewrites and i18n routing stay the same. Forms keep their fields, `name`s, handlers and endpoints. Links keep their destinations; the dead anchor `#repair` now resolves because the hero section carries `id="repair"`. Auth, Square, booking, service requests and tracking behave identically.
-2. **No invented facts** in copy or structured data. Every claim is classified in `copy.md`: tier A facts Tobias set deliberately (commit evidence) versus tier B template-era claims (preserved, never amplified, flagged). UI the code proves fake is removed.
+2. **No invented facts** in copy or structured data. Every claim is classified in `copy.md`: tier A facts Tobias set deliberately (commit evidence, or his answers of 2026-09-14) versus tier B template-era claims (preserved, never amplified, flagged). UI the code proves fake is removed, and so is every claim Tobias confirmed isn't true: the licence, insurance, accreditation, membership and ranking claims (2026-09-14).
 3. **Palette:** the logo reds `#ba233f` and `#cb243c`, white, a near-black ink at the logo's hue, and tints/shades derived from them in OKLCH. No new hues.
 4. **No new UI, component or animation framework.** Tailwind stays. Native CSS first, with Baseline status checked in MDN's browser-compat-data and a real fallback wherever a feature is not Baseline widely available.
 5. **Private routes look the same.** New Tailwind theme names are unique (`--color-brand-*`), so no existing utility changes meaning. The only shared change is that the same Work Sans variable font is now served from the site instead of Google Fonts.
@@ -72,6 +72,7 @@ The confirmation comes from the site itself: the services it lists (springs, ope
 | AC13 | Before/after screenshots of home and services at 390 and 1440 px, from local builds with synthetic data | `screenshots/` |
 | AC14 | No secret, credential or real customer datum is added to this public repository | pre-commit scanner + review |
 | AC15 | The Access-gated preview (`design-refresh` alias) returns 302 to `jrcodex.cloudflareaccess.com` logged out; production returns 200 | `curl --doh-url` in the PR |
+| AC16 | No public page, in any locale, ships a licence, insurance, BBB, IDA or "#1" claim or the generic licensed/insured/accredited lines, in its markup, JSON-LD or hydration payload; nothing from the dashboard's licence, insurance and BBB settings renders publicly; sections that held those claims now hold confirmed facts | smoke: `trust claims` (with sentinel settings) + `copy.md` §2 |
 
 ## Baseline (measured before any change, 2026-09-13)
 

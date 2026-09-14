@@ -36,14 +36,14 @@
 - [x] Skip link, single `<main id="main">`
 - [x] Header: logo + wordmark, localized nav with `aria-current`, call and request actions, `inert` mobile menu with Escape, `:has()` scroll lock, scroll-driven elevation; breakpoints measured in en/es/vi from 360 to 1440 px
 - [x] Mobile action bar (phones), hidden on the request form via `:has([data-request-form])`
-- [x] Footer in the page locale: service areas as text, crawlable page links, support links, phone, licence block; dead links and fake status removed
+- [x] Footer in the page locale: service areas as text, crawlable page links, support links, 24/7 emergency line with the phone; dead links, fake status and (2026-09-14) the false licence block removed
 - [x] Floating AI button restyle (utilities, shared with private routes); loading state restyle
 - [x] `Header.test.tsx`: the mock maps `nav.dashboard` like `nav.login` (same assertions)
 
 ## 5. Pages
 - [x] Home: hero (`id="repair"`, one `h1`, proof card, builders panel), services (subgrid + container queries), value stack, by-the-numbers + testimonials; all server components now
 - [x] Services: one `h1`, two `h2` path cards, capability cards, brands band
-- [x] About: `h1`, stats, standard + values, licensing tiles, call-to-action with phone
+- [x] About: `h1`, stats, standard + values, confirmed-fact tiles (replaced the false licensing tiles on 2026-09-14), call-to-action with phone
 - [x] Portfolio index and detail: no nested `<main>`, localized placeholder instead of "IMG_MISSING_001", headings in order, fake sort controls removed
 - [x] Blog index and post: `BlogFeaturedImage` without the loader and with `sizes`; locale dates; reading progress; call-to-action with phone
 - [x] Contact: same fields, names, handlers and endpoints (verified line by line against `origin/develop`); associated labels; `aria-pressed`; localized strings; `contact/layout.tsx` for metadata
@@ -62,7 +62,8 @@
 ## 7. Tests and gates
 - [x] Smoke fixture `public-content.sql` (synthetic services, testimonials, project) loaded in `beforeAll`
 - [x] Smoke SEO suite: 101 new tests (one h1, canonical per locale, head placement per user agent, unique titles, `lang`, reciprocal hreflang vs `Link` header, JSON-LD, sitemap, robots)
-- [x] `npm run lint:i18n` (458 keys × 3, 352 references) · `npm test -- --run` (113) · `npm run build` · `npm run test:smoke` (113, ports 4421/9253)
+- [x] Smoke trust-claims suite: 33 new tests (every public page × locale, markup + JSON-LD + joined RSC payload, sentinel settings)
+- [x] `npm run lint:i18n` (454 keys × 3, 350 references) · `npm test -- --run` (113) · `npm run build` · `npm run test:smoke` (146, ports 4421/9253)
 - [x] `tsc --noEmit`: 166 errors, the pre-existing count (no new errors)
 
 ## 8. Evidence
@@ -70,8 +71,18 @@
 - [x] After screenshots; before/after WebP for home and services at 390/1440 in `screenshots/`
 - [x] Test changes recorded (`seo.md` §5)
 
-## 9. Delivery
-- [ ] Push branch; open PR into `develop` stating it depends on #6; watch CI `verify` to green
+## 9. Tobias's answers (2026-09-14)
+- [x] Remove every licence, insurance, accreditation, membership and ranking claim in en/es/vi, including the generic lines and the unused `home.licensed_insured` message that shipped in the page payload
+- [x] Rebuild the sections that held only those claims around confirmed facts: footer brand column, home value-stack card, about page section
+- [x] About page reads only `id` and `mission_statement` from settings; the dashboard fields stay as they are
+- [x] JSON-LD guard: `hasCredential`, `hasCertification`, `memberOf`, `award` forbidden (unit + smoke)
+- [x] Smoke assertion over every public page, with sentinel settings values
+- [x] 24/7 emergency calls and the phone to tier A, with the lockout example; no response times added
+- [x] Emails unchanged; DNS findings recorded as an open decision (`copy.md` §3.3)
+- [x] After screenshots re-captured
+
+## 10. Delivery
+- [x] Push branch; open PR into `develop` stating it depends on #6; watch CI `verify` to green
 - [ ] Preview: `wrangler versions upload --preview-alias design-refresh` with credentials from Vault via env only
 - [ ] Gate check over DoH: preview → 302 to Access; production → 200
 - [-] Merge — never (Tobias merges)

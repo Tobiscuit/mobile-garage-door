@@ -22,7 +22,7 @@ Database content — service, testimonial, project and post text, About-page sta
 
 ## 2. Facts: what the site claims, and how each claim was treated
 
-I classified every claim by **evidence in the repository's history**.
+I classified every claim by **evidence in the repository's history**, and since 2026-09-14 by Tobias's own answers.
 
 ### Tier A — facts Tobias set deliberately
 Kept, and used in prominent copy and in structured data.
@@ -30,7 +30,8 @@ Kept, and used in prominent copy and in structured data.
 | Fact | Evidence |
 |---|---|
 | Name "Mobil Garage Door" | Logo; commit `18ad1a7` "update phone and address strategy to Mobil persona" |
-| Phone **832-419-1293** | `18ad1a7` replaced the placeholder `555-000-0000` with it |
+| Phone **832-419-1293** | `18ad1a7` replaced the placeholder `555-000-0000` with it. Tobias confirmed on 2026-09-14 that it is the working line |
+| **24/7 emergency calls**, for example a customer locked out of their garage | Tobias, 2026-09-14: he takes emergency calls around the clock, for example when someone is locked out of their garage. He gave no response time, so the copy adds none |
 | Service areas: Greater Katy & West Houston · The Woodlands & North Houston · Sugar Land & Richmond · Houston Interior & Heights; "Houston & surrounding areas" | `eba7e4b` "update deployment zones to **real Houston areas** and clean up placeholders" |
 | **Since 2000** | `d351bd7` "update since 2014→2000" (and "Years in Business 10+ → 25+" in the database) |
 | Domain `mobilgaragedoor.com` | `40e35f7` (metadataBase set to production domain); `wrangler.jsonc` routes |
@@ -42,14 +43,8 @@ These entered with the Jan–Feb 2026 template redesigns (`4a08694`, `a56acfa`, 
 
 | Claim | Where |
 |---|---|
-| "24/7" emergency response, dispatch and hotline | home hero badge, contact hero badge, contact card, form toggle |
 | Typically on-site within 2 hours; wait time under 2 minutes; 2-hour arrival window; "within hours, not days"; "contact you within minutes" | home hero, value stack, services section, contact form |
-| ⚠ "Rated #1 by local contractors" | home contractor panel — an unsubstantiated superlative |
 | Volume pricing, guaranteed scheduling, white-label installation, bulk pricing | home contractor panel, contact hero |
-| Fully licensed and insured; $2M liability coverage per project site | value stack |
-| ⚠ "State License #9942-B-RES"; ⚠ "Liberty Mutual • $2M Agg" | footer. Texas DPS: opener installers need no DPS licence unless connected to alarm or monitoring systems, so ask which licence this is |
-| "TX Registered & Bonded", "$2M Policy" (code fallbacks when the settings row is empty) | about page |
-| ⚠ "IDA member · Certified technicians"; ⚠ "A+ BBB accredited" | about page tiles |
 | No hidden fees; flat-rate pricing approved before work starts | value stack |
 | Background-checked, uniformed, drug-tested W-2 employees; no random subcontractors | value stack |
 | "No-headache" guarantee | value stack badge |
@@ -58,7 +53,23 @@ These entered with the Jan–Feb 2026 template redesigns (`4a08694`, `a56acfa`, 
 | ⚠ Authorized dealer and installer for LiftMaster, Chamberlain, Amarr, Clopay | services page. Trademark authorisation claims need the dealer agreements |
 | Secure transmission · 256-bit encryption | contact form |
 | Service area "Houston metro + 50 miles" (was "Houston Metro + 50mi") | contact page map caption. The footer names four areas, not a radius. A Google Business Profile can't use a radius either (areas must be cities or postal codes) |
-| Emails `dispatch@mobilgarage.com`, `privacy@mobilegaragedoor.com` | contact and privacy pages. ⚠ Neither domain is the site's (`mobilgaragedoor.com`) |
+| Emails `dispatch@mobilgarage.com`, `privacy@mobilegaragedoor.com` | contact and privacy pages. ⚠ No mailbox can receive mail at either: undecided, see §3.3. Unchanged |
+
+### Removed — claims Tobias confirmed are not true (2026-09-14)
+Tobias answered question C5: the licence, insurer, BBB, IDA and "#1" claims are not real. Every licence, insurance, accreditation, membership and ranking claim is gone from every page in all three languages, together with the generic lines that rested on them. Where a section existed only to hold them, it now holds facts he confirmed (tier A).
+
+| Claim (es and vi said the same) | Where | Now |
+|---|---|---|
+| "State License #9942-B-RES" and "Liberty Mutual • $2M Agg", under "Official Data" | footer, on every public page | The column is gone. The brand column now ends with **"24/7 emergency calls"** above the phone link |
+| "Fully licensed and insured" and "$2M in liability coverage per project site" | home value stack, first card | **"24/7 emergency calls": "Locked out of your garage? Call 832-419-1293, day or night."** |
+| "Rated #1 by local contractors" | home builders panel, fine print | Removed. The panel keeps its heading, description and links, so nothing was left empty |
+| "Licensed, insured and accredited" over four tiles: License "TX Registered & Bonded" and Insurance "$2M Policy" (from the dashboard settings row, or code fallbacks), "IDA member: Certified technicians", "Rating: A+ BBB accredited" | about page | **"Mobil Garage Door at a glance"**: "Locked out of your garage? We take emergency calls around the clock." Tiles: emergency calls 24/7, phone (tel link), service area, in business since 2000 |
+| "…and license and insurance details" | about page meta description | "…and takes emergency calls 24/7." |
+| "Licensed & Insured" (`home.licensed_insured`) | No component renders it, but the public layout passes the whole message catalogue to the client, so it was in every public page's source | Deleted |
+
+- **Structured data** never carried these claims. The JSON-LD guard now also rejects `hasCredential`, `hasCertification`, `memberOf` and `award`, the schema.org Organization properties that would carry them.
+- **Dashboard.** The settings form's License Number, Liability Insurance and BBB Rating fields are unchanged, because that is dashboard functionality. The about page now selects only `id` and `mission_statement` from the settings row, so whatever those fields hold can't reach a public page. The smoke suite stores sentinel values in them, then scans every public page in every locale, including the inline hydration payload, for the sentinels and for every claim above.
+- **Still live and still unconfirmed** (tier B, above): arrival and wait times, "5-star rated" and "100%" satisfaction, the stat counts, background-checked W-2 technicians, the "no-headache" guarantee, and the dealer authorisations. Tobias didn't address these, so they stay flagged in C5.
 
 ### Removed — UI the code proves false, or that does nothing
 Removing these adds nothing and changes no behaviour.
@@ -89,34 +100,50 @@ Removing these adds nothing and changes no behaviour.
 - "Delivers industrial-grade security and performance" → what the company does
 - "DISPATCH TECHNICIAN NOW" → "Request emergency service" (the button opens the payment step)
 - "Read our Service Level Agreement" → "Ask about our service terms" (it linked to the contact form)
-- "Licensed. Insured. Verified." → "Licensed, insured and accredited"
 - "We don't sell doors. We sell Security." → "We don't *just* sell doors. We sell security." (they do sell doors)
 
 ### Translation drift corrected
 - **Hero arrival time, es.** Said "llega en **menos de** 2 horas" (arrives in under 2 hours). The English says "**typically** within 2 hours". The Spanish now says "normalmente llega en un plazo de 2 horas".
-- **Rated badge, es.** Said "#1 **entre** contratistas locales" (#1 among). The English says "Rated #1 **by**". It now matches.
 
 ## 3. Questions for Tobias
 
-These are claims that would help conversion but that the site doesn't make today, so the copy leaves them out.
+### 3.1 Answered on 2026-09-14
+| # | Question | Answer | What changed |
+|---|---|---|---|
+| C4 | Is "24/7" true for phone *and* dispatch? | Yes. 832-419-1293 is the working line, and he takes emergency calls around the clock, for example garage lockouts | "24/7" moved to tier A. The lockout example is on the home value stack and the about page. No response time was added. Opening hours stay out of the JSON-LD, because 24/7 covers emergency calls, not every service (`seo.md` §4.5) |
+| C5 (part) | The licence number, insurer, IDA membership, BBB rating and "#1" ranking | Not real | All removed, in all three languages (§2 "Removed — claims Tobias confirmed are not true") |
+| C10 | Which email address is real? | Undecided | Nothing changed. The findings are recorded as an open decision (§3.3) |
+
+### 3.2 Still open
+These are claims that would help conversion but that the site doesn't make today, so the copy leaves them out, plus the tier-B claims nobody has confirmed yet.
 
 | # | Would help | What I need |
 |---|---|---|
 | C1 | Real review proof (Google rating and count, with a link) | Profile URL; permission to show the rating with its source and date |
 | C2 | Warranty terms (the footer offers "Submit a warranty claim", but nothing says what the warranty covers) | The written terms |
 | C3 | The **$99 trip fee** up front, before the form. The request flow charges `99.00`, and the booking copy says the fee is "credited towards your repair" (and renders it as "The 9 Trip Fee", a pre-existing bug in the out-of-scope `booking` namespace) | Confirm the amount and the credit policy |
-| C4 | Hours: is "24/7" true for phone *and* dispatch? | Yes/no. Opening hours stay out of the markup until confirmed |
-| C5 | The licence numbers, insurer, IDA membership, BBB rating and dealer authorisations in §2 | Proof or removal |
+| C5 (rest) | The remaining tier-B claims in §2: dealer authorisations (LiftMaster, Chamberlain, Amarr, Clopay), arrival and wait times, "5-star rated" and "100%" satisfaction, the stat counts, background-checked W-2 technicians, the "no-headache" guarantee | Proof or removal |
 | C6 | Owner or team names and photos ("who shows up at my house") | Names, roles, photos, consent |
 | C7 | Real project photos (every live project shows a placeholder) | Photos uploaded through the dashboard (database content) |
 | C8 | Same-day service (the database's company values say "Same-day service is our standard") | Confirm before it appears in page copy |
 | C9 | A terms of service page (the login page tells users they agree to one) | The terms text |
-| C10 | Which email address is real (see `seo.md` Q4) | The address |
+
+### 3.3 Open decision: email addresses
+Tobias hasn't decided which address is real, so **no address changes in this PR**, and none goes into the JSON-LD. The coordinating session found that none of the addresses the code uses can receive mail. I re-checked the DNS records with DNS-over-HTTPS (Cloudflare's resolver) on 2026-09-14 at 02:55 UTC:
+
+| Address | Used by | DNS |
+|---|---|---|
+| `dispatch@mobilgarage.com` | contact page, contact card (`mailto:`) | `mobilgarage.com` is a different domain, parked at NameBright (nameservers `nsg1`/`nsg2.namebrightdns.com`). **No MX record** |
+| `privacy@mobilegaragedoor.com` | privacy policy | `mobilegaragedoor.com` (note the extra "e") is parked with Afternic, a domain marketplace (nameservers `ns1`/`ns2.afternic.com`), where the coordinating session found it listed for sale. **Null MX** (`0 .`: RFC 7505's "this domain accepts no mail") |
+| `dispatch@mobilegaragedoor.com` | the dashboard's email replies: the SES "from" default in `dashboard/emails/actions.ts` (used when `SES_FROM_ADDRESS` is unset), also hard-coded in `features/admin/emails/ChatInterface.tsx` | The same misspelled, for-sale domain |
+| `service@mobilgaragedoor.com` (settings default, VAPID subject), `noreply@mobilgaragedoor.com` (`lib/email.ts` sender) | dashboard and notifications | The site's own domain, but **it has no MX records**. Without one, senders fall back to the domain's A records (RFC 5321's implicit MX), and those are Cloudflare proxy addresses (`104.21.34.11`, `172.67.194.176`), not a mail server |
+
+**Decision for Tobias:** pick the mailbox, then either publish MX records for `mobilgaragedoor.com` (and SPF, DKIM and DMARC before sending from it) or name another address he controls. Once that's decided, a follow-up changes the contact card, the privacy policy and the dashboard default together.
 
 ## 4. Structure changes that moved copy
 - **Two `h1`s became one.** The home contractor panel became an `h2` (`hero.contractor_title`). The services page's two `h1`s became `services_page.title` plus two `h2` path cards.
 - **Split headings merged into one translatable string.** `*_accent` keys (e.g. "Garage" + "Intel"), which forced English word order on es and vi, are gone.
-- **Hard-coded English moved into messages.** The header "DASHBOARD" (`nav.dashboard`); the about tiles (`about_page.*_label/_value`); privacy data labels (`privacy.*_label`); every contact success, status and ASAP string (`contact_page.*`); the footer, which read the English messages in every locale because it called `getTranslations('footer')` without a locale.
+- **Hard-coded English moved into messages.** The header "DASHBOARD" (`nav.dashboard`); the about page tiles (their English "LICENSE", "INSURANCE", "IDA MEMBER" and "RATING" labels went with the claims; the new tiles read `about_page.*_label/_value`); privacy data labels (`privacy.*_label`); every contact success, status and ASAP string (`contact_page.*`); the footer, which read the English messages in every locale because it called `getTranslations('footer')` without a locale.
 - **Phone links.** The number is interpolated from one constant (`{phone}`) and rendered as `tel:+18324191293` (RFC 3966 global form). The visible format stays `832-419-1293`.
 
 ## 5. Every change, before → after
@@ -181,7 +208,7 @@ These are claims that would help conversion but that the site doesn't make today
 | `fix_now` | en | We Fix It Now. | *(removed)* | "We Fix It Now." promised immediacy the site does not support; the arrival claim below is the stated one. | ⬇ claim softened, nothing added |
 |  | es | La Reparamos Ya. | *(removed)* |  |  |
 |  | vi | Chúng tôi sửa ngay lập tức. | *(removed)* |  |  |
-| `emergency_badge` | en | 24/7 Emergency Response | 24/7 emergency response | Sentence case, same claim, same place. | ✅ tier B kept, not amplified |
+| `emergency_badge` | en | 24/7 Emergency Response | 24/7 emergency response | Sentence case, same claim, same place. 24/7 confirmed by Tobias on 2026-09-14 (he takes emergency calls around the clock). | ✅ tier A kept |
 |  | es | Respuesta de Emergencia 24/7 | Respuesta de emergencia 24/7 |  |  |
 |  | vi | Phản ứng khẩn cấp 24/7 | Ứng cứu khẩn cấp 24/7 |  |  |
 | `left_desc` | en | Don't get trapped. Our Rapid Response fleet is typically on-site within 2 hours. | Our rapid response team is typically on-site within 2 hours. | Drops "Don't get trapped" (the brand voice says: avoid fear-mongering). es previously said "llega en menos de 2 horas" (arrives in under 2 hours), stronger than the English "typically within": now matches. | ✅ tier B kept, not amplified |
@@ -196,9 +223,9 @@ These are claims that would help conversion but that the site doesn't make today
 | `wait_time` | en | Wait time: < 2 minutes | Wait time: under 2 minutes | Same claim, same position, written out instead of "<". | ✅ tier B kept, not amplified |
 |  | es | Tiempo de espera: < 2 minutos | Tiempo de espera: menos de 2 minutos |  |  |
 |  | vi | Thời gian chờ: < 2 phút | Thời gian chờ: dưới 2 phút |  |  |
-| `rated_badge` | en | Rated #1 by Local Contractors | Rated #1 by local contractors | Sentence case, same place. es previously read "#1 among local contractors", a different claim: now matches the English. Flagged HIGH (unsubstantiated superlative). | ✅ tier B kept, not amplified |
-|  | es | #1 Entre Contratistas Locales | Calificados como #1 por contratistas locales |  |  |
-|  | vi | Được xếp hạng #1 bởi các nhà thầu địa phương | Được các nhà thầu địa phương xếp hạng #1 |  |  |
+| `rated_badge` | en | Rated #1 by Local Contractors | *(removed)* | "Rated #1 by Local Contractors" (es: "#1 Entre Contratistas Locales") is not true (Tobias, 2026-09-14). The line is gone; the builders panel keeps its heading, description and links. | 🗑 not true (Tobias, 2026-09-14), removed |
+|  | es | #1 Entre Contratistas Locales | *(removed)* |  |  |
+|  | vi | Được xếp hạng #1 bởi các nhà thầu địa phương | *(removed)* |  |  |
 | `contractor_eyebrow` | en | — | For builders & contractors | Labels the secondary path so it cannot be mistaken for the emergency one. | no claim |
 |  | es | — | Para constructores y contratistas |  |  |
 |  | vi | — | Dành cho nhà thầu và nhà xây dựng |  |  |
@@ -272,12 +299,18 @@ These are claims that would help conversion but that the site doesn't make today
 | `sla_link` | en | Read our Service Level Agreement | Ask about our service terms | "Read our Service Level Agreement" linked to the contact form; no agreement document exists on the site. | ⬇ claim softened, nothing added |
 |  | es | Lea nuestro Acuerdo de Nivel de Servicio | Pregunte por nuestras condiciones de servicio |  |  |
 |  | vi | Đọc Thỏa thuận Mức Dịch vụ của chúng tôi | Hỏi về điều khoản dịch vụ của chúng tôi |  |  |
-| `licensed_title` | en | Fully Licensed & Insured | Fully licensed and insured | Sentence case; same claim. | ✅ tier B kept, not amplified |
-|  | es | Licencia y Seguro Completos | Con licencia y seguro completos |  |  |
-|  | vi | Được cấp phép & Bảo hiểm đầy đủ | Được cấp phép và bảo hiểm đầy đủ |  |  |
-| `licensed_desc` | en | $2M Liability Coverage per project site. | $2M in liability coverage per project site. | Reads as a sentence; same amount. | ✅ tier B kept, not amplified |
-|  | es | $2M de cobertura de responsabilidad por sitio. | $2M de cobertura de responsabilidad civil por obra. |  |  |
-|  | vi | Bảo hiểm trách nhiệm 2 triệu đô la cho mỗi công trường dự án. | Bảo hiểm trách nhiệm 2 triệu đô la cho mỗi công trình. |  |  |
+| `licensed_title` | en | Fully Licensed & Insured | *(removed)* | "Fully Licensed & Insured" is not true (Tobias, 2026-09-14). The card now holds the confirmed 24/7 emergency line (emergency_title). | 🗑 not true (Tobias, 2026-09-14), removed |
+|  | es | Licencia y Seguro Completos | *(removed)* |  |  |
+|  | vi | Được cấp phép & Bảo hiểm đầy đủ | *(removed)* |  |  |
+| `licensed_desc` | en | $2M Liability Coverage per project site. | *(removed)* | "$2M Liability Coverage per project site" rested on the same insurance claim: removed. | 🗑 not true (Tobias, 2026-09-14), removed |
+|  | es | $2M de cobertura de responsabilidad por sitio. | *(removed)* |  |  |
+|  | vi | Bảo hiểm trách nhiệm 2 triệu đô la cho mỗi công trường dự án. | *(removed)* |  |  |
+| `emergency_title` | en | — | 24/7 emergency calls | Replaces the licence card with a fact Tobias confirmed on 2026-09-14: he takes emergency calls around the clock. | ✅ tier A kept |
+|  | es | — | Llamadas de emergencia 24/7 |  |  |
+|  | vi | — | Cuộc gọi khẩn cấp 24/7 |  |  |
+| `emergency_desc` | en | — | Locked out of your garage? Call {phone}, day or night. | Tobias's own example of an emergency call (a garage lockout) and the confirmed line. No response time is promised. | ✅ tier A kept |
+|  | es | — | ¿No puede entrar a su garaje? Llame al {phone}, de día o de noche. |  |  |
+|  | vi | — | Không vào được gara? Hãy gọi {phone}, dù ngày hay đêm. |  |  |
 | `fees_title` | en | Zero Hidden Fees | No hidden fees | Sentence case; same claim. | ✅ tier B kept, not amplified |
 |  | es | Cero Cargos Ocultos | Sin cargos ocultos |  |  |
 |  | vi | Không có phí ẩn | Không phí ẩn |  |  |
@@ -366,12 +399,18 @@ These are claims that would help conversion but that the site doesn't make today
 | `sla_docs` | en | SLA Documentation | *(removed)* | "SLA Documentation" was a dead href="#" link. | 🗑 false by construction, removed |
 |  | es | Documentación SLA | *(removed)* |  |  |
 |  | vi | Tài liệu SLA | *(removed)* |  |  |
-| `official_data` | en | Official Data | License & insurance | Says what the block contains. | ✅ tier B kept, not amplified |
-|  | es | Datos Oficiales | Licencia y seguro |  |  |
-|  | vi | Dữ liệu chính thức | Giấy phép và bảo hiểm |  |  |
-| `state_license` | en | State License | State license | Sentence case; the number shown is unchanged and flagged HIGH. | ✅ tier B kept, not amplified |
-|  | es | Licencia Estatal | Licencia estatal |  |  |
-|  | vi | Giấy phép tiểu bang | Giấy phép tiểu bang |  |  |
+| `official_data` | en | Official Data | *(removed)* | "Official Data" headed a block that held only the state licence number and the insurer, neither of which is true (Tobias, 2026-09-14). The column is gone; the brand column now ends with the 24/7 emergency line and the phone link (emergency_heading). | 🗑 not true (Tobias, 2026-09-14), removed |
+|  | es | Datos Oficiales | *(removed)* |  |  |
+|  | vi | Dữ liệu chính thức | *(removed)* |  |  |
+| `state_license` | en | State License | *(removed)* | "State License" labelled "#9942-B-RES", which is not a real licence (Tobias, 2026-09-14). | 🗑 not true (Tobias, 2026-09-14), removed |
+|  | es | Licencia Estatal | *(removed)* |  |  |
+|  | vi | Giấy phép tiểu bang | *(removed)* |  |  |
+| `insurance` | en | Insurance | *(removed)* | "Insurance" labelled "Liberty Mutual • $2M Agg", which is not real (Tobias, 2026-09-14). | 🗑 not true (Tobias, 2026-09-14), removed |
+|  | es | Seguro | *(removed)* |  |  |
+|  | vi | Bảo hiểm | *(removed)* |  |  |
+| `emergency_heading` | en | — | 24/7 emergency calls | Replaces the licence block with a confirmed fact: a heading in the brand column, directly above the phone link. | ✅ tier A kept |
+|  | es | — | Llamadas de emergencia 24/7 |  |  |
+|  | vi | — | Cuộc gọi khẩn cấp 24/7 |  |  |
 | `hq_dispatch` | en | HQ Dispatch | *(removed)* | "HQ Dispatch" block replaced by the service areas list and the contact block. | ⬇ claim softened, nothing added |
 |  | es | Despacho Central | *(removed)* |  |  |
 |  | vi | Điều phối từ trụ sở | *(removed)* |  |  |
@@ -408,9 +447,6 @@ These are claims that would help conversion but that the site doesn't make today
 | `nav_contact` | en | — | Request service | Footer navigation to the request form. | no claim |
 |  | es | — | Solicitar servicio |  |  |
 |  | vi | — | Yêu cầu dịch vụ |  |  |
-| `contact_heading` | en | — | Contact | Heading for the phone link. | no claim |
-|  | es | — | Contacto |  |  |
-|  | vi | — | Liên hệ |  |  |
 | `call` | en | — | Call {phone} | Click-to-call in the footer. | ✅ tier A kept |
 |  | es | — | Llame al {phone} |  |  |
 |  | vi | — | Gọi {phone} |  |  |
@@ -493,9 +529,33 @@ These are claims that would help conversion but that the site doesn't make today
 | `standard_desc` | en | Most contractors maximize profit by minimizing time on site. We maximize lifespan by obsessing over the install details you'll never see. | Most contractors maximize profit by minimizing time on site. We maximize your door's lifespan by caring about the install details you'll never see. | "Obsessing over" → "caring about": warmer, same promise. | no claim |
 |  | es | La mayoría de contratistas maximizan ganancias minimizando tiempo en sitio. Nosotros maximizamos la vida útil obsesionándonos con los detalles de instalación que nunca verá. | La mayoría de los contratistas maximizan sus ganancias reduciendo el tiempo en obra. Nosotros maximizamos la vida útil de su puerta cuidando los detalles de instalación que usted nunca verá. |  |  |
 |  | vi | Hầu hết các nhà thầu tối đa hóa lợi nhuận bằng cách giảm thiểu thời gian tại công trường. Chúng tôi tối đa hóa tuổi thọ bằng cách chú trọng đến từng chi tiết lắp đặt mà bạn sẽ không bao giờ nhìn thấy. | Hầu hết các nhà thầu tối đa hóa lợi nhuận bằng cách rút ngắn thời gian tại công trình. Chúng tôi kéo dài tuổi thọ cửa của bạn bằng cách chăm chút từng chi tiết lắp đặt mà bạn sẽ không bao giờ thấy. |  |  |
-| `licensed_heading` | en | Licensed. Insured. Verified. | Licensed, insured and accredited | "Verified" implied a verification nobody performs; "accredited" is the claim the tiles make (BBB). | ⬇ claim softened, nothing added |
-|  | es | Licenciados. Asegurados. Verificados. | Con licencia, asegurados y acreditados |  |  |
-|  | vi | Được cấp phép. Có bảo hiểm. Đã xác minh. | Được cấp phép, có bảo hiểm và được công nhận |  |  |
+| `licensed_heading` | en | Licensed. Insured. Verified. | *(removed)* | "Licensed. Insured. Verified." headed four tiles of claims that are not true (Tobias, 2026-09-14): licence, insurance, IDA membership with certified technicians, and an A+ BBB rating. The section now holds confirmed facts (facts_heading). | 🗑 not true (Tobias, 2026-09-14), removed |
+|  | es | Licenciados. Asegurados. Verificados. | *(removed)* |  |  |
+|  | vi | Được cấp phép. Có bảo hiểm. Đã xác minh. | *(removed)* |  |  |
+| `facts_heading` | en | — | Mobil Garage Door at a glance | Heads the section rebuilt around confirmed facts: 24/7 emergency calls, the phone line, the service area and "since 2000". | ✅ tier A kept |
+|  | es | — | Mobil Garage Door de un vistazo |  |  |
+|  | vi | — | Thông tin nhanh về Mobil Garage Door |  |  |
+| `facts_lead` | en | — | Locked out of your garage? We take emergency calls around the clock. | Tobias's answer, in his words: he takes emergency calls around the clock, for example garage lockouts. No response time is promised. | ✅ tier A kept |
+|  | es | — | ¿No puede entrar a su garaje? Atendemos llamadas de emergencia las 24 horas del día. |  |  |
+|  | vi | — | Không vào được gara? Chúng tôi nhận cuộc gọi khẩn cấp suốt ngày đêm. |  |  |
+| `emergency_label` | en | — | Emergency calls | Tile label. | ✅ tier A kept |
+|  | es | — | Llamadas de emergencia |  |  |
+|  | vi | — | Cuộc gọi khẩn cấp |  |  |
+| `emergency_value` | en | — | 24/7 | Tile value, as the hero and contact page already write it. | ✅ tier A kept |
+|  | es | — | 24/7 |  |  |
+|  | vi | — | 24/7 |  |  |
+| `phone_label` | en | — | Phone | Tile label; the value is the tel: link to 832-419-1293, the confirmed line. | ✅ tier A kept |
+|  | es | — | Teléfono |  |  |
+|  | vi | — | Điện thoại |  |  |
+| `area_label` | en | — | Service area | Tile label. | ✅ tier A kept |
+|  | es | — | Área de servicio |  |  |
+|  | vi | — | Khu vực phục vụ |  |  |
+| `area_value` | en | — | Houston & surrounding areas | Same words as the footer and hero (tier A). | ✅ tier A kept |
+|  | es | — | Houston y áreas cercanas |  |  |
+|  | vi | — | Houston và khu vực lân cận |  |  |
+| `since_label` | en | — | In business since | Tile label; the value is the founding year the site states (2000). | ✅ tier A kept |
+|  | es | — | En servicio desde |  |  |
+|  | vi | — | Hoạt động từ năm |  |  |
 | `cta_heading` | en | Work with Mobil Garage Door. | Work with Mobil Garage Door | No trailing period on a heading. | no claim |
 |  | es | Trabaje con Mobil Garage Door. | Trabaje con Mobil Garage Door |  |  |
 |  | vi | Làm việc với Mobil Garage Door. | Làm việc cùng Mobil Garage Door |  |  |
@@ -505,24 +565,6 @@ These are claims that would help conversion but that the site doesn't make today
 | `call_cta` | en | — | or call {phone} | Adds the real phone link beside the call-to-action. | ✅ tier A kept |
 |  | es | — | o llame al {phone} |  |  |
 |  | vi | — | hoặc gọi {phone} |  |  |
-| `license_label` | en | — | License | Was hard-coded English "LICENSE". | ✅ tier B kept, not amplified |
-|  | es | — | Licencia |  |  |
-|  | vi | — | Giấy phép |  |  |
-| `insurance_label` | en | — | Insurance | Was hard-coded English "INSURANCE". | ✅ tier B kept, not amplified |
-|  | es | — | Seguro |  |  |
-|  | vi | — | Bảo hiểm |  |  |
-| `ida_label` | en | — | IDA member | Was hard-coded English "IDA MEMBER" (flagged HIGH). | ✅ tier B kept, not amplified |
-|  | es | — | Miembro de IDA |  |  |
-|  | vi | — | Thành viên IDA |  |  |
-| `ida_value` | en | — | Certified technicians | Was hard-coded English "Certified Techs". | ✅ tier B kept, not amplified |
-|  | es | — | Técnicos certificados |  |  |
-|  | vi | — | Kỹ thuật viên được chứng nhận |  |  |
-| `rating_label` | en | — | Rating | Was hard-coded English "RATING". | ✅ tier B kept, not amplified |
-|  | es | — | Calificación |  |  |
-|  | vi | — | Xếp hạng |  |  |
-| `rating_value` | en | — | A+ BBB accredited | Was hard-coded English "A+ BBB Accredited" (flagged HIGH). | ✅ tier B kept, not amplified |
-|  | es | — | Acreditación A+ de BBB |  |  |
-|  | vi | — | Được BBB công nhận hạng A+ |  |  |
 
 ### `portfolio_page`
 
@@ -692,7 +734,7 @@ These are claims that would help conversion but that the site doesn't make today
 
 | Key | Locale | Before | After | Why | Facts |
 |---|---|---|---|---|---|
-| `emergency_badge` | en | 24/7 Emergency Dispatch | 24/7 emergency service | "Dispatch" → "service"; same 24/7 claim, same place. | ✅ tier B kept, not amplified |
+| `emergency_badge` | en | 24/7 Emergency Dispatch | 24/7 emergency service | "Dispatch" → "service"; same 24/7 claim, same place (confirmed by Tobias on 2026-09-14). | ✅ tier A kept |
 |  | es | Despacho de Emergencia 24/7 | Servicio de emergencia 24/7 |  |  |
 |  | vi | Điều động khẩn cấp 24/7 | Dịch vụ khẩn cấp 24/7 |  |  |
 | `contractor_badge` | en | Contractor Portal | For contractors | "Contractor Portal" — this page is a form, not the portal. | no claim |
@@ -775,7 +817,7 @@ These are claims that would help conversion but that the site doesn't make today
 | `direct_contact` | en | Direct Contact | Talk to us | Plain words. | no claim |
 |  | es | Contacto Directo | Hable con nosotros |  |  |
 |  | vi | Liên hệ trực tiếp | Liên hệ với chúng tôi |  |  |
-| `hotline` | en | 24/7 Hotline | 24/7 hotline | Sentence case; same claim. | ✅ tier B kept, not amplified |
+| `hotline` | en | 24/7 Hotline | 24/7 hotline | Sentence case; same claim (24/7 confirmed by Tobias on 2026-09-14). | ✅ tier A kept |
 |  | es | Línea 24/7 | Línea 24/7 |  |  |
 |  | vi | Đường dây nóng 24/7 | Đường dây nóng 24/7 |  |  |
 | `email_support` | en | Email Support | Email | The address itself is unchanged (question for Tobias). | ✅ tier B kept, not amplified |
@@ -899,9 +941,9 @@ These are claims that would help conversion but that the site doesn't make today
 | `about_title` | en | — | About Us: Houston Garage Door Service Since 2000 | Unique page title. | ✅ tier A kept |
 |  | es | — | Sobre nosotros: servicio de puertas de garaje en Houston desde 2000 |  |  |
 |  | vi | — | Về chúng tôi: dịch vụ cửa gara tại Houston từ năm 2000 |  |  |
-| `about_description` | en | — | Mobil Garage Door has repaired and installed garage doors in the Houston area since 2000. Learn about our standards, values, and license and insurance details. | Unique page description. | ✅ tier A kept |
-|  | es | — | Mobil Garage Door repara e instala puertas de garaje en el área de Houston desde 2000. Conozca nuestros estándares, valores y datos de licencia y seguro. |  |  |
-|  | vi | — | Mobil Garage Door sửa chữa và lắp đặt cửa gara tại khu vực Houston từ năm 2000. Tìm hiểu tiêu chuẩn, giá trị và thông tin giấy phép, bảo hiểm của chúng tôi. |  |  |
+| `about_description` | en | — | Mobil Garage Door has repaired and installed garage doors in the Houston area since 2000, and takes emergency calls 24/7. Learn about our standards and values. | Unique page description. It no longer promises "license and insurance details" (not true, Tobias 2026-09-14); it states the confirmed 24/7 emergency line instead. | ✅ tier A kept |
+|  | es | — | Mobil Garage Door repara e instala puertas de garaje en el área de Houston desde 2000 y atiende llamadas de emergencia 24/7. Conozca nuestros estándares y valores. |  |  |
+|  | vi | — | Mobil Garage Door sửa chữa và lắp đặt cửa gara tại khu vực Houston từ năm 2000 và nhận cuộc gọi khẩn cấp 24/7. Tìm hiểu tiêu chuẩn và giá trị của chúng tôi. |  |  |
 | `portfolio_title` | en | — | Garage Door Installation Projects | Unique page title. | no claim |
 |  | es | — | Proyectos de instalación de puertas de garaje |  |  |
 |  | vi | — | Dự án lắp đặt cửa gara |  |  |
@@ -932,3 +974,11 @@ These are claims that would help conversion but that the site doesn't make today
 | `privacy_description` | en | — | How Mobil Garage Door collects, uses and protects your personal and payment information. | Summarises the existing policy; no new commitment. | no claim |
 |  | es | — | Cómo Mobil Garage Door recopila, usa y protege su información personal y de pago. |  |  |
 |  | vi | — | Cách Mobil Garage Door thu thập, sử dụng và bảo vệ thông tin cá nhân và thanh toán của bạn. |  |  |
+
+### `home`
+
+| Key | Locale | Before | After | Why | Facts |
+|---|---|---|---|---|---|
+| `licensed_insured` | en | Licensed & Insured | *(removed)* | "Licensed & Insured" is not true (Tobias, 2026-09-14). No component renders this key, but the public layout passes the whole catalogue to the client provider, so it shipped in every public page's inline payload. | 🗑 not true (Tobias, 2026-09-14), removed |
+|  | es | Con Licencia y Asegurados | *(removed)* |  |  |
+|  | vi | Được Cấp Phép & Bảo Hiểm | *(removed)* |  |  |

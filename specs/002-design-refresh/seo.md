@@ -56,6 +56,7 @@ Every source below was checked on **2026-09-13**. "Updated" is the page's own la
 - `Service`: `name`, `description`, `serviceType`, `provider`, `areaServed` (AdministrativeArea / GeoShape / Place / Text), `hasOfferCatalog`.
 - `areaServed`: "The geographic area where a service or offered item is provided. Supersedes serviceArea." It is used by schema.org consumers, not documented by Google.
 - `additionalType`: "typically used for adding more specific types from external vocabularies". Not supported by Google (see LocalBusiness above).
+- Organization properties, from schema.org/Organization fetched 2026-09-14: `award` ("An award won by or for this item."), `memberOf` ("An Organization (or ProgramMembership) to which this Person or Organization belongs."), `hasCredential` ("A credential awarded to the Person or Organization.") and `hasCertification` ("Certification information about a product, organization, service, place, or person."). This is where licence, membership, accreditation and ranking claims would go, so the JSON-LD guard forbids all four (§4.5).
 
 ### Standards, law and platform
 | Topic | Source | Date | Relevance |
@@ -69,7 +70,9 @@ Every source below was checked on **2026-09-13**. "Updated" is the page's own la
 | WCAG 2.2 2.5.8 | …/target-size-minimum | 2026-05-11 | AA 24×24 CSS px minimum |
 | WCAG 2.2 2.4.13 | …/focus-appearance | 2026-08-10 | AAA: 2 px perimeter, 3:1 change |
 | FTC Consumer Reviews and Testimonials Rule | ftc.gov/business-guidance/resources/consumer-reviews-testimonials-rule-questions-answers | Nov 2024; effective 2024-10-21 | Prohibits fake reviews and testimonials. Context for removing the index-generated "VERIFIED" badges |
-| Texas DPS, garage door openers | dps.texas.gov/section/private-security/gate-operatorsgarage-door-openers | 2019/2020 | Opener installers need no DPS license unless the operator connects to an alarm or monitoring. Context for asking Tobias to verify the footer's "State License #9942-B-RES" |
+| Texas DPS, garage door openers | dps.texas.gov/section/private-security/gate-operatorsgarage-door-openers | 2019/2020 | Opener installers need no DPS license unless the operator connects to an alarm or monitoring. Context for asking Tobias to verify the footer's "State License #9942-B-RES". On 2026-09-14 he confirmed it isn't real, and it's removed |
+| Null MX | RFC 7505, rfc-editor.org/rfc/rfc7505 | Jun 2015 | A single MX record `0 .` means the domain accepts no mail. `mobilegaragedoor.com`, the domain of the privacy policy's address, publishes exactly that (`copy.md` §3.3) |
+| MX and NS records | Cloudflare DNS-over-HTTPS, `cloudflare-dns.com/dns-query` | 2026-09-14, 02:55 UTC | `mobilgaragedoor.com`: no MX. `mobilgarage.com`: NameBright nameservers, no MX. `mobilegaragedoor.com`: Afternic nameservers, null MX (`copy.md` §3.3) |
 | Cloudflare managed robots.txt | developers.cloudflare.com/bots/additional-configurations/managed-robots-txt | 2026-08-03 | Cloudflare prepends its managed block to a Worker's own 200 `/robots.txt` |
 | llms.txt proposal | llmstxt.org | modified 2026-08-10 | Still a proposal; used "on demand" by agents |
 | OpenAI crawlers | developers.openai.com/api/docs/bots | no date | Allow OAI-SearchBot to appear in ChatGPT search; a wildcard allow covers it |
@@ -180,8 +183,8 @@ Built by `src/lib/seo/structured-data.ts` and serialized with `<` escaped. **Onl
 
 **Deliberately omitted.** Each needs a fact the site doesn't show, or one I can't verify; see the questions in §6:
 - **`address`.** None is shown, and Tobias removed the placeholder street address in Feb 2026. **Without it the business node is not eligible for Google's LocalBusiness rich result**, but it still describes the entity.
-- **Ratings, prices, hours.** `aggregateRating` and `review` (Google limits them to sites reviewing *other* businesses, and the testimonials are first-party); `priceRange`; `openingHoursSpecification`. The "24/7" claim is tier B.
-- **Other.** `geo`; `sameAs` (the footer's "IG"/"LN" circles link nowhere); `email` (the contact page's `dispatch@mobilgarage.com` is on a different domain from the site); licence and insurance numbers (tier B); dealer brands (tier B); `additionalType` (unsupported); `SearchAction` (feature removed); `FAQPage`; breadcrumbs.
+- **Ratings, prices, hours.** `aggregateRating` and `review` (Google limits them to sites reviewing *other* businesses, and the testimonials are first-party); `priceRange`; `openingHoursSpecification`. On 2026-09-14 Tobias confirmed that he takes **emergency calls** around the clock. That isn't opening hours for every service, and a 24/7 `openingHoursSpecification` would say installations are available at 3 a.m. too, so hours stay out.
+- **Other.** `geo`; `sameAs` (the footer's "IG"/"LN" circles link nowhere); `email` (no address the site uses can receive mail, and Tobias hasn't picked one: `copy.md` §3.3); licences, insurance, memberships, accreditations and awards (`hasCredential`, `hasCertification`, `memberOf`, `award`), because Tobias confirmed on 2026-09-14 that the licence, insurer, BBB, IDA and "#1" claims aren't real. All four are in `FORBIDDEN_PROPERTIES`, which the unit and smoke tests check; dealer brands (tier B); `additionalType` (unsupported); `SearchAction` (feature removed); `FAQPage`; breadcrumbs.
 
 ### 4.6 Sitemap
 `src/app/sitemap.ts` returns, at request time:
@@ -246,7 +249,7 @@ Sitemap: https://mobilgaragedoor.com/sitemap.xml
 
 ### 4.10 Local SEO
 - **Service area.** Named naturally, once, in the visible copy: the hero eyebrow says "Houston & surrounding areas", and the footer lists the four areas the site already names. There is no city list in headings or repeated blocks, which is keyword stuffing per Google's spam policies.
-- **Click-to-call** only for the number the site already shows, `832-419-1293`. It was set by Tobias (commit `18ad1a7`, which replaced placeholder `555-000-0000`). Every `tel:` uses the RFC 3966 global form `tel:+18324191293`, while the display format stays `832-419-1293`.
+- **Click-to-call** only for the number the site already shows, `832-419-1293`. It was set by Tobias (commit `18ad1a7`, which replaced placeholder `555-000-0000`), and on 2026-09-14 he confirmed it is the working line. Every `tel:` uses the RFC 3966 global form `tel:+18324191293`, while the display format stays `832-419-1293`.
 - **Consistency.** Name, phone and areas are identical in the header, hero, footer, contact page and JSON-LD.
 - **Off-site factors.** Local ranking comes from the Google Business Profile: relevance, distance and prominence (reviews). Nothing on the website replaces it (questions Q1, Q2).
 
@@ -277,21 +280,22 @@ The Search Console generative-AI control defaults to "Include" (Google blog, 202
 
 ## 5. Tests
 
-Added to `tests/smoke/worker-routes.test.ts`, run against the built Worker on workerd with the synthetic fixtures (`blog-posts.sql`, plus the new `public-content.sql`: three services, two testimonials, one project). 101 of the suite's 113 tests are new; the original 12 are unchanged and still pass. Every test fetches as Googlebot unless noted.
+Added to `tests/smoke/worker-routes.test.ts`, run against the built Worker on workerd with the synthetic fixtures (`blog-posts.sql`, plus the new `public-content.sql`: three services, two testimonials, one project, and sentinel values in the settings row's licence, insurance and BBB fields). 134 of the suite's 146 tests are new; the original 12 are unchanged and still pass. Every test fetches as Googlebot unless noted.
 
 | Group | What it proves | Tests |
 |---|---|---|
 | SEO: headings | Every redesigned page (7 static + 2 detail) in en/es/vi has exactly one `<h1>`, and no Server Components error row | 27 |
 | SEO: metadata in `<head>` | One absolute, self-referencing canonical per page per locale; title, description and canonical in the initial `<head>` for a Googlebot, a mobile Chrome and an OAI-SearchBot user agent (guards `htmlLimitedBots`); unique titles and descriptions across the 21 static page × locale combinations; `<html lang>` per locale | 27 + 3 + 1 + 3 |
 | SEO: hreflang | For each page, the en/es/vi documents carry the identical cluster (en, es, vi, x-default), each contains its own canonical, and it matches next-intl's `Link` header by pathname | 9 |
-| SEO: structured data | Every JSON-LD block on every page × locale parses and contains no `aggregateRating`, `review`, `priceRange`, `openingHours(Specification)`, `address` or `geo`. Home carries `HomeAndConstructionBusiness` (name, url, telephone), `WebSite` (name, url) and one `Service` per fixture service with its provider. The post carries `BlogPosting` (headline, datePublished, image) | 27 + 2 |
+| SEO: structured data | Every JSON-LD block on every page × locale parses and contains no `aggregateRating`, `review`, `priceRange`, `openingHours(Specification)`, `address`, `geo`, `hasCredential`, `hasCertification`, `memberOf` or `award`. Home carries `HomeAndConstructionBusiness` (name, url, telephone), `WebSite` (name, url) and one `Service` per fixture service with its provider. The post carries `BlogPosting` (headline, datePublished, image) | 27 + 2 |
+| Trust claims | Every public page (the 9 redesigned pages plus `/login` and `/signup`) in en/es/vi ships none of the claims Tobias confirmed aren't real (licence number, insurer and $2M policy, BBB, IDA, certified technicians, "#1"), nor the licensed/insured/accredited lines that rested on them, in any language, nor the fixture's sentinels from the dashboard's licence, insurance and BBB settings. The scan covers the markup, the JSON-LD and the inline RSC payload, with its chunks joined, because the public layout sends the whole message catalogue to the browser. A positive control fails the test if the payload isn't found. Run over the live pages captured on 2026-09-14, 9 to 14 of the patterns match on each page | 33 |
 | SEO: sitemap.xml | 200 XML; every page in every locale; `x-default` and localized alternates; no private, API or auth URL | 1 |
 | SEO: robots.txt | 200 text/plain. Google's longest-match rule (implemented in the test) allows public pages, blog images and `/login`, and disallows `/dashboard`, `/portal`, `/admin` and their `/es`, `/vi` variants. Absolute `Sitemap:` | 1 |
 
 Unit tests (`npm test`, 113 across 13 files, 37 new):
 - `src/lib/seo/site.test.ts`: pins the next-intl routing assumptions; localized paths, absolute URLs, reciprocal alternates, robots rules.
 - `src/lib/seo/metadata.test.ts`: localized titles, canonicals, hreflang, Open Graph, noindex, social image dimensions.
-- `src/lib/seo/structured-data.test.ts`: types and facts, no forbidden properties, `<` escaping.
+- `src/lib/seo/structured-data.test.ts`: types and facts, no forbidden properties (now including the credential, certification, membership and award properties), `<` escaping.
 - `src/lib/seo/text.test.ts`: description excerpts and locale dates.
 - `src/shared/design/design-scale.test.ts`: generated CSS in sync, monotonic scales, WCAG contrast pairs, φ spacing.
 
@@ -305,14 +309,14 @@ Changed test: `src/shared/layout/Header.test.tsx`. The mock now maps `nav.dashbo
 |---|---|---|
 | Q1 | Is there a Google Business Profile? Is it set up as a service-area business, with the four areas the footer lists? | Local pack ranking comes from the profile, not the site |
 | Q2 | Is there a public street address customers can visit? | LocalBusiness rich results require `address`. If it's service-area only, leave it out, as now |
-| Q3 | Is `832-419-1293` the live business line, and is the "24/7" claim true for phone *and* dispatch? | It is now the click-to-call in the header and on mobile, and it's in the JSON-LD. Hours stay out of the markup until confirmed |
-| Q4 | Which email is real: `dispatch@mobilgarage.com` (contact page), `privacy@mobilegaragedoor.com` (privacy page) or `service@mobilgaragedoor.com` (settings default)? Two use a domain that isn't the site's | NAP consistency and the privacy policy's contact route. Emails stay as they are and out of the JSON-LD |
+| Q3 | ~~Is `832-419-1293` the live business line, and is the "24/7" claim true for phone *and* dispatch?~~ **Answered 2026-09-14:** yes, it's the working line, and he takes emergency calls around the clock | Tier A now (`copy.md` §3.1). Hours still stay out of the JSON-LD (§4.5) |
+| Q4 | Which email is real: `dispatch@mobilgarage.com` (contact page), `privacy@mobilegaragedoor.com` (privacy page) or `service@mobilgaragedoor.com` (settings default)? **Undecided as of 2026-09-14.** None of them can receive mail (`copy.md` §3.3) | NAP consistency and the privacy policy's contact route. Emails stay as they are and out of the JSON-LD until he decides |
 | Q5 | Are there real social profiles (the footer had "IG"/"LN" circles that linked nowhere)? | `sameAs` in JSON-LD and footer links |
 | Q6 | Should untranslated blog posts canonicalize to English? | It needs next-intl `alternateLinks: false` to avoid a header/HTML conflict (§4.3) |
 | Q7 | Keep automatic `Accept-Language` redirects on `/`? | Google advises against automatic language redirects; changing it is i18n routing |
 | Q8 | Turn on Cloudflare "Always Use HTTPS"? | `http://mobilgaragedoor.com/` serves 200 without a redirect, which splits signals |
 | Q9 | Should the login, signup and auth pages be `noindex`? | Keeps thin auth pages out of results; they're out of this PR's scope |
-| Q10 | Verify or remove the tier-B claims listed in `copy.md` §Facts, especially "State License #9942-B-RES", "Liberty Mutual • $2M Agg", "A+ BBB Accredited", "IDA member" and "Rated #1 by Local Contractors" | Unsubstantiated licence and rating claims are a legal and trust risk. None of them are in the structured data |
+| Q10 | ~~Verify or remove "State License #9942-B-RES", "Liberty Mutual • $2M Agg", "A+ BBB Accredited", "IDA member" and "Rated #1 by Local Contractors"~~ **Answered 2026-09-14:** not real | All removed, in every language, with the generic licensed/insured lines. The remaining tier-B claims are still open (`copy.md` C5) |
 
 ## 7. Could not verify
 - **X/Twitter card specifications.** developer.x.com returns HTTP 402.
@@ -328,6 +332,7 @@ Method, identical for both columns:
 - Lighthouse 13.4.1 via `npx` (not a dependency), default mobile config: Moto G Power emulation, simulated Slow 4G, 4× CPU.
 - Headless Chromium 1243, against the local production build on workerd (`wrangler dev -c dist/server/wrangler.json`, port 4421) with synthetic D1 data.
 - Three runs per page, run one after another; the table shows the **median**.
+- Measured at `61e2181`. The 2026-09-14 trust-claim removal changed text, one home card, one about section and the footer's brand column, with no new assets or scripts, so it wasn't re-run.
 
 | Page | LCP | CLS | TBT | FCP | Performance | Accessibility | Best practices | SEO | Transfer |
 |---|---|---|---|---|---|---|---|---|---|
