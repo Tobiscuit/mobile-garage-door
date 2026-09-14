@@ -1,11 +1,26 @@
 import React from 'react';
+import type { Metadata } from 'next';
 import { getDB } from "@/db";
 import { settings as settingsTable, settingStats, settingValues } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { getTranslations } from '@/lib/server-translations';
 import { getCloudflareContext } from "@/lib/cloudflare";
+import { pageMetadata } from '@/lib/seo/metadata';
+import { JsonLd } from '@/lib/seo/JsonLd';
+import { BUSINESS, TEL_HREF } from '@/lib/seo/site';
+import { businessNode, graph } from '@/lib/seo/structured-data';
 
 export const dynamic = 'force-dynamic';
+
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+    const { locale } = (await params) || { locale: 'en' };
+    return pageMetadata({
+        locale,
+        path: '/about',
+        title: { key: 'about_title' },
+        description: { key: 'about_description' },
+    });
+}
 
 export default async function AboutPage({ params }: { params: Promise<{ locale: string }> }) {
     const resolvedParams = (await params) || { locale: 'en' } as any;
@@ -20,12 +35,16 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
         missionStatement: "To provide fast, honest, and expert garage door service to every homeowner and contractor in our community—ensuring no one is ever left stranded with a broken door.",
         stats: [] as any[],
         values: [] as any[],
-        licenseNumber: "TX Registered & Bonded",
-        insuranceAmount: "$2M Policy"
     };
 
     if (db) {
-        const [settingsRow] = await db.select().from(settingsTable).limit(1);
+        // Only the columns this page shows. The settings row also holds the
+        // dashboard's licence, insurance and BBB fields; Tobias confirmed those
+        // claims aren't real, so they're never read here (copy.md §2).
+        const [settingsRow] = await db
+            .select({ id: settingsTable.id, missionStatement: settingsTable.missionStatement })
+            .from(settingsTable)
+            .limit(1);
         const stats = settingsRow
             ? await db.select().from(settingStats).where(eq(settingStats.settingId, settingsRow.id))
             : [];
@@ -37,118 +56,102 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
             missionStatement: settingsRow?.missionStatement || settingsObj.missionStatement,
             stats,
             values,
-            licenseNumber: settingsRow?.licenseNumber || settingsObj.licenseNumber,
-            insuranceAmount: settingsRow?.insuranceAmount || settingsObj.insuranceAmount
         };
     }
 
     const settings = settingsObj;
 
     return (
-        <div className="min-h-screen bg-cloudy-white font-work-sans">
+        <div className="page">
+            <JsonLd data={graph([businessNode(settings.missionStatement)])} />
 
-            {/* HERO: Blueprint Style */}
-            <section className="bg-charcoal-blue text-white pt-48 pb-24 relative overflow-hidden min-h-[50vh] flex flex-col justify-center">
-                {/* Grid Background */}
-                <div className="absolute inset-0 opacity-10"
-                    style={{ backgroundImage: 'linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)', backgroundSize: '40px 40px' }}>
-                </div>
-
-                <div className="container mx-auto px-6 relative z-10">
-                    <div className="max-w-4xl">
-                        <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 text-golden-yellow px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-6">
-                            {t('since')}
-                        </div>
-                        <h1 className="text-5xl md:text-7xl font-black leading-tight mb-8">
-                            {t('heading_1')} <br />
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-golden-yellow to-white">
-                                {t('heading_2')}
-                            </span>
-                        </h1>
-                        <p className="text-xl text-gray-300 max-w-2xl leading-relaxed">
-                            {settings.missionStatement}
-                        </p>
+            <section className="section section--snug" aria-labelledby="about-title">
+                <div className="wrap wrap--wide split split--center">
+                    <div className="stack">
+                        <p className="eyebrow">{t('since')}</p>
+                        <h1 id="about-title" className="title-1">{t('heading_1')}</h1>
+                        <p className="title-3 accent">{t('heading_2')}</p>
+                        <p className="lead">{settings.missionStatement}</p>
                     </div>
-                </div>
-            </section>
 
-            {/* STATS BAR */}
-            <div className="bg-golden-yellow py-12">
-                <div className="container mx-auto px-6">
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-                        {settings.stats?.map((stat: any, index: number) => (
-                            <div key={index} className="text-center md:text-left border-r last:border-0 border-charcoal-blue/10">
-                                <div className="text-4xl md:text-5xl font-black text-charcoal-blue mb-1">{stat.value}</div>
-                                <div className="text-sm font-bold uppercase tracking-widest text-charcoal-blue/60">{stat.label}</div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </div>
-
-            {/* CORE VALUES */}
-            <section className="py-24 px-6">
-                <div className="container mx-auto">
-                    <div className="flex flex-col md:flex-row gap-16">
-                        <div className="md:w-1/3">
-                            <h2 className="text-4xl font-black text-charcoal-blue mb-6">{t('standard_heading')}</h2>
-                            <p className="text-steel-gray text-lg">
-                                {t('standard_desc')}
-                            </p>
-                        </div>
-
-                        <div className="md:w-2/3 space-y-12">
-                            {settings.values?.map((value: any, index: number) => (
-                                <div key={index} className="flex gap-6 group">
-                                    <div className="text-5xl font-black text-gray-200 group-hover:text-golden-yellow transition-colors select-none">
-                                        0{index + 1}
-                                    </div>
-                                    <div>
-                                        <h3 className="text-2xl font-bold text-charcoal-blue mb-2">{value.title}</h3>
-                                        <p className="text-gray-600 leading-relaxed">
-                                            {value.description}
-                                        </p>
-                                    </div>
+                    {settings.stats?.length > 0 && (
+                        <dl className="stat-grid stat-grid--pair">
+                            {settings.stats.map((stat: any, index: number) => (
+                                <div key={index} className="stat">
+                                    <dt>{stat.label}</dt>
+                                    <dd><span className="stat__value">{stat.value}</span></dd>
                                 </div>
                             ))}
-                        </div>
-                    </div>
+                        </dl>
+                    )}
                 </div>
             </section>
 
-            {/* TRUST / CERTIFICATIONS */}
-            <section className="bg-gray-100 py-24 px-6">
-                <div className="container mx-auto text-center">
-                    <h2 className="text-3xl font-black text-charcoal-blue mb-12">{t('licensed_heading')}</h2>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
-                        <div className="bg-white p-6 rounded-xl shadow-sm flex flex-col justify-center items-center h-48">
-                            <div className="font-black text-gray-300 text-xl mb-2">LICENSE</div>
-                            <div className="font-bold text-charcoal-blue text-lg">{settings.licenseNumber}</div>
-                        </div>
-                        <div className="bg-white p-6 rounded-xl shadow-sm flex flex-col justify-center items-center h-48">
-                            <div className="font-black text-gray-300 text-xl mb-2">INSURANCE</div>
-                            <div className="font-bold text-charcoal-blue text-lg">{settings.insuranceAmount}</div>
-                        </div>
-                        <div className="bg-white p-6 rounded-xl shadow-sm flex flex-col justify-center items-center h-48">
-                            <div className="font-black text-gray-300 text-xl mb-2">IDA MEMBER</div>
-                            <div className="font-bold text-charcoal-blue text-lg">Certified Techs</div>
-                        </div>
-                        <div className="bg-white p-6 rounded-xl shadow-sm flex flex-col justify-center items-center h-48">
-                            <div className="font-black text-gray-300 text-xl mb-2">RATING</div>
-                            <div className="font-bold text-charcoal-blue text-lg">A+ BBB Accredited</div>
-                        </div>
+            <section className="section surface-tint" aria-labelledby="standard-heading">
+                <div className="wrap wrap--wide split">
+                    <div className="stack">
+                        <h2 id="standard-heading" className="title-2">{t('standard_heading')}</h2>
+                        <p className="lead muted">{t('standard_desc')}</p>
                     </div>
+
+                    {settings.values?.length > 0 && (
+                        <ol className="values-list">
+                            {settings.values.map((value: any, index: number) => (
+                                <li key={index}>
+                                    <div className="stack" style={{ '--stack-space': 'var(--space-3xs)' } as React.CSSProperties}>
+                                        <h3 className="title-4">{value.title}</h3>
+                                        <p className="muted">{value.description}</p>
+                                    </div>
+                                </li>
+                            ))}
+                        </ol>
+                    )}
                 </div>
             </section>
 
-            {/* CTA */}
-            <section className="bg-charcoal-blue py-24 px-6 text-center">
-                <h2 className="text-white text-4xl font-black mb-8">{t('cta_heading')}</h2>
-                <a href="/contact" className="inline-block bg-golden-yellow hover:bg-white text-charcoal-blue font-bold py-4 px-10 rounded-xl transition-all transform hover:-translate-y-1 shadow-2xl">
-                    {t('cta_button')}
-                </a>
+            {/* Confirmed facts only. This section used to show licence, insurance, IDA and BBB claims that aren't real. */}
+            <section className="section" aria-labelledby="facts-heading">
+                <div className="wrap wrap--wide stack" style={{ '--stack-space': 'var(--space-l)' } as React.CSSProperties}>
+                    <div className="stack" style={{ '--stack-space': 'var(--space-xs)' } as React.CSSProperties}>
+                        <h2 id="facts-heading" className="title-2">{t('facts_heading')}</h2>
+                        <p className="lead muted">{t('facts_lead')}</p>
+                    </div>
+                    <dl className="tile-grid">
+                        <div className="tile">
+                            <dt>{t('emergency_label')}</dt>
+                            <dd>{t('emergency_value')}</dd>
+                        </div>
+                        <div className="tile">
+                            <dt>{t('phone_label')}</dt>
+                            <dd>
+                                <a href={TEL_HREF} className="text-link">{BUSINESS.phoneDisplay}</a>
+                            </dd>
+                        </div>
+                        <div className="tile">
+                            <dt>{t('area_label')}</dt>
+                            <dd>{t('area_value')}</dd>
+                        </div>
+                        <div className="tile">
+                            <dt>{t('since_label')}</dt>
+                            <dd>{BUSINESS.foundingYear}</dd>
+                        </div>
+                    </dl>
+                </div>
             </section>
 
+            <section className="section--snug surface-red" aria-labelledby="about-cta">
+                <div className="wrap wrap--wide cluster cluster--between">
+                    <h2 id="about-cta" className="title-2">{t('cta_heading')}</h2>
+                    <div className="cluster">
+                        <a href="/contact" className="button">
+                            {t('cta_button')}
+                        </a>
+                        <a href={TEL_HREF} className="text-link">
+                            {t('call_cta', { phone: BUSINESS.phoneDisplay })}
+                        </a>
+                    </div>
+                </div>
+            </section>
         </div>
     );
 }

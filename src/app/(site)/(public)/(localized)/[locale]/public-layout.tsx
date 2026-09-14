@@ -2,9 +2,12 @@
 import React from 'react'
 import Header from '@/shared/layout/Header'
 import Footer from '@/shared/layout/Footer'
+import MobileActionBar from '@/shared/layout/MobileActionBar'
 import ScrollSaver from '@/shared/layout/ScrollSaver'
 import PageTransition from '@/shared/layout/PageTransition'
 import NextIntlProvider from '@/components/NextIntlProvider';
+import { getTranslations } from '@/lib/server-translations';
+import './site.css';
 
 
 export default async function PublicLayout({
@@ -28,18 +31,21 @@ export default async function PublicLayout({
   } catch (err) {
     console.warn("Could not load public messages for locale:", locale, err);
   }
+  const t = await getTranslations({ locale, namespace: 'nav' });
 
   return (
     <NextIntlProvider messages={messages} locale={locale} timeZone="America/Chicago">
-      <div className="flex flex-col min-h-screen bg-background text-primary">
+      <div className="site flex flex-col min-h-screen bg-background text-primary">
+        <a className="skip-link" href="#main">{t('skip_to_content')}</a>
         <ScrollSaver />
         <Header />
-        <main className="flex-grow relative">
+        <main id="main" tabIndex={-1} className="flex-grow relative">
           <PageTransition>
             {children}
           </PageTransition>
         </main>
-        <Footer />
+        <Footer locale={locale} />
+        <MobileActionBar locale={locale} />
       </div>
     </NextIntlProvider>
   )

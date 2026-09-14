@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useRef, useEffect, useState, useMemo } from 'react';
+import { useTranslations } from '@/hooks/useTranslations';
 
 interface RecentAddress {
   address: string;
@@ -8,6 +9,8 @@ interface RecentAddress {
 }
 
 interface AddressAutocompleteProps {
+  /** Lets a <label htmlFor> name the input. */
+  id?: string;
   onAddressSelect: (place: any) => void;
   className?: string;
   defaultValue?: string;
@@ -16,6 +19,7 @@ interface AddressAutocompleteProps {
 }
 
 export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
+  id,
   onAddressSelect,
   className,
   defaultValue,
@@ -28,6 +32,7 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [sessionToken, setSessionToken] = useState<string>('');
   const [isFocused, setIsFocused] = useState(false);
+  const t = useTranslations('contact_page');
 
   const wrapperRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -186,8 +191,9 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
     <div ref={wrapperRef} className="relative w-full">
       <input
         ref={inputRef}
+        id={id}
         type="text"
-        className={`${className} transition-all duration-300 focus:ring-2 focus:ring-golden-yellow focus:border-transparent outline-none`}
+        className={className}
         value={inputValue}
         onChange={handleInputChange}
         onFocus={handleFocus}
@@ -198,33 +204,33 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
 
       {/* Hybrid Dropdown: Recent Sites + Google Places */}
       {showDropdown && (
-        <div className="absolute z-50 w-full mt-2 bg-charcoal-blue border border-white/10 rounded-xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2">
+        <div className="absolute z-50 w-full mt-2 overflow-hidden rounded-xl border border-brand-line bg-brand-white text-brand-ink shadow-2xl">
           
           {/* Recent Addresses Section */}
           {showRecent && (
             <>
-              <div className="px-4 py-2 bg-white/5">
-                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-                  {inputValue.trim() ? 'Matching Sites' : 'Recent Sites'}
+              <div className="px-4 py-2 bg-brand-tint">
+                <span className="text-xs font-bold text-brand-ink-muted uppercase tracking-widest">
+                  {inputValue.trim() ? t('address_matching') : t('address_recent')}
                 </span>
               </div>
               {filteredRecent.map((addr, i) => (
                 <button
                   key={`recent-${i}`}
                   onClick={() => handleRecentSelect(addr)}
-                  className="w-full text-left px-4 py-3 text-sm text-gray-300 hover:text-white hover:bg-white/5 transition-colors border-b border-white/5 last:border-0 flex items-start gap-3 group"
+                  className="w-full text-left px-4 py-3 text-sm text-brand-ink hover:bg-brand-tint border-b border-brand-line last:border-0 flex items-start gap-3 group"
                 >
-                  <div className="mt-0.5 text-golden-yellow">
+                  <div className="mt-0.5 text-brand-red">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
                       <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
                     </svg>
                   </div>
                   <div>
-                    <span className="block font-bold text-white">
+                    <span className="block font-bold">
                       {addr.address}
                     </span>
                     {addr.label && (
-                      <span className="block text-xs text-golden-yellow/70">
+                      <span className="block text-xs text-brand-ink-muted">
                         {addr.label}
                       </span>
                     )}
@@ -236,16 +242,16 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
 
           {/* Divider between sections */}
           {showRecent && showPlaces && (
-            <div className="border-t border-white/10" />
+            <div className="border-t border-brand-line" />
           )}
 
           {/* Google Places Section */}
           {showPlaces && (
             <>
               {showRecent && (
-                <div className="px-4 py-2 bg-white/5">
-                  <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-                    New Address
+                <div className="px-4 py-2 bg-brand-tint">
+                  <span className="text-xs font-bold text-brand-ink-muted uppercase tracking-widest">
+                    {t('address_new')}
                   </span>
                 </div>
               )}
@@ -253,18 +259,18 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
                 <button
                   key={prediction.place_id}
                   onClick={() => handlePredictionSelect(prediction)}
-                  className="w-full text-left px-4 py-3 text-sm text-gray-300 hover:text-white hover:bg-white/5 transition-colors border-b border-white/5 last:border-0 flex items-start gap-3 group"
+                  className="w-full text-left px-4 py-3 text-sm text-brand-ink hover:bg-brand-tint border-b border-brand-line last:border-0 flex items-start gap-3 group"
                 >
-                  <div className="mt-0.5 text-gray-500 group-hover:text-golden-yellow transition-colors">
+                  <div className="mt-0.5 text-brand-red">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
                       <path fillRule="evenodd" d="M11.54 22.351l.07.04.028.016a.76.76 0 00.723 0l.028-.015.071-.041a16.975 16.975 0 001.144-.742 19.58 19.58 0 002.683-2.282c1.944-1.99 3.963-4.98 3.963-8.827a8.25 8.25 0 00-16.5 0c0 3.846 2.02 6.837 3.963 8.827a19.58 19.58 0 002.682 2.282 16.975 16.975 0 001.145.742zM12 13.5a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" />
                     </svg>
                   </div>
                   <div>
-                    <span className="block font-bold text-white">
+                    <span className="block font-bold">
                       {prediction.main_text}
                     </span>
-                    <span className="block text-xs text-gray-400 group-hover:text-gray-300">
+                    <span className="block text-xs text-brand-ink-muted">
                       {prediction.secondary_text}
                     </span>
                   </div>
@@ -273,8 +279,8 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
             </>
           )}
 
-          <div className="px-4 py-2 bg-black/20 text-[10px] text-gray-500 flex justify-end">
-            <span className="opacity-50">Powered by Google</span>
+          <div className="px-4 py-2 bg-brand-tint text-xs text-brand-ink-muted flex justify-end">
+            <span>Powered by Google</span>
           </div>
         </div>
       )}

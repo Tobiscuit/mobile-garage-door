@@ -68,6 +68,9 @@ export default async function RootLayout({
   return (
     <html lang={locale} suppressHydrationWarning>
       <head>
+        {/* The latin subset of the self-hosted Work Sans renders English and Spanish; fetching it
+            with the HTML shortens the swap from the fallback face (web.dev, Optimize LCP). */}
+        <link rel="preload" href="/fonts/work-sans/work-sans-var-latin.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
         <link rel="manifest" href="/manifest.webmanifest" />
         <meta name="theme-color" content="#1e293b" />
         <meta name="apple-mobile-web-app-capable" content="yes" />

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
+import { useTranslations } from '@/hooks/useTranslations';
 
 const MAP_STYLE = [
   {
@@ -108,6 +109,7 @@ const MAP_STYLE = [
 export const ServiceAreaMap = () => {
   const mapRef = useRef<HTMLDivElement>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
+  const t = useTranslations('contact_page');
 
   useEffect(() => {
     const loadMap = () => {
@@ -153,7 +155,7 @@ export const ServiceAreaMap = () => {
             icon: {
                 path: (window as any).google.maps.SymbolPath.CIRCLE,
                 scale: 10,
-                fillColor: "#fbbf24",
+                fillColor: "#ba233f", // brand red (logo)
                 fillOpacity: 1,
                 strokeWeight: 2,
                 strokeColor: "#ffffff",
@@ -168,36 +170,24 @@ export const ServiceAreaMap = () => {
   }, []);
 
   return (
-    <div className="relative w-full h-80 rounded-3xl overflow-hidden shadow-inner border border-black/5 group bg-charcoal-blue">
-      <div ref={mapRef} className={`w-full h-full transition-opacity duration-1000 ${mapLoaded ? 'opacity-80 group-hover:opacity-100' : 'opacity-0'}`} />
-      
+    <div className="relative w-full h-80 overflow-hidden rounded-2xl border border-brand-line bg-brand-tint">
+      <div ref={mapRef} className={`h-full w-full ${mapLoaded ? 'opacity-100' : 'opacity-0'}`} />
+
       {!mapLoaded && (
         <div className="absolute inset-0 flex items-center justify-center">
-            <div className="animate-pulse text-golden-yellow text-xs font-bold uppercase tracking-widest">
-                Initializing Uplink...
-            </div>
+          <div className="text-xs font-bold uppercase tracking-widest text-brand-ink-muted">
+            {t('map_loading')}
+          </div>
         </div>
       )}
 
-      {/* Techno-Hero Overlay */}
-       <div className="absolute bottom-6 left-6 right-6 pointer-events-none">
-           <div className="bg-charcoal-blue/90 backdrop-blur-md p-4 rounded-2xl shadow-lg border border-white/10 flex justify-between items-center">
-               <div>
-                   <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Active Sector</div>
-                   <div className="text-white font-bold text-sm">Houston Metro + 50mi</div>
-               </div>
-               <div className="flex items-center gap-2">
-                   <span className="relative flex h-2 w-2">
-                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                     <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-                   </span>
-                   <span className="text-[10px] font-bold text-green-400 uppercase tracking-widest">Online</span>
-               </div>
-           </div>
-       </div>
-       
-       {/* Decorative Corner */}
-       <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-golden-yellow/20 to-transparent rounded-bl-full pointer-events-none"></div>
+      {/* Service area caption. The fake "Online" status indicator was removed. */}
+      <div className="pointer-events-none absolute bottom-4 left-4 right-4">
+        <div className="rounded-xl border border-brand-line bg-brand-white/95 p-4 text-brand-ink shadow-lg">
+          <div className="text-xs font-bold uppercase tracking-widest text-brand-ink-muted">{t('map_area_label')}</div>
+          <div className="text-sm font-bold">{t('map_area_value')}</div>
+        </div>
+      </div>
     </div>
   );
 };
