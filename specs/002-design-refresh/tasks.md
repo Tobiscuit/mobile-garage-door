@@ -83,6 +83,6 @@
 
 ## 10. Delivery
 - [x] Push branch; open PR into `develop` stating it depends on #6; watch CI `verify` to green
-- [ ] Preview: `wrangler versions upload --preview-alias design-refresh` with credentials from Vault via env only
-- [ ] Gate check over DoH: preview → 302 to Access; production → 200
+- [x] Preview: `wrangler versions upload --preview-alias design-refresh` with credentials from Vault via env only (`c11b6b1`, version `8dae7120-78a4-4cef-b339-b9b20af39d00`, 2026-09-14, after CI `verify` passed on that commit)
+- [x] Gate check over DoH, logged out, 2026-09-14 03:20 UTC: alias and version URLs → 302 to `jrcodex.cloudflareaccess.com`; production → 200 (results in PR #7)
 - [-] Merge — never (Tobias merges)
